@@ -1,0 +1,45 @@
+{
+  "clinicName": "Nose Creek Physiotherapy",
+  "logoText": "Nose Creek Physiotherapy",
+  "contact": {
+    "phone": "403-295-8590",
+    "email": "info@nosecreekphysiotherapy.com",
+    "address": "#22, 8120 Beddington Blvd NW, Calgary, AB T3K 2A8",
+    "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2503.7027581561765!2d-114.09503612349079!3d51.132514538183226!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x53716503c200be6f%3A0xe54d9095bb12be8f!2sNose%20Creek%20Physiotherapy%20-%20Beddington!5e0!3m2!1sen!2sca!4v1700000000000!5m2!1sen!2sca"
+  },
+  "openingHours": {
+    "monday": "7:00 am — 8:00 pm",
+    "tuesday": "7:00 am — 8:00 pm",
+    "wednesday": "7:00 am — 8:00 pm",
+    "thursday": "7:00 am — 8:00 pm",
+    "friday": "7:00 am — 6:00 pm",
+    "saturday": "8:00 am — 1:00 pm",
+    "sunday": "Closed"
+  },
+  "socialLinks": {
+    "facebook": "https://facebook.com/nosecreekphysio",
+    "instagram": "https://instagram.com/nosecreekphysio",
+    "tiktok": "https://tiktok.com/@nosecreekphysio"
+  },
+  "bookingUrl": "#booking",
+  "primaryCTA": "Book Online",
+  "footerContent": "© 2026 Nose Creek Physiotherapy. All rights reserved. Registered physiotherapy, chiropractic, and massage therapy clinic in Calgary.",
+  "seo": {
+    "title": "Nose Creek Physiotherapy | Calgary North NW & NE",
+    "description": "Welcome to Nose Creek Physiotherapy in Calgary. We offer patient-focused physical therapy, chiropractic adjustments, and dry needling since 2001.",
+    "ogTitle": "Nose Creek Physiotherapy | Calgary NW & NE",
+    "ogDescription": "Move well and feel better with our expert-led, tailored physiotherapy, massage therapy, and chiropractic care in Calgary.",
+    "ogImage": "/images/og-home.jpg",
+    "canonicalUrl": "https://nosecreekphysiotherapy.com"
+  },
+  "marketing": {
+    "callTracking": {
+      "enabled": true,
+      "scriptUrl": "https://cdn.calltrk.com/companies/208038913/2a4e80164caeb8bbc760/12/swap.js"
+    },
+    "gtm": {
+      "enabled": false,
+      "containerId": ""
+    }
+  }
+}

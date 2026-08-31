@@ -1,0 +1,36 @@
+.nav {
+  margin-bottom: 24px;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.link {
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: var(--secondary);
+}
+
+.separator {
+  user-select: none;
+  font-size: 0.75rem;
+}
+
+.active {
+  color: var(--primary);
+  font-weight: 500;
+}
