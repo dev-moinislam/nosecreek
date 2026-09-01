@@ -17,26 +17,12 @@
       "Comprehensive biomechanical lumbar spine and pelvic assessment",
       "CAMPT-certified joint mobilizations and spinal manual therapy",
       "IMS / Dry Needling to release chronic deep lumbar muscle spasms",
-      "Custom active core stabilization exercises (McKenzie / Stuart McGill protocols)"
+      "Custom active core stabilization exercises (McKenzie / Stuart McGill protocols)",
+      "omprehensive biomechanical lumbar spine and pelvic assessmen"
     ],
     "customSections": [],
     "faqs": [],
-    "hiddenSections": [
-      "at_a_glance",
-      "other_links"
-    ],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy",
-      "acupuncture"
-    ],
-    "category": "Spine & Core",
-    "seo": {
-      "title": "Back Pain Treatment Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Back Pain Treatment | Nose Creek Physiotherapy",
-      "description": "Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.",
-      "ogDescription": "End back pain without pills or surgery with evidence-based physical therapy in Calgary."
-    },
+    "hiddenSections": [],
     "sectionOrder": [
       "hero",
       "at_a_glance",
@@ -51,7 +37,19 @@
       "decision_ctas",
       "other_links",
       "bottom_cta"
-    ]
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture"
+    ],
+    "category": "Spine & Core",
+    "seo": {
+      "title": "Back Pain Treatment Calgary | Nose Creek Physiotherapy",
+      "ogTitle": "Back Pain Treatment | Nose Creek Physiotherapy",
+      "description": "Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.",
+      "ogDescription": "End back pain without pills or surgery with evidence-based physical therapy in Calgary."
+    }
   },
   {
     "id": "neck-shoulder-pain",
@@ -76,6 +74,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "massage-therapy",
@@ -112,6 +111,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "knee-bracing",
@@ -149,6 +149,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "custom-orthotics",
       "shockwave-therapy",
@@ -185,6 +186,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "massage-therapy",
@@ -221,6 +223,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy"
     ],
@@ -255,6 +258,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "shockwave-therapy",
@@ -291,6 +295,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy"
     ],
@@ -325,6 +330,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "shockwave-therapy",
@@ -361,6 +367,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "acupuncture",
@@ -397,6 +404,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "acupuncture",
@@ -433,6 +441,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "massage-therapy",
@@ -469,6 +478,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "massage-therapy",
       "physiotherapy",
@@ -505,6 +515,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "shockwave-therapy",
@@ -542,6 +553,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "massage-therapy"
@@ -577,6 +589,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "massage-therapy",
@@ -613,6 +626,7 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
+    "sectionOrder": [],
     "relatedServices": [
       "physiotherapy",
       "massage-therapy"

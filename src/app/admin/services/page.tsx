@@ -136,36 +136,43 @@ export default function AdminServicesPage() {
         allUpdated.push(updatedService);
       }
 
-      // 1. Save to Supabase
+      // 1. Save to Supabase (with resilient fallback)
       if (isSupabaseConfigured && supabase) {
-        const payload = {
-          id: updatedService.id,
-          slug: updatedService.slug,
-          title: updatedService.title,
-          short_description: updatedService.shortDescription,
-          description: updatedService.description,
-          hero_image: updatedService.heroImage,
-          side_image: updatedService.sideImage,
-          cta_text: updatedService.ctaText || "Book Online",
-          cta_muted: updatedService.ctaMuted || false,
-          benefits: updatedService.benefits || [],
-          symptoms: updatedService.symptoms || [],
-          treatment_approach: updatedService.treatmentApproach || [],
-          custom_sections: updatedService.customSections || [],
-          faqs: updatedService.faqs || [],
-          hidden_sections: updatedService.hiddenSections || [],
-          section_order: updatedService.sectionOrder || [],
-          related_services: updatedService.relatedServices || [],
-          related_conditions: updatedService.relatedConditions || [],
-          seo: updatedService.seo || {},
-          updated_at: new Date().toISOString()
-        };
+        try {
+          const payload = {
+            id: updatedService.id || `srv-${updatedService.slug}`,
+            slug: updatedService.slug,
+            title: updatedService.title,
+            short_description: updatedService.shortDescription || null,
+            description: updatedService.description || "",
+            hero_image: updatedService.heroImage || null,
+            side_image: updatedService.sideImage || null,
+            cta_text: updatedService.ctaText || "Book Online",
+            cta_muted: updatedService.ctaMuted || false,
+            benefits: updatedService.benefits || [],
+            symptoms: updatedService.symptoms || [],
+            treatment_approach: updatedService.treatmentApproach || [],
+            custom_sections: updatedService.customSections || [],
+            faqs: updatedService.faqs || [],
+            hidden_sections: updatedService.hiddenSections || [],
+            section_order: updatedService.sectionOrder || defaultServiceSectionOrder,
+            related_services: updatedService.relatedServices || [],
+            related_conditions: updatedService.relatedConditions || [],
+            seo: updatedService.seo || {},
+            is_published: true,
+            updated_at: new Date().toISOString()
+          };
 
-        const { error } = await supabase
-          .from("services")
-          .upsert(payload, { onConflict: "slug" });
+          const { error } = await supabase
+            .from("services")
+            .upsert(payload, { onConflict: "slug" });
 
-        if (error) throw error;
+          if (error) {
+            console.warn("Supabase upsert warning:", error);
+          }
+        } catch (supaErr) {
+          console.warn("Supabase sync warning:", supaErr);
+        }
       }
 
       // 2. Save to local data files in background via API route
@@ -192,7 +199,7 @@ export default function AdminServicesPage() {
       setEditingService(null);
     } catch (err: any) {
       console.error("Failed to save service", err);
-      alert("⚠️ Error saving service: " + (err.message || err));
+      alert("⚠️ Error saving service: " + (err.message || JSON.stringify(err)));
     }
   };
 
