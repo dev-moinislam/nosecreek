@@ -40,7 +40,7 @@ export default function ServiceLiveView({
 }) {
   const [service, setService] = useState<Service>(initialService);
 
-  // Real-time synchronization with localStorage, Supabase, and browser events
+  // Real-time synchronization with Supabase Database and local events
   useEffect(() => {
     function syncFromLocal() {
       try {
@@ -50,21 +50,14 @@ export default function ServiceLiveView({
           const found = list.find((s) => s.slug === initialService.slug || s.id === initialService.id);
           if (found) {
             setService(found);
-            return true;
           }
         }
       } catch {
         // ignore
       }
-      return false;
     }
 
     async function fetchLiveSupabase() {
-      const hasLocal = syncFromLocal();
-      if (hasLocal) {
-        // User has active local edits; protect against stale Supabase overwrites
-        return;
-      }
       if (isSupabaseConfigured && supabase) {
         try {
           const { data, error } = await supabase
@@ -100,14 +93,15 @@ export default function ServiceLiveView({
               testimonials: data.testimonials || [],
               seo: data.seo || {}
             });
+            return;
           }
         } catch {
           // ignore
         }
       }
+      syncFromLocal();
     }
 
-    syncFromLocal();
     fetchLiveSupabase();
     window.addEventListener("servicesUpdated", syncFromLocal);
     window.addEventListener("storage", syncFromLocal);

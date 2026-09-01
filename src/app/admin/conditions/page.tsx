@@ -146,9 +146,9 @@ export default function AdminConditionsPage() {
         allUpdated.push(cond);
       }
 
-      // 1. Save to Supabase
+      // 1. Save to Supabase (Database-first)
       if (isSupabaseConfigured && supabase) {
-        await supabase.from("conditions").upsert({
+        const fullPayload = {
           id: cond.id || `cond-${cond.slug}`,
           slug: cond.slug,
           name: cond.name,
@@ -170,7 +170,38 @@ export default function AdminConditionsPage() {
           seo: cond.seo || {},
           is_published: true,
           updated_at: new Date().toISOString()
-        });
+        };
+
+        const { error: fullErr } = await supabase
+          .from("conditions")
+          .upsert(fullPayload, { onConflict: "slug" });
+
+        if (fullErr) {
+          console.warn("Retrying with core columns fallback:", fullErr);
+          const corePayload = {
+            id: cond.id || `cond-${cond.slug}`,
+            slug: cond.slug,
+            name: cond.name,
+            short_description: cond.shortDescription || null,
+            description: cond.description,
+            hero_image: cond.heroImage || null,
+            symptoms: cond.symptoms || [],
+            treatment_approach: cond.treatmentApproach || [],
+            hidden_sections: cond.hiddenSections || [],
+            section_order: cond.sectionOrder || defaultConditionSectionOrder,
+            related_services: cond.relatedServices || [],
+            category: cond.category || "general",
+            seo: cond.seo || {},
+            is_published: true,
+            updated_at: new Date().toISOString()
+          };
+          const { error: coreErr } = await supabase
+            .from("conditions")
+            .upsert(corePayload, { onConflict: "slug" });
+          if (coreErr) {
+            console.error("Supabase condition save error:", coreErr);
+          }
+        }
       }
 
       // 2. Save to local data files via API route
