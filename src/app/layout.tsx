@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SiteLayout from "@/components/layout/SiteLayout";
 import ThemeApplier from "@/components/theme/ThemeApplier";
+import { RoleProvider } from "@/components/admin/RoleGuard";
 import settingsData from "@/data/settings.json";
 
 export const metadata: Metadata = {
@@ -37,7 +38,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ThemeApplier />
-        <SiteLayout>{children}</SiteLayout>
+        <RoleProvider>
+          <SiteLayout>{children}</SiteLayout>
+        </RoleProvider>
       </body>
     </html>
   );

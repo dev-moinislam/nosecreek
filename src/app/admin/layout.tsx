@@ -15,26 +15,24 @@ export default function AdminRootLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <RoleProvider>
-      <AdminLoginGate>
-        <div className="adm-app">
-          {/* Sidebar Navigation */}
-          <AdminSidebar
-            isOpen={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
+    <AdminLoginGate>
+      <div className="adm-app">
+        {/* Sidebar Navigation */}
+        <AdminSidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+
+        {/* Main Content Wrapper */}
+        <div className="adm-main-wrapper">
+          <AdminHeader
+            onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
+            title="Clinic Management Dashboard"
           />
 
-          {/* Main Content Wrapper */}
-          <div className="adm-main-wrapper">
-            <AdminHeader
-              onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
-              title="Clinic Management Dashboard"
-            />
-
-            <main className="adm-content">{children}</main>
-          </div>
+          <main className="adm-content">{children}</main>
         </div>
-      </AdminLoginGate>
-    </RoleProvider>
+      </div>
+    </AdminLoginGate>
   );
 }
