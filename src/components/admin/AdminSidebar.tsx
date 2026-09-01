@@ -42,15 +42,17 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const navItems = [
-    { label: "Overview", href: "/admin", icon: "📊" },
-    { label: "Leads & Inbox", href: "/admin/leads", icon: "📥", badge: newLeadsCount },
-    { label: "Services", href: "/admin/services", icon: "🩺" },
-    { label: "Conditions", href: "/admin/conditions", icon: "🩹" },
-    { label: "Team Members", href: "/admin/team", icon: "👥" },
-    { label: "Locations", href: "/admin/locations", icon: "📍" },
-    { label: "Settings & Marketing", href: "/admin/settings", icon: "⚙️" },
+  const allNavItems = [
+    { label: "Overview", href: "/admin", icon: "📊", adminOnly: false },
+    { label: "Leads & Inbox", href: "/admin/leads", icon: "📥", badge: newLeadsCount, adminOnly: false },
+    { label: "Services", href: "/admin/services", icon: "🩺", adminOnly: false },
+    { label: "Conditions", href: "/admin/conditions", icon: "🩹", adminOnly: false },
+    { label: "Team Members", href: "/admin/team", icon: "👥", adminOnly: false },
+    { label: "Locations", href: "/admin/locations", icon: "📍", adminOnly: false },
+    { label: "Settings & Marketing", href: "/admin/settings", icon: "⚙️", adminOnly: true },
   ];
+
+  const visibleNavItems = allNavItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <aside className={`adm-sidebar ${isOpen ? "open" : ""}`}>
@@ -66,7 +68,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* Navigation */}
       <nav className="adm-sidebar-nav">
         <div className="adm-nav-group-title">Main Menu</div>
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
           return (
             <Link
@@ -101,10 +103,27 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         </Link>
       </nav>
 
-      {/* Footer / User Profile */}
-      <div style={{ padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,0.08)", fontSize: 12, color: "#94a3b8" }}>
-        <div>Logged in as: <strong style={{ color: "#fff" }}>{role === "admin" ? "Master Admin" : "Clinic Owner"}</strong></div>
-        <div style={{ fontSize: 11, marginTop: 2, color: "#64748b" }}>Supabase Connected</div>
+      {/* Role Footer Card */}
+      <div className="adm-sidebar-footer">
+        <div
+          style={{
+            padding: "10px 14px",
+            background: isAdmin ? "rgba(28, 159, 216, 0.12)" : "rgba(111, 175, 28, 0.12)",
+            border: `1px solid ${isAdmin ? "rgba(28, 159, 216, 0.25)" : "rgba(111, 175, 28, 0.25)"}`,
+            borderRadius: 10,
+            fontSize: 12,
+            color: "var(--adm-text)"
+          }}
+        >
+          <div style={{ fontWeight: 700, color: isAdmin ? "#0284c7" : "#16a34a", marginBottom: 2 }}>
+            {isAdmin ? "🛡️ Master Admin" : "👤 Client Portal"}
+          </div>
+          <div style={{ color: "var(--adm-text-muted)", fontSize: 11 }}>
+            {isAdmin
+              ? "All features & settings unlocked."
+              : "Safe content mode active."}
+          </div>
+        </div>
       </div>
     </aside>
   );

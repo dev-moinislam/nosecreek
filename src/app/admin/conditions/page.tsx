@@ -4,8 +4,105 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Condition, ServiceCustomSection, FAQItem } from "@/types/content";
-import conditionsData from "@/data/conditions.json";
+import { getConditions } from "@/lib/api";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
+
+const defaultConditionSectionOrder = [
+  "hero",
+  "at_a_glance",
+  "clinical_overview",
+  "custom_sections",
+  "symptoms",
+  "treatment_approach",
+  "related_therapies",
+  "team_carousel",
+  "faqs",
+  "location_map",
+  "decision_ctas",
+  "other_links",
+  "bottom_cta"
+];
+
+const conditionSectionDefs: Record<string, { title: string; desc: string; category: string; icon: string }> = {
+  hero: {
+    title: "Hero Header & Assessment Banner",
+    desc: "Top banner with title, badges, ratings, and assessment booking button.",
+    category: "Header",
+    icon: "🚀"
+  },
+  at_a_glance: {
+    title: "Treatment At-A-Glance Bar",
+    desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
+    category: "Summary",
+    icon: "⏱️"
+  },
+  clinical_overview: {
+    title: "Clinical Overview & Root Cause",
+    desc: "Understanding this condition and how we fix the mechanical dysfunction.",
+    category: "Overview",
+    icon: "📋"
+  },
+  custom_sections: {
+    title: "Custom Visual Storytelling Sections",
+    desc: "Rich storytelling sections with left/right/top/bottom image placement.",
+    category: "Custom Content",
+    icon: "🎨"
+  },
+  symptoms: {
+    title: "Recognizable Symptoms Grid",
+    desc: "Recognize the warning signs and symptom patterns patients experience.",
+    category: "Symptoms",
+    icon: "🩺"
+  },
+  treatment_approach: {
+    title: "4-Step Clinical Treatment Roadmap",
+    desc: "Structured rehabilitation protocol from assessment to prevention.",
+    category: "Roadmap",
+    icon: "🛣️"
+  },
+  related_therapies: {
+    title: "Recommended Treatments & Therapies",
+    desc: "Cards linking to physiotherapy, massage, acupuncture, etc.",
+    category: "Services",
+    icon: "✨"
+  },
+  team_carousel: {
+    title: "Meet Our Registered Team Carousel",
+    desc: "Scrolling carousel of registered physiotherapists & staff.",
+    category: "Team",
+    icon: "👥"
+  },
+  faqs: {
+    title: "Frequently Asked Questions (Accordion)",
+    desc: "Interactive accordion answering patient questions & insurance.",
+    category: "FAQ",
+    icon: "❓"
+  },
+  location_map: {
+    title: "Clinic Location & Interactive Google Map",
+    desc: "Beddington location details, hours of operation, phone, and Google map.",
+    category: "Location",
+    icon: "📍"
+  },
+  decision_ctas: {
+    title: "Decision CTAs (Free Discovery & Phone Consult)",
+    desc: "Two cards offering Free Discovery Session or Telephone Consult.",
+    category: "Conversion",
+    icon: "💡"
+  },
+  other_links: {
+    title: "Explore Other 17 Conditions",
+    desc: "Pill buttons linking to other physical conditions.",
+    category: "Navigation",
+    icon: "🩹"
+  },
+  bottom_cta: {
+    title: "Bottom Booking Call-to-Action Banner",
+    desc: "Full-width high-contrast booking banner at the bottom of the page.",
+    category: "Conversion",
+    icon: "📣"
+  }
+};
 
 export default function AdminConditionsPage() {
   const { role, isAdmin, canDelete, canEditSlugs } = useRole();
@@ -17,50 +114,14 @@ export default function AdminConditionsPage() {
 
   const fetchConditions = async () => {
     setLoading(true);
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await supabase
-          .from("conditions")
-          .select("*")
-          .order("sort_order", { ascending: true });
-        if (!error && data && data.length > 0) {
-          setConditions(
-            data.map((d: any) => ({
-              id: d.id,
-              slug: d.slug,
-              name: d.name,
-              shortDescription: d.short_description || "",
-              description: d.description || "",
-              heroImage: d.hero_image,
-              sideImage: d.side_image,
-              ctaText: d.cta_text || "Book Assessment Online",
-              ctaMuted: d.cta_muted || false,
-              benefits: d.benefits || [],
-              symptoms: d.symptoms || [],
-              treatmentApproach: d.treatment_approach || [],
-              customSections: d.custom_sections || [],
-              faqs: d.faqs || [],
-              hiddenSections: d.hidden_sections || [],
-              relatedServices: d.related_services || [],
-              category: d.category || "general",
-              seo: d.seo || {}
-            }))
-          );
-        } else {
-          setConditions(conditionsData as Condition[]);
-        }
-      } catch {
-        setConditions(conditionsData as Condition[]);
-      }
-    } else if (typeof window !== "undefined") {
-      const local = localStorage.getItem("adm_conditions");
-      if (local) {
-        setConditions(JSON.parse(local));
-      } else {
-        setConditions(conditionsData as Condition[]);
-      }
+    try {
+      const data = await getConditions();
+      setConditions(data);
+    } catch {
+      // ignore
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -68,8 +129,14 @@ export default function AdminConditionsPage() {
   }, []);
 
   const handleSave = async (cond: Condition) => {
-    if (isSupabaseConfigured && supabase) {
-      try {
+    try {
+      const allUpdated = conditions.map((c) => (c.slug === cond.slug ? cond : c));
+      if (!allUpdated.find((c) => c.slug === cond.slug)) {
+        allUpdated.push(cond);
+      }
+
+      // 1. Save to Supabase
+      if (isSupabaseConfigured && supabase) {
         await supabase.from("conditions").upsert({
           id: cond.id || `cond-${cond.slug}`,
           slug: cond.slug,
@@ -86,42 +153,63 @@ export default function AdminConditionsPage() {
           custom_sections: cond.customSections || [],
           faqs: cond.faqs || [],
           hidden_sections: cond.hiddenSections || [],
+          section_order: cond.sectionOrder || defaultConditionSectionOrder,
           related_services: cond.relatedServices || [],
           category: cond.category || "general",
           seo: cond.seo || {},
-          is_published: true
+          is_published: true,
+          updated_at: new Date().toISOString()
         });
-      } catch (err) {
-        console.error("Save condition failed:", err);
       }
-    } else if (typeof window !== "undefined") {
-      const updated = conditions.map((c) => (c.slug === cond.slug ? cond : c));
-      if (!updated.find((c) => c.slug === cond.slug)) {
-        updated.push(cond);
+
+      // 2. Save to local data files via API route
+      try {
+        await fetch("/api/admin/save-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "conditions", data: allUpdated })
+        });
+      } catch {
+        // ignore in static export
       }
-      localStorage.setItem("adm_conditions", JSON.stringify(updated));
-      setConditions(updated);
+
+      // 3. Save to localStorage for instant client hydration
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_conditions", JSON.stringify(allUpdated));
+        window.dispatchEvent(new Event("conditionsUpdated"));
+      }
+
+      setConditions(allUpdated);
+      alert("✓ Condition saved successfully! Live website updated.");
+      setEditingCondition(null);
+    } catch (err: any) {
+      console.error("Save condition failed:", err);
+      alert("⚠️ Error saving: " + (err.message || err));
     }
-    fetchConditions();
-    alert("✓ Condition saved successfully!");
-    setEditingCondition(null);
   };
 
   const handleDelete = async (slug: string) => {
-    if (!canDelete) {
+    if (!isAdmin) {
       alert("In Client Safe Mode, deleting core conditions is disabled to preserve SEO rankings. Switch to Master Admin mode if needed.");
       return;
     }
     if (!confirm(`Are you sure you want to delete the condition "${slug}"?`)) return;
 
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from("conditions").delete().eq("slug", slug);
-    } else if (typeof window !== "undefined") {
+    try {
+      if (isSupabaseConfigured && supabase) {
+        await supabase.from("conditions").delete().eq("slug", slug);
+      }
       const updated = conditions.filter((c) => c.slug !== slug);
-      localStorage.setItem("adm_conditions", JSON.stringify(updated));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_conditions", JSON.stringify(updated));
+        window.dispatchEvent(new Event("conditionsUpdated"));
+      }
       setConditions(updated);
+      alert("✓ Condition deleted!");
+    } catch (err: any) {
+      console.error("Delete condition failed:", err);
+      alert("⚠️ Error deleting: " + (err.message || err));
     }
-    fetchConditions();
   };
 
   const filtered = conditions.filter(
@@ -140,7 +228,7 @@ export default function AdminConditionsPage() {
             Treatable Conditions Manager
           </h2>
           <p style={{ fontSize: 13.5, color: "#64748b", margin: "2px 0 0 0" }}>
-            Manage pain conditions, page sections, custom visual blocks, FAQs, symptoms, and treatment roadmaps
+            Manage pain conditions, page section ordering, custom visual blocks, FAQs, symptoms, and treatment roadmaps
           </p>
         </div>
 
@@ -158,6 +246,7 @@ export default function AdminConditionsPage() {
                 faqs: [],
                 benefits: [],
                 hiddenSections: [],
+                sectionOrder: defaultConditionSectionOrder,
                 relatedServices: []
               })
             }
@@ -173,7 +262,7 @@ export default function AdminConditionsPage() {
         <div className="adm-guarded-banner">
           <span>🛡️</span>
           <div>
-            <strong>Client Safe Mode Active:</strong> You can safely edit descriptions, images, custom sections, symptoms, and FAQs. Condition URLs (slugs) and core deletions are protected to preserve SEO rankings.
+            <strong>Client Safe Mode Active:</strong> You can safely edit text descriptions, images, symptoms, and FAQs. Section reordering, hiding, and deletions are protected to preserve SEO rankings.
           </div>
         </div>
       )}
@@ -242,7 +331,7 @@ export default function AdminConditionsPage() {
                         {cond.symptoms?.length || 0} Symptoms · {cond.treatmentApproach?.length || 0} Steps
                       </span>
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setPreviewUrl(`/conditions/${cond.slug}`)}
                         className="adm-btn adm-btn-secondary adm-btn-sm"
@@ -258,7 +347,7 @@ export default function AdminConditionsPage() {
                       >
                         ✏️ Edit
                       </button>
-                      {canDelete && (
+                      {isAdmin && (
                         <button
                           onClick={() => handleDelete(cond.slug)}
                           className="adm-btn adm-btn-secondary adm-btn-sm"
@@ -280,6 +369,7 @@ export default function AdminConditionsPage() {
       {editingCondition && (
         <ConditionEditorModal
           condition={editingCondition}
+          isAdmin={isAdmin}
           canEditSlugs={canEditSlugs}
           onClose={() => setEditingCondition(null)}
           onSave={handleSave}
@@ -298,29 +388,58 @@ export default function AdminConditionsPage() {
   );
 }
 
-// Sub-component: Rich Condition Editor Modal with Modular Section Manager
+// Sub-component: Rich Condition Editor Modal with Section Reordering
 function ConditionEditorModal({
   condition: initial,
+  isAdmin,
   canEditSlugs,
   onClose,
   onSave,
   onPreview
 }: {
   condition: Condition;
+  isAdmin: boolean;
   canEditSlugs: boolean;
   onClose: () => void;
   onSave: (cond: Condition) => void;
   onPreview: (slug: string) => void;
 }) {
-  const [cond, setCond] = useState<Condition>(initial);
+  const [cond, setCond] = useState<Condition>({
+    ...initial,
+    sectionOrder: initial.sectionOrder && initial.sectionOrder.length > 0
+      ? initial.sectionOrder
+      : defaultConditionSectionOrder
+  });
+
   const [activeTab, setActiveTab] = useState<"layout" | "general" | "sections" | "faqs" | "symptoms">("layout");
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
-  // Section Visibility toggle helper
+  // Section Ordering & Visibility helpers
+  const currentOrder = cond.sectionOrder || defaultConditionSectionOrder;
   const hiddenSections = cond.hiddenSections || [];
   const isSectionHidden = (key: string) => hiddenSections.includes(key);
 
+  const moveSection = (index: number, direction: "up" | "down") => {
+    if (!isAdmin) {
+      alert("Only Master Admin can change section layout order.");
+      return;
+    }
+    const newOrder = [...currentOrder];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newOrder.length) return;
+
+    const temp = newOrder[index];
+    newOrder[index] = newOrder[targetIndex];
+    newOrder[targetIndex] = temp;
+
+    setCond((prev) => ({ ...prev, sectionOrder: newOrder }));
+  };
+
   const toggleSectionVisibility = (key: string) => {
+    if (!isAdmin) {
+      alert("Only Master Admin can hide or delete page sections.");
+      return;
+    }
     setCond((prev) => {
       const curHidden = prev.hiddenSections || [];
       const updatedHidden = curHidden.includes(key)
@@ -384,7 +503,11 @@ function ConditionEditorModal({
       title: `Understanding ${cond.name} & Recovery Protocol`,
       subtitle: "Targeted orthopaedic & manual assessment",
       content: "Explain your clinical approach, causes, and biomechanical adjustments here.",
-      bullets: ["Direct billing available", "No physician referral required", "Personalized exercise conditioning"],
+      bullets: [
+        "Direct billing to major extended health insurance",
+        "No physician referral required",
+        "Personalized active exercise conditioning"
+      ],
       image: "/images/clinic/treatment-hands-on.jpg",
       imagePosition: pos,
       background: "white"
@@ -410,88 +533,6 @@ function ConditionEditorModal({
       customSections: prev.customSections?.filter((_, i) => i !== idx)
     }));
   };
-
-  // Standard Page Sections Registry
-  const pageSections = [
-    {
-      key: "hero",
-      title: "Hero Header & Assessment Banner",
-      desc: "Top banner with title, badges, ratings, and assessment booking button.",
-      category: "Header"
-    },
-    {
-      key: "at_a_glance",
-      title: "Treatment At-A-Glance Bar",
-      desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
-      category: "Summary"
-    },
-    {
-      key: "clinical_overview",
-      title: "Clinical Overview & Root Cause",
-      desc: "Understanding this condition and how we fix the mechanical dysfunction.",
-      category: "Overview"
-    },
-    {
-      key: "custom_sections",
-      title: `Custom Visual Sections (${cond.customSections?.length || 0} Sections)`,
-      desc: "Rich storytelling sections with left/right/top/bottom image placement.",
-      category: "Custom Content"
-    },
-    {
-      key: "symptoms",
-      title: `Common Symptoms Grid (${cond.symptoms?.length || 0} Signs)`,
-      desc: "Recognize the signs and symptoms patients experience.",
-      category: "Symptoms"
-    },
-    {
-      key: "treatment_approach",
-      title: `Our 4-Step Treatment Roadmap (${cond.treatmentApproach?.length || 0} Steps)`,
-      desc: "Structured rehabilitation protocol from assessment to prevention.",
-      category: "Roadmap"
-    },
-    {
-      key: "related_therapies",
-      title: "Recommended Treatments & Therapies",
-      desc: "Cards linking to physiotherapy, massage, acupuncture, etc.",
-      category: "Services"
-    },
-    {
-      key: "team_carousel",
-      title: "Meet Our Team Carousel",
-      desc: "Scrolling carousel of registered physiotherapists & staff.",
-      category: "Team"
-    },
-    {
-      key: "faqs",
-      title: `Frequently Asked Questions (${cond.faqs?.length || 0} FAQs)`,
-      desc: "Interactive accordion answering patient questions & insurance.",
-      category: "FAQ"
-    },
-    {
-      key: "location_map",
-      title: "Clinic Location & Interactive Google Map",
-      desc: "Beddington location details, hours of operation, phone, and Google map.",
-      category: "Location"
-    },
-    {
-      key: "decision_ctas",
-      title: "Decision CTAs (Free Discovery & Phone Consult)",
-      desc: "Two cards offering Free Discovery Session or Telephone Consult.",
-      category: "Conversion"
-    },
-    {
-      key: "other_links",
-      title: "Explore Other 17 Conditions",
-      desc: "Pill buttons linking to other physical conditions.",
-      category: "Navigation"
-    },
-    {
-      key: "bottom_cta",
-      title: "Bottom Booking Call-to-Action Banner",
-      desc: "Full-width high-contrast booking banner at the bottom of the page.",
-      category: "Conversion"
-    }
-  ];
 
   return (
     <div className="adm-modal-overlay" onClick={onClose}>
@@ -527,7 +568,7 @@ function ConditionEditorModal({
         {/* Modal Tabs */}
         <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 20px", overflowX: "auto" }}>
           {[
-            { id: "layout", label: "🧩 Page Sections & Layout" },
+            { id: "layout", label: "🧩 Page Sections & Order" },
             { id: "general", label: "📝 General & Details" },
             { id: "sections", label: `🎨 Custom Sections (${cond.customSections?.length || 0})` },
             { id: "faqs", label: `❓ FAQ Builder (${cond.faqs?.length || 0})` },
@@ -556,126 +597,180 @@ function ConditionEditorModal({
         {/* Modal Body */}
         <div className="adm-modal-body">
 
-          {/* ── TAB 1: PAGE SECTIONS & MODULAR BLOCK MANAGER ── */}
+          {/* ── TAB 1: MODULAR SECTION ORDERING & VISIBILITY MANAGER ── */}
           {activeTab === "layout" && (
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "14px 18px", borderRadius: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "14px 18px", borderRadius: 10, flexWrap: "wrap", gap: 10 }}>
                 <div>
                   <h4 style={{ margin: "0 0 4px 0", fontSize: 14, fontWeight: 700, color: "#0369a1" }}>
-                    Modular Condition Page Section Manager
+                    Modular Condition Layout &amp; Reordering
                   </h4>
                   <p style={{ margin: 0, fontSize: 13, color: "#0284c7" }}>
-                    Turn sections ON or OFF, hide sections you don&apos;t need (e.g. Clinical Overview), or add new custom storytelling blocks.
+                    {isAdmin
+                      ? "Use ⬆️ Up and ⬇️ Down arrows to change section display order, or 🗑️ Hide sections you don't need."
+                      : "Client View: Displays page section order and active blocks. Layout reordering is managed by Master Admin."}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowAddSectionModal(true)}
-                  className="adm-btn adm-btn-primary adm-btn-sm"
-                  style={{ display: "flex", alignItems: "center", gap: 6 }}
-                >
-                  <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
-                </button>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddSectionModal(true)}
+                    className="adm-btn adm-btn-primary adm-btn-sm"
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
+                  </button>
+                )}
               </div>
 
-              {/* Sections List */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {pageSections.map((sec, idx) => {
-                  const hidden = isSectionHidden(sec.key);
+              {/* Reorderable Sections List */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {currentOrder.map((key, idx) => {
+                  const secDef = conditionSectionDefs[key] || {
+                    title: key,
+                    desc: "Custom page section block",
+                    category: "Block",
+                    icon: "🧩"
+                  };
+                  const hidden = isSectionHidden(key);
+
                   return (
                     <div
-                      key={sec.key}
+                      key={key}
                       style={{
                         background: hidden ? "#f8fafc" : "#ffffff",
                         border: hidden ? "1px dashed #cbd5e1" : "1px solid #e2e8f0",
                         borderRadius: 12,
-                        padding: "14px 18px",
+                        padding: "12px 16px",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        gap: 16,
-                        opacity: hidden ? 0.65 : 1,
-                        transition: "all 0.2s ease"
+                        gap: 12,
+                        opacity: hidden ? 0.6 : 1,
+                        transition: "all 0.15s ease"
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         <div
                           style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 8,
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
                             background: hidden ? "#e2e8f0" : "#e0f2fe",
                             color: hidden ? "#64748b" : "#0284c7",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 700,
-                            fontSize: 13
+                            fontSize: 12.5
                           }}
                         >
                           {idx + 1}
                         </div>
+
                         <div>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <strong style={{ fontSize: 14, color: hidden ? "#64748b" : "#1e293b" }}>
-                              {sec.title}
+                            <span style={{ fontSize: 16 }}>{secDef.icon}</span>
+                            <strong style={{ fontSize: 13.5, color: hidden ? "#64748b" : "#1e293b" }}>
+                              {secDef.title}
                             </strong>
                             <span
                               style={{
                                 fontSize: 11,
                                 fontWeight: 700,
-                                padding: "2px 7px",
+                                padding: "2px 6px",
                                 borderRadius: 999,
                                 background: hidden ? "#fee2e2" : "#dcfce7",
                                 color: hidden ? "#991b1b" : "#166534"
                               }}
                             >
-                              {hidden ? "🚫 Hidden / Deleted" : "🟢 Visible"}
+                              {hidden ? "🚫 Hidden" : "🟢 Active"}
                             </span>
                           </div>
-                          <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 2 }}>
-                            {sec.desc}
+                          <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                            {secDef.desc}
                           </div>
                         </div>
                       </div>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        {sec.key === "custom_sections" && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {isAdmin && (
+                          <div style={{ display: "flex", gap: 4, marginRight: 6 }}>
+                            <button
+                              type="button"
+                              onClick={() => moveSection(idx, "up")}
+                              disabled={idx === 0}
+                              style={{
+                                background: "#f1f5f9",
+                                border: "1px solid #cbd5e1",
+                                borderRadius: 6,
+                                padding: "4px 8px",
+                                fontSize: 13,
+                                cursor: idx === 0 ? "not-allowed" : "pointer",
+                                opacity: idx === 0 ? 0.4 : 1
+                              }}
+                              title="Move section UP"
+                            >
+                              ⬆️
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveSection(idx, "down")}
+                              disabled={idx === currentOrder.length - 1}
+                              style={{
+                                background: "#f1f5f9",
+                                border: "1px solid #cbd5e1",
+                                borderRadius: 6,
+                                padding: "4px 8px",
+                                fontSize: 13,
+                                cursor: idx === currentOrder.length - 1 ? "not-allowed" : "pointer",
+                                opacity: idx === currentOrder.length - 1 ? 0.4 : 1
+                              }}
+                              title="Move section DOWN"
+                            >
+                              ⬇️
+                            </button>
+                          </div>
+                        )}
+
+                        {key === "custom_sections" && (
                           <button
                             type="button"
                             onClick={() => setActiveTab("sections")}
                             className="adm-btn adm-btn-secondary adm-btn-sm"
                           >
-                            🎨 Edit Sections
+                            🎨 Edit
                           </button>
                         )}
-                        {sec.key === "faqs" && (
+                        {key === "faqs" && (
                           <button
                             type="button"
                             onClick={() => setActiveTab("faqs")}
                             className="adm-btn adm-btn-secondary adm-btn-sm"
                           >
-                            ❓ Edit FAQs
+                            ❓ Edit
                           </button>
                         )}
-                        {sec.key === "symptoms" && (
+                        {key === "symptoms" && (
                           <button
                             type="button"
                             onClick={() => setActiveTab("symptoms")}
                             className="adm-btn adm-btn-secondary adm-btn-sm"
                           >
-                            🩺 Edit Symptoms
+                            🩺 Edit
                           </button>
                         )}
 
-                        <button
-                          type="button"
-                          onClick={() => toggleSectionVisibility(sec.key)}
-                          className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
-                          style={{ minWidth: 100 }}
-                        >
-                          {hidden ? "👁️ Restore" : "🗑️ Delete / Hide"}
-                        </button>
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => toggleSectionVisibility(key)}
+                            className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
+                            style={{ minWidth: 90 }}
+                          >
+                            {hidden ? "👁️ Restore" : "🗑️ Hide"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -786,13 +881,15 @@ function ConditionEditorModal({
                     <div key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 18 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                         <span style={{ fontWeight: 700, fontSize: 14 }}>Section #{idx + 1}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeCustomSection(idx)}
-                          style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
-                        >
-                          🗑️ Delete Section
-                        </button>
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => removeCustomSection(idx)}
+                            style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+                          >
+                            🗑️ Delete Section
+                          </button>
+                        )}
                       </div>
 
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
@@ -913,13 +1010,15 @@ function ConditionEditorModal({
                         {faq.answer}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFaq(idx)}
-                      style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
-                    >
-                      ✕
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => removeFaq(idx)}
+                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -949,7 +1048,9 @@ function ConditionEditorModal({
                   {cond.symptoms?.map((s, idx) => (
                     <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "8px 12px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: 13.5 }}>• {s}</span>
-                      <button type="button" onClick={() => removeSymptom(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}>✕</button>
+                      {isAdmin && (
+                        <button type="button" onClick={() => removeSymptom(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}>✕</button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -975,7 +1076,9 @@ function ConditionEditorModal({
                   {cond.treatmentApproach?.map((step, idx) => (
                     <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "8px 12px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: 13.5 }}><strong>Step {idx + 1}:</strong> {step}</span>
-                      <button type="button" onClick={() => removeApproach(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}>✕</button>
+                      {isAdmin && (
+                        <button type="button" onClick={() => removeApproach(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}>✕</button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1014,13 +1117,18 @@ function ConditionEditorModal({
         >
           <div
             className="adm-modal"
-            style={{ maxWidth: 640 }}
+            style={{ maxWidth: 680 }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="adm-modal-header">
-              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
-                + Add / Insert Page Section
-              </h3>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
+                  + Add / Insert Condition Page Section
+                </h3>
+                <span style={{ fontSize: 12.5, color: "#64748b" }}>
+                  Choose a standard clinical section or build a custom storytelling block
+                </span>
+              </div>
               <button
                 onClick={() => setShowAddSectionModal(false)}
                 style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
@@ -1030,10 +1138,6 @@ function ConditionEditorModal({
             </div>
             
             <div className="adm-modal-body">
-              <p style={{ margin: "0 0 16px 0", fontSize: 13.5, color: "#64748b" }}>
-                Select what kind of section you want to add to this condition page:
-              </p>
-
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[
                   {
@@ -1056,6 +1160,15 @@ function ConditionEditorModal({
                     }
                   },
                   {
+                    icon: "⏱️",
+                    title: "Treatment At-A-Glance Bar",
+                    desc: "4 highlight cards for quick patient answers.",
+                    action: () => {
+                      if (isSectionHidden("at_a_glance")) toggleSectionVisibility("at_a_glance");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
                     icon: "🩺",
                     title: "Recognizable Symptoms Block",
                     desc: "Grid of recognizable symptom warning signs.",
@@ -1072,6 +1185,15 @@ function ConditionEditorModal({
                     action: () => {
                       if (isSectionHidden("treatment_approach")) toggleSectionVisibility("treatment_approach");
                       setActiveTab("symptoms");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "✨",
+                    title: "Recommended Therapies Block",
+                    desc: "Links to physio, massage, acupuncture, etc.",
+                    action: () => {
+                      if (isSectionHidden("related_therapies")) toggleSectionVisibility("related_therapies");
                       setShowAddSectionModal(false);
                     }
                   },

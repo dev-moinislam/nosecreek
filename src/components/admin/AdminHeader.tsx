@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRole } from "./RoleGuard";
+import ThemeCustomizerModal from "./ThemeCustomizerModal";
 
 interface AdminHeaderProps {
   onToggleSidebar: () => void;
@@ -10,7 +11,8 @@ interface AdminHeaderProps {
 }
 
 export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps) {
-  const { user, role, setRole, isAdmin, logout } = useRole();
+  const { user, isAdmin, logout } = useRole();
+  const [themeModalOpen, setThemeModalOpen] = useState(false);
 
   return (
     <header className="adm-header">
@@ -34,43 +36,42 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
         <h1 className="adm-page-title">{title}</h1>
       </div>
 
-      <div className="adm-header-right">
-        {/* Role Switcher */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 12, color: "var(--adm-text-muted)", fontWeight: 500 }}>
-            Mode:
-          </span>
-          <div className="adm-role-switch">
-            <button
-              onClick={() => setRole("admin")}
-              className={`adm-role-btn ${role === "admin" ? "active admin" : ""}`}
-              title="Full Master Access (Edit all configs, SEO, marketing scripts, and delete content)"
-            >
-              🛡️ Admin
-            </button>
-            <button
-              onClick={() => setRole("client")}
-              className={`adm-role-btn ${role === "client" ? "active client" : ""}`}
-              title="Safe Client Mode (Edit text, photos, bios, and reply to leads without risk of breaking site)"
-            >
-              👤 Client
-            </button>
+      <div className="adm-header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* User Role Badge (Clean display without toggle switch) */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "6px 12px",
+            background: isAdmin ? "#f0f9ff" : "#f0fdf4",
+            border: isAdmin ? "1px solid #bae6fd" : "1px solid #bbf7d0",
+            borderRadius: 8
+          }}
+        >
+          <span style={{ fontSize: 14 }}>{isAdmin ? "🛡️" : "👤"}</span>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: isAdmin ? "#0369a1" : "#15803d" }}>
+              {user?.name || (isAdmin ? "Master Administrator" : "Clinic Client")}
+            </div>
+            <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1 }}>
+              {isAdmin ? "Full Master Control" : "Safe Content Mode"}
+            </div>
           </div>
         </div>
 
-        {/* User Info */}
-        {user && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 10px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8 }}>
-            <span style={{ fontSize: 14 }}>{isAdmin ? "🛡️" : "👤"}</span>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: "#1e293b" }}>
-                {user.name || user.email}
-              </div>
-              <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1 }}>
-                {isAdmin ? "Master Admin" : "Client Safe Mode"}
-              </div>
-            </div>
-          </div>
+        {/* Master Admin: Color Theme Customizer Button */}
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setThemeModalOpen(true)}
+            className="adm-btn adm-btn-secondary adm-btn-sm"
+            style={{ display: "flex", alignItems: "center", gap: 6 }}
+            title="Customize Website Brand Colors & Themes"
+          >
+            <span>🎨</span>
+            <span>Theme Colors</span>
+          </button>
         )}
 
         {/* View Live Website Button */}
@@ -88,12 +89,20 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
           onClick={logout}
           className="adm-btn adm-btn-secondary adm-btn-sm"
           style={{ color: "#dc2626", borderColor: "#fecaca" }}
-          title="Sign out of Admin Dashboard"
+          title="Sign out of Dashboard"
         >
           <span>🚪</span>
           <span>Log Out</span>
         </button>
       </div>
+
+      {/* Theme Customizer Modal */}
+      {isAdmin && (
+        <ThemeCustomizerModal
+          isOpen={themeModalOpen}
+          onClose={() => setThemeModalOpen(false)}
+        />
+      )}
     </header>
   );
 }

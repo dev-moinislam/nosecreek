@@ -7,6 +7,96 @@ import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import { useRole } from "@/components/admin/RoleGuard";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
 
+const defaultServiceSectionOrder = [
+  "hero",
+  "at_a_glance",
+  "clinical_overview",
+  "custom_sections",
+  "benefits",
+  "symptoms",
+  "treatment_approach",
+  "team_carousel",
+  "faqs",
+  "location_map",
+  "decision_ctas",
+  "bottom_cta"
+];
+
+const sectionDefinitions: Record<string, { title: string; desc: string; category: string; icon: string }> = {
+  hero: {
+    title: "Hero Header & Booking Banner",
+    desc: "Top banner with title, badges, ratings, and primary booking button.",
+    category: "Header",
+    icon: "🚀"
+  },
+  at_a_glance: {
+    title: "Treatment At-A-Glance Bar",
+    desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
+    category: "Summary",
+    icon: "⏱️"
+  },
+  clinical_overview: {
+    title: "Clinical Overview & Root Cause",
+    desc: "Detailed medical explanation of why this treatment works.",
+    category: "Overview",
+    icon: "📋"
+  },
+  custom_sections: {
+    title: "Custom Visual Storytelling Sections",
+    desc: "Rich storytelling sections with left/right/top/bottom image placement.",
+    category: "Custom Content",
+    icon: "🎨"
+  },
+  benefits: {
+    title: "Key Treatment Benefits Grid",
+    desc: "Checkmark grid highlighting proven benefits of this service.",
+    category: "Benefits",
+    icon: "✨"
+  },
+  symptoms: {
+    title: "Targeted Symptoms & Conditions",
+    desc: "List of conditions and complaints this treatment specifically addresses.",
+    category: "Symptoms",
+    icon: "🩺"
+  },
+  treatment_approach: {
+    title: "Treatment Approach Roadmap (4 Steps)",
+    desc: "Step-by-step patient journey from assessment to prevention.",
+    category: "Roadmap",
+    icon: "🛣️"
+  },
+  team_carousel: {
+    title: "Meet Our Registered Team Carousel",
+    desc: "Interactive scrolling carousel of registered physiotherapists & staff.",
+    category: "Team",
+    icon: "👥"
+  },
+  faqs: {
+    title: "Frequently Asked Questions (Accordion)",
+    desc: "Interactive accordion answering patient questions & insurance.",
+    category: "FAQ",
+    icon: "❓"
+  },
+  location_map: {
+    title: "Clinic Location & Interactive Google Map",
+    desc: "Beddington location details, hours of operation, phone, and Google map.",
+    category: "Location",
+    icon: "📍"
+  },
+  decision_ctas: {
+    title: "Decision CTAs (Free Discovery & Phone Consult)",
+    desc: "Two cards offering Free Discovery Session or Telephone Consult.",
+    category: "Conversion",
+    icon: "💡"
+  },
+  bottom_cta: {
+    title: "Bottom Booking Call-to-Action Banner",
+    desc: "Full-width high-contrast booking banner at the bottom of the page.",
+    category: "Conversion",
+    icon: "📣"
+  }
+};
+
 export default function AdminServicesPage() {
   const { role, isAdmin, canDelete, canEditSlugs } = useRole();
   const [services, setServices] = useState<Service[]>([]);
@@ -41,6 +131,12 @@ export default function AdminServicesPage() {
   // Save Service
   const handleSaveService = async (updatedService: Service) => {
     try {
+      const allUpdated = services.map((s) => (s.slug === updatedService.slug ? updatedService : s));
+      if (!allUpdated.find((s) => s.slug === updatedService.slug)) {
+        allUpdated.push(updatedService);
+      }
+
+      // 1. Save to Supabase
       if (isSupabaseConfigured && supabase) {
         const payload = {
           id: updatedService.id,
@@ -71,34 +167,52 @@ export default function AdminServicesPage() {
         if (error) throw error;
       }
 
-      // Update local state
-      setServices((prev) => {
-        const idx = prev.findIndex((s) => s.slug === updatedService.slug);
-        if (idx >= 0) {
-          const clone = [...prev];
-          clone[idx] = updatedService;
-          return clone;
-        }
-        return [...prev, updatedService];
-      });
+      // 2. Save to local data files in background via API route
+      try {
+        await fetch("/api/admin/save-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "services", data: allUpdated })
+        });
+      } catch {
+        // ignore in static export
+      }
 
-      alert("✓ Service saved successfully!");
+      // 3. Save to localStorage for instant client hydration
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_services", JSON.stringify(allUpdated));
+        window.dispatchEvent(new Event("servicesUpdated"));
+      }
+
+      // Update local state
+      setServices(allUpdated);
+
+      alert("✓ Service saved successfully! Live website updated.");
       setEditingService(null);
     } catch (err: any) {
       console.error("Failed to save service", err);
-      alert("⚠️ Error saving service to Supabase: " + (err.message || err));
+      alert("⚠️ Error saving service: " + (err.message || err));
     }
   };
 
   // Delete Service
   const handleDeleteService = async (slug: string) => {
+    if (!isAdmin) {
+      alert("In Client Mode, deleting services is disabled to protect SEO. Use Master Admin if needed.");
+      return;
+    }
     if (!window.confirm(`Are you sure you want to delete /services/${slug}?`)) return;
     try {
       if (isSupabaseConfigured && supabase) {
         const { error } = await supabase.from("services").delete().eq("slug", slug);
         if (error) throw error;
       }
-      setServices((prev) => prev.filter((s) => s.slug !== slug));
+      const allUpdated = services.filter((s) => s.slug !== slug);
+      setServices(allUpdated);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_services", JSON.stringify(allUpdated));
+        window.dispatchEvent(new Event("servicesUpdated"));
+      }
       alert("✓ Service deleted!");
     } catch (err: any) {
       console.error("Failed to delete service", err);
@@ -124,7 +238,7 @@ export default function AdminServicesPage() {
             Clinical Services Manager
           </h1>
           <p style={{ margin: 0, color: "var(--adm-text-muted)", fontSize: 14 }}>
-            Manage treatments, page sections, image placement, benefits, FAQs, and modular blocks
+            Manage treatments, page section ordering, hide/unhide blocks, image layouts, benefits, and FAQs
           </p>
         </div>
 
@@ -143,6 +257,7 @@ export default function AdminServicesPage() {
                 customSections: [],
                 faqs: [],
                 hiddenSections: [],
+                sectionOrder: defaultServiceSectionOrder,
                 relatedServices: [],
                 relatedConditions: []
               })
@@ -159,7 +274,7 @@ export default function AdminServicesPage() {
         <div className="adm-guarded-banner">
           <span>🛡️</span>
           <div>
-            <strong>Client Safe Mode Active:</strong> You can safely edit descriptions, images, bullet points, sections, and FAQs. Service URLs (slugs) and deletions are protected to preserve SEO.
+            <strong>Client Safe Mode Active:</strong> You can safely edit text descriptions, images, bullet points, and FAQs. Section reordering, hiding, and deletions are protected to preserve SEO rankings.
           </div>
         </div>
       )}
@@ -243,7 +358,7 @@ export default function AdminServicesPage() {
                       >
                         ✏️ Edit
                       </button>
-                      {canDelete && (
+                      {isAdmin && (
                         <button
                           onClick={() => handleDeleteService(service.slug)}
                           className="adm-btn adm-btn-secondary adm-btn-sm"
@@ -265,6 +380,7 @@ export default function AdminServicesPage() {
       {editingService && (
         <ServiceEditorModal
           service={editingService}
+          isAdmin={isAdmin}
           canEditSlugs={canEditSlugs}
           onClose={() => setEditingService(null)}
           onSave={handleSaveService}
@@ -283,29 +399,58 @@ export default function AdminServicesPage() {
   );
 }
 
-// Sub-component: Service Editor Modal with Page Layout & Modular Section Manager
+// Sub-component: Service Editor Modal with Section Reordering & Modular Manager
 function ServiceEditorModal({
   service: initialService,
+  isAdmin,
   canEditSlugs,
   onClose,
   onSave,
   onPreview
 }: {
   service: Service;
+  isAdmin: boolean;
   canEditSlugs: boolean;
   onClose: () => void;
   onSave: (service: Service) => void;
   onPreview: (slug: string) => void;
 }) {
-  const [service, setService] = useState<Service>(initialService);
+  const [service, setService] = useState<Service>({
+    ...initialService,
+    sectionOrder: initialService.sectionOrder && initialService.sectionOrder.length > 0
+      ? initialService.sectionOrder
+      : defaultServiceSectionOrder
+  });
+
   const [activeTab, setActiveTab] = useState<"layout" | "general" | "sections" | "faqs" | "bullets">("layout");
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
-  // Section Visibility toggle helper
+  // Section Ordering & Visibility helpers
+  const currentOrder = service.sectionOrder || defaultServiceSectionOrder;
   const hiddenSections = service.hiddenSections || [];
   const isSectionHidden = (key: string) => hiddenSections.includes(key);
 
+  const moveSection = (index: number, direction: "up" | "down") => {
+    if (!isAdmin) {
+      alert("Only Master Admin can change section layout order.");
+      return;
+    }
+    const newOrder = [...currentOrder];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newOrder.length) return;
+
+    const temp = newOrder[index];
+    newOrder[index] = newOrder[targetIndex];
+    newOrder[targetIndex] = temp;
+
+    setService((prev) => ({ ...prev, sectionOrder: newOrder }));
+  };
+
   const toggleSectionVisibility = (key: string) => {
+    if (!isAdmin) {
+      alert("Only Master Admin can hide or delete page sections.");
+      return;
+    }
     setService((prev) => {
       const curHidden = prev.hiddenSections || [];
       const updatedHidden = curHidden.includes(key)
@@ -362,7 +507,11 @@ function ServiceEditorModal({
       title: "New Featured Care Section",
       subtitle: "Personalized clinical evaluation",
       content: "Explain your comprehensive treatment protocol and therapeutic approach here.",
-      bullets: ["Direct billing to major health insurance", "Targeted joint mobilization & soft tissue release", "One-on-one registered therapist care"],
+      bullets: [
+        "Direct billing to major health insurance",
+        "Targeted joint mobilization & soft tissue release",
+        "One-on-one registered therapist care"
+      ],
       image: "/images/clinic/reception-three.jpg",
       imagePosition: pos,
       background: "white"
@@ -388,82 +537,6 @@ function ServiceEditorModal({
       customSections: prev.customSections?.filter((_, i) => i !== idx)
     }));
   };
-
-  // Standard Page Sections Registry
-  const pageSections = [
-    {
-      key: "hero",
-      title: "Hero Header & Booking Banner",
-      desc: "Top banner with title, badges, ratings, and primary booking button.",
-      category: "Header"
-    },
-    {
-      key: "at_a_glance",
-      title: "Treatment At-A-Glance Bar",
-      desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
-      category: "Summary"
-    },
-    {
-      key: "clinical_overview",
-      title: "Clinical Overview & Root Cause",
-      desc: "Detailed medical explanation of why this treatment works.",
-      category: "Overview"
-    },
-    {
-      key: "custom_sections",
-      title: `Custom Visual Sections (${service.customSections?.length || 0} Sections)`,
-      desc: "Rich storytelling sections with left/right/top/bottom image placement.",
-      category: "Custom Content"
-    },
-    {
-      key: "benefits",
-      title: `Key Treatment Benefits (${service.benefits?.length || 0} Bullets)`,
-      desc: "Checkmark grid highlighting proven benefits of this service.",
-      category: "Benefits"
-    },
-    {
-      key: "symptoms",
-      title: `Targeted Symptoms & Conditions (${service.symptoms?.length || 0} Items)`,
-      desc: "List of conditions and complaints this treatment specifically addresses.",
-      category: "Symptoms"
-    },
-    {
-      key: "treatment_approach",
-      title: "Treatment Approach Roadmap (4 Steps)",
-      desc: "Step-by-step patient journey from assessment to prevention.",
-      category: "Roadmap"
-    },
-    {
-      key: "team_carousel",
-      title: "Meet Our Team Carousel",
-      desc: "Interactive scrolling carousel of registered physiotherapists & staff.",
-      category: "Team"
-    },
-    {
-      key: "faqs",
-      title: `Frequently Asked Questions (${service.faqs?.length || 0} FAQs)`,
-      desc: "Interactive accordion answering patient questions & insurance.",
-      category: "FAQ"
-    },
-    {
-      key: "location_map",
-      title: "Clinic Location & Interactive Google Map",
-      desc: "Beddington location details, hours of operation, phone, and Google map.",
-      category: "Location"
-    },
-    {
-      key: "decision_ctas",
-      title: "Decision CTAs (Free Discovery & Phone Consult)",
-      desc: "Two cards offering Free Discovery Session or Telephone Consult.",
-      category: "Conversion"
-    },
-    {
-      key: "bottom_cta",
-      title: "Bottom Booking Call-to-Action Banner",
-      desc: "Full-width high-contrast booking banner at the bottom of the page.",
-      category: "Conversion"
-    }
-  ];
 
   return (
     <div className="adm-modal-overlay" onClick={onClose}>
@@ -499,7 +572,7 @@ function ServiceEditorModal({
         {/* Modal Navigation Tabs */}
         <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 20px", overflowX: "auto" }}>
           {[
-            { id: "layout", label: "🧩 Page Sections & Layout" },
+            { id: "layout", label: "🧩 Page Sections & Order" },
             { id: "general", label: "📝 General & Hero" },
             { id: "sections", label: `🎨 Custom Sections (${service.customSections?.length || 0})` },
             { id: "faqs", label: `❓ FAQ Builder (${service.faqs?.length || 0})` },
@@ -528,126 +601,183 @@ function ServiceEditorModal({
         {/* Modal Body */}
         <div className="adm-modal-body">
           
-          {/* ── TAB 1: PAGE SECTIONS & MODULAR BLOCK MANAGER ── */}
+          {/* ── TAB 1: MODULAR SECTION ORDERING & VISIBILITY MANAGER ── */}
           {activeTab === "layout" && (
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "14px 18px", borderRadius: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "14px 18px", borderRadius: 10, flexWrap: "wrap", gap: 10 }}>
                 <div>
                   <h4 style={{ margin: "0 0 4px 0", fontSize: 14, fontWeight: 700, color: "#0369a1" }}>
-                    Modular Page Section Manager
+                    Modular Section Layout &amp; Reordering
                   </h4>
                   <p style={{ margin: 0, fontSize: 13, color: "#0284c7" }}>
-                    Turn sections ON or OFF, hide sections you don&apos;t need (e.g. Clinical Overview), or add new custom storytelling blocks.
+                    {isAdmin
+                      ? "Use ⬆️ Up and ⬇️ Down arrows to change section display order, or 🗑️ Hide sections you don't need."
+                      : "Client View: Displays page section order and active blocks. Layout reordering is managed by Master Admin."}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowAddSectionModal(true)}
-                  className="adm-btn adm-btn-primary adm-btn-sm"
-                  style={{ display: "flex", alignItems: "center", gap: 6 }}
-                >
-                  <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
-                </button>
+                {isAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddSectionModal(true)}
+                    className="adm-btn adm-btn-primary adm-btn-sm"
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
+                  </button>
+                )}
               </div>
 
-              {/* Sections List */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {pageSections.map((sec, idx) => {
-                  const hidden = isSectionHidden(sec.key);
+              {/* Reorderable Sections List */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {currentOrder.map((key, idx) => {
+                  const secDef = sectionDefinitions[key] || {
+                    title: key,
+                    desc: "Custom page section block",
+                    category: "Block",
+                    icon: "🧩"
+                  };
+                  const hidden = isSectionHidden(key);
+
                   return (
                     <div
-                      key={sec.key}
+                      key={key}
                       style={{
                         background: hidden ? "#f8fafc" : "#ffffff",
                         border: hidden ? "1px dashed #cbd5e1" : "1px solid #e2e8f0",
                         borderRadius: 12,
-                        padding: "14px 18px",
+                        padding: "12px 16px",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
-                        gap: 16,
-                        opacity: hidden ? 0.65 : 1,
-                        transition: "all 0.2s ease"
+                        gap: 12,
+                        opacity: hidden ? 0.6 : 1,
+                        transition: "all 0.15s ease"
                       }}
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      {/* Left side: Position, Icon, Title */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        {/* Order Number Badge */}
                         <div
                           style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 8,
+                            width: 28,
+                            height: 28,
+                            borderRadius: 6,
                             background: hidden ? "#e2e8f0" : "#e0f2fe",
                             color: hidden ? "#64748b" : "#0284c7",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 700,
-                            fontSize: 13
+                            fontSize: 12.5
                           }}
                         >
                           {idx + 1}
                         </div>
+
                         <div>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <strong style={{ fontSize: 14, color: hidden ? "#64748b" : "#1e293b" }}>
-                              {sec.title}
+                            <span style={{ fontSize: 16 }}>{secDef.icon}</span>
+                            <strong style={{ fontSize: 13.5, color: hidden ? "#64748b" : "#1e293b" }}>
+                              {secDef.title}
                             </strong>
                             <span
                               style={{
                                 fontSize: 11,
                                 fontWeight: 700,
-                                padding: "2px 7px",
+                                padding: "2px 6px",
                                 borderRadius: 999,
                                 background: hidden ? "#fee2e2" : "#dcfce7",
                                 color: hidden ? "#991b1b" : "#166534"
                               }}
                             >
-                              {hidden ? "🚫 Hidden / Deleted" : "🟢 Visible"}
+                              {hidden ? "🚫 Hidden" : "🟢 Active"}
                             </span>
                           </div>
-                          <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 2 }}>
-                            {sec.desc}
+                          <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                            {secDef.desc}
                           </div>
                         </div>
                       </div>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        {sec.key === "custom_sections" && (
+                      {/* Right side: Reordering & Actions */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {isAdmin && (
+                          <div style={{ display: "flex", gap: 4, marginRight: 6 }}>
+                            <button
+                              type="button"
+                              onClick={() => moveSection(idx, "up")}
+                              disabled={idx === 0}
+                              style={{
+                                background: "#f1f5f9",
+                                border: "1px solid #cbd5e1",
+                                borderRadius: 6,
+                                padding: "4px 8px",
+                                fontSize: 13,
+                                cursor: idx === 0 ? "not-allowed" : "pointer",
+                                opacity: idx === 0 ? 0.4 : 1
+                              }}
+                              title="Move section UP"
+                            >
+                              ⬆️
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveSection(idx, "down")}
+                              disabled={idx === currentOrder.length - 1}
+                              style={{
+                                background: "#f1f5f9",
+                                border: "1px solid #cbd5e1",
+                                borderRadius: 6,
+                                padding: "4px 8px",
+                                fontSize: 13,
+                                cursor: idx === currentOrder.length - 1 ? "not-allowed" : "pointer",
+                                opacity: idx === currentOrder.length - 1 ? 0.4 : 1
+                              }}
+                              title="Move section DOWN"
+                            >
+                              ⬇️
+                            </button>
+                          </div>
+                        )}
+
+                        {key === "custom_sections" && (
                           <button
                             type="button"
                             onClick={() => setActiveTab("sections")}
                             className="adm-btn adm-btn-secondary adm-btn-sm"
                           >
-                            🎨 Edit Sections
+                            🎨 Edit
                           </button>
                         )}
-                        {sec.key === "faqs" && (
+                        {key === "faqs" && (
                           <button
                             type="button"
                             onClick={() => setActiveTab("faqs")}
                             className="adm-btn adm-btn-secondary adm-btn-sm"
                           >
-                            ❓ Edit FAQs
+                            ❓ Edit
                           </button>
                         )}
-                        {sec.key === "benefits" && (
+                        {key === "benefits" && (
                           <button
                             type="button"
                             onClick={() => setActiveTab("bullets")}
                             className="adm-btn adm-btn-secondary adm-btn-sm"
                           >
-                            ✨ Edit Bullets
+                            ✨ Edit
                           </button>
                         )}
 
-                        <button
-                          type="button"
-                          onClick={() => toggleSectionVisibility(sec.key)}
-                          className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
-                          style={{ minWidth: 100 }}
-                        >
-                          {hidden ? "👁️ Restore" : "🗑️ Delete / Hide"}
-                        </button>
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => toggleSectionVisibility(key)}
+                            className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
+                            style={{ minWidth: 90 }}
+                          >
+                            {hidden ? "👁️ Restore" : "🗑️ Hide"}
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
@@ -695,7 +825,7 @@ function ServiceEditorModal({
               </div>
 
               <div className="adm-form-group">
-                <label className="adm-form-label">Clinical Overview Content</label>
+                <label className="adm-form-label">Clinical Overview Content (Why treatment works)</label>
                 <textarea
                   className="adm-textarea"
                   style={{ minHeight: 120 }}
@@ -756,13 +886,15 @@ function ServiceEditorModal({
                     <div key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 18 }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                         <span style={{ fontWeight: 700, fontSize: 14 }}>Section #{idx + 1}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeCustomSection(idx)}
-                          style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
-                        >
-                          🗑️ Delete Section
-                        </button>
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => removeCustomSection(idx)}
+                            style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+                          >
+                            🗑️ Delete Section
+                          </button>
+                        )}
                       </div>
 
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
@@ -883,13 +1015,15 @@ function ServiceEditorModal({
                         {faq.answer}
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeFaq(idx)}
-                      style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
-                    >
-                      ✕
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => removeFaq(idx)}
+                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -924,13 +1058,15 @@ function ServiceEditorModal({
                 {service.benefits?.map((b, idx) => (
                   <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "10px 14px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 13.5 }}>✓ {b}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeBenefit(idx)}
-                      style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
-                    >
-                      ✕
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => removeBenefit(idx)}
+                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -968,13 +1104,18 @@ function ServiceEditorModal({
         >
           <div
             className="adm-modal"
-            style={{ maxWidth: 640 }}
+            style={{ maxWidth: 680 }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="adm-modal-header">
-              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
-                + Add / Insert Page Section
-              </h3>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
+                  + Add / Insert Physiotherapy Page Section
+                </h3>
+                <span style={{ fontSize: 12.5, color: "#64748b" }}>
+                  Choose a standard clinic section or build a custom storytelling block
+                </span>
+              </div>
               <button
                 onClick={() => setShowAddSectionModal(false)}
                 style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
@@ -984,10 +1125,6 @@ function ServiceEditorModal({
             </div>
             
             <div className="adm-modal-body">
-              <p style={{ margin: "0 0 16px 0", fontSize: 13.5, color: "#64748b" }}>
-                Select what kind of section you want to add to this page:
-              </p>
-
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[
                   {
@@ -1010,6 +1147,15 @@ function ServiceEditorModal({
                     }
                   },
                   {
+                    icon: "⏱️",
+                    title: "Treatment At-A-Glance Bar",
+                    desc: "4 highlight cards for quick patient answers.",
+                    action: () => {
+                      if (isSectionHidden("at_a_glance")) toggleSectionVisibility("at_a_glance");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
                     icon: "🩺",
                     title: "Symptoms & Conditions Block",
                     desc: "List of treatable symptoms and linked conditions.",
@@ -1025,6 +1171,16 @@ function ServiceEditorModal({
                     desc: "4-step clinical recovery journey.",
                     action: () => {
                       if (isSectionHidden("treatment_approach")) toggleSectionVisibility("treatment_approach");
+                      setActiveTab("bullets");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "✨",
+                    title: "Key Clinical Benefits Grid",
+                    desc: "Highlighted checklist of proven benefits.",
+                    action: () => {
+                      if (isSectionHidden("benefits")) toggleSectionVisibility("benefits");
                       setActiveTab("bullets");
                       setShowAddSectionModal(false);
                     }

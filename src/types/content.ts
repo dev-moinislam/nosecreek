@@ -85,6 +85,7 @@ export interface Service {
   customSections?: ServiceCustomSection[];
   faqs?: FAQItem[];
   hiddenSections?: string[]; // list of section keys to hide/disable
+  sectionOrder?: string[]; // custom ordered list of section keys
   relatedServices?: string[]; // slugs
   relatedConditions?: string[]; // slugs
   teamMembers?: string[]; // slugs
@@ -173,6 +174,7 @@ export interface Condition {
   customSections?: ServiceCustomSection[];
   faqs?: FAQItem[];
   hiddenSections?: string[];
+  sectionOrder?: string[];
   relatedServices?: string[]; // slugs
   category?: string;
   seo?: SEOData;
