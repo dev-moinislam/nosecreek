@@ -1,153 +1,130 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Service, ServiceCustomSection } from "@/types/content";
+import { getServices } from "@/lib/api";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import { useRole } from "@/components/admin/RoleGuard";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
-import { Service, ServiceCustomSection, FAQItem } from "@/types/content";
-import servicesData from "@/data/services.json";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
 
 export default function AdminServicesPage() {
   const { role, isAdmin, canDelete, canEditSlugs } = useRole();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
 
-  const fetchServices = async () => {
-    setLoading(true);
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await supabase
-          .from("services")
-          .select("*")
-          .order("sort_order", { ascending: true });
-        if (!error && data && data.length > 0) {
-          setServices(data.map((d: any) => ({
-            id: d.id,
-            slug: d.slug,
-            title: d.title,
-            shortDescription: d.short_description || "",
-            description: d.description || "",
-            heroImage: d.hero_image,
-            sideImage: d.side_image,
-            iconType: d.icon_type,
-            iconBg: d.icon_bg,
-            iconColor: d.icon_color,
-            ctaText: d.cta_text,
-            ctaMuted: d.cta_muted,
-            benefits: d.benefits || [],
-            symptoms: d.symptoms || [],
-            treatmentApproach: d.treatment_approach || [],
-            customSections: d.custom_sections || [],
-            faqs: d.faqs || [],
-            relatedServices: d.related_services || [],
-            relatedConditions: d.related_conditions || [],
-            teamMembers: d.team_members || [],
-            locations: d.locations || [],
-            testimonials: d.testimonials || [],
-            seo: d.seo || {}
-          })));
-        } else {
-          setServices(servicesData as Service[]);
-        }
-      } catch {
-        setServices(servicesData as Service[]);
-      }
-    } else if (typeof window !== "undefined") {
-      const local = localStorage.getItem("adm_services");
-      if (local) {
-        setServices(JSON.parse(local));
-      } else {
-        setServices(servicesData as Service[]);
-      }
-    }
-    setLoading(false);
-  };
-
+  // Load services
   useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const handleSaveService = async (service: Service) => {
-    if (isSupabaseConfigured && supabase) {
+    async function load() {
+      setLoading(true);
       try {
-        await supabase.from("services").upsert({
-          id: service.id || `service-${service.slug}`,
-          slug: service.slug,
-          title: service.title,
-          short_description: service.shortDescription,
-          description: service.description,
-          hero_image: service.heroImage || null,
-          side_image: service.sideImage || null,
-          icon_type: service.iconType || null,
-          icon_bg: service.iconBg || null,
-          icon_color: service.iconColor || null,
-          cta_text: service.ctaText || "Book Online",
-          cta_muted: service.ctaMuted || false,
-          benefits: service.benefits || [],
-          symptoms: service.symptoms || [],
-          treatment_approach: service.treatmentApproach || [],
-          custom_sections: service.customSections || [],
-          faqs: service.faqs || [],
-          related_services: service.relatedServices || [],
-          related_conditions: service.relatedConditions || [],
-          team_members: service.teamMembers || [],
-          locations: service.locations || [],
-          testimonials: service.testimonials || [],
-          seo: service.seo || {},
-          is_published: true
-        });
-      } catch (e) {
-        console.error("Save failed:", e);
+        const data = await getServices();
+        setServices(data);
+      } catch (err) {
+        console.error("Failed to load services", err);
+      } finally {
+        setLoading(false);
       }
-    } else if (typeof window !== "undefined") {
-      const updated = services.map((s) => (s.slug === service.slug ? service : s));
-      if (!updated.find((s) => s.slug === service.slug)) {
-        updated.push(service);
-      }
-      localStorage.setItem("adm_services", JSON.stringify(updated));
-      setServices(updated);
     }
-    fetchServices();
-    setEditingService(null);
-  };
-
-  const handleDeleteService = async (slug: string) => {
-    if (!canDelete) {
-      alert("In Client Safe Mode, deleting core services is disabled to protect website structure and SEO rankings. Switch to Admin mode if necessary.");
-      return;
-    }
-    if (!confirm(`Are you sure you want to delete the service "${slug}"?`)) return;
-
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from("services").delete().eq("slug", slug);
-    } else if (typeof window !== "undefined") {
-      const updated = services.filter((s) => s.slug !== slug);
-      localStorage.setItem("adm_services", JSON.stringify(updated));
-      setServices(updated);
-    }
-    fetchServices();
-  };
+    load();
+  }, []);
 
   const filtered = services.filter(
     (s) =>
       s.title.toLowerCase().includes(search.toLowerCase()) ||
       s.slug.toLowerCase().includes(search.toLowerCase()) ||
-      s.shortDescription.toLowerCase().includes(search.toLowerCase())
+      (s.shortDescription && s.shortDescription.toLowerCase().includes(search.toLowerCase()))
   );
 
+  // Save Service
+  const handleSaveService = async (updatedService: Service) => {
+    try {
+      if (isSupabaseConfigured && supabase) {
+        const payload = {
+          id: updatedService.id,
+          slug: updatedService.slug,
+          title: updatedService.title,
+          short_description: updatedService.shortDescription,
+          description: updatedService.description,
+          hero_image: updatedService.heroImage,
+          side_image: updatedService.sideImage,
+          cta_text: updatedService.ctaText || "Book Online",
+          cta_muted: updatedService.ctaMuted || false,
+          benefits: updatedService.benefits || [],
+          symptoms: updatedService.symptoms || [],
+          treatment_approach: updatedService.treatmentApproach || [],
+          custom_sections: updatedService.customSections || [],
+          faqs: updatedService.faqs || [],
+          hidden_sections: updatedService.hiddenSections || [],
+          related_services: updatedService.relatedServices || [],
+          related_conditions: updatedService.relatedConditions || [],
+          seo: updatedService.seo || {},
+          updated_at: new Date().toISOString()
+        };
+
+        const { error } = await supabase
+          .from("services")
+          .upsert(payload, { onConflict: "slug" });
+
+        if (error) throw error;
+      }
+
+      // Update local state
+      setServices((prev) => {
+        const idx = prev.findIndex((s) => s.slug === updatedService.slug);
+        if (idx >= 0) {
+          const clone = [...prev];
+          clone[idx] = updatedService;
+          return clone;
+        }
+        return [...prev, updatedService];
+      });
+
+      alert("✓ Service saved successfully!");
+      setEditingService(null);
+    } catch (err: any) {
+      console.error("Failed to save service", err);
+      alert("⚠️ Error saving service to Supabase: " + (err.message || err));
+    }
+  };
+
+  // Delete Service
+  const handleDeleteService = async (slug: string) => {
+    if (!window.confirm(`Are you sure you want to delete /services/${slug}?`)) return;
+    try {
+      if (isSupabaseConfigured && supabase) {
+        const { error } = await supabase.from("services").delete().eq("slug", slug);
+        if (error) throw error;
+      }
+      setServices((prev) => prev.filter((s) => s.slug !== slug));
+      alert("✓ Service deleted!");
+    } catch (err: any) {
+      console.error("Failed to delete service", err);
+      alert("⚠️ Error deleting: " + (err.message || err));
+    }
+  };
+
   return (
-    <div>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 14 }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      {/* Page Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 24,
+          flexWrap: "wrap",
+          gap: 16
+        }}
+      >
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0, fontFamily: "var(--adm-font-display)" }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--adm-text)", margin: "0 0 6px 0" }}>
             Clinical Services Manager
-          </h2>
-          <p style={{ fontSize: 13.5, color: "#64748b", margin: "2px 0 0 0" }}>
-            Manage treatments, descriptions, rich custom sections, benefits, and service FAQs
+          </h1>
+          <p style={{ margin: 0, color: "var(--adm-text-muted)", fontSize: 14 }}>
+            Manage treatments, page sections, image placement, benefits, FAQs, and modular blocks
           </p>
         </div>
 
@@ -165,6 +142,7 @@ export default function AdminServicesPage() {
                 treatmentApproach: [],
                 customSections: [],
                 faqs: [],
+                hiddenSections: [],
                 relatedServices: [],
                 relatedConditions: []
               })
@@ -181,7 +159,7 @@ export default function AdminServicesPage() {
         <div className="adm-guarded-banner">
           <span>🛡️</span>
           <div>
-            <strong>Client Safe Mode Active:</strong> You can safely edit descriptions, images, bullet points, and FAQs. Service URLs (slugs) and core deletions are protected to preserve SEO.
+            <strong>Client Safe Mode Active:</strong> You can safely edit descriptions, images, bullet points, sections, and FAQs. Service URLs (slugs) and deletions are protected to preserve SEO.
           </div>
         </div>
       )}
@@ -250,12 +228,11 @@ export default function AdminServicesPage() {
                         {service.benefits?.length || 0} bullet points
                       </span>
                     </td>
-                    <td style={{ textAlign: "right" }}>
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setPreviewUrl(`/services/${service.slug}`)}
                         className="adm-btn adm-btn-secondary adm-btn-sm"
                         style={{ marginRight: 6 }}
-                        title="View Live Preview"
                       >
                         👁️ Preview
                       </button>
@@ -306,7 +283,7 @@ export default function AdminServicesPage() {
   );
 }
 
-// Sub-component: Service Editor Modal
+// Sub-component: Service Editor Modal with Page Layout & Modular Section Manager
 function ServiceEditorModal({
   service: initialService,
   canEditSlugs,
@@ -321,9 +298,24 @@ function ServiceEditorModal({
   onPreview: (slug: string) => void;
 }) {
   const [service, setService] = useState<Service>(initialService);
-  const [activeTab, setActiveTab] = useState<"general" | "sections" | "faqs" | "bullets">("general");
+  const [activeTab, setActiveTab] = useState<"layout" | "general" | "sections" | "faqs" | "bullets">("layout");
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
-  // Benefits & Symptoms helpers
+  // Section Visibility toggle helper
+  const hiddenSections = service.hiddenSections || [];
+  const isSectionHidden = (key: string) => hiddenSections.includes(key);
+
+  const toggleSectionVisibility = (key: string) => {
+    setService((prev) => {
+      const curHidden = prev.hiddenSections || [];
+      const updatedHidden = curHidden.includes(key)
+        ? curHidden.filter((k) => k !== key)
+        : [...curHidden, key];
+      return { ...prev, hiddenSections: updatedHidden };
+    });
+  };
+
+  // Benefits & FAQs helpers
   const [newBenefit, setNewBenefit] = useState("");
   const [newFaqQ, setNewFaqQ] = useState("");
   const [newFaqA, setNewFaqA] = useState("");
@@ -362,20 +354,24 @@ function ServiceEditorModal({
   };
 
   // Custom Sections Helper
-  const addCustomSection = () => {
+  const addCustomSection = (pos: "right" | "left" | "top" | "bottom" | "none" = "right") => {
     const newSec: ServiceCustomSection = {
       id: `sec-${Date.now()}`,
+      eyebrow: "Personalized Care Protocol",
+      eyebrowColor: "#1c9fd8",
       title: "New Featured Care Section",
       subtitle: "Personalized clinical evaluation",
-      content: "Explain your comprehensive treatment protocol here.",
-      bullets: ["Direct billing available", "One-on-one manual assessment"],
+      content: "Explain your comprehensive treatment protocol and therapeutic approach here.",
+      bullets: ["Direct billing to major health insurance", "Targeted joint mobilization & soft tissue release", "One-on-one registered therapist care"],
       image: "/images/clinic/reception-three.jpg",
-      imagePosition: "right"
+      imagePosition: pos,
+      background: "white"
     };
     setService((prev) => ({
       ...prev,
       customSections: [...(prev.customSections || []), newSec]
     }));
+    setActiveTab("sections");
   };
 
   const updateCustomSection = (idx: number, updated: Partial<ServiceCustomSection>) => {
@@ -393,9 +389,87 @@ function ServiceEditorModal({
     }));
   };
 
+  // Standard Page Sections Registry
+  const pageSections = [
+    {
+      key: "hero",
+      title: "Hero Header & Booking Banner",
+      desc: "Top banner with title, badges, ratings, and primary booking button.",
+      category: "Header"
+    },
+    {
+      key: "at_a_glance",
+      title: "Treatment At-A-Glance Bar",
+      desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
+      category: "Summary"
+    },
+    {
+      key: "clinical_overview",
+      title: "Clinical Overview & Root Cause",
+      desc: "Detailed medical explanation of why this treatment works.",
+      category: "Overview"
+    },
+    {
+      key: "custom_sections",
+      title: `Custom Visual Sections (${service.customSections?.length || 0} Sections)`,
+      desc: "Rich storytelling sections with left/right/top/bottom image placement.",
+      category: "Custom Content"
+    },
+    {
+      key: "benefits",
+      title: `Key Treatment Benefits (${service.benefits?.length || 0} Bullets)`,
+      desc: "Checkmark grid highlighting proven benefits of this service.",
+      category: "Benefits"
+    },
+    {
+      key: "symptoms",
+      title: `Targeted Symptoms & Conditions (${service.symptoms?.length || 0} Items)`,
+      desc: "List of conditions and complaints this treatment specifically addresses.",
+      category: "Symptoms"
+    },
+    {
+      key: "treatment_approach",
+      title: "Treatment Approach Roadmap (4 Steps)",
+      desc: "Step-by-step patient journey from assessment to prevention.",
+      category: "Roadmap"
+    },
+    {
+      key: "team_carousel",
+      title: "Meet Our Team Carousel",
+      desc: "Interactive scrolling carousel of registered physiotherapists & staff.",
+      category: "Team"
+    },
+    {
+      key: "faqs",
+      title: `Frequently Asked Questions (${service.faqs?.length || 0} FAQs)`,
+      desc: "Interactive accordion answering patient questions & insurance.",
+      category: "FAQ"
+    },
+    {
+      key: "location_map",
+      title: "Clinic Location & Interactive Google Map",
+      desc: "Beddington location details, hours of operation, phone, and Google map.",
+      category: "Location"
+    },
+    {
+      key: "decision_ctas",
+      title: "Decision CTAs (Free Discovery & Phone Consult)",
+      desc: "Two cards offering Free Discovery Session or Telephone Consult.",
+      category: "Conversion"
+    },
+    {
+      key: "bottom_cta",
+      title: "Bottom Booking Call-to-Action Banner",
+      desc: "Full-width high-contrast booking banner at the bottom of the page.",
+      category: "Conversion"
+    }
+  ];
+
   return (
     <div className="adm-modal-overlay" onClick={onClose}>
-      <div className="adm-modal wide" onClick={(e) => e.stopPropagation()} style={{ maxHeight: "92vh" }}>
+      <div className="adm-modal wide" onClick={(e) => e.stopPropagation()} style={{ maxHeight: "92vh", width: "95%", maxWidth: 1050 }}>
+        
+        {/* Modal Header */}
         <div className="adm-modal-header">
           <div>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
@@ -422,13 +496,14 @@ function ServiceEditorModal({
           </div>
         </div>
 
-        {/* Modal Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 24px" }}>
+        {/* Modal Navigation Tabs */}
+        <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 20px", overflowX: "auto" }}>
           {[
-            { id: "general", label: "📝 General & SEO" },
+            { id: "layout", label: "🧩 Page Sections & Layout" },
+            { id: "general", label: "📝 General & Hero" },
             { id: "sections", label: `🎨 Custom Sections (${service.customSections?.length || 0})` },
             { id: "faqs", label: `❓ FAQ Builder (${service.faqs?.length || 0})` },
-            { id: "bullets", label: `✨ Benefits & Bullets (${service.benefits?.length || 0})` }
+            { id: "bullets", label: `✨ Benefits & Roadmap (${service.benefits?.length || 0})` }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -440,6 +515,7 @@ function ServiceEditorModal({
                 fontSize: 13.5,
                 fontWeight: 600,
                 cursor: "pointer",
+                whiteSpace: "nowrap",
                 color: activeTab === tab.id ? "var(--adm-primary)" : "#64748b",
                 borderBottom: activeTab === tab.id ? "2px solid var(--adm-primary)" : "2px solid transparent"
               }}
@@ -451,6 +527,136 @@ function ServiceEditorModal({
 
         {/* Modal Body */}
         <div className="adm-modal-body">
+          
+          {/* ── TAB 1: PAGE SECTIONS & MODULAR BLOCK MANAGER ── */}
+          {activeTab === "layout" && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "14px 18px", borderRadius: 10 }}>
+                <div>
+                  <h4 style={{ margin: "0 0 4px 0", fontSize: 14, fontWeight: 700, color: "#0369a1" }}>
+                    Modular Page Section Manager
+                  </h4>
+                  <p style={{ margin: 0, fontSize: 13, color: "#0284c7" }}>
+                    Turn sections ON or OFF, hide sections you don&apos;t need (e.g. Clinical Overview), or add new custom storytelling blocks.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddSectionModal(true)}
+                  className="adm-btn adm-btn-primary adm-btn-sm"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
+                >
+                  <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
+                </button>
+              </div>
+
+              {/* Sections List */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {pageSections.map((sec, idx) => {
+                  const hidden = isSectionHidden(sec.key);
+                  return (
+                    <div
+                      key={sec.key}
+                      style={{
+                        background: hidden ? "#f8fafc" : "#ffffff",
+                        border: hidden ? "1px dashed #cbd5e1" : "1px solid #e2e8f0",
+                        borderRadius: 12,
+                        padding: "14px 18px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 16,
+                        opacity: hidden ? 0.65 : 1,
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 8,
+                            background: hidden ? "#e2e8f0" : "#e0f2fe",
+                            color: hidden ? "#64748b" : "#0284c7",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 700,
+                            fontSize: 13
+                          }}
+                        >
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <strong style={{ fontSize: 14, color: hidden ? "#64748b" : "#1e293b" }}>
+                              {sec.title}
+                            </strong>
+                            <span
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 999,
+                                background: hidden ? "#fee2e2" : "#dcfce7",
+                                color: hidden ? "#991b1b" : "#166534"
+                              }}
+                            >
+                              {hidden ? "🚫 Hidden / Deleted" : "🟢 Visible"}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 2 }}>
+                            {sec.desc}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {sec.key === "custom_sections" && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("sections")}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                          >
+                            🎨 Edit Sections
+                          </button>
+                        )}
+                        {sec.key === "faqs" && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("faqs")}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                          >
+                            ❓ Edit FAQs
+                          </button>
+                        )}
+                        {sec.key === "benefits" && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("bullets")}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                          >
+                            ✨ Edit Bullets
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => toggleSectionVisibility(sec.key)}
+                          className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
+                          style={{ minWidth: 100 }}
+                        >
+                          {hidden ? "👁️ Restore" : "🗑️ Delete / Hide"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── TAB 2: GENERAL & HERO ── */}
           {activeTab === "general" && (
             <div>
               <div className="adm-form-group">
@@ -489,10 +695,10 @@ function ServiceEditorModal({
               </div>
 
               <div className="adm-form-group">
-                <label className="adm-form-label">Full Clinical Description</label>
+                <label className="adm-form-label">Clinical Overview Content</label>
                 <textarea
                   className="adm-textarea"
-                  style={{ minHeight: 130 }}
+                  style={{ minHeight: 120 }}
                   value={service.description}
                   onChange={(e) => setService({ ...service, description: e.target.value })}
                 />
@@ -509,7 +715,7 @@ function ServiceEditorModal({
                   />
                 </div>
                 <div className="adm-form-group">
-                  <label className="adm-form-label">Primary Call to Action Text</label>
+                  <label className="adm-form-label">Primary Call to Action Button Text</label>
                   <input
                     type="text"
                     className="adm-input"
@@ -521,98 +727,122 @@ function ServiceEditorModal({
             </div>
           )}
 
+          {/* ── TAB 3: CUSTOM SECTIONS BUILDER ── */}
           {activeTab === "sections" && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <span style={{ fontSize: 13, color: "#64748b" }}>
-                  Add rich visual storytelling sections with custom images, subheaders, and badge highlights.
+                  Create rich storytelling sections with image left/right/top/bottom placement and custom badge styling.
                 </span>
                 <button
                   type="button"
-                  onClick={addCustomSection}
+                  onClick={() => addCustomSection("right")}
                   className="adm-btn adm-btn-primary adm-btn-sm"
                 >
                   + Add Custom Section
                 </button>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {service.customSections?.map((sec, idx) => (
-                  <div key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 18 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontWeight: 700, fontSize: 14 }}>Section #{idx + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeCustomSection(idx)}
-                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
-                      >
-                        🗑️ Delete Section
-                      </button>
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
-                      <div>
-                        <label className="adm-form-label">Section Title</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={sec.title}
-                          onChange={(e) => updateCustomSection(idx, { title: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className="adm-form-label">Eyebrow / Badge Text</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={sec.eyebrow || ""}
-                          onChange={(e) => updateCustomSection(idx, { eyebrow: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="adm-form-group">
-                      <label className="adm-form-label">Body Content</label>
-                      <textarea
-                        className="adm-textarea"
-                        style={{ minHeight: 80 }}
-                        value={sec.content || ""}
-                        onChange={(e) => updateCustomSection(idx, { content: e.target.value })}
-                      />
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                      <div>
-                        <label className="adm-form-label">Image Path</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={sec.image || ""}
-                          onChange={(e) => updateCustomSection(idx, { image: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className="adm-form-label">Image Position</label>
-                        <select
-                          className="adm-select"
-                          value={sec.imagePosition || "right"}
-                          onChange={(e) => updateCustomSection(idx, { imagePosition: e.target.value as any })}
+              {service.customSections?.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 36, background: "#f8fafc", borderRadius: 12, border: "2px dashed #e2e8f0" }}>
+                  <p style={{ color: "#64748b", margin: "0 0 12px 0" }}>No custom sections created yet.</p>
+                  <button type="button" onClick={() => addCustomSection("right")} className="adm-btn adm-btn-primary adm-btn-sm">
+                    + Add First Section
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                  {service.customSections?.map((sec, idx) => (
+                    <div key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 18 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                        <span style={{ fontWeight: 700, fontSize: 14 }}>Section #{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeCustomSection(idx)}
+                          style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
                         >
-                          <option value="right">Right Side</option>
-                          <option value="left">Left Side</option>
-                          <option value="none">No Image (Text Only)</option>
-                        </select>
+                          🗑️ Delete Section
+                        </button>
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
+                        <div>
+                          <label className="adm-form-label">Section Title</label>
+                          <input
+                            type="text"
+                            className="adm-input"
+                            value={sec.title}
+                            onChange={(e) => updateCustomSection(idx, { title: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="adm-form-label">Eyebrow / Badge Text</label>
+                          <input
+                            type="text"
+                            className="adm-input"
+                            value={sec.eyebrow || ""}
+                            onChange={(e) => updateCustomSection(idx, { eyebrow: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="adm-form-group">
+                        <label className="adm-form-label">Body Content</label>
+                        <textarea
+                          className="adm-textarea"
+                          style={{ minHeight: 80 }}
+                          value={sec.content || ""}
+                          onChange={(e) => updateCustomSection(idx, { content: e.target.value })}
+                        />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                        <div>
+                          <label className="adm-form-label">Image Path</label>
+                          <input
+                            type="text"
+                            className="adm-input"
+                            value={sec.image || ""}
+                            onChange={(e) => updateCustomSection(idx, { image: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="adm-form-label">Image Position</label>
+                          <select
+                            className="adm-select"
+                            value={sec.imagePosition || "right"}
+                            onChange={(e) => updateCustomSection(idx, { imagePosition: e.target.value as any })}
+                          >
+                            <option value="right">Right Side</option>
+                            <option value="left">Left Side</option>
+                            <option value="top">Top Banner</option>
+                            <option value="bottom">Bottom Image</option>
+                            <option value="none">No Image (Text Only)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="adm-form-label">Background Style</label>
+                          <select
+                            className="adm-select"
+                            value={sec.background || "white"}
+                            onChange={(e) => updateCustomSection(idx, { background: e.target.value as any })}
+                          >
+                            <option value="white">Clean White</option>
+                            <option value="light">Soft Light Blue (#f8fafc)</option>
+                            <option value="teal">Dark Teal Theme</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
+          {/* ── TAB 4: FAQ BUILDER ── */}
           {activeTab === "faqs" && (
             <div>
-              {/* Add FAQ Form */}
               <div style={{ background: "#f1f5f9", padding: 16, borderRadius: 12, marginBottom: 20 }}>
                 <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>+ Add New Question & Answer</h4>
                 <div className="adm-form-group">
@@ -642,7 +872,6 @@ function ServiceEditorModal({
                 </button>
               </div>
 
-              {/* FAQs List */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {service.faqs?.map((faq, idx) => (
                   <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: 14, borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
@@ -667,6 +896,7 @@ function ServiceEditorModal({
             </div>
           )}
 
+          {/* ── TAB 5: BENEFITS & ROADMAP ── */}
           {activeTab === "bullets" && (
             <div>
               <div style={{ background: "#f1f5f9", padding: 16, borderRadius: 12, marginBottom: 20 }}>
@@ -674,7 +904,7 @@ function ServiceEditorModal({
                 <div style={{ display: "flex", gap: 10 }}>
                   <input
                     type="text"
-                    placeholder="E.g., Rapid relief from acute cervical nerve compression"
+                    placeholder="E.g., Rapid relief from acute nerve compression"
                     className="adm-input"
                     value={newBenefit}
                     onChange={(e) => setNewBenefit(e.target.value)}
@@ -706,6 +936,7 @@ function ServiceEditorModal({
               </div>
             </div>
           )}
+
         </div>
 
         {/* Modal Footer */}
@@ -725,7 +956,165 @@ function ServiceEditorModal({
             💾 Save Service Changes
           </button>
         </div>
+
       </div>
+
+      {/* ── MODAL: SECTION BLOCK PICKER (+ ADD / INSERT SECTION) ── */}
+      {showAddSectionModal && (
+        <div
+          className="adm-modal-overlay"
+          style={{ zIndex: 1100 }}
+          onClick={() => setShowAddSectionModal(false)}
+        >
+          <div
+            className="adm-modal"
+            style={{ maxWidth: 640 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="adm-modal-header">
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
+                + Add / Insert Page Section
+              </h3>
+              <button
+                onClick={() => setShowAddSectionModal(false)}
+                style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="adm-modal-body">
+              <p style={{ margin: "0 0 16px 0", fontSize: 13.5, color: "#64748b" }}>
+                Select what kind of section you want to add to this page:
+              </p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  {
+                    icon: "🎨",
+                    title: "Custom Storytelling Section",
+                    desc: "Add left/right image, badge, text, and checklist bullets.",
+                    action: () => {
+                      addCustomSection("right");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "📋",
+                    title: "Clinical Overview Block",
+                    desc: "Explain the root cause and why treatment works.",
+                    action: () => {
+                      if (isSectionHidden("clinical_overview")) toggleSectionVisibility("clinical_overview");
+                      setActiveTab("general");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "🩺",
+                    title: "Symptoms & Conditions Block",
+                    desc: "List of treatable symptoms and linked conditions.",
+                    action: () => {
+                      if (isSectionHidden("symptoms")) toggleSectionVisibility("symptoms");
+                      setActiveTab("bullets");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "🛣️",
+                    title: "Treatment Steps Roadmap",
+                    desc: "4-step clinical recovery journey.",
+                    action: () => {
+                      if (isSectionHidden("treatment_approach")) toggleSectionVisibility("treatment_approach");
+                      setActiveTab("bullets");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "❓",
+                    title: "FAQ Accordion Block",
+                    desc: "Patient questions, insurance, and answers.",
+                    action: () => {
+                      if (isSectionHidden("faqs")) toggleSectionVisibility("faqs");
+                      setActiveTab("faqs");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "👥",
+                    title: "Meet The Team Carousel",
+                    desc: "Showcase clinic therapists and staff.",
+                    action: () => {
+                      if (isSectionHidden("team_carousel")) toggleSectionVisibility("team_carousel");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "📍",
+                    title: "Location Map & Hours Card",
+                    desc: "Beddington location map, directions, and hours.",
+                    action: () => {
+                      if (isSectionHidden("location_map")) toggleSectionVisibility("location_map");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "💡",
+                    title: "Free Discovery & Phone CTAs",
+                    desc: "Two cards for free consultations before booking.",
+                    action: () => {
+                      if (isSectionHidden("decision_ctas")) toggleSectionVisibility("decision_ctas");
+                      setShowAddSectionModal(false);
+                    }
+                  }
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    onClick={item.action}
+                    style={{
+                      background: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 10,
+                      padding: 14,
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 6,
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--adm-primary)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(28,159,216,0.12)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>{item.icon}</span>
+                      <strong style={{ fontSize: 13.5, color: "#1e293b" }}>{item.title}</strong>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="adm-modal-footer">
+              <button
+                type="button"
+                onClick={() => setShowAddSectionModal(false)}
+                className="adm-btn adm-btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

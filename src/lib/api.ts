@@ -88,6 +88,7 @@ export async function getServices(): Promise<Service[]> {
           treatmentApproach: d.treatment_approach || [],
           customSections: d.custom_sections || [],
           faqs: d.faqs || [],
+          hiddenSections: d.hidden_sections || [],
           relatedServices: d.related_services || [],
           relatedConditions: d.related_conditions || [],
           teamMembers: d.team_members || [],
@@ -131,6 +132,7 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
           treatmentApproach: data.treatment_approach || [],
           customSections: data.custom_sections || [],
           faqs: data.faqs || [],
+          hiddenSections: data.hidden_sections || [],
           relatedServices: data.related_services || [],
           relatedConditions: data.related_conditions || [],
           teamMembers: data.team_members || [],
@@ -307,6 +309,7 @@ export async function getConditions(): Promise<Condition[]> {
           treatmentApproach: d.treatment_approach || [],
           customSections: d.custom_sections || [],
           faqs: d.faqs || [],
+          hiddenSections: d.hidden_sections || [],
           relatedServices: d.related_services || [],
           category: d.category || "general",
           seo: d.seo || {}

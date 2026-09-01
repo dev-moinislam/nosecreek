@@ -84,6 +84,7 @@ export interface Service {
   treatmentApproach?: string[];
   customSections?: ServiceCustomSection[];
   faqs?: FAQItem[];
+  hiddenSections?: string[]; // list of section keys to hide/disable
   relatedServices?: string[]; // slugs
   relatedConditions?: string[]; // slugs
   teamMembers?: string[]; // slugs
@@ -171,6 +172,7 @@ export interface Condition {
   treatmentApproach?: string[];
   customSections?: ServiceCustomSection[];
   faqs?: FAQItem[];
+  hiddenSections?: string[];
   relatedServices?: string[]; // slugs
   category?: string;
   seo?: SEOData;

@@ -67,10 +67,13 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     (service.relatedConditions ?? []).includes(c.id) || (service.relatedConditions ?? []).includes(c.slug)
   );
 
+  const isHidden = (key: string) => (service.hiddenSections || []).includes(key);
+
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
       
       {/* ── 1. HERO HEADER ── */}
+      {!isHidden("hero") && (
       <section style={{ background: "linear-gradient(180deg, #f2f8fb 0%, #ffffff 100%)", padding: "clamp(36px, 4vw, 56px) 0 36px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
           <Breadcrumbs
@@ -119,7 +122,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Right Hero Image Card with Rating Badge */}
             <div style={{ position: "relative" }}>
               <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 50px rgba(18,60,80,0.14)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -138,8 +140,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 2. TREATMENT AT-A-GLANCE BAR ── */}
+      {!isHidden("at_a_glance") && (
       <section style={{ background: "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1", padding: "20px 0" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
           {[
@@ -158,8 +162,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           ))}
         </div>
       </section>
+      )}
 
       {/* ── 3. CLINICAL OVERVIEW & WHY IT WORKS ── */}
+      {!isHidden("clinical_overview") && (
       <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
@@ -176,9 +182,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
-      {/* ── 4. DYNAMIC CUSTOM SECTIONS ENGINE (Supports Left/Right/Top/Bottom Image & Any Extra Content) ── */}
-      {service.customSections && service.customSections.map((sec, idx) => {
+      {/* ── 4. DYNAMIC CUSTOM SECTIONS ENGINE ── */}
+      {!isHidden("custom_sections") && service.customSections && service.customSections.map((sec, idx) => {
         const isLeft = sec.imagePosition === "left";
         const isTop = sec.imagePosition === "top";
         const isBottom = sec.imagePosition === "bottom";
@@ -199,12 +206,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           >
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               
-              {/* TOP IMAGE LAYOUT */}
               {isTop && (
                 <div style={{ maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
                   {sec.image && (
                     <div style={{ borderRadius: 20, overflow: "hidden", marginBottom: 36, boxShadow: "0 14px 36px rgba(18,60,80,0.1)", aspectRatio: "16/9" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
@@ -234,19 +239,15 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* LEFT / RIGHT 2-COLUMN LAYOUT */}
               {(isLeft || sec.imagePosition === "right") && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(36px, 5vw, 64px)", alignItems: "center" }}>
                   
-                  {/* Image Column (if left) */}
                   {isLeft && sec.image && (
                     <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.12)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
 
-                  {/* Text Column */}
                   <div>
                     {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#6faf1c")}
                     <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 16 }}>
@@ -284,10 +285,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                     )}
                   </div>
 
-                  {/* Image Column (if right) */}
                   {!isLeft && sec.image && (
                     <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.12)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
@@ -295,21 +294,53 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* CENTERED TEXT ONLY */}
-              {(isNone || isBottom) && (
+              {isNone && (
                 <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
                   {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#1c9fd8")}
                   <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", marginBottom: 16 }}>
                     {sec.title}
                   </h2>
+                  {sec.subtitle && (
+                    <p style={{ fontSize: 18, fontWeight: 600, color: "#0e78a8", marginBottom: 16 }}>
+                      {sec.subtitle}
+                    </p>
+                  )}
                   {sec.content && (
                     <p style={{ fontSize: 16.5, lineHeight: 1.8, color: pColor, marginBottom: 24 }}>
                       {sec.content}
                     </p>
                   )}
-                  {isBottom && sec.image && (
-                    <div style={{ borderRadius: 20, overflow: "hidden", marginTop: 32, boxShadow: "0 14px 36px rgba(18,60,80,0.1)", aspectRatio: "16/9" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {sec.bullets && sec.bullets.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, textAlign: "left", marginTop: 24 }}>
+                      {sec.bullets.map((b, i) => (
+                        <div key={i} style={{ background: "#f8fafc", padding: "14px 18px", borderRadius: 12, border: "1px solid #e2ebf0", display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ color: "#6faf1c", fontWeight: 800, fontSize: 16 }}>✓</span>
+                          <span style={{ fontSize: 14.5, fontWeight: 600, color: "#1d2b34" }}>{b}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {isBottom && (
+                <div style={{ maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
+                  {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#1c9fd8")}
+                  <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", marginBottom: 16 }}>
+                    {sec.title}
+                  </h2>
+                  {sec.subtitle && (
+                    <p style={{ fontSize: 18, fontWeight: 600, color: "#0e78a8", marginBottom: 16 }}>
+                      {sec.subtitle}
+                    </p>
+                  )}
+                  {sec.content && (
+                    <p style={{ fontSize: 16.5, lineHeight: 1.8, color: pColor, marginBottom: 24 }}>
+                      {sec.content}
+                    </p>
+                  )}
+                  {sec.image && (
+                    <div style={{ borderRadius: 20, overflow: "hidden", marginTop: 36, boxShadow: "0 14px 36px rgba(18,60,80,0.1)", aspectRatio: "16/9" }}>
                       <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
@@ -321,17 +352,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         );
       })}
 
-      {/* ── 5. KEY CLINICAL BENEFITS GRID ── */}
-      {service.benefits && service.benefits.length > 0 && (
+      {/* ── 5. KEY TREATMENT BENEFITS ── */}
+      {!isHidden("benefits") && service.benefits && service.benefits.length > 0 && (
         <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
             <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 48px" }}>
-              {eyebrow("Proven Clinical Outcomes", "#6faf1c")}
+              {eyebrow("Proven Benefits", "#6faf1c")}
               <h2 style={{ fontSize: "clamp(26px,3.8vw,42px)", fontWeight: 800, letterSpacing: "-0.5px" }}>
-                Key Benefits of Our {service.title} Program
+                Why Choose {service.title} at Nose Creek?
               </h2>
               <p style={{ marginTop: 12, fontSize: 16.5, color: "#5a6570", lineHeight: 1.6 }}>
-                Experience targeted, long-term relief designed around your personal health and recovery goals:
+                Patients across North Calgary trust our clinical team for long-term recovery and rapid pain relief:
               </p>
             </div>
 
@@ -352,7 +383,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       )}
 
       {/* ── 6. CONDITIONS & SYMPTOMS TREATED ── */}
-      {service.symptoms && service.symptoms.length > 0 && (
+      {!isHidden("symptoms") && service.symptoms && service.symptoms.length > 0 && (
         <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
           <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
             <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 44px" }}>
@@ -375,7 +406,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             </div>
 
             {/* Related Conditions Links */}
-            {relatedConditionObjects.length > 0 && (
+            {!isHidden("related_conditions") && relatedConditionObjects.length > 0 && (
               <div style={{ background: "#f2f8fb", borderRadius: 18, border: "1px solid #d7e6ef", padding: "26px 30px", textAlign: "center" }}>
                 <div style={{ fontSize: 14, color: "#0e78a8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 14 }}>
                   Explore Specific Condition Guides:
@@ -398,6 +429,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       )}
 
       {/* ── 7. PATIENT JOURNEY / WHAT TO EXPECT ── */}
+      {!isHidden("treatment_approach") && (
       <section style={{ background: "#f8fafc", padding: "clamp(56px,7vw,96px) 0", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 48px" }}>
@@ -444,11 +476,13 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
-      {/* ── 8. MEET THE TEAM CAROUSEL (EXACTLY LIKE HOMEPAGE) ── */}
-      <TeamCarousel members={allTeam} />
+      {/* ── 8. MEET THE TEAM CAROUSEL ── */}
+      {!isHidden("team_carousel") && <TeamCarousel members={allTeam} />}
 
-      {/* ── 9. FREQUENTLY ASKED QUESTIONS (EXACT HOMEPAGE STYLE) ── */}
+      {/* ── 9. FREQUENTLY ASKED QUESTIONS ── */}
+      {!isHidden("faqs") && (
       <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 820, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: 38 }}>
@@ -482,8 +516,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
-      {/* ── 10. ONE CLINIC, IDEALLY LOCATED IN CALGARY (EXACT HOMEPAGE SECTION) ── */}
+      {/* ── 10. ONE CLINIC, IDEALLY LOCATED IN CALGARY ── */}
+      {!isHidden("location_map") && (
       <section id="contact" style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 44px" }}>
@@ -493,7 +529,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             </h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 28, alignItems: "stretch" }}>
-            {/* Map */}
             <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 30px rgba(18,60,80,0.1)", minHeight: 340 }}>
               <iframe
                 title="Map to Nose Creek Physiotherapy"
@@ -503,7 +538,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-            {/* Info card */}
             <div style={{ background: "#12303d", color: "#eaf3f8", borderRadius: 18, padding: "clamp(26px,3vw,38px)", display: "flex", flexDirection: "column", gap: 18 }}>
               <div>
                 <h3 style={{ color: "#fff", fontSize: 22, fontWeight: 700 }}>Nose Creek Physiotherapy</h3>
@@ -540,8 +574,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
-      {/* ── 11. DECISION CTAs (Discovery + Phone Consult) ── */}
+      {/* ── 11. DECISION CTAs ── */}
+      {!isHidden("decision_ctas") && (
       <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 40px" }}>
@@ -576,8 +612,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 12. BOTTOM CTA BANNER ── */}
+      {!isHidden("bottom_cta") && (
       <section style={{ background: "linear-gradient(120deg,#1c9fd8,#1179ab)", color: "#fff" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(48px,6vw,76px) 24px", textAlign: "center" }}>
           <h2 style={{ color: "#fff", fontSize: "clamp(26px,3.8vw,44px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.15 }}>
@@ -603,6 +641,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {service.faqs && service.faqs.length > 0 && (
         <SchemaMarkup type="FAQPage" data={service.faqs} />

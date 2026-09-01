@@ -51,6 +51,7 @@ VALUES (
   '["Thorough orthopaedic assessment and biomechanical movement analysis","Hands-on joint mobilization, spinal manipulation, and soft tissue release","Intramuscular Stimulation (IMS / Dry Needling) when indicated","Personalized active exercise prescriptions and postural education"]'::jsonb,
   '[{"id":"manual-therapy-focus","eyebrow":"Advanced Clinical Technique","eyebrowColor":"#6faf1c","title":"Hands-On Manual Therapy & Joint Mobilization","subtitle":"Direct spinal and extremity joint mobilization to unlock restricted motion.","content":"At Nose Creek Physiotherapy, our manual therapists are Fellows of the Canadian Academy of Manipulative Physiotherapy (FCAMPT) — representing the highest internationally recognized standard in orthopaedic physical therapy. We don''t just hand you a sheet of exercises; we use targeted hands-on mobilizations to free stiff joints and calm irritated nerve roots on your very first visit.","bullets":["FCAMPT-certified orthopaedic joint mobilizations","Myofascial trigger point and soft-tissue release","Spinal traction and mechanical decompression strategies","Safe and gentle techniques tailored to your comfort"],"image":"/images/clinic/reception-four.jpg","imageAlt":"Physiotherapist performing manual joint mobilization","imagePosition":"right","background":"white","ctaText":"Book An Assessment Online →","ctaHref":"https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"},{"id":"dry-needling-ims","eyebrow":"Deep Muscle Release","eyebrowColor":"#1c9fd8","title":"Gunn Intramuscular Stimulation (IMS / Dry Needling)","subtitle":"Relieve deep, chronic muscle spasms that stretching cannot reach.","content":"When nerve roots are sensitized or compressed, deep postural muscles develop permanent taut bands (neuropathic shortening) that stay tight no matter how much you stretch. Gunn IMS uses ultra-fine needles to release these deep contracted muscle fibers, allowing the nerve to heal and eliminating radiating pain.","bullets":["Targets deep spinal and buttock muscles unreachable by hand","Resets hyperactive nerve pathways for lasting pain relief","Highly effective for chronic sciatica, neck pain, and headaches","Administered by certified CGIMS practitioners"],"image":"/images/clinic/clinic-mobile.jpg","imageAlt":"IMS Dry Needling treatment at Nose Creek Physiotherapy","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral for physiotherapy?","answer":"No, in Alberta you do not need a physician referral to see a licensed physiotherapist. You can book an appointment directly with our clinic. (Some private insurance plans may request one for claim reimbursement)."},{"question":"Is physiotherapy covered by my insurance plan?","answer":"Yes, physiotherapy is covered under almost all extended health care benefit plans, WCB workplace claims, and auto insurance policies. We provide direct billing to all major insurers."},{"question":"What should I wear to my physiotherapy appointment?","answer":"Wear comfortable, loose-fitting clothing that allows easy access to the injured area (e.g., shorts for knee or hip injuries, a tank top or loose shirt for shoulder and neck issues)."}]'::jsonb,
+  '[]'::jsonb,
   '["massage-therapy","shockwave-therapy","acupuncture"]'::jsonb,
   '["back-pain","knee-pain","neck-shoulder-pain"]'::jsonb,
   '["blair-schachterle","rizelle-manzano","madelyne-agius"]'::jsonb,
@@ -67,6 +68,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -89,6 +91,7 @@ VALUES (
   '["Pre-treatment consultation to pinpoint areas of restriction","Targeted deep tissue massage and myofascial trigger point release","Swedish relaxation techniques to calm the nervous system","Therapist recommendations for home stretching and hydration"]'::jsonb,
   '[{"id":"rmt-credentials","eyebrow":"Certified 2200-Hour RMTs","eyebrowColor":"#6faf1c","title":"Medical & Therapeutic Registered Massage Therapy","subtitle":"Targeted soft tissue release tailored to your exact physical tension.","content":"All our massage therapists are fully registered (2200-Hour RMTs) with recognized Alberta associations. Whether you need focused deep-tissue therapy for a stubborn muscle spasm or gentle myofascial release following a car accident, our RMTs collaborate with our physiotherapists to accelerate your complete physical recovery.","bullets":["Deep Tissue & Myofascial Trigger Point Release","Sports & Athletic Pre/Post Performance Massage","Prenatal & Postnatal Gentle Muscle Therapy","100% Direct Billing to Extended Health Insurance"],"image":"/images/clinic/reception-three.jpg","imageAlt":"Registered Massage Therapy treatment room at Nose Creek","imagePosition":"right","background":"white"}]'::jsonb,
   '[{"question":"Are your massage therapists registered in Alberta?","answer":"Yes, all massage therapists at Nose Creek are fully registered (2200-Hour RMTs) and can provide official receipts for extended health insurance reimbursement."},{"question":"Can I combine massage therapy with physiotherapy?","answer":"Yes, combining massage therapy with active physiotherapy is often the most effective approach for resolving chronic pain and complex injuries."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","acupuncture","shockwave-therapy"]'::jsonb,
   '["neck-shoulder-pain","back-pain"]'::jsonb,
   '["katie-luu","shawn-gille","amalia","smita-nagpal","jihan-shayya"]'::jsonb,
@@ -105,6 +108,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -127,6 +131,7 @@ VALUES (
   '["Precise anatomical localization of injured tendon fibers","Application of acoustic shockwave pulses tailored to your comfort level","Integration with eccentric strengthening and loading exercises","Progressive rehabilitation protocol over 4–6 weeks"]'::jsonb,
   '[{"id":"how-shockwave-heals","eyebrow":"Advanced Medical Technology","eyebrowColor":"#1c9fd8","title":"How Acoustic Shockwaves Dissolve Chronic Calcifications","subtitle":"Reactivating your body''s natural cellular healing cycle without surgery.","content":"Radial shockwave therapy generates high-energy acoustic pulses that pass through skin into deep tendon structures. These soundwaves trigger ''neovascularization'' — the formation of new micro-capillaries that flood scarred, stagnant tendon tissue with oxygen and healing nutrients, while simultaneously breaking apart painful calcifications.","bullets":["Non-invasive alternative to cortisone shots or surgery","Typically requires only 3 to 5 weekly sessions of 10–15 minutes","High clinical success rate for chronic plantar fasciitis and tennis elbow","Administered by trained physiotherapy clinicians"],"image":"/images/clinic/reception-desktop.jpg","imageAlt":"Acoustic Radial Shockwave Therapy at Nose Creek","imagePosition":"left","background":"white"}]'::jsonb,
   '[{"question":"Is shockwave therapy painful?","answer":"You may experience mild discomfort during the 5-minute treatment, but our therapists adjust the intensity so it is always tolerable. Discomfort stops immediately when the pulses finish."},{"question":"How many shockwave sessions do I need?","answer":"Most patients achieve substantial relief within 3 to 5 weekly sessions."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","custom-orthotics"]'::jsonb,
   '["foot-pain","knee-pain","sports-injury"]'::jsonb,
   '["blair-schachterle","rizelle-manzano"]'::jsonb,
@@ -143,6 +148,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -165,6 +171,7 @@ VALUES (
   '["Comprehensive diagnostic assessment of symptoms and tension points","Insertion of ultra-thin, single-use sterile micro-needles","Gentle manual stimulation or optional electro-acupuncture for nerve modulation","Relaxing 20–30 minute resting phase in a private treatment room"]'::jsonb,
   '[]'::jsonb,
   '[{"question":"Does acupuncture hurt?","answer":"Acupuncture needles are hair-thin and most patients feel only a slight prick or dull warmth on insertion. Many patients find the experience deeply relaxing."},{"question":"Is acupuncture covered by extended health insurance?","answer":"Yes, acupuncture provided by licensed practitioners is covered by most extended health plans in Alberta."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy"]'::jsonb,
   '["neck-shoulder-pain","back-pain"]'::jsonb,
   '["dr-eileen-wei","blair-schachterle"]'::jsonb,
@@ -181,6 +188,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -203,6 +211,7 @@ VALUES (
   '["3D computerized gait analysis and biomechanical foot assessment","Precision foam cast or 3D digital scan of both feet","Custom fabrication by specialized orthotic laboratories","Fitting, footwear review, and follow-up adjustments"]'::jsonb,
   '[]'::jsonb,
   '[{"question":"How long do custom orthotics last?","answer":"High-quality custom orthotics typically last 2 to 4 years depending on your daily wear, body weight, and activity level."},{"question":"Will my insurance cover custom orthotics?","answer":"Most extended healthcare plans cover custom orthotics when prescribed by a doctor or qualified specialist. We provide all detailed lab documentation for claims."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","shockwave-therapy","knee-bracing"]'::jsonb,
   '["foot-pain","knee-pain","back-pain"]'::jsonb,
   '["blair-schachterle"]'::jsonb,
@@ -219,6 +228,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -241,6 +251,7 @@ VALUES (
   '["Clinical knee joint evaluation and stability testing","Measurement and selection of the ideal brace design (Custom / Off-the-shelf)","Custom fitting, strap calibration, and movement trial in clinic","Integration with knee-strengthening physiotherapy exercises"]'::jsonb,
   '[]'::jsonb,
   '[{"question":"What is a Spring-Loaded Knee Brace?","answer":"Spring-loaded knee braces store energy during knee bending and return it during knee extension, taking up to 40% of the mechanical load off your joint when standing up or climbing stairs."},{"question":"Is custom knee bracing covered by insurance?","answer":"Yes, many extended health insurance plans cover custom knee bracing with a physician prescription."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","custom-orthotics"]'::jsonb,
   '["knee-pain","sports-injury"]'::jsonb,
   '["blair-schachterle"]'::jsonb,
@@ -257,6 +268,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -279,6 +291,7 @@ VALUES (
   '["Private, compassionate consultation and pelvic floor assessment","Breathing, pressure management, and pelvic floor coordination training","Hands-on soft tissue release and gentle joint alignment","Gradual return to running, gym workouts, and daily living"]'::jsonb,
   '[]'::jsonb,
   '[{"question":"What happens during a pelvic health assessment?","answer":"Your therapist takes a detailed history of your symptoms and, with your consent, assesses your pelvic floor muscles, breathing, posture, and core coordination in a private room."},{"question":"Can pelvic physiotherapy help years after having children?","answer":"Yes! It is never too late to rehabilitate your pelvic floor muscles and restore strength and bladder control."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy"]'::jsonb,
   '["back-pain"]'::jsonb,
   '["rizelle-manzano","madelyne-agius"]'::jsonb,
@@ -295,12 +308,13 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
 
 -- 3. Conditions
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'back-pain',
   'back-pain',
@@ -316,6 +330,7 @@ VALUES (
   '["Comprehensive biomechanical lumbar spine and pelvic assessment","CAMPT-certified joint mobilizations and spinal manual therapy","IMS / Dry Needling to release chronic deep lumbar muscle spasms","Custom active core stabilization exercises (McKenzie / Stuart McGill protocols)"]'::jsonb,
   '[{"id":"sec-back-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Back Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your back pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"right","background":"white"},{"id":"sec-back-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Back Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-three.jpg","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for back pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for back pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my back pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy","acupuncture"]'::jsonb,
   'Spine & Core',
   '{"title":"Back Pain Treatment Calgary | Nose Creek Physiotherapy","description":"Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.","ogTitle":"Back Pain Treatment | Nose Creek Physiotherapy","ogDescription":"End back pain without pills or surgery with evidence-based physical therapy in Calgary."}'::jsonb,
@@ -334,8 +349,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'neck-shoulder-pain',
   'neck-shoulder-pain',
@@ -351,6 +367,7 @@ VALUES (
   '["Gentle cervical and upper thoracic joint mobilizations","Myofascial release of suboccipital and shoulder girdle muscles","Cervical deep flexor retraining and chin-tuck exercises","Postural and workplace ergonomic calibration"]'::jsonb,
   '[{"id":"sec-neck-shoulder-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Neck & Shoulder Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your neck & shoulder pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-three.jpg","imagePosition":"left","background":"white"},{"id":"sec-neck-shoulder-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Neck & Shoulder Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"right","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for neck & shoulder pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for neck & shoulder pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my neck & shoulder pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy","acupuncture"]'::jsonb,
   'Spine & Neck',
   '{"title":"Neck & Shoulder Pain Treatment Calgary | Nose Creek","description":"Relieve neck stiffness, tech-neck, and shoulder tension with hands-on physiotherapy and massage in Calgary.","ogTitle":"Neck & Shoulder Pain Relief | Nose Creek","ogDescription":"Restore neck mobility and stop tension headaches with targeted physical therapy."}'::jsonb,
@@ -369,8 +386,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'knee-pain',
   'knee-pain',
@@ -386,6 +404,7 @@ VALUES (
   '["Patellar tracking and lower-limb biomechanical assessment","Quadriceps, hamstring, and hip abductor strengthening","Shockwave therapy for chronic patellar tendinopathy","Custom or spring-loaded unloader knee bracing recommendations"]'::jsonb,
   '[{"id":"sec-knee-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Knee Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your knee pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"right","background":"white"},{"id":"sec-knee-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Knee Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/staff-team-photo.jpg","imagePosition":"none","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for knee pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for knee pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my knee pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","knee-bracing","shockwave-therapy","custom-orthotics"]'::jsonb,
   'Lower Extremity',
   '{"title":"Knee Pain Treatment & Knee Bracing Calgary | Nose Creek","description":"Evidence-based knee pain rehabilitation, custom knee bracing, and shockwave therapy in Calgary.","ogTitle":"Knee Pain Rehabilitation | Nose Creek Physiotherapy","ogDescription":"Stop knee pain without injections or surgery. Personalized physical therapy in Calgary."}'::jsonb,
@@ -404,8 +423,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'foot-pain',
   'foot-pain',
@@ -421,6 +441,7 @@ VALUES (
   '["Dynamic 3D digital gait analysis and foot mechanics evaluation","Radial shockwave therapy to stimulate cellular collagen repair","Custom medical orthotics to realign arch structure and foot biomechanics","Calf stretching, intrinsic foot muscle strengthening, and taping"]'::jsonb,
   '[{"id":"sec-foot-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Foot Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your foot pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/staff-team-photo.jpg","imagePosition":"left","background":"white"},{"id":"sec-foot-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Foot Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/treatment-gym.jpg","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for foot pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for foot pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my foot pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["custom-orthotics","shockwave-therapy","physiotherapy"]'::jsonb,
   'Lower Extremity',
   '{"title":"Foot Pain & Plantar Fasciitis Calgary | Nose Creek","description":"Heal plantar fasciitis, heel spurs, and Achilles tendon pain with shockwave therapy and custom orthotics in Calgary.","ogTitle":"Foot & Heel Pain Treatment | Nose Creek Physiotherapy","ogDescription":"Custom orthotics and acoustic shockwave therapy for lasting foot pain relief."}'::jsonb,
@@ -439,8 +460,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'sports-injury',
   'sports-injury',
@@ -456,6 +478,7 @@ VALUES (
   '["Sport-specific functional movement screen and strength testing","Manual therapy, soft tissue mobilization, and IMS dry needling","Progressive eccentric loading and plyometric training","Gradual return-to-sport protocols and injury prevention coaching"]'::jsonb,
   '[{"id":"sec-sports-injury-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Sports Injury at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your sports injury. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-gym.jpg","imagePosition":"right","background":"white"},{"id":"sec-sports-injury-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Sports Injury Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"right","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for sports injury?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for sports injury covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my sports injury?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy","shockwave-therapy"]'::jsonb,
   'Athletic Rehab',
   '{"title":"Sports Injury Rehabilitation Calgary | Nose Creek","description":"Sport physiotherapy and athletic rehabilitation in Calgary NW & NE for sprains, tears, and tendonitis.","ogTitle":"Sports Injury Clinic | Nose Creek Physiotherapy","ogDescription":"Recover faster and return to your sport stronger with certified sport physiotherapy."}'::jsonb,
@@ -474,8 +497,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'balance-falls',
   'balance-falls',
@@ -491,6 +515,7 @@ VALUES (
   '["Vestibular ocular motor screening and Dix-Hallpike diagnostic maneuver","Canalith repositioning procedures (Epley maneuver for BPPV vertigo)","Dynamic balance retraining on uneven and multi-surface platforms","Gait speed training and lower limb stabilizer strengthening"]'::jsonb,
   '[{"id":"sec-balance-falls-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Balance & Falls at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your balance & falls. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"left","background":"white"},{"id":"sec-balance-falls-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Balance & Falls Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-three.jpg","imagePosition":"none","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for balance & falls?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for balance & falls covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my balance & falls?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy"]'::jsonb,
   'Vestibular & Balance',
   '{"title":"Balance & Fall Prevention Clinic Calgary | Nose Creek","description":"Improve your balance, resolve vertigo, and prevent falls with specialized vestibular physiotherapy in Calgary.","ogTitle":"Balance & Fall Prevention | Nose Creek Physiotherapy","ogDescription":"Build steady footing and confidence with specialized balance and vestibular therapy."}'::jsonb,
@@ -509,8 +534,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'shoulder-conditions',
   'shoulder-conditions',
@@ -526,6 +552,7 @@ VALUES (
   '["Glenohumeral and scapulothoracic joint mobilization","Rotator cuff strengthening and scapular stabilizer coordination","Shockwave therapy for calcific rotator cuff tendinitis","IMS dry needling to release hypertonic shoulder musculature"]'::jsonb,
   '[{"id":"sec-shoulder-conditions-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Shoulder Conditions at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your shoulder conditions. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-three.jpg","imagePosition":"right","background":"white"},{"id":"sec-shoulder-conditions-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Shoulder Conditions Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for shoulder conditions?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for shoulder conditions covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my shoulder conditions?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","shockwave-therapy","massage-therapy"]'::jsonb,
   'Upper Extremity',
   '{"title":"Shoulder Pain & Rotator Cuff Clinic Calgary | Nose Creek","description":"Expert rotator cuff rehabilitation, frozen shoulder therapy, and impingement treatment in Calgary.","ogTitle":"Shoulder Pain Rehabilitation | Nose Creek Physiotherapy","ogDescription":"Restore full overhead reach and pain-free sleep with evidence-based shoulder physiotherapy."}'::jsonb,
@@ -544,8 +571,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'concussion',
   'concussion',
@@ -561,6 +589,7 @@ VALUES (
   '["Comprehensive baseline and post-injury cognitive/vestibular evaluation","Cervical manual therapy for associated neck whiplash tension","Vestibular-ocular reflex (VOR) and gaze stabilization drills","Sub-symptom threshold aerobic conditioning for autonomic recovery"]'::jsonb,
   '[{"id":"sec-concussion-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Concussion at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your concussion. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"left","background":"white"},{"id":"sec-concussion-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Concussion Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/staff-team-photo.jpg","imagePosition":"right","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for concussion?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for concussion covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my concussion?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy"]'::jsonb,
   'Neurological & Head',
   '{"title":"Concussion Management Clinic Calgary | Nose Creek","description":"Comprehensive concussion testing, visual-vestibular rehab, and cervical treatment in Calgary.","ogTitle":"Concussion Rehabilitation | Nose Creek Physiotherapy","ogDescription":"Evidence-based post-concussion care to restore mental clarity and safe return to sport."}'::jsonb,
@@ -579,8 +608,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'hip-pain',
   'hip-pain',
@@ -596,6 +626,7 @@ VALUES (
   '["Pelvic-lumbar-hip kinetic chain biomechanical assessment","Hip capsule distraction and manual mobilization techniques","Gluteus medius and deep hip rotator strengthening","Shockwave therapy for stubborn greater trochanteric pain syndrome"]'::jsonb,
   '[{"id":"sec-hip-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Hip Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your hip pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/staff-team-photo.jpg","imagePosition":"right","background":"white"},{"id":"sec-hip-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Hip Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/treatment-gym.jpg","imagePosition":"none","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for hip pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for hip pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my hip pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","shockwave-therapy","massage-therapy"]'::jsonb,
   'Lower Extremity',
   '{"title":"Hip Pain Treatment Calgary | Nose Creek Physiotherapy","description":"Relieve hip bursitis, arthritis, and groin pain with specialized physical therapy in Calgary.","ogTitle":"Hip Pain Rehabilitation | Nose Creek Physiotherapy","ogDescription":"Restore hip mobility and pain-free walking with expert manual physiotherapy."}'::jsonb,
@@ -614,8 +645,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'sciatica',
   'sciatica',
@@ -631,6 +663,7 @@ VALUES (
   '["Neurological sensory, motor, and reflex testing","Gentle neural mobilization and ''nerve flossing'' techniques","Lumbar directional preference exercises to centralize pain","Piriformis and deep gluteal myofascial release"]'::jsonb,
   '[{"id":"sec-sciatica-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Sciatica at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your sciatica. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-gym.jpg","imagePosition":"left","background":"white"},{"id":"sec-sciatica-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Sciatica Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for sciatica?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for sciatica covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my sciatica?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","acupuncture","massage-therapy"]'::jsonb,
   'Spine & Nerve',
   '{"title":"Sciatica & Pinched Nerve Relief Calgary | Nose Creek","description":"Fast relief from radiating sciatic nerve pain and lumbar disc compression in Calgary.","ogTitle":"Sciatica Treatment Clinic | Nose Creek Physiotherapy","ogDescription":"Decompress your sciatic nerve and stop radiating leg pain without invasive surgery."}'::jsonb,
@@ -649,8 +682,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'nerve-pain',
   'nerve-pain',
@@ -666,6 +700,7 @@ VALUES (
   '["Detailed upper and lower limb neurodynamic tension testing","Manual decompression of anatomical entrapment tunnels","Gentle neural glide exercises and postural retraining","Acupuncture and IMS dry needling for nerve signal regulation"]'::jsonb,
   '[{"id":"sec-nerve-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Nerve Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your nerve pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"right","background":"white"},{"id":"sec-nerve-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Nerve Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-three.jpg","imagePosition":"right","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for nerve pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for nerve pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my nerve pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","acupuncture","massage-therapy"]'::jsonb,
   'Nerve & Neurological',
   '{"title":"Nerve Pain & Neuropathy Treatment Calgary | Nose Creek","description":"Targeted nerve decompression, neural glide therapy, and pain management in Calgary.","ogTitle":"Nerve Pain Treatment | Nose Creek Physiotherapy","ogDescription":"Resolve carpal tunnel, pinched nerves, and neuropathy with specialized physical therapy."}'::jsonb,
@@ -684,8 +719,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'headaches',
   'headaches',
@@ -701,6 +737,7 @@ VALUES (
   '["Upper cervical (C1–C3) facet joint assessment and gentle mobilization","Suboccipital trigger point release and acupuncture","Ergonomic computer and sitting posture adjustment","Cervical stabilization and progressive postural endurance exercises"]'::jsonb,
   '[{"id":"sec-headaches-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Headaches at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your headaches. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-three.jpg","imagePosition":"left","background":"white"},{"id":"sec-headaches-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Headaches Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"none","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for headaches?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for headaches covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my headaches?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy","acupuncture"]'::jsonb,
   'Head & Neck',
   '{"title":"Cervicogenic Headache Treatment Calgary | Nose Creek","description":"Stop tension and neck headaches with cervical manual therapy and dry needling in Calgary.","ogTitle":"Headache Relief Clinic | Nose Creek Physiotherapy","ogDescription":"Target the cervical root cause of chronic headaches for lasting relief without daily pills."}'::jsonb,
@@ -719,8 +756,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'muscle-pain',
   'muscle-pain',
@@ -736,6 +774,7 @@ VALUES (
   '["Intramuscular Stimulation (IMS / Dry Needling) for deep muscle release","Registered Massage Therapy and myofascial trigger point work","Therapeutic stretching and progressive resistance loading","Hydration, heat/ice protocols, and postural modifications"]'::jsonb,
   '[{"id":"sec-muscle-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Muscle Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your muscle pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"right","background":"white"},{"id":"sec-muscle-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Muscle Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/staff-team-photo.jpg","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for muscle pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for muscle pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my muscle pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["massage-therapy","physiotherapy","acupuncture"]'::jsonb,
   'Muscular & Soft Tissue',
   '{"title":"Muscle Pain & Myofascial Relief Calgary | Nose Creek","description":"Release chronic muscle knots and soreness with IMS dry needling and massage therapy in Calgary.","ogTitle":"Muscle Pain Treatment | Nose Creek Physiotherapy","ogDescription":"Relieve deep muscle knots and spasms with registered massage therapy and IMS dry needling."}'::jsonb,
@@ -754,8 +793,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'joint-pain',
   'joint-pain',
@@ -771,6 +811,7 @@ VALUES (
   '["Joint traction, distraction, and manual mobilization","Low-impact strengthening exercises (glute, quad, and core stabilizers)","Shockwave therapy for adjacent tendinopathy and calcifications","Custom bracing and orthotics to optimize joint loading"]'::jsonb,
   '[{"id":"sec-joint-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Joint Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your joint pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/staff-team-photo.jpg","imagePosition":"left","background":"white"},{"id":"sec-joint-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Joint Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/treatment-gym.jpg","imagePosition":"right","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for joint pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for joint pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my joint pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","shockwave-therapy","knee-bracing","custom-orthotics"]'::jsonb,
   'Joints & Arthritis',
   '{"title":"Joint Pain & Arthritis Management Calgary | Nose Creek","description":"Non-surgical joint pain relief, osteoarthritis care, and joint mobilization in Calgary.","ogTitle":"Joint Pain & Arthritis Therapy | Nose Creek","ogDescription":"Lubricate joints and restore pain-free movement with customized physiotherapy."}'::jsonb,
@@ -789,8 +830,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'workplace-injuries',
   'workplace-injuries',
@@ -806,6 +848,7 @@ VALUES (
   '["Immediate WCB clinical assessment and paperwork support","Pain relief through manual therapy and soft tissue treatments","Work-simulation conditioning and ergonomic education","Structured, graduated return-to-work planning"]'::jsonb,
   '[{"id":"sec-workplace-injuries-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Workplace Injuries at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your workplace injuries. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-gym.jpg","imagePosition":"right","background":"white"},{"id":"sec-workplace-injuries-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Workplace Injuries Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"none","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for workplace injuries?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for workplace injuries covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my workplace injuries?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy"]'::jsonb,
   'Work & Occupational',
   '{"title":"WCB Workplace Injury Physiotherapy Calgary | Nose Creek","description":"WCB-approved physical therapy and occupational rehabilitation in Calgary NW & NE.","ogTitle":"Workplace Injury Rehabilitation | Nose Creek","ogDescription":"Fast recovery and WCB claim support for workplace injuries in Calgary."}'::jsonb,
@@ -824,8 +867,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'motor-vehicle-accidents',
   'motor-vehicle-accidents',
@@ -841,6 +885,7 @@ VALUES (
   '["Comprehensive diagnostic AB-2 injury assessment","Direct billing coordination with auto insurance providers (No out-of-pocket fees)","Gentle cervical manual therapy, IMS, and massage therapy","Progressive spinal stabilization and active range of motion recovery"]'::jsonb,
   '[{"id":"sec-motor-vehicle-accidents-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Motor Vehicle Accidents at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your motor vehicle accidents. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/treatment-hands-on.jpg","imagePosition":"left","background":"white"},{"id":"sec-motor-vehicle-accidents-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Motor Vehicle Accidents Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-three.jpg","imagePosition":"left","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for motor vehicle accidents?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for motor vehicle accidents covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my motor vehicle accidents?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy","acupuncture"]'::jsonb,
   'MVA & Whiplash',
   '{"title":"MVA Whiplash & Car Accident Physiotherapy Calgary","description":"Direct-billed auto insurance physiotherapy for whiplash and car accident injuries in Calgary.","ogTitle":"Motor Vehicle Accident Rehab | Nose Creek","ogDescription":"Complete whiplash and auto injury rehabilitation with 100% direct insurance billing in Alberta."}'::jsonb,
@@ -859,8 +904,9 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
-INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
+INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   'chest-rib-pain',
   'chest-rib-pain',
@@ -876,6 +922,7 @@ VALUES (
   '["Thoracic spine and rib cage joint mobility assessment","Gentle costovertebral joint mobilization and rib realignments","Intercostal muscle release and thoracic mobility stretches","Diaphragmatic breathing mechanics and postural training"]'::jsonb,
   '[{"id":"sec-chest-rib-pain-1","eyebrow":"Personalized Care Protocol","eyebrowColor":"#1c9fd8","title":"How We Eliminate Chest & Rib Pain at the Mechanical Source","subtitle":"Comprehensive assessment & targeted manual adjustments","content":"At Nose Creek Physiotherapy, we don''t just treat your symptoms—we identify the underlying biomechanical dysfunction causing your chest & rib pain. Our registered clinicians evaluate your movement patterns, joint mobility, and muscular balance to build a customized rehabilitation roadmap.","bullets":["In-depth orthopaedic movement assessment","Direct billing to major extended health insurance plans","Targeted joint mobilization & soft tissue myofascial release","Long-term exercise conditioning to prevent re-injury"],"image":"/images/clinic/reception-three.jpg","imagePosition":"right","background":"white"},{"id":"sec-chest-rib-pain-2","eyebrow":"Evidence-Based Techniques","eyebrowColor":"#6faf1c","title":"Advanced Modalities for Faster Chest & Rib Pain Recovery","subtitle":"Integrated physio, IMS dry needling, and therapeutic exercise","content":"Combining hands-on joint manipulation with active retraining allows your body to heal naturally without reliance on pain medication. We help Calgary North residents regain their strength, mobility, and confidence in daily activities.","bullets":["Dry Needling / Intramuscular Stimulation (IMS) for deep spasms","Customized neuromuscular retraining program","Ergonomic & lifestyle guidance tailored to your daily routine"],"image":"/images/clinic/reception-desktop.jpg","imagePosition":"right","background":"light"}]'::jsonb,
   '[{"question":"Do I need a doctor''s referral to receive physiotherapy for chest & rib pain?","answer":"No, in Alberta you have direct access to physiotherapy. You can book an appointment with our registered clinicians without a doctor''s referral."},{"question":"Is treatment for chest & rib pain covered by health insurance?","answer":"Yes, physiotherapy for this condition is covered under most extended health benefit plans. We offer direct billing to Alberta Blue Cross, Sun Life, Manulife, Canada Life, and many other insurers."},{"question":"How many sessions will it take to notice improvement in my chest & rib pain?","answer":"Most patients feel measurable relief and improved mobility within 3 to 6 targeted sessions. During your initial assessment, your physiotherapist will outline a clear step-by-step roadmap."}]'::jsonb,
+  '[]'::jsonb,
   '["physiotherapy","massage-therapy"]'::jsonb,
   'Thorax & Ribs',
   '{"title":"Chest & Rib Pain Treatment Calgary | Nose Creek","description":"Relieve costochondritis, rib subluxations, and thoracic pain with gentle physiotherapy in Calgary.","ogTitle":"Chest & Rib Pain Physiotherapy | Nose Creek","ogDescription":"Restore painless breathing and rib cage alignment with expert physical therapy."}'::jsonb,
@@ -894,7 +941,8 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
 
 -- 4. Team Members
 INSERT INTO team_members (id, slug, name, role, title, short_bio, full_bio, profile_image, specialties, credentials, education, certifications, experience, locations, services, languages, email, phone, booking_url, social_links, featured, is_director, sort_order, is_published)

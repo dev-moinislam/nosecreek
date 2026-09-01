@@ -70,11 +70,13 @@ export default async function ConditionDetailPage({ params }: PageProps) {
   );
 
   const otherConditions = allConditions.filter((c) => c.slug !== condition.slug);
+  const isHidden = (key: string) => (condition.hiddenSections || []).includes(key);
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
       
       {/* ── 1. HERO HEADER ── */}
+      {!isHidden("hero") && (
       <section style={{ background: "linear-gradient(180deg, #f2f8fb 0%, #ffffff 100%)", padding: "clamp(36px, 4vw, 56px) 0 36px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
           <Breadcrumbs
@@ -142,8 +144,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 2. TREATMENT AT-A-GLANCE BAR ── */}
+      {!isHidden("at_a_glance") && (
       <section style={{ background: "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1", padding: "20px 0" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
           {[
@@ -162,8 +166,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           ))}
         </div>
       </section>
+      )}
 
       {/* ── 3. CLINICAL OVERVIEW & ROOT CAUSE ── */}
+      {!isHidden("clinical_overview") && (
       <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
@@ -180,9 +186,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
-      {/* ── 4. DYNAMIC CUSTOM SECTIONS ENGINE (Exact Match to Services & Home Page) ── */}
-      {condition.customSections && condition.customSections.map((sec, idx) => {
+      {/* ── 4. DYNAMIC CUSTOM SECTIONS ENGINE ── */}
+      {!isHidden("custom_sections") && condition.customSections && condition.customSections.map((sec, idx) => {
         const isLeft = sec.imagePosition === "left";
         const isTop = sec.imagePosition === "top";
         const isBottom = sec.imagePosition === "bottom";
@@ -202,7 +209,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
             }}
           >
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-              
               {/* TOP IMAGE LAYOUT */}
               {isTop && (
                 <div style={{ maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
@@ -241,16 +247,12 @@ export default async function ConditionDetailPage({ params }: PageProps) {
               {/* LEFT / RIGHT 2-COLUMN LAYOUT */}
               {(isLeft || sec.imagePosition === "right") && (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(36px, 5vw, 64px)", alignItems: "center" }}>
-                  
-                  {/* Image Column (if left) */}
                   {isLeft && sec.image && (
                     <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.12)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
-
-                  {/* Text Column */}
                   <div>
                     {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#6faf1c")}
                     <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 16 }}>
@@ -277,15 +279,12 @@ export default async function ConditionDetailPage({ params }: PageProps) {
                       </div>
                     )}
                   </div>
-
-                  {/* Image Column (if right) */}
                   {!isLeft && sec.image && (
                     <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.12)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                     </div>
                   )}
-
                 </div>
               )}
 
@@ -344,14 +343,13 @@ export default async function ConditionDetailPage({ params }: PageProps) {
                   )}
                 </div>
               )}
-
             </div>
           </section>
         );
       })}
 
       {/* ── 5. COMMON SYMPTOMS GRID ── */}
-      {condition.symptoms && condition.symptoms.length > 0 && (
+      {!isHidden("symptoms") && condition.symptoms && condition.symptoms.length > 0 && (
         <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
             <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 48px" }}>
@@ -363,7 +361,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
                 If you are experiencing any of the following, our specialized Calgary physiotherapy team can help:
               </p>
             </div>
-
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
               {condition.symptoms.map((symptom, i) => (
                 <div key={i} style={{ background: "#fff", borderRadius: 16, padding: "24px 22px", border: "1px solid #e2ebf0", boxShadow: "0 6px 20px rgba(18,60,80,0.04)", display: "flex", alignItems: "flex-start", gap: 14 }}>
@@ -381,6 +378,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
       )}
 
       {/* ── 6. OUR 4-STEP TREATMENT APPROACH ── */}
+      {!isHidden("treatment_approach") && (
       <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 48px" }}>
@@ -392,7 +390,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
               A structured, evidence-based plan tailored to your specific biomechanics and recovery goals:
             </p>
           </div>
-
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
             {(condition.treatmentApproach && condition.treatmentApproach.length > 0 ? condition.treatmentApproach : [
               "Thorough orthopaedic assessment and biomechanical movement analysis",
@@ -411,9 +408,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 7. RECOMMENDED THERAPIES ── */}
-      {relatedServiceObjects.length > 0 && (
+      {!isHidden("related_therapies") && relatedServiceObjects.length > 0 && (
         <section style={{ background: "#f8fafc", padding: "clamp(56px,7vw,96px) 0", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
             <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 48px" }}>
@@ -425,7 +423,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
                 Depending on your assessment, our team may recommend one or more of these specialized modalities:
               </p>
             </div>
-
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
               {relatedServiceObjects.map((service) => (
                 <Link
@@ -447,9 +444,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
       )}
 
       {/* ── 8. MEET THE TEAM CAROUSEL ── */}
-      <TeamCarousel members={allTeam} />
+      {!isHidden("team_carousel") && <TeamCarousel members={allTeam} />}
 
-      {/* ── 9. FREQUENTLY ASKED QUESTIONS (Dynamic & Accordion) ── */}
+      {/* ── 9. FREQUENTLY ASKED QUESTIONS ── */}
+      {!isHidden("faqs") && (
       <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 820, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: 38 }}>
@@ -484,8 +482,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 10. CLINIC LOCATION & MAP ── */}
+      {!isHidden("location_map") && (
       <section id="contact" style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 44px" }}>
@@ -540,8 +540,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 11. DECISION CTAs ── */}
+      {!isHidden("decision_ctas") && (
       <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 40px" }}>
@@ -576,8 +578,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 12. OTHER CONDITIONS EXPLORER ── */}
+      {!isHidden("other_links") && (
       <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           {eyebrow("Other Conditions We Treat")}
@@ -597,8 +601,10 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       {/* ── 13. BOTTOM CTA BANNER ── */}
+      {!isHidden("bottom_cta") && (
       <section style={{ background: "linear-gradient(120deg,#1c9fd8,#1179ab)", color: "#fff" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(48px,6vw,76px) 24px", textAlign: "center" }}>
           <h2 style={{ color: "#fff", fontSize: "clamp(26px,3.8vw,44px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.15 }}>
@@ -624,6 +630,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+      )}
 
       <SchemaMarkup type="MedicalBusiness" data={condition} />
     </div>

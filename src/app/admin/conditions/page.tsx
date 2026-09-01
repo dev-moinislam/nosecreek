@@ -40,6 +40,7 @@ export default function AdminConditionsPage() {
               treatmentApproach: d.treatment_approach || [],
               customSections: d.custom_sections || [],
               faqs: d.faqs || [],
+              hiddenSections: d.hidden_sections || [],
               relatedServices: d.related_services || [],
               category: d.category || "general",
               seo: d.seo || {}
@@ -84,6 +85,7 @@ export default function AdminConditionsPage() {
           treatment_approach: cond.treatmentApproach || [],
           custom_sections: cond.customSections || [],
           faqs: cond.faqs || [],
+          hidden_sections: cond.hiddenSections || [],
           related_services: cond.relatedServices || [],
           category: cond.category || "general",
           seo: cond.seo || {},
@@ -101,6 +103,7 @@ export default function AdminConditionsPage() {
       setConditions(updated);
     }
     fetchConditions();
+    alert("✓ Condition saved successfully!");
     setEditingCondition(null);
   };
 
@@ -137,7 +140,7 @@ export default function AdminConditionsPage() {
             Treatable Conditions Manager
           </h2>
           <p style={{ fontSize: 13.5, color: "#64748b", margin: "2px 0 0 0" }}>
-            Manage pain conditions, rich custom visual sections, FAQs, symptoms, and treatment protocols
+            Manage pain conditions, page sections, custom visual blocks, FAQs, symptoms, and treatment roadmaps
           </p>
         </div>
 
@@ -154,6 +157,7 @@ export default function AdminConditionsPage() {
                 customSections: [],
                 faqs: [],
                 benefits: [],
+                hiddenSections: [],
                 relatedServices: []
               })
             }
@@ -294,7 +298,7 @@ export default function AdminConditionsPage() {
   );
 }
 
-// Sub-component: Rich Condition Editor Modal (Matches Services Editor)
+// Sub-component: Rich Condition Editor Modal with Modular Section Manager
 function ConditionEditorModal({
   condition: initial,
   canEditSlugs,
@@ -309,7 +313,22 @@ function ConditionEditorModal({
   onPreview: (slug: string) => void;
 }) {
   const [cond, setCond] = useState<Condition>(initial);
-  const [activeTab, setActiveTab] = useState<"general" | "sections" | "faqs" | "symptoms">("general");
+  const [activeTab, setActiveTab] = useState<"layout" | "general" | "sections" | "faqs" | "symptoms">("layout");
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+
+  // Section Visibility toggle helper
+  const hiddenSections = cond.hiddenSections || [];
+  const isSectionHidden = (key: string) => hiddenSections.includes(key);
+
+  const toggleSectionVisibility = (key: string) => {
+    setCond((prev) => {
+      const curHidden = prev.hiddenSections || [];
+      const updatedHidden = curHidden.includes(key)
+        ? curHidden.filter((k) => k !== key)
+        : [...curHidden, key];
+      return { ...prev, hiddenSections: updatedHidden };
+    });
+  };
 
   const [newSymptom, setNewSymptom] = useState("");
   const [newApproach, setNewApproach] = useState("");
@@ -357,21 +376,24 @@ function ConditionEditorModal({
   };
 
   // Custom Sections Helper
-  const addCustomSection = () => {
+  const addCustomSection = (pos: "right" | "left" | "top" | "bottom" | "none" = "right") => {
     const newSec: ServiceCustomSection = {
       id: `sec-${Date.now()}`,
+      eyebrow: "Personalized Care Protocol",
+      eyebrowColor: "#1c9fd8",
       title: `Understanding ${cond.name} & Recovery Protocol`,
       subtitle: "Targeted orthopaedic & manual assessment",
       content: "Explain your clinical approach, causes, and biomechanical adjustments here.",
       bullets: ["Direct billing available", "No physician referral required", "Personalized exercise conditioning"],
       image: "/images/clinic/treatment-hands-on.jpg",
-      imagePosition: "right",
+      imagePosition: pos,
       background: "white"
     };
     setCond((prev) => ({
       ...prev,
       customSections: [...(prev.customSections || []), newSec]
     }));
+    setActiveTab("sections");
   };
 
   const updateCustomSection = (idx: number, updated: Partial<ServiceCustomSection>) => {
@@ -389,9 +411,92 @@ function ConditionEditorModal({
     }));
   };
 
+  // Standard Page Sections Registry
+  const pageSections = [
+    {
+      key: "hero",
+      title: "Hero Header & Assessment Banner",
+      desc: "Top banner with title, badges, ratings, and assessment booking button.",
+      category: "Header"
+    },
+    {
+      key: "at_a_glance",
+      title: "Treatment At-A-Glance Bar",
+      desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
+      category: "Summary"
+    },
+    {
+      key: "clinical_overview",
+      title: "Clinical Overview & Root Cause",
+      desc: "Understanding this condition and how we fix the mechanical dysfunction.",
+      category: "Overview"
+    },
+    {
+      key: "custom_sections",
+      title: `Custom Visual Sections (${cond.customSections?.length || 0} Sections)`,
+      desc: "Rich storytelling sections with left/right/top/bottom image placement.",
+      category: "Custom Content"
+    },
+    {
+      key: "symptoms",
+      title: `Common Symptoms Grid (${cond.symptoms?.length || 0} Signs)`,
+      desc: "Recognize the signs and symptoms patients experience.",
+      category: "Symptoms"
+    },
+    {
+      key: "treatment_approach",
+      title: `Our 4-Step Treatment Roadmap (${cond.treatmentApproach?.length || 0} Steps)`,
+      desc: "Structured rehabilitation protocol from assessment to prevention.",
+      category: "Roadmap"
+    },
+    {
+      key: "related_therapies",
+      title: "Recommended Treatments & Therapies",
+      desc: "Cards linking to physiotherapy, massage, acupuncture, etc.",
+      category: "Services"
+    },
+    {
+      key: "team_carousel",
+      title: "Meet Our Team Carousel",
+      desc: "Scrolling carousel of registered physiotherapists & staff.",
+      category: "Team"
+    },
+    {
+      key: "faqs",
+      title: `Frequently Asked Questions (${cond.faqs?.length || 0} FAQs)`,
+      desc: "Interactive accordion answering patient questions & insurance.",
+      category: "FAQ"
+    },
+    {
+      key: "location_map",
+      title: "Clinic Location & Interactive Google Map",
+      desc: "Beddington location details, hours of operation, phone, and Google map.",
+      category: "Location"
+    },
+    {
+      key: "decision_ctas",
+      title: "Decision CTAs (Free Discovery & Phone Consult)",
+      desc: "Two cards offering Free Discovery Session or Telephone Consult.",
+      category: "Conversion"
+    },
+    {
+      key: "other_links",
+      title: "Explore Other 17 Conditions",
+      desc: "Pill buttons linking to other physical conditions.",
+      category: "Navigation"
+    },
+    {
+      key: "bottom_cta",
+      title: "Bottom Booking Call-to-Action Banner",
+      desc: "Full-width high-contrast booking banner at the bottom of the page.",
+      category: "Conversion"
+    }
+  ];
+
   return (
     <div className="adm-modal-overlay" onClick={onClose}>
-      <div className="adm-modal wide" onClick={(e) => e.stopPropagation()} style={{ maxHeight: "92vh" }}>
+      <div className="adm-modal wide" onClick={(e) => e.stopPropagation()} style={{ maxHeight: "92vh", width: "95%", maxWidth: 1050 }}>
+        
         {/* Header */}
         <div className="adm-modal-header">
           <div>
@@ -420,8 +525,9 @@ function ConditionEditorModal({
         </div>
 
         {/* Modal Tabs */}
-        <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 24px" }}>
+        <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 20px", overflowX: "auto" }}>
           {[
+            { id: "layout", label: "🧩 Page Sections & Layout" },
             { id: "general", label: "📝 General & Details" },
             { id: "sections", label: `🎨 Custom Sections (${cond.customSections?.length || 0})` },
             { id: "faqs", label: `❓ FAQ Builder (${cond.faqs?.length || 0})` },
@@ -437,6 +543,7 @@ function ConditionEditorModal({
                 fontSize: 13.5,
                 fontWeight: 600,
                 cursor: "pointer",
+                whiteSpace: "nowrap",
                 color: activeTab === tab.id ? "var(--adm-primary)" : "#64748b",
                 borderBottom: activeTab === tab.id ? "2px solid var(--adm-primary)" : "2px solid transparent"
               }}
@@ -448,7 +555,136 @@ function ConditionEditorModal({
 
         {/* Modal Body */}
         <div className="adm-modal-body">
-          {/* TAB 1: General */}
+
+          {/* ── TAB 1: PAGE SECTIONS & MODULAR BLOCK MANAGER ── */}
+          {activeTab === "layout" && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "14px 18px", borderRadius: 10 }}>
+                <div>
+                  <h4 style={{ margin: "0 0 4px 0", fontSize: 14, fontWeight: 700, color: "#0369a1" }}>
+                    Modular Condition Page Section Manager
+                  </h4>
+                  <p style={{ margin: 0, fontSize: 13, color: "#0284c7" }}>
+                    Turn sections ON or OFF, hide sections you don&apos;t need (e.g. Clinical Overview), or add new custom storytelling blocks.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddSectionModal(true)}
+                  className="adm-btn adm-btn-primary adm-btn-sm"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
+                >
+                  <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
+                </button>
+              </div>
+
+              {/* Sections List */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {pageSections.map((sec, idx) => {
+                  const hidden = isSectionHidden(sec.key);
+                  return (
+                    <div
+                      key={sec.key}
+                      style={{
+                        background: hidden ? "#f8fafc" : "#ffffff",
+                        border: hidden ? "1px dashed #cbd5e1" : "1px solid #e2e8f0",
+                        borderRadius: 12,
+                        padding: "14px 18px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 16,
+                        opacity: hidden ? 0.65 : 1,
+                        transition: "all 0.2s ease"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 8,
+                            background: hidden ? "#e2e8f0" : "#e0f2fe",
+                            color: hidden ? "#64748b" : "#0284c7",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 700,
+                            fontSize: 13
+                          }}
+                        >
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <strong style={{ fontSize: 14, color: hidden ? "#64748b" : "#1e293b" }}>
+                              {sec.title}
+                            </strong>
+                            <span
+                              style={{
+                                fontSize: 11,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 999,
+                                background: hidden ? "#fee2e2" : "#dcfce7",
+                                color: hidden ? "#991b1b" : "#166534"
+                              }}
+                            >
+                              {hidden ? "🚫 Hidden / Deleted" : "🟢 Visible"}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 2 }}>
+                            {sec.desc}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {sec.key === "custom_sections" && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("sections")}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                          >
+                            🎨 Edit Sections
+                          </button>
+                        )}
+                        {sec.key === "faqs" && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("faqs")}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                          >
+                            ❓ Edit FAQs
+                          </button>
+                        )}
+                        {sec.key === "symptoms" && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab("symptoms")}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                          >
+                            🩺 Edit Symptoms
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => toggleSectionVisibility(sec.key)}
+                          className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
+                          style={{ minWidth: 100 }}
+                        >
+                          {hidden ? "👁️ Restore" : "🗑️ Delete / Hide"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── TAB 2: GENERAL & DETAILS ── */}
           {activeTab === "general" && (
             <div>
               <div className="adm-form-group">
@@ -464,7 +700,7 @@ function ConditionEditorModal({
 
               <div className="adm-form-group">
                 <label className="adm-form-label">
-                  URL Slug {canEditSlugs ? "" : "(Guarded in Client Mode)"}
+                  URL Slug {canEditSlugs ? "" : "(Protected in Client Mode)"}
                 </label>
                 <input
                   type="text"
@@ -487,27 +723,29 @@ function ConditionEditorModal({
               </div>
 
               <div className="adm-form-group">
-                <label className="adm-form-label">Full Clinical Description & Root Cause</label>
+                <label className="adm-form-label">Clinical Overview & Root Cause Explanation</label>
                 <textarea
                   className="adm-textarea"
                   style={{ minHeight: 120 }}
                   value={cond.description}
                   onChange={(e) => setCond({ ...cond, description: e.target.value })}
+                  required
                 />
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div className="adm-form-group">
-                  <label className="adm-form-label">Hero Image URL</label>
+                  <label className="adm-form-label">Hero / Featured Image Path</label>
                   <input
                     type="text"
                     className="adm-input"
                     value={cond.heroImage || ""}
                     onChange={(e) => setCond({ ...cond, heroImage: e.target.value })}
+                    placeholder="/images/clinic/reception-desktop.jpg"
                   />
                 </div>
                 <div className="adm-form-group">
-                  <label className="adm-form-label">Primary Call to Action Button Text</label>
+                  <label className="adm-form-label">Primary Call to Action Text</label>
                   <input
                     type="text"
                     className="adm-input"
@@ -519,138 +757,128 @@ function ConditionEditorModal({
             </div>
           )}
 
-          {/* TAB 2: Custom Sections Builder (Left / Right / Top / Bottom / None Image layout) */}
+          {/* ── TAB 3: CUSTOM SECTIONS BUILDER ── */}
           {activeTab === "sections" && (
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <span style={{ fontSize: 13, color: "#64748b" }}>
-                  Add rich visual storytelling sections with custom images on the left, right, top, or text-only without image.
+                  Create rich storytelling sections with image left/right/top/bottom placement, badge styling, and checklist items.
                 </span>
                 <button
                   type="button"
-                  onClick={addCustomSection}
+                  onClick={() => addCustomSection("right")}
                   className="adm-btn adm-btn-primary adm-btn-sm"
                 >
                   + Add Custom Section
                 </button>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {cond.customSections?.length === 0 && (
-                  <div style={{ textAlign: "center", padding: "32px", background: "#f8fafc", borderRadius: 12, border: "2px dashed #cbd5e1", color: "#64748b" }}>
-                    <p style={{ margin: "0 0 10px 0" }}>No custom sections added yet for this condition.</p>
-                    <button type="button" onClick={addCustomSection} className="adm-btn adm-btn-primary adm-btn-sm">
-                      + Add Your First Custom Section
-                    </button>
-                  </div>
-                )}
-
-                {cond.customSections?.map((sec, idx) => (
-                  <div key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 18 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontWeight: 700, fontSize: 14 }}>Section #{idx + 1}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeCustomSection(idx)}
-                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
-                      >
-                        🗑️ Delete Section
-                      </button>
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
-                      <div>
-                        <label className="adm-form-label">Section Title</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={sec.title}
-                          onChange={(e) => updateCustomSection(idx, { title: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className="adm-form-label">Eyebrow / Badge Text</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={sec.eyebrow || ""}
-                          onChange={(e) => updateCustomSection(idx, { eyebrow: e.target.value })}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="adm-form-group">
-                      <label className="adm-form-label">Subtitle / Key Highlight</label>
-                      <input
-                        type="text"
-                        className="adm-input"
-                        value={sec.subtitle || ""}
-                        onChange={(e) => updateCustomSection(idx, { subtitle: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="adm-form-group">
-                      <label className="adm-form-label">Body Content</label>
-                      <textarea
-                        className="adm-textarea"
-                        style={{ minHeight: 80 }}
-                        value={sec.content || ""}
-                        onChange={(e) => updateCustomSection(idx, { content: e.target.value })}
-                      />
-                    </div>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
-                      <div>
-                        <label className="adm-form-label">Image Path / URL</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={sec.image || ""}
-                          onChange={(e) => updateCustomSection(idx, { image: e.target.value })}
-                        />
-                      </div>
-                      <div>
-                        <label className="adm-form-label">Image Position</label>
-                        <select
-                          className="adm-select"
-                          value={sec.imagePosition || "right"}
-                          onChange={(e) => updateCustomSection(idx, { imagePosition: e.target.value as any })}
+              {cond.customSections?.length === 0 ? (
+                <div style={{ textAlign: "center", padding: 36, background: "#f8fafc", borderRadius: 12, border: "2px dashed #e2e8f0" }}>
+                  <p style={{ color: "#64748b", margin: "0 0 12px 0" }}>No custom sections created yet.</p>
+                  <button type="button" onClick={() => addCustomSection("right")} className="adm-btn adm-btn-primary adm-btn-sm">
+                    + Add First Section
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                  {cond.customSections?.map((sec, idx) => (
+                    <div key={idx} style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 18 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                        <span style={{ fontWeight: 700, fontSize: 14 }}>Section #{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeCustomSection(idx)}
+                          style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
                         >
-                          <option value="right">Right Side (Image Right, Text Left)</option>
-                          <option value="left">Left Side (Image Left, Text Right)</option>
-                          <option value="top">Top (Centered)</option>
-                          <option value="bottom">Bottom (Centered)</option>
-                          <option value="none">No Image (Text & Bullets Only)</option>
-                        </select>
+                          🗑️ Delete Section
+                        </button>
                       </div>
-                      <div>
-                        <label className="adm-form-label">Background Color</label>
-                        <select
-                          className="adm-select"
-                          value={sec.background || "white"}
-                          onChange={(e) => updateCustomSection(idx, { background: e.target.value as any })}
-                        >
-                          <option value="white">Clean White</option>
-                          <option value="light">Soft Light Blue (#f8fafc)</option>
-                          <option value="teal">Dark Teal Theme</option>
-                        </select>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 10 }}>
+                        <div>
+                          <label className="adm-form-label">Section Title</label>
+                          <input
+                            type="text"
+                            className="adm-input"
+                            value={sec.title}
+                            onChange={(e) => updateCustomSection(idx, { title: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="adm-form-label">Eyebrow / Badge Text</label>
+                          <input
+                            type="text"
+                            className="adm-input"
+                            value={sec.eyebrow || ""}
+                            onChange={(e) => updateCustomSection(idx, { eyebrow: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="adm-form-group">
+                        <label className="adm-form-label">Body Content</label>
+                        <textarea
+                          className="adm-textarea"
+                          style={{ minHeight: 80 }}
+                          value={sec.content || ""}
+                          onChange={(e) => updateCustomSection(idx, { content: e.target.value })}
+                        />
+                      </div>
+
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                        <div>
+                          <label className="adm-form-label">Image Path</label>
+                          <input
+                            type="text"
+                            className="adm-input"
+                            value={sec.image || ""}
+                            onChange={(e) => updateCustomSection(idx, { image: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="adm-form-label">Image Position</label>
+                          <select
+                            className="adm-select"
+                            value={sec.imagePosition || "right"}
+                            onChange={(e) => updateCustomSection(idx, { imagePosition: e.target.value as any })}
+                          >
+                            <option value="right">Right Side</option>
+                            <option value="left">Left Side</option>
+                            <option value="top">Top Banner</option>
+                            <option value="bottom">Bottom Image</option>
+                            <option value="none">No Image (Text Only)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="adm-form-label">Background Style</label>
+                          <select
+                            className="adm-select"
+                            value={sec.background || "white"}
+                            onChange={(e) => updateCustomSection(idx, { background: e.target.value as any })}
+                          >
+                            <option value="white">Clean White</option>
+                            <option value="light">Soft Light Blue (#f8fafc)</option>
+                            <option value="teal">Dark Teal Theme</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* TAB 3: FAQ Builder */}
+          {/* ── TAB 4: FAQ BUILDER ── */}
           {activeTab === "faqs" && (
             <div>
               <div style={{ background: "#f1f5f9", padding: 16, borderRadius: 12, marginBottom: 20 }}>
-                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>+ Add Question & Answer for {cond.name}</h4>
+                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>+ Add New Question & Answer</h4>
                 <div className="adm-form-group">
                   <input
                     type="text"
-                    placeholder={`E.g., How soon can I return to sports after treatment for ${cond.name.toLowerCase()}?`}
+                    placeholder={`E.g., Do I need a doctor's referral for ${cond.name}?`}
                     className="adm-input"
                     value={newFaqQ}
                     onChange={(e) => setNewFaqQ(e.target.value)}
@@ -658,7 +886,7 @@ function ConditionEditorModal({
                 </div>
                 <div className="adm-form-group">
                   <textarea
-                    placeholder="Enter comprehensive answer..."
+                    placeholder="Enter full answer..."
                     className="adm-textarea"
                     style={{ minHeight: 70 }}
                     value={newFaqA}
@@ -670,7 +898,7 @@ function ConditionEditorModal({
                   onClick={addFaq}
                   className="adm-btn adm-btn-primary adm-btn-sm"
                 >
-                  Add FAQ Item
+                  Add FAQ
                 </button>
               </div>
 
@@ -698,76 +926,241 @@ function ConditionEditorModal({
             </div>
           )}
 
-          {/* TAB 4: Symptoms & Treatment Approaches */}
+          {/* ── TAB 5: SYMPTOMS & ROADMAP ── */}
           {activeTab === "symptoms" && (
             <div>
               {/* Symptoms */}
-              <div style={{ background: "#f8fafc", padding: 16, borderRadius: 12, marginBottom: 18, border: "1px solid #e2e8f0" }}>
-                <label className="adm-form-label">Recognizable Symptoms</label>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              <div style={{ marginBottom: 24 }}>
+                <h4 style={{ margin: "0 0 10px 0", fontSize: 15, fontWeight: 700 }}>Recognizable Symptoms</h4>
+                <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
                   <input
                     type="text"
-                    placeholder="E.g., Sharp shooting pain down posterior thigh"
+                    placeholder="E.g., Sharp shooting pain down the back of the leg"
                     className="adm-input"
                     value={newSymptom}
                     onChange={(e) => setNewSymptom(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSymptom(); } }}
                   />
                   <button type="button" onClick={addSymptom} className="adm-btn adm-btn-primary adm-btn-sm">
-                    Add
+                    Add Symptom
                   </button>
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {cond.symptoms?.map((s, idx) => (
-                    <span key={idx} style={{ background: "#e0f2fe", color: "#0369a1", padding: "4px 10px", borderRadius: 999, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 6 }}>
-                      {s}
-                      <button type="button" onClick={() => removeSymptom(idx)} style={{ background: "none", border: "none", cursor: "pointer", color: "#0284c7", fontWeight: 700 }}>✕</button>
-                    </span>
+                    <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "8px 12px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 13.5 }}>• {s}</span>
+                      <button type="button" onClick={() => removeSymptom(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}>✕</button>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Treatment Approaches */}
-              <div style={{ background: "#f8fafc", padding: 16, borderRadius: 12, border: "1px solid #e2e8f0" }}>
-                <label className="adm-form-label">Step-by-Step Treatment Protocol Roadmap</label>
-                <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+              {/* Treatment Approach */}
+              <div>
+                <h4 style={{ margin: "0 0 10px 0", fontSize: 15, fontWeight: 700 }}>4-Step Treatment Roadmap</h4>
+                <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
                   <input
                     type="text"
-                    placeholder="E.g., Targeted joint mobilization, spinal decompression, and dry needling"
+                    placeholder="E.g., CAMPT-certified joint mobilizations and spinal manual therapy"
                     className="adm-input"
                     value={newApproach}
                     onChange={(e) => setNewApproach(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addApproach(); } }}
                   />
                   <button type="button" onClick={addApproach} className="adm-btn adm-btn-primary adm-btn-sm">
-                    Add
+                    Add Step
                   </button>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {cond.treatmentApproach?.map((t, idx) => (
-                    <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "10px 14px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 13.5 }}>
-                        <strong>Step {idx + 1}:</strong> {t}
-                      </span>
-                      <button type="button" onClick={() => removeApproach(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}>✕</button>
+                  {cond.treatmentApproach?.map((step, idx) => (
+                    <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "8px 12px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 13.5 }}><strong>Step {idx + 1}:</strong> {step}</span>
+                      <button type="button" onClick={() => removeApproach(idx)} style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer" }}>✕</button>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
           )}
+
         </div>
 
-        {/* Footer */}
+        {/* Modal Footer */}
         <div className="adm-modal-footer">
-          <button type="button" onClick={onClose} className="adm-btn adm-btn-secondary">
+          <button
+            type="button"
+            onClick={onClose}
+            className="adm-btn adm-btn-secondary"
+          >
             Cancel
           </button>
-          <button type="button" onClick={() => onSave(cond)} className="adm-btn adm-btn-success">
-            💾 Save Condition Details
+          <button
+            type="button"
+            onClick={() => onSave(cond)}
+            className="adm-btn adm-btn-success"
+          >
+            💾 Save Condition Changes
           </button>
         </div>
+
       </div>
+
+      {/* ── MODAL: SECTION BLOCK PICKER (+ ADD / INSERT SECTION) ── */}
+      {showAddSectionModal && (
+        <div
+          className="adm-modal-overlay"
+          style={{ zIndex: 1100 }}
+          onClick={() => setShowAddSectionModal(false)}
+        >
+          <div
+            className="adm-modal"
+            style={{ maxWidth: 640 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="adm-modal-header">
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
+                + Add / Insert Page Section
+              </h3>
+              <button
+                onClick={() => setShowAddSectionModal(false)}
+                style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="adm-modal-body">
+              <p style={{ margin: "0 0 16px 0", fontSize: 13.5, color: "#64748b" }}>
+                Select what kind of section you want to add to this condition page:
+              </p>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  {
+                    icon: "🎨",
+                    title: "Custom Storytelling Section",
+                    desc: "Add left/right image, badge, text, and checklist bullets.",
+                    action: () => {
+                      addCustomSection("right");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "📋",
+                    title: "Clinical Overview Block",
+                    desc: "Explain the root cause and why treatment works.",
+                    action: () => {
+                      if (isSectionHidden("clinical_overview")) toggleSectionVisibility("clinical_overview");
+                      setActiveTab("general");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "🩺",
+                    title: "Recognizable Symptoms Block",
+                    desc: "Grid of recognizable symptom warning signs.",
+                    action: () => {
+                      if (isSectionHidden("symptoms")) toggleSectionVisibility("symptoms");
+                      setActiveTab("symptoms");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "🛣️",
+                    title: "Treatment Steps Roadmap",
+                    desc: "4-step clinical recovery roadmap.",
+                    action: () => {
+                      if (isSectionHidden("treatment_approach")) toggleSectionVisibility("treatment_approach");
+                      setActiveTab("symptoms");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "❓",
+                    title: "FAQ Accordion Block",
+                    desc: "Patient questions, doctor referrals, and insurance.",
+                    action: () => {
+                      if (isSectionHidden("faqs")) toggleSectionVisibility("faqs");
+                      setActiveTab("faqs");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "👥",
+                    title: "Meet The Team Carousel",
+                    desc: "Showcase clinic therapists and staff.",
+                    action: () => {
+                      if (isSectionHidden("team_carousel")) toggleSectionVisibility("team_carousel");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "📍",
+                    title: "Location Map & Hours Card",
+                    desc: "Beddington location map, directions, and hours.",
+                    action: () => {
+                      if (isSectionHidden("location_map")) toggleSectionVisibility("location_map");
+                      setShowAddSectionModal(false);
+                    }
+                  },
+                  {
+                    icon: "💡",
+                    title: "Free Discovery & Phone CTAs",
+                    desc: "Two cards for free consultations before booking.",
+                    action: () => {
+                      if (isSectionHidden("decision_ctas")) toggleSectionVisibility("decision_ctas");
+                      setShowAddSectionModal(false);
+                    }
+                  }
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    onClick={item.action}
+                    style={{
+                      background: "#fff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 10,
+                      padding: 14,
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 6,
+                      transition: "all 0.15s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "var(--adm-primary)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(28,159,216,0.12)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "#e2e8f0";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>{item.icon}</span>
+                      <strong style={{ fontSize: 13.5, color: "#1e293b" }}>{item.title}</strong>
+                    </div>
+                    <p style={{ margin: 0, fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="adm-modal-footer">
+              <button
+                type="button"
+                onClick={() => setShowAddSectionModal(false)}
+                className="adm-btn adm-btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

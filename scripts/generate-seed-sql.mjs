@@ -74,6 +74,7 @@ VALUES (
   ${jsonSql(s.treatmentApproach)},
   ${jsonSql(s.customSections)},
   ${jsonSql(s.faqs)},
+  ${jsonSql(s.hiddenSections)},
   ${jsonSql(s.relatedServices)},
   ${jsonSql(s.relatedConditions)},
   ${jsonSql(s.teamMembers)},
@@ -90,6 +91,7 @@ ON CONFLICT (slug) DO UPDATE SET
   hero_image = EXCLUDED.hero_image,
   custom_sections = EXCLUDED.custom_sections,
   faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections,
   benefits = EXCLUDED.benefits,
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach;
@@ -99,7 +101,7 @@ ON CONFLICT (slug) DO UPDATE SET
 sql += `\n-- 3. Conditions\n`;
 for (let i = 0; i < conditionsData.length; i++) {
   const c = conditionsData[i];
-  sql += `INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, related_services, category, seo, sort_order, is_published)
+  sql += `INSERT INTO conditions (id, slug, name, short_description, description, hero_image, side_image, cta_text, cta_muted, benefits, symptoms, treatment_approach, custom_sections, faqs, hidden_sections, related_services, category, seo, sort_order, is_published)
 VALUES (
   ${escapeSql(c.id || `cond-${c.slug}`)},
   ${escapeSql(c.slug)},
@@ -115,6 +117,7 @@ VALUES (
   ${jsonSql(c.treatmentApproach)},
   ${jsonSql(c.customSections)},
   ${jsonSql(c.faqs)},
+  ${jsonSql(c.hiddenSections)},
   ${jsonSql(c.relatedServices)},
   ${escapeSql(c.category || "general")},
   ${jsonSql(c.seo)},
@@ -133,7 +136,8 @@ ON CONFLICT (slug) DO UPDATE SET
   symptoms = EXCLUDED.symptoms,
   treatment_approach = EXCLUDED.treatment_approach,
   custom_sections = EXCLUDED.custom_sections,
-  faqs = EXCLUDED.faqs;
+  faqs = EXCLUDED.faqs,
+  hidden_sections = EXCLUDED.hidden_sections;
 `;
 }
 
