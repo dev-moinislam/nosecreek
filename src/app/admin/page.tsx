@@ -11,6 +11,13 @@ import servicesData from "@/data/services.json";
 import teamData from "@/data/team.json";
 import conditionsData from "@/data/conditions.json";
 
+import {
+  InboxIcon,
+  ServiceIconSvg,
+  TeamIcon,
+  HelpCircleIcon
+} from "@/components/admin/AdminIcons";
+
 export default function AdminOverviewPage() {
   const { role } = useRole();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -117,11 +124,13 @@ export default function AdminOverviewPage() {
         </div>
 
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/admin/leads" className="adm-btn adm-btn-primary">
-            📥 View All Leads ({leads.length})
+          <Link href="/admin/leads" className="adm-btn adm-btn-primary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <InboxIcon size={16} />
+            <span>View All Leads ({leads.length})</span>
           </Link>
-          <Link href="/admin/services" className="adm-btn adm-btn-secondary">
-            🩺 Manage Services
+          <Link href="/admin/services" className="adm-btn adm-btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <ServiceIconSvg size={16} />
+            <span>Manage Services</span>
           </Link>
         </div>
       </div>
@@ -129,7 +138,9 @@ export default function AdminOverviewPage() {
       {/* Stats Cards Grid */}
       <div className="adm-stats-grid">
         <div className="adm-stat-card">
-          <div className="adm-stat-icon blue">📥</div>
+          <div className="adm-stat-icon blue" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <InboxIcon size={22} />
+          </div>
           <div className="adm-stat-info">
             <h3>{leads.length}</h3>
             <p>Total Leads Ingested</p>
@@ -137,7 +148,9 @@ export default function AdminOverviewPage() {
         </div>
 
         <div className="adm-stat-card">
-          <div className="adm-stat-icon amber">🔔</div>
+          <div className="adm-stat-icon amber" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <InboxIcon size={22} />
+          </div>
           <div className="adm-stat-info">
             <h3>{newLeads}</h3>
             <p>New Inquiries Pending</p>
@@ -145,7 +158,9 @@ export default function AdminOverviewPage() {
         </div>
 
         <div className="adm-stat-card">
-          <div className="adm-stat-icon green">🩺</div>
+          <div className="adm-stat-icon green" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ServiceIconSvg size={22} />
+          </div>
           <div className="adm-stat-info">
             <h3>{servicesData.length}</h3>
             <p>Active Clinical Services</p>
@@ -153,10 +168,12 @@ export default function AdminOverviewPage() {
         </div>
 
         <div className="adm-stat-card">
-          <div className="adm-stat-icon purple">👥</div>
+          <div className="adm-stat-icon purple" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <TeamIcon size={22} />
+          </div>
           <div className="adm-stat-info">
             <h3>{teamData.length}</h3>
-            <p>Practitioners & Staff</p>
+            <p>Practitioners &amp; Staff</p>
           </div>
         </div>
       </div>

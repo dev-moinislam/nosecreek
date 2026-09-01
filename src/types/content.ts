@@ -50,20 +50,26 @@ export interface SiteSettings {
   seo: SEOData;
 }
 
-export interface ServiceCustomSection {
+export interface SectionBlockConfig {
   id?: string;
   eyebrow?: string;
   eyebrowColor?: string;
-  title: string;
+  title?: string;
   subtitle?: string;
   content?: string;
   bullets?: string[];
-  image?: string;
+  items?: string[];
+  image?: string | null;
   imageAlt?: string;
   imagePosition?: "left" | "right" | "top" | "bottom" | "none";
   background?: "white" | "light" | "teal" | "gradient";
+  align?: "left" | "center" | "right";
   ctaText?: string;
   ctaHref?: string;
+}
+
+export interface ServiceCustomSection extends SectionBlockConfig {
+  title: string;
 }
 
 export interface Service {
@@ -83,6 +89,7 @@ export interface Service {
   symptoms?: string[];
   treatmentApproach?: string[];
   customSections?: ServiceCustomSection[];
+  sectionsData?: Record<string, SectionBlockConfig>; // Deep customization for any section
   faqs?: FAQItem[];
   hiddenSections?: string[]; // list of section keys to hide/disable
   sectionOrder?: string[]; // custom ordered list of section keys
@@ -172,6 +179,7 @@ export interface Condition {
   symptoms?: string[];
   treatmentApproach?: string[];
   customSections?: ServiceCustomSection[];
+  sectionsData?: Record<string, SectionBlockConfig>; // Deep customization for any section
   faqs?: FAQItem[];
   hiddenSections?: string[];
   sectionOrder?: string[];

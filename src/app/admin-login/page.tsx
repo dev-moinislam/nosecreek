@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRole } from "@/components/admin/RoleGuard";
 
+import { ShieldIcon } from "@/components/admin/AdminIcons";
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login } = useRole();
@@ -73,12 +75,10 @@ export default function AdminLoginPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 26,
-            fontWeight: 800,
             margin: "0 auto 16px"
           }}
         >
-          🛡️
+          <ShieldIcon size={28} />
         </div>
 
         <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1e293b", margin: "0 0 6px" }}>

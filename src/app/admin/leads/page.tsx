@@ -6,6 +6,14 @@ import { Lead, LeadStatus, FormType } from "@/lib/supabase/types";
 import LeadDetailModal from "@/components/admin/LeadDetailModal";
 import LeadReplyModal from "@/components/admin/LeadReplyModal";
 
+import {
+  SearchIcon,
+  EyeIcon,
+  InboxIcon,
+  CheckIcon,
+  ExternalLinkIcon
+} from "@/components/admin/AdminIcons";
+
 export default function AdminLeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,15 +156,16 @@ export default function AdminLeadsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 14 }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0, fontFamily: "var(--adm-font-display)" }}>
-            Leads & Inquiries Inbox
+            Leads &amp; Inquiries Inbox
           </h2>
           <p style={{ fontSize: 13.5, color: "#64748b", margin: "2px 0 0 0" }}>
             All patient inquiries, online appointment bookings, and workshop signups
           </p>
         </div>
 
-        <button onClick={exportCSV} className="adm-btn adm-btn-secondary">
-          📊 Export CSV
+        <button onClick={exportCSV} className="adm-btn adm-btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <ExternalLinkIcon size={14} />
+          <span>Export CSV</span>
         </button>
       </div>
 
@@ -164,11 +173,13 @@ export default function AdminLeadsPage() {
       <div className="adm-card" style={{ padding: "16px 20px", marginBottom: 20 }}>
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
           {/* Search Box */}
-          <div style={{ flex: 1, minWidth: 260 }}>
+          <div style={{ flex: 1, minWidth: 260, display: "flex", alignItems: "center", gap: 8, background: "#f8fafc", padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+            <SearchIcon size={16} style={{ color: "#64748b" }} />
             <input
               type="text"
-              placeholder="🔍 Search leads by name, email, phone, or service..."
+              placeholder="Search leads by name, email, phone, or service..."
               className="adm-input"
+              style={{ border: "none", background: "none", padding: 0, boxShadow: "none" }}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -201,12 +212,12 @@ export default function AdminLeadsPage() {
               onChange={(e) => setSelectedStatus(e.target.value)}
             >
               <option value="all">All Statuses</option>
-              <option value="new">🔴 New / Unopened</option>
-              <option value="contacted">🟡 Contacted</option>
-              <option value="in_progress">🟠 In Progress</option>
-              <option value="replied">🔵 Replied</option>
-              <option value="converted">🟢 Converted</option>
-              <option value="archived">⚪ Archived</option>
+              <option value="new">New / Unopened</option>
+              <option value="contacted">Contacted</option>
+              <option value="in_progress">In Progress</option>
+              <option value="replied">Replied</option>
+              <option value="converted">Converted</option>
+              <option value="archived">Archived</option>
             </select>
           </div>
         </div>
@@ -288,27 +299,30 @@ export default function AdminLeadsPage() {
                           backgroundColor: "#fff"
                         }}
                       >
-                        <option value="new">🔴 New</option>
-                        <option value="contacted">🟡 Contacted</option>
-                        <option value="in_progress">🟠 In Progress</option>
-                        <option value="replied">🔵 Replied</option>
-                        <option value="converted">🟢 Converted</option>
-                        <option value="archived">⚪ Archived</option>
+                        <option value="new">New</option>
+                        <option value="contacted">Contacted</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="replied">Replied</option>
+                        <option value="converted">Converted</option>
+                        <option value="archived">Archived</option>
                       </select>
                     </td>
                     <td style={{ textAlign: "right" }}>
                       <button
                         onClick={() => setSelectedLead(lead)}
                         className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 4 }}
                       >
-                        Details
+                        <EyeIcon size={13} />
+                        <span>Details</span>
                       </button>
                       <button
                         onClick={() => setReplyLead(lead)}
                         className="adm-btn adm-btn-primary adm-btn-sm"
+                        style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
                       >
-                        ✉️ Reply
+                        <InboxIcon size={13} />
+                        <span>Reply</span>
                       </button>
                     </td>
                   </tr>

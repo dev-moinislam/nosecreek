@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRole } from "./RoleGuard";
 import ThemeCustomizerModal from "./ThemeCustomizerModal";
+import { ShieldIcon, UserIcon, PaletteIcon, ExternalLinkIcon, LogoutIcon } from "./AdminIcons";
 
 interface AdminHeaderProps {
   onToggleSidebar: () => void;
@@ -37,19 +38,21 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
       </div>
 
       <div className="adm-header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        {/* User Role Badge (Clean display without toggle switch) */}
+        {/* User Role Badge */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            padding: "6px 12px",
+            gap: 10,
+            padding: "6px 14px",
             background: isAdmin ? "#f0f9ff" : "#f0fdf4",
             border: isAdmin ? "1px solid #bae6fd" : "1px solid #bbf7d0",
-            borderRadius: 8
+            borderRadius: 10
           }}
         >
-          <span style={{ fontSize: 14 }}>{isAdmin ? "🛡️" : "👤"}</span>
+          <div style={{ color: isAdmin ? "#0284c7" : "#16a34a", display: "flex", alignItems: "center" }}>
+            {isAdmin ? <ShieldIcon size={18} /> : <UserIcon size={18} />}
+          </div>
           <div style={{ textAlign: "left" }}>
             <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: isAdmin ? "#0369a1" : "#15803d" }}>
               {user?.name || (isAdmin ? "Master Administrator" : "Clinic Client")}
@@ -69,7 +72,7 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
             style={{ display: "flex", alignItems: "center", gap: 6 }}
             title="Customize Website Brand Colors & Themes"
           >
-            <span>🎨</span>
+            <PaletteIcon size={15} />
             <span>Theme Colors</span>
           </button>
         )}
@@ -79,19 +82,20 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
           href="/"
           target="_blank"
           className="adm-btn adm-btn-secondary adm-btn-sm"
+          style={{ display: "flex", alignItems: "center", gap: 6 }}
         >
           <span>Live Site</span>
-          <span style={{ fontSize: 12 }}>↗</span>
+          <ExternalLinkIcon size={13} />
         </Link>
 
         {/* Log Out Button */}
         <button
           onClick={logout}
           className="adm-btn adm-btn-secondary adm-btn-sm"
-          style={{ color: "#dc2626", borderColor: "#fecaca" }}
+          style={{ color: "#dc2626", borderColor: "#fecaca", display: "flex", alignItems: "center", gap: 6 }}
           title="Sign out of Dashboard"
         >
-          <span>🚪</span>
+          <LogoutIcon size={15} />
           <span>Log Out</span>
         </button>
       </div>

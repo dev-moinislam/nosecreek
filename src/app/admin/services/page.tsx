@@ -1,11 +1,32 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Service, ServiceCustomSection } from "@/types/content";
+import { Service, ServiceCustomSection, SectionBlockConfig } from "@/types/content";
 import { getServices } from "@/lib/api";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import { useRole } from "@/components/admin/RoleGuard";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
+import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomizerModal";
+import {
+  SlidersIcon,
+  LayoutIcon,
+  ImageIcon,
+  HelpCircleIcon,
+  ListIcon,
+  EditIcon,
+  TrashIcon,
+  EyeIcon,
+  EyeOffIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  PlusIcon,
+  SparklesIcon,
+  CheckIcon,
+  ExternalLinkIcon,
+  ShieldIcon,
+  SearchIcon,
+  XIcon
+} from "@/components/admin/AdminIcons";
 
 const defaultServiceSectionOrder = [
   "hero",
@@ -22,78 +43,66 @@ const defaultServiceSectionOrder = [
   "bottom_cta"
 ];
 
-const sectionDefinitions: Record<string, { title: string; desc: string; category: string; icon: string }> = {
+const sectionDefinitions: Record<string, { title: string; desc: string; category: string }> = {
   hero: {
     title: "Hero Header & Booking Banner",
     desc: "Top banner with title, badges, ratings, and primary booking button.",
-    category: "Header",
-    icon: "🚀"
+    category: "Header"
   },
   at_a_glance: {
     title: "Treatment At-A-Glance Bar",
     desc: "4 highlight cards: Duration, Direct Billing, Referral info, Care Plan.",
-    category: "Summary",
-    icon: "⏱️"
+    category: "Summary"
   },
   clinical_overview: {
     title: "Clinical Overview & Root Cause",
-    desc: "Detailed medical explanation of why this treatment works.",
-    category: "Overview",
-    icon: "📋"
+    desc: "Detailed medical explanation of why this treatment works with side image option.",
+    category: "Overview"
   },
   custom_sections: {
     title: "Custom Visual Storytelling Sections",
     desc: "Rich storytelling sections with left/right/top/bottom image placement.",
-    category: "Custom Content",
-    icon: "🎨"
+    category: "Custom Content"
   },
   benefits: {
     title: "Key Treatment Benefits Grid",
     desc: "Checkmark grid highlighting proven benefits of this service.",
-    category: "Benefits",
-    icon: "✨"
+    category: "Benefits"
   },
   symptoms: {
     title: "Targeted Symptoms & Conditions",
     desc: "List of conditions and complaints this treatment specifically addresses.",
-    category: "Symptoms",
-    icon: "🩺"
+    category: "Symptoms"
   },
   treatment_approach: {
     title: "Treatment Approach Roadmap (4 Steps)",
     desc: "Step-by-step patient journey from assessment to prevention.",
-    category: "Roadmap",
-    icon: "🛣️"
+    category: "Roadmap"
   },
   team_carousel: {
     title: "Meet Our Registered Team Carousel",
     desc: "Interactive scrolling carousel of registered physiotherapists & staff.",
-    category: "Team",
-    icon: "👥"
+    category: "Team"
   },
   faqs: {
     title: "Frequently Asked Questions (Accordion)",
     desc: "Interactive accordion answering patient questions & insurance.",
-    category: "FAQ",
-    icon: "❓"
+    category: "FAQ"
   },
   location_map: {
     title: "Clinic Location & Interactive Google Map",
     desc: "Beddington location details, hours of operation, phone, and Google map.",
-    category: "Location",
-    icon: "📍"
+    category: "Location"
   },
   decision_ctas: {
     title: "Decision CTAs (Free Discovery & Phone Consult)",
     desc: "Two cards offering Free Discovery Session or Telephone Consult.",
-    category: "Conversion",
-    icon: "💡"
+    category: "Conversion"
   },
   bottom_cta: {
     title: "Bottom Booking Call-to-Action Banner",
     desc: "Full-width high-contrast booking banner at the bottom of the page.",
-    category: "Conversion",
-    icon: "📣"
+    category: "Conversion"
   }
 };
 
@@ -147,7 +156,7 @@ export default function AdminServicesPage() {
         allUpdated.push(updatedService);
       }
 
-      // 1. Save to Supabase (with resilient fallback)
+      // 1. Save to Supabase
       if (isSupabaseConfigured && supabase) {
         try {
           const payload = {
@@ -164,6 +173,7 @@ export default function AdminServicesPage() {
             symptoms: updatedService.symptoms || [],
             treatment_approach: updatedService.treatmentApproach || [],
             custom_sections: updatedService.customSections || [],
+            sections_data: updatedService.sectionsData || {},
             faqs: updatedService.faqs || [],
             hidden_sections: updatedService.hiddenSections || [],
             section_order: updatedService.sectionOrder || defaultServiceSectionOrder,
@@ -179,14 +189,20 @@ export default function AdminServicesPage() {
             .upsert(payload, { onConflict: "slug" });
 
           if (error) {
-            console.warn("Supabase upsert warning:", error);
+            console.warn("Supabase upsert note:", error);
           }
         } catch (supaErr) {
-          console.warn("Supabase sync warning:", supaErr);
+          console.warn("Supabase sync note:", supaErr);
         }
       }
 
-      // 2. Save to local data files in background via API route
+      // 2. Save to local storage for instant client hydration
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_services", JSON.stringify(allUpdated));
+        window.dispatchEvent(new Event("servicesUpdated"));
+      }
+
+      // 3. Save to local data files via API
       try {
         await fetch("/api/admin/save-content", {
           method: "POST",
@@ -194,13 +210,7 @@ export default function AdminServicesPage() {
           body: JSON.stringify({ type: "services", data: allUpdated })
         });
       } catch {
-        // ignore in static export
-      }
-
-      // 3. Save to localStorage for instant client hydration
-      if (typeof window !== "undefined") {
-        localStorage.setItem("adm_services", JSON.stringify(allUpdated));
-        window.dispatchEvent(new Event("servicesUpdated"));
+        // ignore
       }
 
       // Update local state
@@ -257,7 +267,7 @@ export default function AdminServicesPage() {
             Clinical Services Manager
           </h1>
           <p style={{ margin: 0, color: "var(--adm-text-muted)", fontSize: 14 }}>
-            Manage treatments, page section ordering, hide/unhide blocks, image layouts, benefits, and FAQs
+            Manage treatments, page section layout order, image alignment, custom badges, and FAQs
           </p>
         </div>
 
@@ -274,6 +284,7 @@ export default function AdminServicesPage() {
                 symptoms: [],
                 treatmentApproach: [],
                 customSections: [],
+                sectionsData: {},
                 faqs: [],
                 hiddenSections: [],
                 sectionOrder: defaultServiceSectionOrder,
@@ -282,16 +293,18 @@ export default function AdminServicesPage() {
               })
             }
             className="adm-btn adm-btn-primary"
+            style={{ display: "flex", alignItems: "center", gap: 6 }}
           >
-            + Add New Service
+            <PlusIcon size={16} />
+            <span>Add New Service</span>
           </button>
         )}
       </div>
 
       {/* Role Banner if in Client Mode */}
       {!isAdmin && (
-        <div className="adm-guarded-banner">
-          <span>🛡️</span>
+        <div className="adm-guarded-banner" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <ShieldIcon size={20} style={{ color: "#0284c7" }} />
           <div>
             <strong>Client Safe Mode Active:</strong> You can safely edit text descriptions, images, bullet points, and FAQs. Section reordering, hiding, and deletions are protected to preserve SEO rankings.
           </div>
@@ -299,14 +312,18 @@ export default function AdminServicesPage() {
       )}
 
       {/* Search Filter */}
-      <div className="adm-card" style={{ padding: 16, marginBottom: 20 }}>
-        <input
-          type="text"
-          placeholder="🔍 Search services by name or description..."
-          className="adm-input"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="adm-card" style={{ padding: 14, marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <SearchIcon size={16} style={{ color: "#64748b" }} />
+          <input
+            type="text"
+            placeholder="Search services by title or description..."
+            className="adm-input"
+            style={{ border: "none", padding: "6px 0", boxShadow: "none" }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Services List Table */}
@@ -317,8 +334,8 @@ export default function AdminServicesPage() {
               <tr>
                 <th>Service Name</th>
                 <th>URL Slug</th>
-                <th>Sections & FAQs</th>
-                <th>Benefits</th>
+                <th>Sections &amp; FAQs</th>
+                <th>Key Benefits</th>
                 <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
@@ -339,51 +356,54 @@ export default function AdminServicesPage() {
                 filtered.map((service) => (
                   <tr key={service.slug}>
                     <td>
-                      <div style={{ fontWeight: 700, fontSize: 14 }}>{service.title}</div>
+                      <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{service.title}</div>
                       <div style={{ fontSize: 12, color: "#64748b", maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {service.shortDescription}
+                        {service.shortDescription || "Clinical treatment"}
                       </div>
                     </td>
                     <td>
-                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>
+                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a" }}>
                         /services/{service.slug}
                       </code>
                     </td>
                     <td>
-                      <span style={{ fontSize: 12, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, marginRight: 6 }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, marginRight: 6 }}>
                         {service.customSections?.length || 0} Sections
                       </span>
-                      <span style={{ fontSize: 12, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6 }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6 }}>
                         {service.faqs?.length || 0} FAQs
                       </span>
                     </td>
                     <td>
                       <span style={{ fontSize: 12.5, color: "#475569" }}>
-                        {service.benefits?.length || 0} bullet points
+                        {service.benefits?.length || 0} highlights
                       </span>
                     </td>
                     <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setPreviewUrl(`/services/${service.slug}`)}
                         className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
                       >
-                        👁️ Preview
+                        <EyeIcon size={14} />
+                        <span>Preview</span>
                       </button>
                       <button
                         onClick={() => setEditingService(JSON.parse(JSON.stringify(service)))}
                         className="adm-btn adm-btn-primary adm-btn-sm"
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
                       >
-                        ✏️ Edit
+                        <EditIcon size={14} />
+                        <span>Edit</span>
                       </button>
                       {isAdmin && (
                         <button
                           onClick={() => handleDeleteService(service.slug)}
                           className="adm-btn adm-btn-secondary adm-btn-sm"
-                          style={{ color: "#dc2626" }}
+                          style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
+                          title="Delete Service"
                         >
-                          🗑️
+                          <TrashIcon size={14} />
                         </button>
                       )}
                     </td>
@@ -418,7 +438,7 @@ export default function AdminServicesPage() {
   );
 }
 
-// Sub-component: Service Editor Modal with Section Reordering & Modular Manager
+// Sub-component: Service Editor Modal with Section Reordering & Universal Block Customizer
 function ServiceEditorModal({
   service: initialService,
   isAdmin,
@@ -438,11 +458,13 @@ function ServiceEditorModal({
     ...initialService,
     sectionOrder: initialService.sectionOrder && initialService.sectionOrder.length > 0
       ? initialService.sectionOrder
-      : defaultServiceSectionOrder
+      : defaultServiceSectionOrder,
+    sectionsData: initialService.sectionsData || {}
   });
 
   const [activeTab, setActiveTab] = useState<"layout" | "general" | "sections" | "faqs" | "bullets">("layout");
   const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  const [customizingBlockKey, setCustomizingBlockKey] = useState<string | null>(null);
 
   // Section Ordering & Visibility helpers
   const currentOrder = service.sectionOrder || defaultServiceSectionOrder;
@@ -477,6 +499,18 @@ function ServiceEditorModal({
         : [...curHidden, key];
       return { ...prev, hiddenSections: updatedHidden };
     });
+  };
+
+  // Block Customizer Save Handler
+  const handleSaveBlockConfig = (updatedCfg: SectionBlockConfig) => {
+    if (!customizingBlockKey) return;
+    setService((prev) => ({
+      ...prev,
+      sectionsData: {
+        ...(prev.sectionsData || {}),
+        [customizingBlockKey]: updatedCfg
+      }
+    }));
   };
 
   // Benefits & FAQs helpers
@@ -564,26 +598,28 @@ function ServiceEditorModal({
         {/* Modal Header */}
         <div className="adm-modal-header">
           <div>
-            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#0f172a" }}>
               Edit Service: {service.title}
             </h3>
             <span style={{ fontSize: 13, color: "var(--adm-text-muted)" }}>
               /services/{service.slug}
             </span>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
             <button
               type="button"
               onClick={() => onPreview(service.slug)}
               className="adm-btn adm-btn-secondary adm-btn-sm"
+              style={{ display: "flex", alignItems: "center", gap: 6 }}
             >
-              👁️ Preview Live
+              <EyeIcon size={14} />
+              <span>Preview Live</span>
             </button>
             <button
               onClick={onClose}
-              style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
+              style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", padding: 4 }}
             >
-              ✕
+              <XIcon size={20} />
             </button>
           </div>
         </div>
@@ -591,11 +627,11 @@ function ServiceEditorModal({
         {/* Modal Navigation Tabs */}
         <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc", padding: "0 20px", overflowX: "auto" }}>
           {[
-            { id: "layout", label: "🧩 Page Sections & Order" },
-            { id: "general", label: "📝 General & Hero" },
-            { id: "sections", label: `🎨 Custom Sections (${service.customSections?.length || 0})` },
-            { id: "faqs", label: `❓ FAQ Builder (${service.faqs?.length || 0})` },
-            { id: "bullets", label: `✨ Benefits & Roadmap (${service.benefits?.length || 0})` }
+            { id: "layout", label: "Page Sections & Layout", icon: <SlidersIcon size={15} /> },
+            { id: "general", label: "General & Hero", icon: <LayoutIcon size={15} /> },
+            { id: "sections", label: `Custom Sections (${service.customSections?.length || 0})`, icon: <ImageIcon size={15} /> },
+            { id: "faqs", label: `FAQ Builder (${service.faqs?.length || 0})`, icon: <HelpCircleIcon size={15} /> },
+            { id: "bullets", label: `Benefits & Roadmap (${service.benefits?.length || 0})`, icon: <ListIcon size={15} /> }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -608,11 +644,15 @@ function ServiceEditorModal({
                 fontWeight: 600,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
                 color: activeTab === tab.id ? "var(--adm-primary)" : "#64748b",
                 borderBottom: activeTab === tab.id ? "2px solid var(--adm-primary)" : "2px solid transparent"
               }}
             >
-              {tab.label}
+              {tab.icon}
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
@@ -630,7 +670,7 @@ function ServiceEditorModal({
                   </h4>
                   <p style={{ margin: 0, fontSize: 13, color: "#0284c7" }}>
                     {isAdmin
-                      ? "Use ⬆️ Up and ⬇️ Down arrows to change section display order, or 🗑️ Hide sections you don't need."
+                      ? "Customize images, placement (left/right/banner), background styling, or reorder/hide any section."
                       : "Client View: Displays page section order and active blocks. Layout reordering is managed by Master Admin."}
                   </p>
                 </div>
@@ -641,7 +681,8 @@ function ServiceEditorModal({
                     className="adm-btn adm-btn-primary adm-btn-sm"
                     style={{ display: "flex", alignItems: "center", gap: 6 }}
                   >
-                    <span style={{ fontSize: 16 }}>+</span> Add / Insert Section
+                    <PlusIcon size={14} />
+                    <span>Add / Insert Section</span>
                   </button>
                 )}
               </div>
@@ -652,10 +693,10 @@ function ServiceEditorModal({
                   const secDef = sectionDefinitions[key] || {
                     title: key,
                     desc: "Custom page section block",
-                    category: "Block",
-                    icon: "🧩"
+                    category: "Block"
                   };
                   const hidden = isSectionHidden(key);
+                  const hasCustomConfig = Boolean(service.sectionsData?.[key]);
 
                   return (
                     <div
@@ -673,7 +714,7 @@ function ServiceEditorModal({
                         transition: "all 0.15s ease"
                       }}
                     >
-                      {/* Left side: Position, Icon, Title */}
+                      {/* Left side: Position, Title, Badges */}
                       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                         {/* Order Number Badge */}
                         <div
@@ -695,7 +736,6 @@ function ServiceEditorModal({
 
                         <div>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 16 }}>{secDef.icon}</span>
                             <strong style={{ fontSize: 13.5, color: hidden ? "#64748b" : "#1e293b" }}>
                               {secDef.title}
                             </strong>
@@ -703,14 +743,28 @@ function ServiceEditorModal({
                               style={{
                                 fontSize: 11,
                                 fontWeight: 700,
-                                padding: "2px 6px",
+                                padding: "2px 8px",
                                 borderRadius: 999,
                                 background: hidden ? "#fee2e2" : "#dcfce7",
                                 color: hidden ? "#991b1b" : "#166534"
                               }}
                             >
-                              {hidden ? "🚫 Hidden" : "🟢 Active"}
+                              {hidden ? "Hidden" : "Active"}
                             </span>
+                            {hasCustomConfig && (
+                              <span
+                                style={{
+                                  fontSize: 10.5,
+                                  fontWeight: 700,
+                                  padding: "2px 6px",
+                                  borderRadius: 4,
+                                  background: "#f3e8ff",
+                                  color: "#7e22ce"
+                                }}
+                              >
+                                Customized
+                              </span>
+                            )}
                           </div>
                           <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
                             {secDef.desc}
@@ -718,10 +772,24 @@ function ServiceEditorModal({
                         </div>
                       </div>
 
-                      {/* Right side: Reordering & Actions */}
+                      {/* Right side: Customize, Reorder, Visibility */}
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        
+                        {/* Universal Section Block Customizer Button */}
+                        <button
+                          type="button"
+                          onClick={() => setCustomizingBlockKey(key)}
+                          className="adm-btn adm-btn-secondary adm-btn-sm"
+                          style={{ display: "flex", alignItems: "center", gap: 5 }}
+                          title="Customize image, position, background, title, and highlights"
+                        >
+                          <SlidersIcon size={13} />
+                          <span>Customize Block</span>
+                        </button>
+
+                        {/* Master Admin: Move Up & Move Down */}
                         {isAdmin && (
-                          <div style={{ display: "flex", gap: 4, marginRight: 6 }}>
+                          <div style={{ display: "flex", gap: 4, marginRight: 4 }}>
                             <button
                               type="button"
                               onClick={() => moveSection(idx, "up")}
@@ -730,14 +798,15 @@ function ServiceEditorModal({
                                 background: "#f1f5f9",
                                 border: "1px solid #cbd5e1",
                                 borderRadius: 6,
-                                padding: "4px 8px",
-                                fontSize: 13,
+                                padding: "5px 8px",
                                 cursor: idx === 0 ? "not-allowed" : "pointer",
-                                opacity: idx === 0 ? 0.4 : 1
+                                opacity: idx === 0 ? 0.4 : 1,
+                                display: "flex",
+                                alignItems: "center"
                               }}
                               title="Move section UP"
                             >
-                              ⬆️
+                              <ArrowUpIcon size={13} />
                             </button>
                             <button
                               type="button"
@@ -747,54 +816,29 @@ function ServiceEditorModal({
                                 background: "#f1f5f9",
                                 border: "1px solid #cbd5e1",
                                 borderRadius: 6,
-                                padding: "4px 8px",
-                                fontSize: 13,
+                                padding: "5px 8px",
                                 cursor: idx === currentOrder.length - 1 ? "not-allowed" : "pointer",
-                                opacity: idx === currentOrder.length - 1 ? 0.4 : 1
+                                opacity: idx === currentOrder.length - 1 ? 0.4 : 1,
+                                display: "flex",
+                                alignItems: "center"
                               }}
                               title="Move section DOWN"
                             >
-                              ⬇️
+                              <ArrowDownIcon size={13} />
                             </button>
                           </div>
                         )}
 
-                        {key === "custom_sections" && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab("sections")}
-                            className="adm-btn adm-btn-secondary adm-btn-sm"
-                          >
-                            🎨 Edit
-                          </button>
-                        )}
-                        {key === "faqs" && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab("faqs")}
-                            className="adm-btn adm-btn-secondary adm-btn-sm"
-                          >
-                            ❓ Edit
-                          </button>
-                        )}
-                        {key === "benefits" && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab("bullets")}
-                            className="adm-btn adm-btn-secondary adm-btn-sm"
-                          >
-                            ✨ Edit
-                          </button>
-                        )}
-
+                        {/* Master Admin: Hide / Restore Toggle */}
                         {isAdmin && (
                           <button
                             type="button"
                             onClick={() => toggleSectionVisibility(key)}
                             className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
-                            style={{ minWidth: 90 }}
+                            style={{ minWidth: 84, display: "flex", alignItems: "center", gap: 5 }}
                           >
-                            {hidden ? "👁️ Restore" : "🗑️ Hide"}
+                            {hidden ? <EyeIcon size={13} /> : <EyeOffIcon size={13} />}
+                            <span>{hidden ? "Restore" : "Hide"}</span>
                           </button>
                         )}
                       </div>
@@ -834,7 +878,7 @@ function ServiceEditorModal({
               </div>
 
               <div className="adm-form-group">
-                <label className="adm-form-label">Short Summary (Featured in grids & cards)</label>
+                <label className="adm-form-label">Short Summary (Featured in grids &amp; cards)</label>
                 <textarea
                   className="adm-textarea"
                   style={{ minHeight: 70 }}
@@ -887,8 +931,10 @@ function ServiceEditorModal({
                   type="button"
                   onClick={() => addCustomSection("right")}
                   className="adm-btn adm-btn-primary adm-btn-sm"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
                 >
-                  + Add Custom Section
+                  <PlusIcon size={14} />
+                  <span>Add Custom Section</span>
                 </button>
               </div>
 
@@ -909,9 +955,10 @@ function ServiceEditorModal({
                           <button
                             type="button"
                             onClick={() => removeCustomSection(idx)}
-                            style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+                            style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 12, fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}
                           >
-                            🗑️ Delete Section
+                            <TrashIcon size={13} />
+                            <span>Delete Section</span>
                           </button>
                         )}
                       </div>
@@ -995,7 +1042,7 @@ function ServiceEditorModal({
           {activeTab === "faqs" && (
             <div>
               <div style={{ background: "#f1f5f9", padding: 16, borderRadius: 12, marginBottom: 20 }}>
-                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>+ Add New Question & Answer</h4>
+                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>Add New Question &amp; Answer</h4>
                 <div className="adm-form-group">
                   <input
                     type="text"
@@ -1018,8 +1065,10 @@ function ServiceEditorModal({
                   type="button"
                   onClick={addFaq}
                   className="adm-btn adm-btn-primary adm-btn-sm"
+                  style={{ display: "flex", alignItems: "center", gap: 6 }}
                 >
-                  Add FAQ
+                  <PlusIcon size={14} />
+                  <span>Add FAQ</span>
                 </button>
               </div>
 
@@ -1038,9 +1087,9 @@ function ServiceEditorModal({
                       <button
                         type="button"
                         onClick={() => removeFaq(idx)}
-                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
+                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", display: "flex", padding: 4 }}
                       >
-                        ✕
+                        <TrashIcon size={14} />
                       </button>
                     )}
                   </div>
@@ -1053,7 +1102,7 @@ function ServiceEditorModal({
           {activeTab === "bullets" && (
             <div>
               <div style={{ background: "#f1f5f9", padding: 16, borderRadius: 12, marginBottom: 20 }}>
-                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>+ Add Key Benefit / Clinical Outcome</h4>
+                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>Add Key Benefit / Clinical Outcome</h4>
                 <div style={{ display: "flex", gap: 10 }}>
                   <input
                     type="text"
@@ -1067,8 +1116,10 @@ function ServiceEditorModal({
                     type="button"
                     onClick={addBenefit}
                     className="adm-btn adm-btn-primary adm-btn-sm"
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
                   >
-                    Add
+                    <PlusIcon size={14} />
+                    <span>Add</span>
                   </button>
                 </div>
               </div>
@@ -1076,14 +1127,14 @@ function ServiceEditorModal({
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {service.benefits?.map((b, idx) => (
                   <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "10px 14px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 13.5 }}>✓ {b}</span>
+                    <span style={{ fontSize: 13.5, color: "#334155" }}>✓ {b}</span>
                     {isAdmin && (
                       <button
                         type="button"
                         onClick={() => removeBenefit(idx)}
-                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", fontSize: 14 }}
+                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", display: "flex", padding: 4 }}
                       >
-                        ✕
+                        <TrashIcon size={14} />
                       </button>
                     )}
                   </div>
@@ -1107,8 +1158,10 @@ function ServiceEditorModal({
             type="button"
             onClick={() => onSave(service)}
             className="adm-btn adm-btn-success"
+            style={{ display: "flex", alignItems: "center", gap: 6 }}
           >
-            💾 Save Service Changes
+            <CheckIcon size={16} />
+            <span>Save Service Changes</span>
           </button>
         </div>
 
@@ -1128,8 +1181,8 @@ function ServiceEditorModal({
           >
             <div className="adm-modal-header">
               <div>
-                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
-                  + Add / Insert Physiotherapy Page Section
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0f172a" }}>
+                  Add / Insert Physiotherapy Page Section
                 </h3>
                 <span style={{ fontSize: 12.5, color: "#64748b" }}>
                   Choose a standard clinic section or build a custom storytelling block
@@ -1137,9 +1190,9 @@ function ServiceEditorModal({
               </div>
               <button
                 onClick={() => setShowAddSectionModal(false)}
-                style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", padding: 4 }}
               >
-                ✕
+                <XIcon size={20} />
               </button>
             </div>
             
@@ -1147,7 +1200,6 @@ function ServiceEditorModal({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[
                   {
-                    icon: "🎨",
                     title: "Custom Storytelling Section",
                     desc: "Add left/right image, badge, text, and checklist bullets.",
                     action: () => {
@@ -1156,7 +1208,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "📋",
                     title: "Clinical Overview Block",
                     desc: "Explain the root cause and why treatment works.",
                     action: () => {
@@ -1166,7 +1217,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "⏱️",
                     title: "Treatment At-A-Glance Bar",
                     desc: "4 highlight cards for quick patient answers.",
                     action: () => {
@@ -1175,7 +1225,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "🩺",
                     title: "Symptoms & Conditions Block",
                     desc: "List of treatable symptoms and linked conditions.",
                     action: () => {
@@ -1185,7 +1234,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "🛣️",
                     title: "Treatment Steps Roadmap",
                     desc: "4-step clinical recovery journey.",
                     action: () => {
@@ -1195,7 +1243,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "✨",
                     title: "Key Clinical Benefits Grid",
                     desc: "Highlighted checklist of proven benefits.",
                     action: () => {
@@ -1205,7 +1252,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "❓",
                     title: "FAQ Accordion Block",
                     desc: "Patient questions, insurance, and answers.",
                     action: () => {
@@ -1215,7 +1261,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "👥",
                     title: "Meet The Team Carousel",
                     desc: "Showcase clinic therapists and staff.",
                     action: () => {
@@ -1224,7 +1269,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "📍",
                     title: "Location Map & Hours Card",
                     desc: "Beddington location map, directions, and hours.",
                     action: () => {
@@ -1233,7 +1277,6 @@ function ServiceEditorModal({
                     }
                   },
                   {
-                    icon: "💡",
                     title: "Free Discovery & Phone CTAs",
                     desc: "Two cards for free consultations before booking.",
                     action: () => {
@@ -1265,10 +1308,7 @@ function ServiceEditorModal({
                       e.currentTarget.style.boxShadow = "none";
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 20 }}>{item.icon}</span>
-                      <strong style={{ fontSize: 13.5, color: "#1e293b" }}>{item.title}</strong>
-                    </div>
+                    <strong style={{ fontSize: 13.5, color: "#1e293b" }}>{item.title}</strong>
                     <p style={{ margin: 0, fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>
                       {item.desc}
                     </p>
@@ -1288,6 +1328,18 @@ function ServiceEditorModal({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── MODAL: UNIVERSAL SECTION BLOCK CUSTOMIZER ── */}
+      {customizingBlockKey && (
+        <SectionBlockCustomizerModal
+          isOpen={Boolean(customizingBlockKey)}
+          onClose={() => setCustomizingBlockKey(null)}
+          sectionKey={customizingBlockKey}
+          sectionDefaultTitle={sectionDefinitions[customizingBlockKey]?.title || customizingBlockKey}
+          config={service.sectionsData?.[customizingBlockKey]}
+          onSave={handleSaveBlockConfig}
+        />
       )}
 
     </div>

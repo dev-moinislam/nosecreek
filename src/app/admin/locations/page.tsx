@@ -6,6 +6,8 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Location } from "@/types/content";
 import locationsData from "@/data/locations.json";
 
+import { EditIcon, CheckIcon, XIcon } from "@/components/admin/AdminIcons";
+
 export default function AdminLocationsPage() {
   const { isAdmin } = useRole();
   const [locations, setLocations] = useState<Location[]>([]);
@@ -140,8 +142,10 @@ export default function AdminLocationsPage() {
                       <button
                         onClick={() => setEditingLoc(JSON.parse(JSON.stringify(loc)))}
                         className="adm-btn adm-btn-primary adm-btn-sm"
+                        style={{ display: "inline-flex", alignItems: "center", gap: 5 }}
                       >
-                        ✏️ Edit Location
+                        <EditIcon size={13} />
+                        <span>Edit Location</span>
                       </button>
                     </td>
                   </tr>
@@ -179,12 +183,18 @@ function LocationEditorModal({
       <div className="adm-modal wide" onClick={(e) => e.stopPropagation()}>
         <div className="adm-modal-header">
           <div>
-            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#0f172a" }}>
               Edit Location: {loc.name}
             </h3>
+            <span style={{ fontSize: 13, color: "var(--adm-text-muted)" }}>
+              /locations/{loc.slug}
+            </span>
           </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}>
-            ✕
+          <button
+            onClick={onClose}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", padding: 4 }}
+          >
+            <XIcon size={20} />
           </button>
         </div>
 

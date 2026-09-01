@@ -6,6 +6,15 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { TeamMember } from "@/types/content";
 import teamData from "@/data/team.json";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
+import {
+  SearchIcon,
+  EyeIcon,
+  EditIcon,
+  TrashIcon,
+  PlusIcon,
+  CheckIcon,
+  XIcon
+} from "@/components/admin/AdminIcons";
 
 export default function AdminTeamPage() {
   const { isAdmin, canDelete, canEditSlugs } = useRole();
@@ -98,35 +107,37 @@ export default function AdminTeamPage() {
         social_links: member.socialLinks || {},
         featured: member.featured || false,
         is_director: member.isDirector || false,
-        sort_order: member.order ?? 99,
-        is_published: true
+        sort_order: member.order || 99,
+        is_published: true,
+        updated_at: new Date().toISOString()
       });
-    } else if (typeof window !== "undefined") {
-      const updated = team.map((t) => (t.slug === member.slug ? member : t));
-      if (!updated.find((t) => t.slug === member.slug)) {
-        updated.push(member);
-      }
-      localStorage.setItem("adm_team", JSON.stringify(updated));
-      setTeam(updated);
     }
-    fetchTeam();
+    const all = team.map((t) => (t.slug === member.slug ? member : t));
+    if (!all.find((t) => t.slug === member.slug)) all.push(member);
+    setTeam(all);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adm_team", JSON.stringify(all));
+    }
+    alert("✓ Team member saved!");
     setEditingMember(null);
+    fetchTeam();
   };
 
   const handleDelete = async (slug: string) => {
     if (!canDelete) {
-      alert("In Client Safe Mode, removing practitioners is guarded.");
+      alert("In Client Mode, deleting team members is disabled.");
       return;
     }
-    if (!confirm(`Are you sure you want to remove team member "${slug}"?`)) return;
-
+    if (!confirm(`Are you sure you want to delete ${slug}?`)) return;
     if (isSupabaseConfigured && supabase) {
       await supabase.from("team_members").delete().eq("slug", slug);
-    } else if (typeof window !== "undefined") {
-      const updated = team.filter((t) => t.slug !== slug);
-      localStorage.setItem("adm_team", JSON.stringify(updated));
-      setTeam(updated);
     }
+    const all = team.filter((t) => t.slug !== slug);
+    setTeam(all);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adm_team", JSON.stringify(all));
+    }
+    alert("✓ Team member deleted!");
     fetchTeam();
   };
 
@@ -164,20 +175,26 @@ export default function AdminTeamPage() {
               })
             }
             className="adm-btn adm-btn-primary"
+            style={{ display: "flex", alignItems: "center", gap: 6 }}
           >
-            + Add Team Member
+            <PlusIcon size={16} />
+            <span>Add Team Member</span>
           </button>
         )}
       </div>
 
-      <div className="adm-card" style={{ padding: 16, marginBottom: 20 }}>
-        <input
-          type="text"
-          placeholder="🔍 Search team members by name or role..."
-          className="adm-input"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="adm-card" style={{ padding: 14, marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <SearchIcon size={16} style={{ color: "#64748b" }} />
+          <input
+            type="text"
+            placeholder="Search team members by name or role..."
+            className="adm-input"
+            style={{ border: "none", padding: "6px 0", boxShadow: "none" }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="adm-card">
@@ -235,28 +252,31 @@ export default function AdminTeamPage() {
                       </div>
                     </td>
                     <td>{member.order ?? 99}</td>
-                    <td style={{ textAlign: "right" }}>
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                       <button
                         onClick={() => setPreviewUrl(`/team/${member.slug}`)}
                         className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 4 }}
                       >
-                        👁️ Preview
+                        <EyeIcon size={13} />
+                        <span>Preview</span>
                       </button>
                       <button
                         onClick={() => setEditingMember(JSON.parse(JSON.stringify(member)))}
                         className="adm-btn adm-btn-primary adm-btn-sm"
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 4 }}
                       >
-                        ✏️ Edit
+                        <EditIcon size={13} />
+                        <span>Edit</span>
                       </button>
                       {canDelete && (
                         <button
                           onClick={() => handleDelete(member.slug)}
                           className="adm-btn adm-btn-secondary adm-btn-sm"
-                          style={{ color: "#dc2626" }}
+                          style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
+                          title="Delete"
                         >
-                          🗑️
+                          <TrashIcon size={13} />
                         </button>
                       )}
                     </td>

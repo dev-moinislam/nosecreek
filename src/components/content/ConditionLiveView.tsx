@@ -5,9 +5,10 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import TeamCarousel from "@/components/ui/TeamCarousel";
-import { Condition, Service, TeamMember } from "@/types/content";
+import { Condition, Service, TeamMember, SectionBlockConfig } from "@/types/content";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 
-const eyebrow = (text: string, color = "#1c9fd8") => (
+const eyebrowEl = (text: string, color = "#1c9fd8") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
     {text}
   </div>
@@ -18,6 +19,7 @@ const defaultConditionSectionOrder = [
   "at_a_glance",
   "clinical_overview",
   "custom_sections",
+  "benefits",
   "symptoms",
   "treatment_approach",
   "related_therapies",
@@ -28,8 +30,6 @@ const defaultConditionSectionOrder = [
   "other_links",
   "bottom_cta"
 ];
-
-import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 
 export default function ConditionLiveView({
   initialCondition,
@@ -84,6 +84,7 @@ export default function ConditionLiveView({
               symptoms: data.symptoms || [],
               treatmentApproach: data.treatment_approach || [],
               customSections: data.custom_sections || [],
+              sectionsData: data.sections_data || data.sectionsData || {},
               faqs: data.faqs || [],
               hiddenSections: data.hidden_sections || [],
               sectionOrder: data.section_order || data.sectionOrder || [],
@@ -119,9 +120,14 @@ export default function ConditionLiveView({
   );
   const otherConditions = allConditions.filter((c) => c.slug !== condition.slug);
 
-  // Render individual section block
+  const getCustomConfig = (key: string): SectionBlockConfig | undefined => {
+    return (condition.sectionsData || {})[key];
+  };
+
+  // Render individual section block with full layout, image & background flexibility
   const renderSection = (key: string) => {
     if (isHidden(key)) return null;
+    const cfg = getCustomConfig(key);
 
     switch (key) {
       case "hero":
@@ -140,15 +146,15 @@ export default function ConditionLiveView({
                 <div>
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#e6f4ea", color: "#5c9515", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "6px 14px", borderRadius: 999, marginBottom: 18 }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block" }} />
-                    Targeted Clinical Care · Calgary North NW &amp; NE
+                    {cfg?.eyebrow || "Targeted Clinical Care · Calgary North NW & NE"}
                   </div>
 
                   <h1 style={{ fontSize: "clamp(30px, 4.2vw, 48px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.12, marginBottom: 18 }}>
-                    {condition.name} Relief in Calgary
+                    {cfg?.title || `${condition.name} Relief in Calgary`}
                   </h1>
 
                   <p style={{ fontSize: "clamp(16px, 1.5vw, 18.5px)", lineHeight: 1.65, color: "#48535c", marginBottom: 28 }}>
-                    {condition.shortDescription || condition.description}
+                    {cfg?.content || condition.shortDescription || condition.description}
                   </p>
 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
@@ -159,7 +165,7 @@ export default function ConditionLiveView({
                       className="btn btn-primary"
                       style={{ padding: "14px 28px", fontSize: 16, fontWeight: 700, borderRadius: 8, textDecoration: "none", boxShadow: "0 4px 14px rgba(28, 159, 216, 0.35)" }}
                     >
-                      {condition.ctaText || "Book Assessment Online"} &rarr;
+                      {cfg?.ctaText || condition.ctaText || "Book Assessment Online"} &rarr;
                     </a>
                     <a
                       href="tel:4032958590"
@@ -172,14 +178,14 @@ export default function ConditionLiveView({
 
                   {/* Trust Micro-Badges */}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 18, marginTop: 28, paddingTop: 20, borderTop: "1px solid #e7edf1" }}>
-                    {[
-                      { icon: "✓", text: "Direct Billing to Insurance" },
-                      { icon: "✓", text: "No Physician Referral Needed" },
-                      { icon: "✓", text: "Free On-Site Parking" },
-                    ].map((b, i) => (
+                    {(cfg?.bullets && cfg.bullets.length > 0 ? cfg.bullets : [
+                      "Direct Billing to Insurance",
+                      "No Physician Referral Needed",
+                      "Free On-Site Parking"
+                    ]).map((b, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13.5, color: "#334155", fontWeight: 600 }}>
-                        <span style={{ color: "#6faf1c", fontWeight: 800 }}>{b.icon}</span>
-                        <span>{b.text}</span>
+                        <span style={{ color: "#6faf1c", fontWeight: 800 }}>✓</span>
+                        <span>{b}</span>
                       </div>
                     ))}
                   </div>
@@ -188,7 +194,7 @@ export default function ConditionLiveView({
                 <div style={{ position: "relative" }}>
                   <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,48,61,0.15)", aspectRatio: "4/3", background: "#e2e8f0" }}>
                     <img
-                      src={condition.heroImage || "/images/clinic/reception-three.jpg"}
+                      src={cfg?.image || condition.heroImage || "/images/clinic/reception-three.jpg"}
                       alt={`${condition.name} treatment Calgary`}
                       style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
@@ -206,44 +212,131 @@ export default function ConditionLiveView({
 
       case "at_a_glance":
         return (
-          <section key="at_a_glance" style={{ background: "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1", padding: "20px 0" }}>
-            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-              {[
-                { icon: "⏱", label: "Session Duration", val: "30 – 60 Minutes" },
-                { icon: "💳", label: "Direct Billing", val: "Available for Most Insurers" },
-                { icon: "🩺", label: "Referral Required", val: "No Referral Needed" },
-                { icon: "📍", label: "Clinic Location", val: "Beddington SE (Free Parking)" },
-              ].map((item, idx) => (
-                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#fff", borderRadius: 10, border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 24 }}>{item.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>{item.label}</div>
-                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1e293b" }}>{item.val}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-
-      case "clinical_overview":
-        return (
-          <section key="clinical_overview" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#fff" }}>
+          <section key="at_a_glance" style={{ background: cfg?.background === "teal" ? "#12303d" : cfg?.background === "white" ? "#fff" : "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1", padding: "24px 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-              <div style={{ maxWidth: 860 }}>
-                {eyebrow("Clinical Overview")}
-                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 20 }}>
-                  Understanding {condition.name} &amp; How We Fix The Root Cause
-                </h2>
-                <div style={{ fontSize: "clamp(16px, 1.2vw, 17.5px)", lineHeight: 1.8, color: "#48535c" }}>
-                  {condition.description.split("\n\n").map((para, i) => (
-                    <p key={i} style={{ marginBottom: 18 }}>{para}</p>
-                  ))}
+              {cfg?.title && (
+                <div style={{ textAlign: "center", marginBottom: 18 }}>
+                  {cfg.eyebrow && eyebrowEl(cfg.eyebrow, cfg.eyebrowColor || "#1c9fd8")}
+                  <h3 style={{ fontSize: 20, fontWeight: 700, color: cfg.background === "teal" ? "#fff" : "#1d2b34" }}>{cfg.title}</h3>
                 </div>
+              )}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
+                {[
+                  { icon: "⏱", label: "Session Duration", val: "30 – 60 Minutes" },
+                  { icon: "💳", label: "Direct Billing", val: "Available for Most Insurers" },
+                  { icon: "🩺", label: "Referral Required", val: "No Referral Needed" },
+                  { icon: "📍", label: "Clinic Location", val: "Beddington SE (Free Parking)" },
+                ].map((item, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: cfg?.background === "teal" ? "rgba(255,255,255,0.08)" : "#fff", borderRadius: 10, border: cfg?.background === "teal" ? "1px solid rgba(255,255,255,0.15)" : "1px solid #e2e8f0" }}>
+                    <span style={{ fontSize: 24 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: cfg?.background === "teal" ? "#93c5fd" : "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>{item.label}</div>
+                      <div style={{ fontSize: 13.5, fontWeight: 700, color: cfg?.background === "teal" ? "#fff" : "#1e293b" }}>{item.val}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
         );
+
+      case "clinical_overview": {
+        const bgStyle =
+          cfg?.background === "teal"
+            ? { background: "#12303d", color: "#ffffff" }
+            : cfg?.background === "light"
+            ? { background: "#f8fafc", color: "#1d2b34" }
+            : { background: "#ffffff", color: "#1d2b34" };
+
+        const isDark = cfg?.background === "teal";
+        const image = cfg?.image || condition.sideImage;
+        const pos = cfg?.imagePosition || (image ? "right" : "none");
+        const hasLeftImg = pos === "left" && image;
+        const hasRightImg = pos === "right" && image;
+        const hasTopImg = pos === "top" && image;
+        const hasBottomImg = pos === "bottom" && image;
+        const isSplit = hasLeftImg || hasRightImg;
+
+        return (
+          <section key="clinical_overview" style={{ ...bgStyle, padding: "clamp(48px, 5vw, 72px) 0", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+              
+              {hasTopImg && (
+                <div style={{ marginBottom: 36, borderRadius: 16, overflow: "hidden", maxHeight: 420, boxShadow: "0 12px 36px rgba(0,0,0,0.1)" }}>
+                  <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                </div>
+              )}
+
+              <div
+                style={{
+                  display: isSplit ? "grid" : "block",
+                  gridTemplateColumns: isSplit ? "repeat(auto-fit, minmax(320px, 1fr))" : "1fr",
+                  gap: "clamp(32px, 5vw, 64px)",
+                  alignItems: "center"
+                }}
+              >
+                {hasLeftImg && (
+                  <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.12)", aspectRatio: "4/3" }}>
+                    <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
+                )}
+
+                <div style={{ maxWidth: isSplit ? "none" : 860 }}>
+                  {eyebrowEl(cfg?.eyebrow || "Clinical Overview", cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
+                  <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 20 }}>
+                    {cfg?.title || `Understanding ${condition.name} & How We Fix The Root Cause`}
+                  </h2>
+
+                  {cfg?.subtitle && (
+                    <div style={{ fontSize: 17, fontWeight: 600, color: isDark ? "#93c5fd" : "#0e78a8", marginBottom: 18 }}>
+                      {cfg.subtitle}
+                    </div>
+                  )}
+
+                  <div style={{ fontSize: "clamp(16px, 1.2vw, 17.5px)", lineHeight: 1.8, color: isDark ? "#cbd5e1" : "#48535c" }}>
+                    {(cfg?.content || condition.description)
+                      .split("\n\n")
+                      .map((para, i) => (
+                        <p key={i} style={{ marginBottom: 18 }}>{para}</p>
+                      ))}
+                  </div>
+
+                  {cfg?.bullets && cfg.bullets.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginTop: 20 }}>
+                      {cfg.bullets.map((b, i) => (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14.5, color: isDark ? "#e2e8f0" : "#334155", fontWeight: 500 }}>
+                          <span style={{ color: isDark ? "#8cc63f" : "#6faf1c", fontWeight: 800 }}>✓</span>
+                          <span>{b}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {cfg?.ctaText && cfg?.ctaHref && (
+                    <div style={{ marginTop: 24 }}>
+                      <a href={cfg.ctaHref} className="btn btn-primary" style={{ padding: "12px 24px", fontSize: 15, fontWeight: 700, borderRadius: 8, textDecoration: "none" }}>
+                        {cfg.ctaText} &rarr;
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {hasRightImg && (
+                  <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.12)", aspectRatio: "4/3" }}>
+                    <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
+                )}
+              </div>
+
+              {hasBottomImg && (
+                <div style={{ marginTop: 36, borderRadius: 16, overflow: "hidden", maxHeight: 420, boxShadow: "0 12px 36px rgba(0,0,0,0.1)" }}>
+                  <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                </div>
+              )}
+            </div>
+          </section>
+        );
+      }
 
       case "custom_sections":
         if (!condition.customSections || condition.customSections.length === 0) return null;
@@ -267,7 +360,6 @@ export default function ConditionLiveView({
                 <section key={sec.id || idx} style={{ ...bgStyle, padding: "clamp(48px, 6vw, 80px) 0", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
                   <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
                     
-                    {/* Top Image Layout */}
                     {isImageTop && sec.image && (
                       <div style={{ marginBottom: 36, borderRadius: 16, overflow: "hidden", maxHeight: 420, boxShadow: "0 12px 36px rgba(0,0,0,0.1)" }}>
                         <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
@@ -282,16 +374,14 @@ export default function ConditionLiveView({
                         alignItems: "center"
                       }}
                     >
-                      {/* Left Image */}
                       {isImageLeft && sec.image && (
                         <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.12)", aspectRatio: "4/3" }}>
                           <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         </div>
                       )}
 
-                      {/* Content Column */}
                       <div style={{ maxWidth: isImageNone ? 880 : "none" }}>
-                        {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
+                        {sec.eyebrow && eyebrowEl(sec.eyebrow, sec.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
 
                         <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 16 }}>
                           {sec.title}
@@ -331,22 +421,18 @@ export default function ConditionLiveView({
                         )}
                       </div>
 
-                      {/* Right Image */}
                       {!isImageLeft && !isImageNone && !isImageTop && !isImageBottom && sec.image && (
                         <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.12)", aspectRatio: "4/3" }}>
                           <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                         </div>
                       )}
-
                     </div>
 
-                    {/* Bottom Image Layout */}
                     {isImageBottom && sec.image && (
                       <div style={{ marginTop: 36, borderRadius: 16, overflow: "hidden", maxHeight: 420, boxShadow: "0 12px 36px rgba(0,0,0,0.1)" }}>
                         <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                       </div>
                     )}
-
                   </div>
                 </section>
               );
@@ -354,57 +440,93 @@ export default function ConditionLiveView({
           </div>
         );
 
-      case "symptoms":
-        if (!condition.symptoms || condition.symptoms.length === 0) return null;
+      case "benefits": {
+        const benefitsList = (cfg?.bullets && cfg.bullets.length > 0) ? cfg.bullets : (condition.benefits || []);
+        if (benefitsList.length === 0) return null;
+        const isDark = cfg?.background === "teal";
+        const bgStyle = isDark ? { background: "#12303d", color: "#fff" } : cfg?.background === "white" ? { background: "#fff", color: "#1d2b34" } : { background: "#f8fafc", color: "#1d2b34" };
         return (
-          <section key="symptoms" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
+          <section key="benefits" style={{ ...bgStyle, padding: "clamp(48px, 5vw, 72px) 0", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+              <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 40px" }}>
+                {eyebrowEl(cfg?.eyebrow || "Proven Relief", cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
+                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px" }}>
+                  {cfg?.title || `Key Benefits of Treating ${condition.name}`}
+                </h2>
+                {cfg?.subtitle && <p style={{ fontSize: 16, color: isDark ? "#cbd5e1" : "#64748b", marginTop: 8 }}>{cfg.subtitle}</p>}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+                {benefitsList.map((b, i) => (
+                  <div key={i} style={{ background: isDark ? "rgba(255,255,255,0.06)" : "#fff", padding: "20px 24px", borderRadius: 12, border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #e2e8f0", display: "flex", alignItems: "flex-start", gap: 14 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: isDark ? "#8cc63f" : "#e6f4ea", color: isDark ? "#12303d" : "#5c9515", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, flexShrink: 0 }}>✓</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: isDark ? "#fff" : "#1e293b", lineHeight: 1.5 }}>{b}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      case "symptoms": {
+        const symptomsList = (cfg?.bullets && cfg.bullets.length > 0) ? cfg.bullets : (condition.symptoms || []);
+        if (symptomsList.length === 0) return null;
+        const isDark = cfg?.background === "teal";
+        const bgStyle = isDark ? { background: "#12303d", color: "#fff" } : cfg?.background === "light" ? { background: "#f8fafc", color: "#1d2b34" } : { background: "#fff", color: "#1d2b34" };
+        return (
+          <section key="symptoms" style={{ ...bgStyle, padding: "clamp(48px, 5vw, 72px) 0", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ maxWidth: 860, marginBottom: 36 }}>
-                {eyebrow("Warning Signs")}
-                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
-                  Common Symptoms of {condition.name}
+                {eyebrowEl(cfg?.eyebrow || "Warning Signs", cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
+                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px" }}>
+                  {cfg?.title || `Common Symptoms of ${condition.name}`}
                 </h2>
-                <p style={{ fontSize: 16, color: "#64748b", marginTop: 8 }}>
-                  If you are experiencing one or more of the following symptoms, our physiotherapists can evaluate the mechanical root cause:
+                <p style={{ fontSize: 16, color: isDark ? "#cbd5e1" : "#64748b", marginTop: 8 }}>
+                  {cfg?.subtitle || "If you are experiencing one or more of the following symptoms, our physiotherapists can evaluate the mechanical root cause:"}
                 </p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
-                {condition.symptoms.map((symptom, i) => (
-                  <div key={i} style={{ background: "#fff", padding: "18px 22px", borderRadius: 10, border: "1px solid #e2e8f0", display: "flex", alignItems: "flex-start", gap: 12 }}>
+                {symptomsList.map((symptom, i) => (
+                  <div key={i} style={{ background: isDark ? "rgba(255,255,255,0.06)" : "#fff", padding: "18px 22px", borderRadius: 10, border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #e2e8f0", display: "flex", alignItems: "flex-start", gap: 12 }}>
                     <span style={{ color: "#e11d48", fontSize: 18, lineHeight: 1.2 }}>⚠️</span>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: "#1e293b", lineHeight: 1.4 }}>{symptom}</span>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: isDark ? "#fff" : "#1e293b", lineHeight: 1.4 }}>{symptom}</span>
                   </div>
                 ))}
               </div>
             </div>
           </section>
         );
+      }
 
-      case "treatment_approach":
-        if (!condition.treatmentApproach || condition.treatmentApproach.length === 0) return null;
+      case "treatment_approach": {
+        const approachList = (cfg?.bullets && cfg.bullets.length > 0) ? cfg.bullets : (condition.treatmentApproach || []);
+        if (approachList.length === 0) return null;
+        const isLight = cfg?.background === "light" || cfg?.background === "white";
         return (
-          <section key="treatment_approach" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#12303d", color: "#fff" }}>
+          <section key="treatment_approach" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: isLight ? (cfg?.background === "white" ? "#fff" : "#f8fafc") : "#12303d", color: isLight ? "#1d2b34" : "#fff" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 48px" }}>
-                {eyebrow("Our Clinical Roadmap", "#8cc63f")}
-                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.5px" }}>
-                  Your 4-Step Journey to Overcoming {condition.name}
+                {eyebrowEl(cfg?.eyebrow || "Our Clinical Roadmap", cfg?.eyebrowColor || "#8cc63f")}
+                <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: isLight ? "#1d2b34" : "#fff", letterSpacing: "-0.5px" }}>
+                  {cfg?.title || `Your 4-Step Journey to Overcoming ${condition.name}`}
                 </h2>
+                {cfg?.subtitle && <p style={{ fontSize: 16, color: isLight ? "#64748b" : "#cbd5e1", marginTop: 8 }}>{cfg.subtitle}</p>}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
-                {condition.treatmentApproach.map((step, i) => (
-                  <div key={i} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", padding: 24, borderRadius: 14 }}>
+                {approachList.map((step, i) => (
+                  <div key={i} style={{ background: isLight ? "#fff" : "rgba(255,255,255,0.06)", border: isLight ? "1px solid #e2e8f0" : "1px solid rgba(255,255,255,0.12)", padding: 24, borderRadius: 14 }}>
                     <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#6faf1c", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 16, marginBottom: 16 }}>
                       {i + 1}
                     </div>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 10 }}>Step {i + 1}</h3>
-                    <p style={{ margin: 0, fontSize: 14, color: "#cbd5e1", lineHeight: 1.6 }}>{step}</p>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: isLight ? "#1d2b34" : "#fff", marginBottom: 10 }}>Step {i + 1}</h3>
+                    <p style={{ margin: 0, fontSize: 14, color: isLight ? "#475569" : "#cbd5e1", lineHeight: 1.6 }}>{step}</p>
                   </div>
                 ))}
               </div>
             </div>
           </section>
         );
+      }
 
       case "related_therapies":
         if (relatedServiceObjects.length === 0) return null;
@@ -412,9 +534,9 @@ export default function ConditionLiveView({
           <section key="related_therapies" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#fff" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ maxWidth: 860, marginBottom: 36 }}>
-                {eyebrow("Multimodal Care")}
+                {eyebrowEl(cfg?.eyebrow || "Multimodal Care", cfg?.eyebrowColor || "#1c9fd8")}
                 <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
-                  Recommended Treatments for {condition.name}
+                  {cfg?.title || `Recommended Treatments for ${condition.name}`}
                 </h2>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
@@ -444,10 +566,11 @@ export default function ConditionLiveView({
           <section key="team_carousel" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#f8fafc", borderTop: "1px solid #e7edf1" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 40px" }}>
-                {eyebrow("Expert Clinicians")}
+                {eyebrowEl(cfg?.eyebrow || "Expert Clinicians", cfg?.eyebrowColor || "#1c9fd8")}
                 <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
-                  Therapists Treating {condition.name}
+                  {cfg?.title || `Therapists Treating ${condition.name}`}
                 </h2>
+                {cfg?.subtitle && <p style={{ fontSize: 16, color: "#64748b", marginTop: 8 }}>{cfg.subtitle}</p>}
               </div>
               <TeamCarousel members={allTeam} />
             </div>
@@ -460,10 +583,11 @@ export default function ConditionLiveView({
           <section key="faqs" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#fff", borderTop: "1px solid #e7edf1" }}>
             <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", marginBottom: 40 }}>
-                {eyebrow("Common Questions")}
+                {eyebrowEl(cfg?.eyebrow || "Common Questions", cfg?.eyebrowColor || "#1c9fd8")}
                 <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
-                  Frequently Asked Questions About {condition.name}
+                  {cfg?.title || `Frequently Asked Questions About ${condition.name}`}
                 </h2>
+                {cfg?.subtitle && <p style={{ fontSize: 16, color: "#64748b", marginTop: 8 }}>{cfg.subtitle}</p>}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {condition.faqs.map((faq, i) => (
@@ -487,12 +611,12 @@ export default function ConditionLiveView({
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 32, alignItems: "center" }}>
                 <div>
-                  {eyebrow("Visit Our Clinic")}
+                  {eyebrowEl(cfg?.eyebrow || "Visit Our Clinic", cfg?.eyebrowColor || "#1c9fd8")}
                   <h2 style={{ fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px", marginBottom: 18 }}>
-                    Beddington SE Calgary North Clinic
+                    {cfg?.title || "Beddington SE Calgary North Clinic"}
                   </h2>
                   <p style={{ fontSize: 15.5, color: "#48535c", lineHeight: 1.7, marginBottom: 20 }}>
-                    Located at #204, 8120 Beddington Blvd NW, Calgary, AB with dedicated free surface parking and full wheelchair accessibility.
+                    {cfg?.content || "Located at #204, 8120 Beddington Blvd NW, Calgary, AB with dedicated free surface parking and full wheelchair accessibility."}
                   </p>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 14.5, color: "#334155" }}>
                     <div><strong>📍 Address:</strong> #204, 8120 Beddington Blvd NW, Calgary, AB T3K 2A8</div>
@@ -545,9 +669,9 @@ export default function ConditionLiveView({
           <section key="other_links" style={{ padding: "clamp(48px, 5vw, 72px) 0", background: "#f8fafc", borderTop: "1px solid #e7edf1" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", marginBottom: 32 }}>
-                {eyebrow("Complete Pain Care")}
+                {eyebrowEl(cfg?.eyebrow || "Complete Pain Care", cfg?.eyebrowColor || "#1c9fd8")}
                 <h2 style={{ fontSize: "clamp(24px, 2.8vw, 32px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
-                  Other Conditions We Treat in Calgary
+                  {cfg?.title || "Other Conditions We Treat in Calgary"}
                 </h2>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
@@ -570,10 +694,10 @@ export default function ConditionLiveView({
           <section key="bottom_cta" style={{ background: "linear-gradient(135deg, #1c9fd8 0%, #0e78a8 100%)", color: "#fff", padding: "clamp(56px, 6vw, 84px) 0", textAlign: "center" }}>
             <div style={{ maxWidth: 840, margin: "0 auto", padding: "0 24px" }}>
               <h2 style={{ fontSize: "clamp(28px, 3.6vw, 44px)", fontWeight: 800, color: "#fff", marginBottom: 16 }}>
-                Stop Living With {condition.name}
+                {cfg?.title || `Stop Living With ${condition.name}`}
               </h2>
               <p style={{ fontSize: "clamp(16px, 1.4vw, 19px)", color: "#e0f2fe", marginBottom: 32, lineHeight: 1.6 }}>
-                Book your comprehensive assessment at Nose Creek Physiotherapy and get a clear, step-by-step recovery plan today.
+                {cfg?.content || "Book your comprehensive assessment at Nose Creek Physiotherapy and get a clear, step-by-step recovery plan today."}
               </p>
               <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 16 }}>
                 <a
@@ -583,7 +707,7 @@ export default function ConditionLiveView({
                   className="btn btn-secondary"
                   style={{ background: "#fff", color: "#0369a1", padding: "16px 36px", fontSize: 16, fontWeight: 800, borderRadius: 8, textDecoration: "none" }}
                 >
-                  Book Assessment Online &rarr;
+                  {cfg?.ctaText || "Book Assessment Online"} &rarr;
                 </a>
                 <a
                   href="tel:4032958590"

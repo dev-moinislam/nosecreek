@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ThemeColors, defaultTheme, themePresets } from "@/components/theme/ThemeApplier";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
+import { PaletteIcon, CheckIcon, XIcon } from "./AdminIcons";
 
 export default function ThemeCustomizerModal({
   isOpen,
@@ -65,19 +66,24 @@ export default function ThemeCustomizerModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="adm-modal-header">
-          <div>
-            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>
-              🎨 Website Brand Color Theme Customizer
-            </h3>
-            <span style={{ fontSize: 12.5, color: "#64748b" }}>
-              (Master Admin Only) Customize brand colors across all pages
-            </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ padding: 8, background: "#fdf4ff", borderRadius: 8, color: "#9333ea", display: "flex" }}>
+              <PaletteIcon size={18} />
+            </div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0f172a" }}>
+                Brand Color Theme Customizer
+              </h3>
+              <span style={{ fontSize: 12.5, color: "#64748b" }}>
+                (Master Admin Only) Customize brand colors across all pages
+              </span>
+            </div>
           </div>
           <button
             onClick={onClose}
-            style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer", color: "#94a3b8" }}
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", padding: 4 }}
           >
-            ✕
+            <XIcon size={20} />
           </button>
         </div>
 
@@ -212,8 +218,9 @@ export default function ThemeCustomizerModal({
           <button type="button" onClick={onClose} className="adm-btn adm-btn-secondary">
             Cancel
           </button>
-          <button type="button" onClick={handleSave} disabled={saving} className="adm-btn adm-btn-primary">
-            {saving ? "Saving..." : "💾 Save & Apply Color Theme"}
+          <button type="button" onClick={handleSave} disabled={saving} className="adm-btn adm-btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <CheckIcon size={16} />
+            <span>{saving ? "Saving..." : "Save & Apply Color Theme"}</span>
           </button>
         </div>
       </div>

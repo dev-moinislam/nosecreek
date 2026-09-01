@@ -6,6 +6,18 @@ import { usePathname } from "next/navigation";
 import { useRole } from "./RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
+import {
+  DashboardIcon,
+  InboxIcon,
+  ServiceIconSvg,
+  ConditionIconSvg,
+  TeamIcon,
+  LocationIconSvg,
+  SettingsIcon,
+  GlobeIcon,
+  ExternalLinkIcon
+} from "./AdminIcons";
+
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -43,13 +55,13 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   }, []);
 
   const allNavItems = [
-    { label: "Overview", href: "/admin", icon: "📊", adminOnly: false },
-    { label: "Leads & Inbox", href: "/admin/leads", icon: "📥", badge: newLeadsCount, adminOnly: false },
-    { label: "Services", href: "/admin/services", icon: "🩺", adminOnly: false },
-    { label: "Conditions", href: "/admin/conditions", icon: "🩹", adminOnly: false },
-    { label: "Team Members", href: "/admin/team", icon: "👥", adminOnly: false },
-    { label: "Locations", href: "/admin/locations", icon: "📍", adminOnly: false },
-    { label: "Settings & Marketing", href: "/admin/settings", icon: "⚙️", adminOnly: true },
+    { label: "Overview", href: "/admin", icon: <DashboardIcon size={17} />, adminOnly: false },
+    { label: "Leads & Inbox", href: "/admin/leads", icon: <InboxIcon size={17} />, badge: newLeadsCount, adminOnly: false },
+    { label: "Services", href: "/admin/services", icon: <ServiceIconSvg size={17} />, adminOnly: false },
+    { label: "Conditions", href: "/admin/conditions", icon: <ConditionIconSvg size={17} />, adminOnly: false },
+    { label: "Team Members", href: "/admin/team", icon: <TeamIcon size={17} />, adminOnly: false },
+    { label: "Locations", href: "/admin/locations", icon: <LocationIconSvg size={17} />, adminOnly: false },
+    { label: "Settings & Marketing", href: "/admin/settings", icon: <SettingsIcon size={17} />, adminOnly: true },
   ];
 
   const visibleNavItems = allNavItems.filter((item) => !item.adminOnly || isAdmin);
@@ -77,8 +89,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               onClick={onClose}
               className={`adm-nav-item ${isActive ? "active" : ""}`}
             >
-              <div className="adm-nav-left">
-                <span>{item.icon}</span>
+              <div className="adm-nav-left" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ display: "flex", alignItems: "center", opacity: isActive ? 1 : 0.8 }}>{item.icon}</span>
                 <span>{item.label}</span>
               </div>
               {item.badge && item.badge > 0 ? (
@@ -93,13 +105,13 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           href="/"
           target="_blank"
           className="adm-nav-item"
-          style={{ opacity: 0.8 }}
+          style={{ opacity: 0.85 }}
         >
-          <div className="adm-nav-left">
-            <span>🌐</span>
+          <div className="adm-nav-left" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ display: "flex", alignItems: "center" }}><GlobeIcon size={17} /></span>
             <span>View Live Website</span>
           </div>
-          <span style={{ fontSize: 12 }}>↗</span>
+          <ExternalLinkIcon size={13} style={{ opacity: 0.7 }} />
         </Link>
       </nav>
 
