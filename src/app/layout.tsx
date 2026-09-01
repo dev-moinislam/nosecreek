@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import SchemaMarkup from "@/components/seo/SchemaMarkup";
-import MarketingScripts from "@/components/marketing/MarketingScripts";
+import SiteLayout from "@/components/layout/SiteLayout";
 import settingsData from "@/data/settings.json";
 
 export const metadata: Metadata = {
@@ -38,11 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Header />
-        <main id="main-content">{children}</main>
-        <Footer />
-        <SchemaMarkup type="MedicalBusiness" data={settingsData} />
-        <MarketingScripts />
+        <SiteLayout>{children}</SiteLayout>
       </body>
     </html>
   );

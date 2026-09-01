@@ -10,7 +10,7 @@ interface AdminHeaderProps {
 }
 
 export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps) {
-  const { role, setRole, isAdmin } = useRole();
+  const { user, role, setRole, isAdmin, logout } = useRole();
 
   return (
     <header className="adm-header">
@@ -58,6 +58,21 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
           </div>
         </div>
 
+        {/* User Info */}
+        {user && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 10px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8 }}>
+            <span style={{ fontSize: 14 }}>{isAdmin ? "🛡️" : "👤"}</span>
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, lineHeight: 1.2, color: "#1e293b" }}>
+                {user.name || user.email}
+              </div>
+              <div style={{ fontSize: 11, color: "#64748b", lineHeight: 1 }}>
+                {isAdmin ? "Master Admin" : "Client Safe Mode"}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* View Live Website Button */}
         <Link
           href="/"
@@ -67,6 +82,17 @@ export default function AdminHeader({ onToggleSidebar, title }: AdminHeaderProps
           <span>Live Site</span>
           <span style={{ fontSize: 12 }}>↗</span>
         </Link>
+
+        {/* Log Out Button */}
+        <button
+          onClick={logout}
+          className="adm-btn adm-btn-secondary adm-btn-sm"
+          style={{ color: "#dc2626", borderColor: "#fecaca" }}
+          title="Sign out of Admin Dashboard"
+        >
+          <span>🚪</span>
+          <span>Log Out</span>
+        </button>
       </div>
     </header>
   );
