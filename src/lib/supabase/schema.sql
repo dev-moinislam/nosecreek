@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS services (
   custom_sections JSONB DEFAULT '[]'::jsonb,
   faqs JSONB DEFAULT '[]'::jsonb,
   hidden_sections JSONB DEFAULT '[]'::jsonb,
+  section_order JSONB DEFAULT '[]'::jsonb,
   related_services JSONB DEFAULT '[]'::jsonb,
   related_conditions JSONB DEFAULT '[]'::jsonb,
   team_members JSONB DEFAULT '[]'::jsonb,
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS services (
 );
 
 ALTER TABLE services ADD COLUMN IF NOT EXISTS hidden_sections JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS section_order JSONB DEFAULT '[]'::jsonb;
 
 DROP TRIGGER IF EXISTS update_services_modtime ON services;
 CREATE TRIGGER update_services_modtime
@@ -100,6 +102,7 @@ CREATE TABLE IF NOT EXISTS conditions (
   custom_sections JSONB DEFAULT '[]'::jsonb,
   faqs JSONB DEFAULT '[]'::jsonb,
   hidden_sections JSONB DEFAULT '[]'::jsonb,
+  section_order JSONB DEFAULT '[]'::jsonb,
   related_services JSONB DEFAULT '[]'::jsonb,
   category TEXT DEFAULT 'general',
   seo JSONB DEFAULT '{}'::jsonb,
@@ -116,6 +119,7 @@ ALTER TABLE conditions ADD COLUMN IF NOT EXISTS benefits JSONB DEFAULT '[]'::jso
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS custom_sections JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS faqs JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS hidden_sections JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS section_order JSONB DEFAULT '[]'::jsonb;
 
 DROP TRIGGER IF EXISTS update_conditions_modtime ON conditions;
 CREATE TRIGGER update_conditions_modtime

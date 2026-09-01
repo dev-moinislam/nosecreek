@@ -70,10 +70,10 @@ export interface Service {
   id: string;
   slug: string;
   title: string;
-  shortDescription: string;
+  shortDescription?: string | null;
   description: string;
-  heroImage?: string;
-  sideImage?: string;
+  heroImage?: string | null;
+  sideImage?: string | null;
   iconType?: string;
   iconBg?: string;
   iconColor?: string;
@@ -162,10 +162,10 @@ export interface Condition {
   id: string;
   slug: string;
   name: string;
-  shortDescription?: string;
+  shortDescription?: string | null;
   description: string;
-  heroImage?: string;
-  sideImage?: string;
+  heroImage?: string | null;
+  sideImage?: string | null;
   ctaText?: string;
   ctaMuted?: boolean;
   benefits?: string[];

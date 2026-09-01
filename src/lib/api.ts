@@ -89,6 +89,7 @@ export async function getServices(): Promise<Service[]> {
           customSections: d.custom_sections || [],
           faqs: d.faqs || [],
           hiddenSections: d.hidden_sections || [],
+          sectionOrder: d.section_order || d.sectionOrder || [],
           relatedServices: d.related_services || [],
           relatedConditions: d.related_conditions || [],
           teamMembers: d.team_members || [],
@@ -133,6 +134,7 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
           customSections: data.custom_sections || [],
           faqs: data.faqs || [],
           hiddenSections: data.hidden_sections || [],
+          sectionOrder: data.section_order || data.sectionOrder || [],
           relatedServices: data.related_services || [],
           relatedConditions: data.related_conditions || [],
           teamMembers: data.team_members || [],
@@ -310,6 +312,7 @@ export async function getConditions(): Promise<Condition[]> {
           customSections: d.custom_sections || [],
           faqs: d.faqs || [],
           hiddenSections: d.hidden_sections || [],
+          sectionOrder: d.section_order || d.sectionOrder || [],
           relatedServices: d.related_services || [],
           category: d.category || "general",
           seo: d.seo || {}
@@ -323,8 +326,42 @@ export async function getConditions(): Promise<Condition[]> {
 }
 
 export async function getConditionBySlug(slug: string): Promise<Condition | undefined> {
-  const conditions = await getConditions();
-  return conditions.find((c) => c.slug === slug);
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from("conditions")
+        .select("*")
+        .eq("slug", slug)
+        .eq("is_published", true)
+        .single();
+      if (!error && data) {
+        return {
+          id: data.id,
+          slug: data.slug,
+          name: data.name,
+          shortDescription: data.short_description || "",
+          description: data.description || "",
+          heroImage: data.hero_image,
+          sideImage: data.side_image,
+          ctaText: data.cta_text,
+          ctaMuted: data.cta_muted,
+          benefits: data.benefits || [],
+          symptoms: data.symptoms || [],
+          treatmentApproach: data.treatment_approach || [],
+          customSections: data.custom_sections || [],
+          faqs: data.faqs || [],
+          hiddenSections: data.hidden_sections || [],
+          sectionOrder: data.section_order || data.sectionOrder || [],
+          relatedServices: data.related_services || [],
+          category: data.category || "general",
+          seo: data.seo || {}
+        };
+      }
+    } catch (e) {
+      console.warn(`Supabase fetch failed for condition ${slug}, using local fallback`, e);
+    }
+  }
+  return conditionsList.find((c) => c.slug === slug);
 }
 
 /**

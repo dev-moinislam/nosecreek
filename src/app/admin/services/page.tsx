@@ -154,6 +154,7 @@ export default function AdminServicesPage() {
           custom_sections: updatedService.customSections || [],
           faqs: updatedService.faqs || [],
           hidden_sections: updatedService.hiddenSections || [],
+          section_order: updatedService.sectionOrder || [],
           related_services: updatedService.relatedServices || [],
           related_conditions: updatedService.relatedConditions || [],
           seo: updatedService.seo || {},
@@ -819,7 +820,7 @@ function ServiceEditorModal({
                 <textarea
                   className="adm-textarea"
                   style={{ minHeight: 70 }}
-                  value={service.shortDescription}
+                  value={service.shortDescription || ""}
                   onChange={(e) => setService({ ...service, shortDescription: e.target.value })}
                 />
               </div>
