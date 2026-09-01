@@ -27,6 +27,8 @@ const defaultServiceSectionOrder = [
   "bottom_cta"
 ];
 
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
+
 export default function ServiceLiveView({
   initialService,
   allTeam,
@@ -38,7 +40,7 @@ export default function ServiceLiveView({
 }) {
   const [service, setService] = useState<Service>(initialService);
 
-  // Real-time synchronization with localStorage and browser events
+  // Real-time synchronization with localStorage, Supabase, and browser events
   useEffect(() => {
     function syncFromLocal() {
       try {
@@ -55,7 +57,51 @@ export default function ServiceLiveView({
       }
     }
 
+    async function fetchLiveSupabase() {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data, error } = await supabase
+            .from("services")
+            .select("*")
+            .eq("slug", initialService.slug)
+            .single();
+          if (!error && data) {
+            setService({
+              id: data.id,
+              slug: data.slug,
+              title: data.title,
+              shortDescription: data.short_description || "",
+              description: data.description || "",
+              heroImage: data.hero_image,
+              sideImage: data.side_image,
+              iconType: data.icon_type,
+              iconBg: data.icon_bg,
+              iconColor: data.icon_color,
+              ctaText: data.cta_text,
+              ctaMuted: data.cta_muted,
+              benefits: data.benefits || [],
+              symptoms: data.symptoms || [],
+              treatmentApproach: data.treatment_approach || [],
+              customSections: data.custom_sections || [],
+              faqs: data.faqs || [],
+              hiddenSections: data.hidden_sections || [],
+              sectionOrder: data.section_order || data.sectionOrder || [],
+              relatedServices: data.related_services || [],
+              relatedConditions: data.related_conditions || [],
+              teamMembers: data.team_members || [],
+              locations: data.locations || [],
+              testimonials: data.testimonials || [],
+              seo: data.seo || {}
+            });
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+
     syncFromLocal();
+    fetchLiveSupabase();
     window.addEventListener("servicesUpdated", syncFromLocal);
     window.addEventListener("storage", syncFromLocal);
     return () => {

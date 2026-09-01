@@ -29,6 +29,8 @@ const defaultConditionSectionOrder = [
   "bottom_cta"
 ];
 
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
+
 export default function ConditionLiveView({
   initialCondition,
   allServices,
@@ -42,7 +44,7 @@ export default function ConditionLiveView({
 }) {
   const [condition, setCondition] = useState<Condition>(initialCondition);
 
-  // Real-time synchronization with localStorage and browser events
+  // Real-time synchronization with localStorage, Supabase, and browser events
   useEffect(() => {
     function syncFromLocal() {
       try {
@@ -59,7 +61,45 @@ export default function ConditionLiveView({
       }
     }
 
+    async function fetchLiveSupabase() {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data, error } = await supabase
+            .from("conditions")
+            .select("*")
+            .eq("slug", initialCondition.slug)
+            .single();
+          if (!error && data) {
+            setCondition({
+              id: data.id,
+              slug: data.slug,
+              name: data.name,
+              shortDescription: data.short_description || "",
+              description: data.description || "",
+              heroImage: data.hero_image,
+              sideImage: data.side_image,
+              ctaText: data.cta_text,
+              ctaMuted: data.cta_muted,
+              benefits: data.benefits || [],
+              symptoms: data.symptoms || [],
+              treatmentApproach: data.treatment_approach || [],
+              customSections: data.custom_sections || [],
+              faqs: data.faqs || [],
+              hiddenSections: data.hidden_sections || [],
+              sectionOrder: data.section_order || data.sectionOrder || [],
+              relatedServices: data.related_services || [],
+              category: data.category || "general",
+              seo: data.seo || {}
+            });
+          }
+        } catch {
+          // ignore
+        }
+      }
+    }
+
     syncFromLocal();
+    fetchLiveSupabase();
     window.addEventListener("conditionsUpdated", syncFromLocal);
     window.addEventListener("storage", syncFromLocal);
     return () => {
