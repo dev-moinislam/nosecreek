@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import styles from "./AppointmentForm.module.css";
+import { submitLead } from "@/lib/supabase/client";
 
 interface AppointmentFormProps {
   onSuccessClose?: () => void;
@@ -40,8 +41,25 @@ export default function AppointmentForm({ onSuccessClose }: AppointmentFormProps
     }
 
     try {
-      // Simulate API call to clinical trials or appointments system
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const res = await submitLead({
+        form_type: "appointment",
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        service_interest: formData.service || "General Physiotherapy",
+        message: `Appointment requested for service: ${formData.service || "General Assessment"}`,
+        status: "new",
+        metadata: {
+          submitted_at: new Date().toISOString(),
+          requested_service: formData.service
+        }
+      });
+
+      if (!res.success) {
+        throw new Error(res.error || "Failed to submit");
+      }
 
       setStatus({
         type: "success",

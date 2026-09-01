@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { submitLead } from "@/lib/supabase/client";
 
 interface WorkshopReplayModalProps {
   isOpen: boolean;
@@ -30,13 +31,30 @@ export default function WorkshopReplayModal({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      await submitLead({
+        form_type: "workshop_replay",
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service_interest: formData.selectedWorkshop || "Workshop Replay",
+        message: `Requested on-demand replay for: ${formData.selectedWorkshop}`,
+        status: "new",
+        metadata: {
+          requested_workshop: formData.selectedWorkshop,
+          submitted_at: new Date().toISOString()
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
       setSubmitted(true);
-    }, 600);
+    }
   };
 
   return (

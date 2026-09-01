@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { submitLead } from "@/lib/supabase/client";
 
 export default function ContactInquiryForm() {
   const [formData, setFormData] = useState({
@@ -33,8 +34,24 @@ export default function ContactInquiryForm() {
     }
 
     try {
-      // Simulate form submission
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const res = await submitLead({
+        form_type: "contact",
+        name: formData.firstName,
+        first_name: formData.firstName,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+        status: "new",
+        metadata: {
+          submitted_at: new Date().toISOString(),
+          page: typeof window !== "undefined" ? window.location.pathname : "/contact"
+        }
+      });
+
+      if (!res.success) {
+        throw new Error(res.error || "Failed to submit");
+      }
+
       setStatus({
         type: "success",
         message: "Thank you! Your inquiry has been sent to Nose Creek Physiotherapy. We will contact you shortly."

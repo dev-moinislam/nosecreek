@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { submitLead } from "@/lib/supabase/client";
 
 export default function WorkshopRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -12,13 +13,31 @@ export default function WorkshopRegistrationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      await submitLead({
+        form_type: "workshop_registration",
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        service_interest: formData.hurtArea || "Health Workshop",
+        message: `Area of pain: ${formData.hurtArea || "N/A"}. Goal: ${formData.reason || "N/A"}`,
+        status: "new",
+        metadata: {
+          hurt_area: formData.hurtArea,
+          reason: formData.reason,
+          submitted_at: new Date().toISOString()
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
       setSubmitted(true);
-    }, 600);
+    }
   };
 
   if (submitted) {
