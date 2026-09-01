@@ -5,17 +5,19 @@
     "title": "Physiotherapy",
     "shortDescription": "Expert, hands-on physio to restore mobility, strength and balance — while minimizing your dependence on medication.",
     "description": "Our physiotherapy services are designed to help you regain motion, strength, and functionality. We address acute or chronic pain, post-surgical recovery, sports injuries, and mobility restrictions using evidence-based clinical techniques, manual manipulation, and progressive exercise rehabilitation.",
+    "heroImage": "/images/clinic/reception-desktop.jpg",
+    "sideImage": "/images/clinic/reception-four.jpg",
     "iconType": "heart-pulse",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
-    "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/reception-desktop.jpg",
-    "sideImage": "/images/clinic/reception-four.jpg",
+    "ctaText": "more about physiotherapy",
+    "ctaMuted": false,
     "benefits": [
       "Reduces or eliminates pain naturally without invasive procedures",
       "Restores spinal and peripheral joint range of motion and flexibility",
       "Accelerates recovery from sports injuries, workplace accidents, and surgery",
-      "Strengthens stabilizer muscles to prevent injury recurrence"
+      "Strengthens stabilizer muscles to prevent injury recurrence",
+      "Reduces or eliminates pain naturally"
     ],
     "symptoms": [
       "Lower back pain, sciatica, and spinal stiffness",
@@ -32,66 +34,97 @@
     "customSections": [
       {
         "id": "manual-therapy-focus",
-        "eyebrow": "Advanced Clinical Technique",
-        "eyebrowColor": "#6faf1c",
+        "image": "/images/clinic/reception-four.jpg",
         "title": "Hands-On Manual Therapy & Joint Mobilization",
-        "subtitle": "Direct spinal and extremity joint mobilization to unlock restricted motion.",
-        "content": "At Nose Creek Physiotherapy, our manual therapists are Fellows of the Canadian Academy of Manipulative Physiotherapy (FCAMPT) — representing the highest internationally recognized standard in orthopaedic physical therapy. We don't just hand you a sheet of exercises; we use targeted hands-on mobilizations to free stiff joints and calm irritated nerve roots on your very first visit.",
         "bullets": [
           "FCAMPT-certified orthopaedic joint mobilizations",
           "Myofascial trigger point and soft-tissue release",
           "Spinal traction and mechanical decompression strategies",
           "Safe and gentle techniques tailored to your comfort"
         ],
-        "image": "/images/clinic/reception-four.jpg",
-        "imageAlt": "Physiotherapist performing manual joint mobilization",
-        "imagePosition": "right",
-        "background": "white",
+        "content": "At Nose Creek Physiotherapy, our manual therapists are Fellows of the Canadian Academy of Manipulative Physiotherapy (FCAMPT) — representing the highest internationally recognized standard in orthopaedic physical therapy. We don't just hand you a sheet of exercises; we use targeted hands-on mobilizations to free stiff joints and calm irritated nerve roots on your very first visit.",
+        "ctaHref": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
         "ctaText": "Book An Assessment Online →",
-        "ctaHref": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+        "eyebrow": "Advanced Clinical Technique",
+        "imageAlt": "Physiotherapist performing manual joint mobilization",
+        "subtitle": "Direct spinal and extremity joint mobilization to unlock restricted motion.",
+        "background": "white",
+        "eyebrowColor": "#6faf1c",
+        "imagePosition": "right"
       },
       {
         "id": "dry-needling-ims",
-        "eyebrow": "Deep Muscle Release",
-        "eyebrowColor": "#1c9fd8",
+        "image": "/images/clinic/clinic-mobile.jpg",
         "title": "Gunn Intramuscular Stimulation (IMS / Dry Needling)",
-        "subtitle": "Relieve deep, chronic muscle spasms that stretching cannot reach.",
-        "content": "When nerve roots are sensitized or compressed, deep postural muscles develop permanent taut bands (neuropathic shortening) that stay tight no matter how much you stretch. Gunn IMS uses ultra-fine needles to release these deep contracted muscle fibers, allowing the nerve to heal and eliminating radiating pain.",
         "bullets": [
           "Targets deep spinal and buttock muscles unreachable by hand",
           "Resets hyperactive nerve pathways for lasting pain relief",
           "Highly effective for chronic sciatica, neck pain, and headaches",
           "Administered by certified CGIMS practitioners"
         ],
-        "image": "/images/clinic/clinic-mobile.jpg",
+        "content": "When nerve roots are sensitized or compressed, deep postural muscles develop permanent taut bands (neuropathic shortening) that stay tight no matter how much you stretch. Gunn IMS uses ultra-fine needles to release these deep contracted muscle fibers, allowing the nerve to heal and eliminating radiating pain.",
+        "eyebrow": "Deep Muscle Release",
         "imageAlt": "IMS Dry Needling treatment at Nose Creek Physiotherapy",
-        "imagePosition": "left",
-        "background": "light"
+        "subtitle": "Relieve deep, chronic muscle spasms that stretching cannot reach.",
+        "background": "light",
+        "eyebrowColor": "#1c9fd8",
+        "imagePosition": "left"
       }
     ],
     "faqs": [
       {
-        "question": "Do I need a doctor's referral for physiotherapy?",
-        "answer": "No, in Alberta you do not need a physician referral to see a licensed physiotherapist. You can book an appointment directly with our clinic. (Some private insurance plans may request one for claim reimbursement)."
+        "answer": "No, in Alberta you do not need a physician referral to see a licensed physiotherapist. You can book an appointment directly with our clinic. (Some private insurance plans may request one for claim reimbursement).",
+        "question": "Do I need a doctor's referral for physiotherapy?"
       },
       {
-        "question": "Is physiotherapy covered by my insurance plan?",
-        "answer": "Yes, physiotherapy is covered under almost all extended health care benefit plans, WCB workplace claims, and auto insurance policies. We provide direct billing to all major insurers."
+        "answer": "Yes, physiotherapy is covered under almost all extended health care benefit plans, WCB workplace claims, and auto insurance policies. We provide direct billing to all major insurers.",
+        "question": "Is physiotherapy covered by my insurance plan?"
       },
       {
-        "question": "What should I wear to my physiotherapy appointment?",
-        "answer": "Wear comfortable, loose-fitting clothing that allows easy access to the injured area (e.g., shorts for knee or hip injuries, a tank top or loose shirt for shoulder and neck issues)."
+        "answer": "Wear comfortable, loose-fitting clothing that allows easy access to the injured area (e.g., shorts for knee or hip injuries, a tank top or loose shirt for shoulder and neck issues).",
+        "question": "What should I wear to my physiotherapy appointment?"
       }
     ],
-    "relatedServices": ["massage-therapy", "shockwave-therapy", "acupuncture"],
-    "relatedConditions": ["back-pain", "knee-pain", "neck-shoulder-pain"],
-    "teamMembers": ["blair-schachterle", "rizelle-manzano", "madelyne-agius"],
-    "locations": ["nose-creek-clinic"],
-    "testimonials": ["review-1"],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "bottom_cta"
+    ],
+    "relatedServices": [
+      "massage-therapy",
+      "shockwave-therapy",
+      "acupuncture"
+    ],
+    "relatedConditions": [
+      "back-pain",
+      "knee-pain",
+      "neck-shoulder-pain"
+    ],
+    "teamMembers": [
+      "blair-schachterle",
+      "rizelle-manzano",
+      "madelyne-agius"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
+    "testimonials": [
+      "review-1"
+    ],
     "seo": {
       "title": "Physiotherapy in Calgary North | Nose Creek Physiotherapy",
-      "description": "Expert hands-on physiotherapy to restore mobility, strength and balance. Extended health direct billing available in Calgary.",
       "ogTitle": "Physiotherapy Services | Nose Creek Physiotherapy",
+      "description": "Expert hands-on physiotherapy to restore mobility, strength and balance. Extended health direct billing available in Calgary.",
       "ogDescription": "Restore mobility, strength, and balance naturally with our certified Calgary physiotherapists."
     }
   },
@@ -101,12 +134,13 @@
     "title": "Massage Therapy",
     "shortDescription": "Therapeutic massage that soothes muscles, promotes recovery and leaves you refreshed and revitalized.",
     "description": "Our Registered Massage Therapy (RMT) treatments utilize deep tissue techniques, trigger point release, and myofascial therapy to relieve tension, reduce physiological stress, and accelerate musculoskeletal recovery.",
+    "heroImage": "/images/clinic/reception-four.jpg",
+    "sideImage": "/images/clinic/reception-three.jpg",
     "iconType": "sparkles",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
     "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/reception-four.jpg",
-    "sideImage": "/images/clinic/reception-three.jpg",
+    "ctaMuted": false,
     "benefits": [
       "Alleviates chronic muscular tension, spasms, and trigger points",
       "Improves localized blood circulation and lymphatic drainage",
@@ -128,42 +162,61 @@
     "customSections": [
       {
         "id": "rmt-credentials",
-        "eyebrow": "Certified 2200-Hour RMTs",
-        "eyebrowColor": "#6faf1c",
+        "image": "/images/clinic/reception-three.jpg",
         "title": "Medical & Therapeutic Registered Massage Therapy",
-        "subtitle": "Targeted soft tissue release tailored to your exact physical tension.",
-        "content": "All our massage therapists are fully registered (2200-Hour RMTs) with recognized Alberta associations. Whether you need focused deep-tissue therapy for a stubborn muscle spasm or gentle myofascial release following a car accident, our RMTs collaborate with our physiotherapists to accelerate your complete physical recovery.",
         "bullets": [
           "Deep Tissue & Myofascial Trigger Point Release",
           "Sports & Athletic Pre/Post Performance Massage",
           "Prenatal & Postnatal Gentle Muscle Therapy",
           "100% Direct Billing to Extended Health Insurance"
         ],
-        "image": "/images/clinic/reception-three.jpg",
+        "content": "All our massage therapists are fully registered (2200-Hour RMTs) with recognized Alberta associations. Whether you need focused deep-tissue therapy for a stubborn muscle spasm or gentle myofascial release following a car accident, our RMTs collaborate with our physiotherapists to accelerate your complete physical recovery.",
+        "eyebrow": "Certified 2200-Hour RMTs",
         "imageAlt": "Registered Massage Therapy treatment room at Nose Creek",
-        "imagePosition": "right",
-        "background": "white"
+        "subtitle": "Targeted soft tissue release tailored to your exact physical tension.",
+        "background": "white",
+        "eyebrowColor": "#6faf1c",
+        "imagePosition": "right"
       }
     ],
     "faqs": [
       {
-        "question": "Are your massage therapists registered in Alberta?",
-        "answer": "Yes, all massage therapists at Nose Creek are fully registered (2200-Hour RMTs) and can provide official receipts for extended health insurance reimbursement."
+        "answer": "Yes, all massage therapists at Nose Creek are fully registered (2200-Hour RMTs) and can provide official receipts for extended health insurance reimbursement.",
+        "question": "Are your massage therapists registered in Alberta?"
       },
       {
-        "question": "Can I combine massage therapy with physiotherapy?",
-        "answer": "Yes, combining massage therapy with active physiotherapy is often the most effective approach for resolving chronic pain and complex injuries."
+        "answer": "Yes, combining massage therapy with active physiotherapy is often the most effective approach for resolving chronic pain and complex injuries.",
+        "question": "Can I combine massage therapy with physiotherapy?"
       }
     ],
-    "relatedServices": ["physiotherapy", "acupuncture", "shockwave-therapy"],
-    "relatedConditions": ["neck-shoulder-pain", "back-pain"],
-    "teamMembers": ["katie-luu", "shawn-gille", "amalia", "smita-nagpal", "jihan-shayya"],
-    "locations": ["nose-creek-clinic"],
-    "testimonials": ["review-2"],
+    "hiddenSections": [],
+    "sectionOrder": [],
+    "relatedServices": [
+      "physiotherapy",
+      "acupuncture",
+      "shockwave-therapy"
+    ],
+    "relatedConditions": [
+      "neck-shoulder-pain",
+      "back-pain"
+    ],
+    "teamMembers": [
+      "katie-luu",
+      "shawn-gille",
+      "amalia",
+      "smita-nagpal",
+      "jihan-shayya"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
+    "testimonials": [
+      "review-2"
+    ],
     "seo": {
       "title": "Registered Massage Therapy (RMT) Calgary | Nose Creek",
-      "description": "Therapeutic, deep tissue, and relaxation massage therapy by Registered Massage Therapists in Calgary NW & NE.",
       "ogTitle": "Registered Massage Therapy | Nose Creek Physiotherapy",
+      "description": "Therapeutic, deep tissue, and relaxation massage therapy by Registered Massage Therapists in Calgary NW & NE.",
       "ogDescription": "Soothe muscle tension and speed injury recovery with our licensed RMTs in Calgary."
     }
   },
@@ -173,12 +226,13 @@
     "title": "Shockwave Therapy",
     "shortDescription": "State-of-the-art, non-invasive treatment that accelerates healing by targeting the root cause of persistent pain.",
     "description": "Extracorporeal Shockwave Therapy (ESWT) delivers acoustic soundwaves deep into injured tendons and soft tissues, stimulating blood vessel formation, breaking down calcifications, and reactivating the body's natural cellular repair cycle.",
+    "heroImage": "/images/clinic/reception-three.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
     "iconType": "zap",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
     "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/reception-three.jpg",
-    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaMuted": false,
     "benefits": [
       "Non-surgical, non-invasive treatment for chronic tendon conditions",
       "Breaks down stubborn calcium deposits and scar tissue",
@@ -200,42 +254,56 @@
     "customSections": [
       {
         "id": "how-shockwave-heals",
-        "eyebrow": "Advanced Medical Technology",
-        "eyebrowColor": "#1c9fd8",
+        "image": "/images/clinic/reception-desktop.jpg",
         "title": "How Acoustic Shockwaves Dissolve Chronic Calcifications",
-        "subtitle": "Reactivating your body's natural cellular healing cycle without surgery.",
-        "content": "Radial shockwave therapy generates high-energy acoustic pulses that pass through skin into deep tendon structures. These soundwaves trigger 'neovascularization' — the formation of new micro-capillaries that flood scarred, stagnant tendon tissue with oxygen and healing nutrients, while simultaneously breaking apart painful calcifications.",
         "bullets": [
           "Non-invasive alternative to cortisone shots or surgery",
           "Typically requires only 3 to 5 weekly sessions of 10–15 minutes",
           "High clinical success rate for chronic plantar fasciitis and tennis elbow",
           "Administered by trained physiotherapy clinicians"
         ],
-        "image": "/images/clinic/reception-desktop.jpg",
+        "content": "Radial shockwave therapy generates high-energy acoustic pulses that pass through skin into deep tendon structures. These soundwaves trigger 'neovascularization' — the formation of new micro-capillaries that flood scarred, stagnant tendon tissue with oxygen and healing nutrients, while simultaneously breaking apart painful calcifications.",
+        "eyebrow": "Advanced Medical Technology",
         "imageAlt": "Acoustic Radial Shockwave Therapy at Nose Creek",
-        "imagePosition": "left",
-        "background": "white"
+        "subtitle": "Reactivating your body's natural cellular healing cycle without surgery.",
+        "background": "white",
+        "eyebrowColor": "#1c9fd8",
+        "imagePosition": "left"
       }
     ],
     "faqs": [
       {
-        "question": "Is shockwave therapy painful?",
-        "answer": "You may experience mild discomfort during the 5-minute treatment, but our therapists adjust the intensity so it is always tolerable. Discomfort stops immediately when the pulses finish."
+        "answer": "You may experience mild discomfort during the 5-minute treatment, but our therapists adjust the intensity so it is always tolerable. Discomfort stops immediately when the pulses finish.",
+        "question": "Is shockwave therapy painful?"
       },
       {
-        "question": "How many shockwave sessions do I need?",
-        "answer": "Most patients achieve substantial relief within 3 to 5 weekly sessions."
+        "answer": "Most patients achieve substantial relief within 3 to 5 weekly sessions.",
+        "question": "How many shockwave sessions do I need?"
       }
     ],
-    "relatedServices": ["physiotherapy", "custom-orthotics"],
-    "relatedConditions": ["foot-pain", "knee-pain", "sports-injury"],
-    "teamMembers": ["blair-schachterle", "rizelle-manzano"],
-    "locations": ["nose-creek-clinic"],
+    "hiddenSections": [],
+    "sectionOrder": [],
+    "relatedServices": [
+      "physiotherapy",
+      "custom-orthotics"
+    ],
+    "relatedConditions": [
+      "foot-pain",
+      "knee-pain",
+      "sports-injury"
+    ],
+    "teamMembers": [
+      "blair-schachterle",
+      "rizelle-manzano"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
     "testimonials": [],
     "seo": {
       "title": "Shockwave Therapy Calgary | Nose Creek Physiotherapy",
-      "description": "Advanced non-invasive shockwave therapy to heal chronic plantar fasciitis, tennis elbow, and calcific tendinopathy in Calgary.",
       "ogTitle": "Shockwave Therapy Calgary | Nose Creek",
+      "description": "Advanced non-invasive shockwave therapy to heal chronic plantar fasciitis, tennis elbow, and calcific tendinopathy in Calgary.",
       "ogDescription": "Heal stubborn tendon pain and calcifications with acoustic shockwave treatments."
     }
   },
@@ -245,11 +313,13 @@
     "title": "Acupuncture",
     "shortDescription": "Certified practitioners stimulate specific points to balance energy and ease a wide range of ailments.",
     "description": "Our Traditional Chinese Medicine (TCM) and anatomical medical acupuncture treatments stimulate specific neuro-pathways, release deep intramuscular trigger points, and encourage the nervous system to release natural pain-relieving endorphins.",
+    "heroImage": "/images/clinic/clinic-mobile.jpg",
+    "sideImage": null,
     "iconType": "needle",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
     "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/clinic-mobile.jpg",
+    "ctaMuted": false,
     "benefits": [
       "Stimulates endorphin release for natural pain relief",
       "Relaxes deep muscle trigger points and chronic spasms",
@@ -268,25 +338,39 @@
       "Gentle manual stimulation or optional electro-acupuncture for nerve modulation",
       "Relaxing 20–30 minute resting phase in a private treatment room"
     ],
+    "customSections": [],
     "faqs": [
       {
-        "question": "Does acupuncture hurt?",
-        "answer": "Acupuncture needles are hair-thin and most patients feel only a slight prick or dull warmth on insertion. Many patients find the experience deeply relaxing."
+        "answer": "Acupuncture needles are hair-thin and most patients feel only a slight prick or dull warmth on insertion. Many patients find the experience deeply relaxing.",
+        "question": "Does acupuncture hurt?"
       },
       {
-        "question": "Is acupuncture covered by extended health insurance?",
-        "answer": "Yes, acupuncture provided by licensed practitioners is covered by most extended health plans in Alberta."
+        "answer": "Yes, acupuncture provided by licensed practitioners is covered by most extended health plans in Alberta.",
+        "question": "Is acupuncture covered by extended health insurance?"
       }
     ],
-    "relatedServices": ["physiotherapy", "massage-therapy"],
-    "relatedConditions": ["neck-shoulder-pain", "back-pain"],
-    "teamMembers": ["dr-eileen-wei", "blair-schachterle"],
-    "locations": ["nose-creek-clinic"],
+    "hiddenSections": [],
+    "sectionOrder": [],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy"
+    ],
+    "relatedConditions": [
+      "neck-shoulder-pain",
+      "back-pain"
+    ],
+    "teamMembers": [
+      "dr-eileen-wei",
+      "blair-schachterle"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
     "testimonials": [],
     "seo": {
       "title": "Acupuncture & TCM in Calgary | Nose Creek Physiotherapy",
-      "description": "Licensed acupuncture and TCM treatments in Calgary to relieve chronic pain, headaches, and muscle tension naturally.",
       "ogTitle": "Acupuncture Treatment | Nose Creek Physiotherapy",
+      "description": "Licensed acupuncture and TCM treatments in Calgary to relieve chronic pain, headaches, and muscle tension naturally.",
       "ogDescription": "Ease chronic pain, headaches, and muscle tension with licensed acupuncture care in Calgary."
     }
   },
@@ -296,11 +380,13 @@
     "title": "Custom Orthotics",
     "shortDescription": "Orthotics designed to align and support your feet — tailored to your unique needs for lasting comfort.",
     "description": "Custom foot orthotics are precision medical appliances made to support and align your feet, ankles, and entire lower body kinetic chain, redistributing pressure and reducing strain on your knees, hips, and lower back.",
+    "heroImage": "/images/clinic/reception-desktop.jpg",
+    "sideImage": null,
     "iconType": "footprints",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
     "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/reception-desktop.jpg",
+    "ctaMuted": false,
     "benefits": [
       "Corrects over-pronation, supination, and arch collapse",
       "Relieves heel pain, plantar fasciitis, and metatarsalgia",
@@ -319,25 +405,40 @@
       "Custom fabrication by specialized orthotic laboratories",
       "Fitting, footwear review, and follow-up adjustments"
     ],
+    "customSections": [],
     "faqs": [
       {
-        "question": "How long do custom orthotics last?",
-        "answer": "High-quality custom orthotics typically last 2 to 4 years depending on your daily wear, body weight, and activity level."
+        "answer": "High-quality custom orthotics typically last 2 to 4 years depending on your daily wear, body weight, and activity level.",
+        "question": "How long do custom orthotics last?"
       },
       {
-        "question": "Will my insurance cover custom orthotics?",
-        "answer": "Most extended healthcare plans cover custom orthotics when prescribed by a doctor or qualified specialist. We provide all detailed lab documentation for claims."
+        "answer": "Most extended healthcare plans cover custom orthotics when prescribed by a doctor or qualified specialist. We provide all detailed lab documentation for claims.",
+        "question": "Will my insurance cover custom orthotics?"
       }
     ],
-    "relatedServices": ["physiotherapy", "shockwave-therapy", "knee-bracing"],
-    "relatedConditions": ["foot-pain", "knee-pain", "back-pain"],
-    "teamMembers": ["blair-schachterle"],
-    "locations": ["nose-creek-clinic"],
+    "hiddenSections": [],
+    "sectionOrder": [],
+    "relatedServices": [
+      "physiotherapy",
+      "shockwave-therapy",
+      "knee-bracing"
+    ],
+    "relatedConditions": [
+      "foot-pain",
+      "knee-pain",
+      "back-pain"
+    ],
+    "teamMembers": [
+      "blair-schachterle"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
     "testimonials": [],
     "seo": {
       "title": "Custom Foot Orthotics Calgary | Nose Creek Physiotherapy",
-      "description": "Customized orthotic insoles to correct foot alignment and alleviate heel, knee, and lower back pain in Calgary.",
       "ogTitle": "Custom Orthotics Calgary | Nose Creek",
+      "description": "Customized orthotic insoles to correct foot alignment and alleviate heel, knee, and lower back pain in Calgary.",
       "ogDescription": "Restore proper gait and foot alignment with custom-made medical orthotics."
     }
   },
@@ -347,11 +448,13 @@
     "title": "Knee Bracing",
     "shortDescription": "Premium knee braces to protect, support and stabilize — whether recovering from injury or preventing one.",
     "description": "We provide custom and specialized knee braces, including spring-loaded and unloader braces for osteoarthritis, ligament instability (ACL, MCL, PCL), and sports protection, allowing you to stay active with confidence and reduced joint pain.",
+    "heroImage": "/images/clinic/reception-four.jpg",
+    "sideImage": null,
     "iconType": "shield",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
     "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/reception-four.jpg",
+    "ctaMuted": false,
     "benefits": [
       "Unloads osteoarthritis pressure to significantly reduce knee pain",
       "Stabilizes knees recovering from ACL, MCL, or meniscus tears",
@@ -370,25 +473,38 @@
       "Custom fitting, strap calibration, and movement trial in clinic",
       "Integration with knee-strengthening physiotherapy exercises"
     ],
+    "customSections": [],
     "faqs": [
       {
-        "question": "What is a Spring-Loaded Knee Brace?",
-        "answer": "Spring-loaded knee braces store energy during knee bending and return it during knee extension, taking up to 40% of the mechanical load off your joint when standing up or climbing stairs."
+        "answer": "Spring-loaded knee braces store energy during knee bending and return it during knee extension, taking up to 40% of the mechanical load off your joint when standing up or climbing stairs.",
+        "question": "What is a Spring-Loaded Knee Brace?"
       },
       {
-        "question": "Is custom knee bracing covered by insurance?",
-        "answer": "Yes, many extended health insurance plans cover custom knee bracing with a physician prescription."
+        "answer": "Yes, many extended health insurance plans cover custom knee bracing with a physician prescription.",
+        "question": "Is custom knee bracing covered by insurance?"
       }
     ],
-    "relatedServices": ["physiotherapy", "custom-orthotics"],
-    "relatedConditions": ["knee-pain", "sports-injury"],
-    "teamMembers": ["blair-schachterle"],
-    "locations": ["nose-creek-clinic"],
+    "hiddenSections": [],
+    "sectionOrder": [],
+    "relatedServices": [
+      "physiotherapy",
+      "custom-orthotics"
+    ],
+    "relatedConditions": [
+      "knee-pain",
+      "sports-injury"
+    ],
+    "teamMembers": [
+      "blair-schachterle"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
     "testimonials": [],
     "seo": {
       "title": "Custom Knee Bracing & Osteoarthritis Braces | Calgary",
-      "description": "Custom knee bracing, spring-loaded braces, and unloader braces for knee osteoarthritis and ACL stability in Calgary.",
       "ogTitle": "Knee Bracing Solutions | Nose Creek Physiotherapy",
+      "description": "Custom knee bracing, spring-loaded braces, and unloader braces for knee osteoarthritis and ACL stability in Calgary.",
       "ogDescription": "Protect your knees, reduce osteoarthritis pain, and return to sports with custom bracing."
     }
   },
@@ -398,11 +514,13 @@
     "title": "Pelvic Health",
     "shortDescription": "A dedicated women's health program — because caring for your body supports the wellbeing of your whole family.",
     "description": "Specialized pelvic floor physiotherapy to evaluate and treat pelvic floor muscle dysfunction, bladder incontinence, pelvic organ prolapse, pre/post-natal recovery, and chronic pelvic girdle discomfort in a private, supportive environment.",
+    "heroImage": "/images/clinic/clinic-mobile.jpg",
+    "sideImage": null,
     "iconType": "user-check",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
     "ctaText": "Learn more →",
-    "heroImage": "/images/clinic/clinic-mobile.jpg",
+    "ctaMuted": false,
     "benefits": [
       "Resolves stress and urge bladder leaks naturally",
       "Restores core and pelvic stability following pregnancy and childbirth",
@@ -421,25 +539,37 @@
       "Hands-on soft tissue release and gentle joint alignment",
       "Gradual return to running, gym workouts, and daily living"
     ],
+    "customSections": [],
     "faqs": [
       {
-        "question": "What happens during a pelvic health assessment?",
-        "answer": "Your therapist takes a detailed history of your symptoms and, with your consent, assesses your pelvic floor muscles, breathing, posture, and core coordination in a private room."
+        "answer": "Your therapist takes a detailed history of your symptoms and, with your consent, assesses your pelvic floor muscles, breathing, posture, and core coordination in a private room.",
+        "question": "What happens during a pelvic health assessment?"
       },
       {
-        "question": "Can pelvic physiotherapy help years after having children?",
-        "answer": "Yes! It is never too late to rehabilitate your pelvic floor muscles and restore strength and bladder control."
+        "answer": "Yes! It is never too late to rehabilitate your pelvic floor muscles and restore strength and bladder control.",
+        "question": "Can pelvic physiotherapy help years after having children?"
       }
     ],
-    "relatedServices": ["physiotherapy"],
-    "relatedConditions": ["back-pain"],
-    "teamMembers": ["rizelle-manzano", "madelyne-agius"],
-    "locations": ["nose-creek-clinic"],
+    "hiddenSections": [],
+    "sectionOrder": [],
+    "relatedServices": [
+      "physiotherapy"
+    ],
+    "relatedConditions": [
+      "back-pain"
+    ],
+    "teamMembers": [
+      "rizelle-manzano",
+      "madelyne-agius"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
     "testimonials": [],
     "seo": {
       "title": "Pelvic Floor Physiotherapy Calgary | Nose Creek Physiotherapy",
-      "description": "Specialized pelvic health and women's health physiotherapy in Calgary for incontinence, prolapse, and post-partum recovery.",
       "ogTitle": "Pelvic Floor Physiotherapy | Nose Creek",
+      "description": "Specialized pelvic health and women's health physiotherapy in Calgary for incontinence, prolapse, and post-partum recovery.",
       "ogDescription": "Strengthen your core and solve bladder leakage with certified pelvic floor physiotherapy in Calgary."
     }
   }

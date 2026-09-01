@@ -54,14 +54,21 @@ export default function ConditionLiveView({
           const found = list.find((c) => c.slug === initialCondition.slug || c.id === initialCondition.id);
           if (found) {
             setCondition(found);
+            return true;
           }
         }
       } catch {
         // ignore
       }
+      return false;
     }
 
     async function fetchLiveSupabase() {
+      const hasLocal = syncFromLocal();
+      if (hasLocal) {
+        // User has active local edits; protect against stale Supabase overwrites
+        return;
+      }
       if (isSupabaseConfigured && supabase) {
         try {
           const { data, error } = await supabase

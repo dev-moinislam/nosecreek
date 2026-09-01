@@ -50,14 +50,21 @@ export default function ServiceLiveView({
           const found = list.find((s) => s.slug === initialService.slug || s.id === initialService.id);
           if (found) {
             setService(found);
+            return true;
           }
         }
       } catch {
         // ignore
       }
+      return false;
     }
 
     async function fetchLiveSupabase() {
+      const hasLocal = syncFromLocal();
+      if (hasLocal) {
+        // User has active local edits; protect against stale Supabase overwrites
+        return;
+      }
       if (isSupabaseConfigured && supabase) {
         try {
           const { data, error } = await supabase

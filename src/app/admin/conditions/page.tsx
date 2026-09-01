@@ -115,7 +115,18 @@ export default function AdminConditionsPage() {
   const fetchConditions = async () => {
     setLoading(true);
     try {
-      const data = await getConditions();
+      let data = await getConditions();
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("adm_conditions");
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              data = parsed;
+            }
+          } catch {}
+        }
+      }
       setConditions(data);
     } catch {
       // ignore

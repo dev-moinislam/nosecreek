@@ -110,8 +110,19 @@ export default function AdminServicesPage() {
     async function load() {
       setLoading(true);
       try {
-        const data = await getServices();
-        setServices(data);
+        let list = await getServices();
+        if (typeof window !== "undefined") {
+          const saved = localStorage.getItem("adm_services");
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                list = parsed;
+              }
+            } catch {}
+          }
+        }
+        setServices(list);
       } catch (err) {
         console.error("Failed to load services", err);
       } finally {
