@@ -163,8 +163,14 @@ export interface Condition {
   shortDescription?: string;
   description: string;
   heroImage?: string;
+  sideImage?: string;
+  ctaText?: string;
+  ctaMuted?: boolean;
+  benefits?: string[];
   symptoms?: string[];
   treatmentApproach?: string[];
+  customSections?: ServiceCustomSection[];
+  faqs?: FAQItem[];
   relatedServices?: string[]; // slugs
   category?: string;
   seo?: SEOData;

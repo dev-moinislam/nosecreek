@@ -89,7 +89,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
             <div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#e6f4ea", color: "#5c9515", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "6px 14px", borderRadius: 999, marginBottom: 18 }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block" }} />
-                Targeted Care · Calgary North NW &amp; NE
+                Targeted Clinical Care · Calgary North NW &amp; NE
               </div>
 
               <h1 style={{ fontSize: "clamp(30px, 4.2vw, 48px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.12, marginBottom: 18 }}>
@@ -106,7 +106,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
                   target="_blank" rel="noopener noreferrer"
                   style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#6faf1c", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "14px 28px", borderRadius: 9, boxShadow: "0 10px 24px rgba(111,175,28,0.32)", textDecoration: "none" }}
                 >
-                  Book Assessment Online
+                  {condition.ctaText || "Book Assessment Online"}
                 </a>
                 <a
                   href="tel:+14032958590"
@@ -181,7 +181,176 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── 4. COMMON SYMPTOMS GRID ── */}
+      {/* ── 4. DYNAMIC CUSTOM SECTIONS ENGINE (Exact Match to Services & Home Page) ── */}
+      {condition.customSections && condition.customSections.map((sec, idx) => {
+        const isLeft = sec.imagePosition === "left";
+        const isTop = sec.imagePosition === "top";
+        const isBottom = sec.imagePosition === "bottom";
+        const isNone = sec.imagePosition === "none" || !sec.image;
+        const bgStyle = sec.background === "light" ? "#f8fafc" : sec.background === "teal" ? "#12303d" : "#ffffff";
+        const textColor = sec.background === "teal" ? "#ffffff" : "#1d2b34";
+        const pColor = sec.background === "teal" ? "#cbdbe4" : "#48535c";
+
+        return (
+          <section
+            key={sec.id || idx}
+            style={{
+              background: bgStyle,
+              padding: "clamp(56px,7vw,96px) 0",
+              borderTop: "1px solid #e7edf1",
+              borderBottom: "1px solid #e7edf1"
+            }}
+          >
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+              
+              {/* TOP IMAGE LAYOUT */}
+              {isTop && (
+                <div style={{ maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
+                  {sec.image && (
+                    <div style={{ borderRadius: 20, overflow: "hidden", marginBottom: 36, boxShadow: "0 14px 36px rgba(18,60,80,0.1)", aspectRatio: "16/9" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>
+                  )}
+                  {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#1c9fd8")}
+                  <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", marginBottom: 16 }}>
+                    {sec.title}
+                  </h2>
+                  {sec.subtitle && (
+                    <p style={{ fontSize: 18, fontWeight: 600, color: "#0e78a8", marginBottom: 16 }}>
+                      {sec.subtitle}
+                    </p>
+                  )}
+                  {sec.content && (
+                    <p style={{ fontSize: 16.5, lineHeight: 1.8, color: pColor, marginBottom: 24 }}>
+                      {sec.content}
+                    </p>
+                  )}
+                  {sec.bullets && sec.bullets.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12, marginTop: 20 }}>
+                      {sec.bullets.map((b, i) => (
+                        <span key={i} style={{ background: "#fff", border: "1px solid #d7e6ef", color: "#1d2b34", fontWeight: 600, fontSize: 14, padding: "8px 16px", borderRadius: 999 }}>
+                          ✓ {b}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* LEFT / RIGHT 2-COLUMN LAYOUT */}
+              {(isLeft || sec.imagePosition === "right") && (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(36px, 5vw, 64px)", alignItems: "center" }}>
+                  
+                  {/* Image Column (if left) */}
+                  {isLeft && sec.image && (
+                    <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.12)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>
+                  )}
+
+                  {/* Text Column */}
+                  <div>
+                    {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#6faf1c")}
+                    <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 16 }}>
+                      {sec.title}
+                    </h2>
+                    {sec.subtitle && (
+                      <div style={{ fontSize: 16.5, fontWeight: 700, color: "#0e78a8", marginBottom: 16, fontFamily: "'Poppins',sans-serif" }}>
+                        {sec.subtitle}
+                      </div>
+                    )}
+                    {sec.content && (
+                      <p style={{ fontSize: 16, lineHeight: 1.75, color: pColor, marginBottom: 22 }}>
+                        {sec.content}
+                      </p>
+                    )}
+                    {sec.bullets && sec.bullets.length > 0 && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+                        {sec.bullets.map((b, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 15, color: pColor }}>
+                            <span style={{ color: "#6faf1c", fontWeight: 800 }}>✓</span>
+                            <span>{b}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Image Column (if right) */}
+                  {!isLeft && sec.image && (
+                    <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.12)", aspectRatio: "4/3", backgroundColor: "#eef3f6" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {/* NO IMAGE / FULL-WIDTH CENTERED LAYOUT */}
+              {isNone && (
+                <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
+                  {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#1c9fd8")}
+                  <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", marginBottom: 16 }}>
+                    {sec.title}
+                  </h2>
+                  {sec.subtitle && (
+                    <p style={{ fontSize: 18, fontWeight: 600, color: "#0e78a8", marginBottom: 16 }}>
+                      {sec.subtitle}
+                    </p>
+                  )}
+                  {sec.content && (
+                    <p style={{ fontSize: 16.5, lineHeight: 1.8, color: pColor, marginBottom: 24 }}>
+                      {sec.content}
+                    </p>
+                  )}
+                  {sec.bullets && sec.bullets.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, textAlign: "left", marginTop: 24 }}>
+                      {sec.bullets.map((b, i) => (
+                        <div key={i} style={{ background: "#f8fafc", padding: "14px 18px", borderRadius: 12, border: "1px solid #e2ebf0", display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ color: "#6faf1c", fontWeight: 800, fontSize: 16 }}>✓</span>
+                          <span style={{ fontSize: 14.5, fontWeight: 600, color: "#1d2b34" }}>{b}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* BOTTOM IMAGE LAYOUT */}
+              {isBottom && (
+                <div style={{ maxWidth: 960, margin: "0 auto", textAlign: "center" }}>
+                  {sec.eyebrow && eyebrow(sec.eyebrow, sec.eyebrowColor || "#1c9fd8")}
+                  <h2 style={{ fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px", marginBottom: 16 }}>
+                    {sec.title}
+                  </h2>
+                  {sec.subtitle && (
+                    <p style={{ fontSize: 18, fontWeight: 600, color: "#0e78a8", marginBottom: 16 }}>
+                      {sec.subtitle}
+                    </p>
+                  )}
+                  {sec.content && (
+                    <p style={{ fontSize: 16.5, lineHeight: 1.8, color: pColor, marginBottom: 24 }}>
+                      {sec.content}
+                    </p>
+                  )}
+                  {sec.image && (
+                    <div style={{ borderRadius: 20, overflow: "hidden", marginTop: 36, boxShadow: "0 14px 36px rgba(18,60,80,0.1)", aspectRatio: "16/9" }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={sec.image} alt={sec.imageAlt || sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+            </div>
+          </section>
+        );
+      })}
+
+      {/* ── 5. COMMON SYMPTOMS GRID ── */}
       {condition.symptoms && condition.symptoms.length > 0 && (
         <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
@@ -211,7 +380,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* ── 5. OUR 4-STEP TREATMENT APPROACH ── */}
+      {/* ── 6. OUR 4-STEP TREATMENT APPROACH ── */}
       <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 48px" }}>
@@ -243,7 +412,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── 6. RECOMMENDED THERAPIES ── */}
+      {/* ── 7. RECOMMENDED THERAPIES ── */}
       {relatedServiceObjects.length > 0 && (
         <section style={{ background: "#f8fafc", padding: "clamp(56px,7vw,96px) 0", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
@@ -277,46 +446,46 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* ── 7. MEET THE TEAM CAROUSEL (EXACTLY LIKE HOMEPAGE) ── */}
+      {/* ── 8. MEET THE TEAM CAROUSEL ── */}
       <TeamCarousel members={allTeam} />
 
-      {/* ── 8. FREQUENTLY ASKED QUESTIONS (EXACT HOMEPAGE STYLE) ── */}
+      {/* ── 9. FREQUENTLY ASKED QUESTIONS (Dynamic & Accordion) ── */}
       <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 820, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", marginBottom: 38 }}>
             {eyebrow("FAQ")}
             <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, letterSpacing: "-0.5px" }}>
-              Frequently asked questions
+              Frequently Asked Questions
             </h2>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {[
+            {(condition.faqs && condition.faqs.length > 0 ? condition.faqs : [
               {
-                q: `Do I need a doctor's referral to get treatment for ${condition.name}?`,
-                a: "No, in Alberta you do not need a doctor's referral to see a licensed physiotherapist. You can book an appointment directly with our clinic today."
+                question: `Do I need a doctor's referral to get treatment for ${condition.name}?`,
+                answer: "No, in Alberta you do not need a doctor's referral to see a licensed physiotherapist. You can book an appointment directly with our clinic today."
               },
               {
-                q: "Is treatment covered by extended health insurance?",
-                a: "Yes, physiotherapy, massage therapy, and chiropractic care for conditions like this are covered by most extended health plans, and we offer direct billing."
+                question: "Is treatment covered by extended health insurance?",
+                answer: "Yes, physiotherapy, massage therapy, and chiropractic care for conditions like this are covered by most extended health plans, and we offer direct billing."
               },
               {
-                q: `How many sessions will I need to recover from ${condition.name.toLowerCase()}?`,
-                a: "Most patients experience significant pain relief and improved mobility within 3 to 6 tailored sessions. Your physiotherapist will outline a clear roadmap on your first visit."
+                question: `How many sessions will I need to recover from ${condition.name.toLowerCase()}?`,
+                answer: "Most patients experience significant pain relief and improved mobility within 3 to 6 tailored sessions. Your physiotherapist will outline a clear roadmap on your first visit."
               }
-            ].map((faq, idx) => (
+            ]).map((faq, idx) => (
               <details key={idx} style={{ background: "#fff", border: "1px solid #e2ebf0", borderRadius: 14, padding: "4px 22px" }}>
                 <summary style={{ cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, padding: "18px 0", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 17, color: "#1d2b34" }}>
-                  {faq.q}
+                  {faq.question}
                   <span className="faqPlus" style={{ color: "#1c9fd8", fontSize: 24, transition: "transform .2s", flex: "0 0 auto" }}>+</span>
                 </summary>
-                <p style={{ padding: "0 0 20px", fontSize: 15, lineHeight: 1.7, color: "#5a6570", margin: 0 }}>{faq.a}</p>
+                <p style={{ padding: "0 0 20px", fontSize: 15, lineHeight: 1.7, color: "#5a6570", margin: 0 }}>{faq.answer}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── 9. ONE CLINIC, IDEALLY LOCATED IN CALGARY (EXACT HOMEPAGE SECTION) ── */}
+      {/* ── 10. CLINIC LOCATION & MAP ── */}
       <section id="contact" style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 44px" }}>
@@ -326,7 +495,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
             </h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 28, alignItems: "stretch" }}>
-            {/* Map */}
             <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 10px 30px rgba(18,60,80,0.1)", minHeight: 340 }}>
               <iframe
                 title="Map to Nose Creek Physiotherapy"
@@ -336,7 +504,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-            {/* Info card */}
             <div style={{ background: "#12303d", color: "#eaf3f8", borderRadius: 18, padding: "clamp(26px,3vw,38px)", display: "flex", flexDirection: "column", gap: 18 }}>
               <div>
                 <h3 style={{ color: "#fff", fontSize: 22, fontWeight: 700 }}>Nose Creek Physiotherapy</h3>
@@ -374,7 +541,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── 10. DECISION CTAs (Discovery + Phone Consult) ── */}
+      {/* ── 11. DECISION CTAs ── */}
       <section style={{ background: "#f2f8fb", padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
           <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 40px" }}>
@@ -410,7 +577,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── 11. OTHER CONDITIONS EXPLORER ── */}
+      {/* ── 12. OTHER CONDITIONS EXPLORER ── */}
       <section style={{ padding: "clamp(56px,7vw,96px) 0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
           {eyebrow("Other Conditions We Treat")}
@@ -431,7 +598,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── 12. BOTTOM CTA BANNER ── */}
+      {/* ── 13. BOTTOM CTA BANNER ── */}
       <section style={{ background: "linear-gradient(120deg,#1c9fd8,#1179ab)", color: "#fff" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(48px,6vw,76px) 24px", textAlign: "center" }}>
           <h2 style={{ color: "#fff", fontSize: "clamp(26px,3.8vw,44px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.15 }}>

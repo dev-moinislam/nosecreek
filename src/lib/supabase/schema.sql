@@ -88,8 +88,14 @@ CREATE TABLE IF NOT EXISTS conditions (
   short_description TEXT,
   description TEXT,
   hero_image TEXT,
+  side_image TEXT,
+  cta_text TEXT DEFAULT 'Book Assessment Online',
+  cta_muted BOOLEAN DEFAULT false,
+  benefits JSONB DEFAULT '[]'::jsonb,
   symptoms JSONB DEFAULT '[]'::jsonb,
   treatment_approach JSONB DEFAULT '[]'::jsonb,
+  custom_sections JSONB DEFAULT '[]'::jsonb,
+  faqs JSONB DEFAULT '[]'::jsonb,
   related_services JSONB DEFAULT '[]'::jsonb,
   category TEXT DEFAULT 'general',
   seo JSONB DEFAULT '{}'::jsonb,
@@ -98,6 +104,13 @@ CREATE TABLE IF NOT EXISTS conditions (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS side_image TEXT;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS cta_text TEXT DEFAULT 'Book Assessment Online';
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS cta_muted BOOLEAN DEFAULT false;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS benefits JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS custom_sections JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS faqs JSONB DEFAULT '[]'::jsonb;
 
 DROP TRIGGER IF EXISTS update_conditions_modtime ON conditions;
 CREATE TRIGGER update_conditions_modtime
