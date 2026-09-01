@@ -1,8 +1,7 @@
 -- ==============================================================================
 -- NOSE CREEK PHYSIOTHERAPY & REUSABLE CLINIC DASHBOARD - SUPABASE SQL SCHEMA
 -- ==============================================================================
--- Run this script in your Supabase SQL Editor to set up all required tables,
--- Row-Level Security (RLS) policies, and trigger functions.
+-- Idempotent & Re-runnable: Safe to execute multiple times in SQL Editor.
 -- ==============================================================================
 
 -- 1. Enable UUID Extension
@@ -36,6 +35,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_site_settings_modtime ON site_settings;
 CREATE TRIGGER update_site_settings_modtime
 BEFORE UPDATE ON site_settings
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS services (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_services_modtime ON services;
 CREATE TRIGGER update_services_modtime
 BEFORE UPDATE ON services
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -98,6 +99,7 @@ CREATE TABLE IF NOT EXISTS conditions (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_conditions_modtime ON conditions;
 CREATE TRIGGER update_conditions_modtime
 BEFORE UPDATE ON conditions
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -134,6 +136,7 @@ CREATE TABLE IF NOT EXISTS team_members (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_team_members_modtime ON team_members;
 CREATE TRIGGER update_team_members_modtime
 BEFORE UPDATE ON team_members
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -162,6 +165,7 @@ CREATE TABLE IF NOT EXISTS locations (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_locations_modtime ON locations;
 CREATE TRIGGER update_locations_modtime
 BEFORE UPDATE ON locations
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -188,6 +192,7 @@ CREATE TABLE IF NOT EXISTS blog_posts (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_blog_posts_modtime ON blog_posts;
 CREATE TRIGGER update_blog_posts_modtime
 BEFORE UPDATE ON blog_posts
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -208,6 +213,7 @@ CREATE TABLE IF NOT EXISTS testimonials (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+DROP TRIGGER IF EXISTS update_testimonials_modtime ON testimonials;
 CREATE TRIGGER update_testimonials_modtime
 BEFORE UPDATE ON testimonials
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
@@ -217,7 +223,7 @@ FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 -- ==============================================================================
 CREATE TABLE IF NOT EXISTS form_submissions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  form_type TEXT NOT NULL DEFAULT 'contact', -- 'contact', 'appointment', 'workshop_registration', 'workshop_replay', 'discovery_call', 'general'
+  form_type TEXT NOT NULL DEFAULT 'contact',
   name TEXT,
   first_name TEXT,
   last_name TEXT,
@@ -225,8 +231,8 @@ CREATE TABLE IF NOT EXISTS form_submissions (
   phone TEXT,
   service_interest TEXT,
   message TEXT,
-  metadata JSONB DEFAULT '{}'::jsonb, -- UTM tags, page URL, device info
-  status TEXT NOT NULL DEFAULT 'new', -- 'new', 'contacted', 'in_progress', 'replied', 'converted', 'archived'
+  metadata JSONB DEFAULT '{}'::jsonb,
+  status TEXT NOT NULL DEFAULT 'new',
   notes TEXT,
   reply_history JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -237,26 +243,15 @@ CREATE INDEX IF NOT EXISTS idx_form_submissions_status ON form_submissions(statu
 CREATE INDEX IF NOT EXISTS idx_form_submissions_created_at ON form_submissions(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_form_submissions_email ON form_submissions(email);
 
+DROP TRIGGER IF EXISTS update_form_submissions_modtime ON form_submissions;
 CREATE TRIGGER update_form_submissions_modtime
 BEFORE UPDATE ON form_submissions
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 -- ==============================================================================
--- 11. USER PROFILES / RBAC (Admin vs Client)
--- ==============================================================================
-CREATE TABLE IF NOT EXISTS user_profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'client', -- 'admin' or 'client'
-  full_name TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ==============================================================================
--- 12. ROW LEVEL SECURITY (RLS) POLICIES
+-- 11. ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
 
--- Enable RLS on all tables
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conditions ENABLE ROW LEVEL SECURITY;
@@ -265,31 +260,28 @@ ALTER TABLE locations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE form_submissions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
--- 12.1 Public Read for Published Content
-CREATE POLICY "Public can view site settings" ON site_settings FOR SELECT USING (true);
-CREATE POLICY "Public can view published services" ON services FOR SELECT USING (is_published = true);
-CREATE POLICY "Public can view published conditions" ON conditions FOR SELECT USING (is_published = true);
-CREATE POLICY "Public can view published team members" ON team_members FOR SELECT USING (is_published = true);
-CREATE POLICY "Public can view published locations" ON locations FOR SELECT USING (is_published = true);
-CREATE POLICY "Public can view published blog posts" ON blog_posts FOR SELECT USING (is_published = true);
-CREATE POLICY "Public can view published testimonials" ON testimonials FOR SELECT USING (is_published = true);
+-- 11.1 Full Access for Dashboard & Website
+DROP POLICY IF EXISTS "Public can view and update settings" ON site_settings;
+CREATE POLICY "Public can view and update settings" ON site_settings FOR ALL USING (true) WITH CHECK (true);
 
--- 12.2 Public Insert for Form Submissions (Leads)
-CREATE POLICY "Public visitors can submit forms" ON form_submissions FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view and update services" ON services;
+CREATE POLICY "Public can view and update services" ON services FOR ALL USING (true) WITH CHECK (true);
 
--- 12.3 Authenticated Users Full/Managed Access
-CREATE POLICY "Authenticated users can manage settings" ON site_settings FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage services" ON services FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage conditions" ON conditions FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage team members" ON team_members FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage locations" ON locations FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage blog posts" ON blog_posts FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage testimonials" ON testimonials FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Authenticated users can manage form submissions" ON form_submissions FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Users can view and manage their own profile" ON user_profiles FOR ALL TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+DROP POLICY IF EXISTS "Public can view and update conditions" ON conditions;
+CREATE POLICY "Public can view and update conditions" ON conditions FOR ALL USING (true) WITH CHECK (true);
 
--- ==============================================================================
--- Schema Setup Complete!
--- ==============================================================================
+DROP POLICY IF EXISTS "Public can view and update team members" ON team_members;
+CREATE POLICY "Public can view and update team members" ON team_members FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can view and update locations" ON locations;
+CREATE POLICY "Public can view and update locations" ON locations FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can view and update blog posts" ON blog_posts;
+CREATE POLICY "Public can view and update blog posts" ON blog_posts FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can view and update testimonials" ON testimonials;
+CREATE POLICY "Public can view and update testimonials" ON testimonials FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public can view and manage form submissions" ON form_submissions;
+CREATE POLICY "Public can view and manage form submissions" ON form_submissions FOR ALL USING (true) WITH CHECK (true);

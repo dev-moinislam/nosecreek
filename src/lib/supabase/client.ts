@@ -46,7 +46,7 @@ export async function submitLead(lead: Omit<Lead, "id" | "created_at" | "updated
   }
 
   try {
-    const { data, error } = await supabase.from("form_submissions").insert([
+    const { error } = await supabase.from("form_submissions").insert([
       {
         form_type: lead.form_type,
         name: lead.name || `${lead.first_name || ""} ${lead.last_name || ""}`.trim(),
@@ -61,14 +61,14 @@ export async function submitLead(lead: Omit<Lead, "id" | "created_at" | "updated
         notes: lead.notes || "",
         reply_history: lead.reply_history || []
       }
-    ]).select().single();
+    ]);
 
     if (error) {
       console.error("Supabase submitLead error:", error);
       return { success: false, error: error.message };
     }
 
-    return { success: true, data };
+    return { success: true };
   } catch (err: any) {
     console.error("submitLead exception:", err);
     return { success: false, error: err.message || "Failed to submit inquiry" };
