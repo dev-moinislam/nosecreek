@@ -10,24 +10,33 @@ interface VisitUsSectionProps {
 }
 
 function getEmbedMapUrl(rawUrl?: string, address?: string, name?: string): string {
-  if (!rawUrl && !address) {
-    return "https://www.google.com/maps?q=Nose%20Creek%20Physiotherapy%208220%20Centre%20St%20NE%20Suite%20153%2C%20Calgary%2C%20AB%20T3K%201J7&output=embed";
+  const defaultPinUrl = `https://www.google.com/maps?q=${encodeURIComponent(
+    (name || "Nose Creek Physiotherapy") + " " + (address ? address.replace(/\n/g, ", ") : "8220 Centre St NE #153, Calgary, AB T3K 1J7")
+  )}&output=embed`;
+
+  if (!rawUrl || rawUrl.trim() === "") {
+    return defaultPinUrl;
   }
 
-  let url = (rawUrl || "").trim();
+  let url = rawUrl.trim();
 
   // 1. If user pasted iframe HTML: <iframe src="..."></iframe>
-  const iframeMatch = url.match(/src="([^"]+)"/);
+  const iframeMatch = url.match(/src=["']([^"']+)["']/i);
   if (iframeMatch && iframeMatch[1]) {
     url = iframeMatch[1];
   }
 
-  // 2. If it is already a Google Maps embed URL with pb or output=embed
-  if (url.includes("google.com/maps") && (url.includes("output=embed") || url.includes("/embed?pb="))) {
+  // 2. If it is old area polygon pb embed that didn't have clinic pin
+  if (url.includes("0x7d6f51be0e6f6630") || (url.includes("pb=") && !url.toLowerCase().includes("physiotherapy"))) {
+    return defaultPinUrl;
+  }
+
+  // 3. If it is already a valid Google Maps embed URL with output=embed or /embed?pb=
+  if (url.includes("output=embed") || url.includes("/embed?pb=") || url.includes("/maps/embed")) {
     return url;
   }
 
-  // 3. If user pasted a place link like: https://www.google.com/maps/place/Nose+Creek+Physiotherapy/@...
+  // 4. If user pasted a place link like: https://www.google.com/maps/place/...
   if (url.includes("google.com/maps/place/")) {
     const placeMatch = url.match(/google\.com\/maps\/place\/([^/@?]+)/);
     if (placeMatch && placeMatch[1]) {
@@ -37,7 +46,7 @@ function getEmbedMapUrl(rawUrl?: string, address?: string, name?: string): strin
     }
   }
 
-  // 4. If user pasted search link: https://www.google.com/maps/search/... or https://maps.google.com/?q=...
+  // 5. If user pasted search link: https://www.google.com/maps/search/... or https://maps.google.com/?q=...
   if (url.includes("google.com/maps") && (url.includes("q=") || url.includes("query="))) {
     const qMatch = url.match(/[?&](?:q|query)=([^&]+)/);
     if (qMatch && qMatch[1]) {
@@ -45,9 +54,12 @@ function getEmbedMapUrl(rawUrl?: string, address?: string, name?: string): strin
     }
   }
 
-  // 5. Fall back to exact query using Clinic Name + Physical Address
-  const query = [name || "Nose Creek Physiotherapy", address ? address.replace(/\n/g, ", ") : "8220 Centre St NE Suite 153, Calgary, AB T3K 1J7"].filter(Boolean).join(" ");
-  return `https://www.google.com/maps?q=${encodeURIComponent(query)}&output=embed`;
+  // 6. If it's a search term or custom text
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed`;
+  }
+
+  return defaultPinUrl;
 }
 
 export default function VisitUsSection({ customEyebrow, customTitle }: VisitUsSectionProps) {

@@ -374,21 +374,60 @@ function LocationEditorModal({
             </div>
 
             <div>
-              <label style={labelStyle}>Google Maps Embed URL (Iframe Src)</label>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+                <label style={{ ...labelStyle, marginBottom: 0 }}>Google Maps Embed URL (Iframe Src)</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const exactPin = `https://www.google.com/maps?q=${encodeURIComponent(
+                      (loc.name || "Nose Creek Physiotherapy") + " " + (loc.address ? loc.address.replace(/\n/g, ", ") : "8220 Centre St NE #153, Calgary, AB T3K 1J7")
+                    )}&output=embed`;
+                    setLoc({ ...loc, mapEmbedUrl: exactPin });
+                  }}
+                  style={{
+                    background: "#f0fdf4",
+                    color: "#166534",
+                    border: "1px solid #bbf7d0",
+                    padding: "4px 10px",
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  📍 Use Exact Address Pin
+                </button>
+              </div>
               <input
                 type="text"
                 value={loc.mapEmbedUrl || ""}
                 onChange={(e) => {
                   let val = e.target.value;
-                  const match = val.match(/src="([^"]+)"/);
+                  const match = val.match(/src=["']([^"']+)["']/i);
                   if (match && match[1]) {
                     val = match[1];
                   }
                   setLoc({ ...loc, mapEmbedUrl: val });
                 }}
                 style={inputStyle}
-                placeholder="https://www.google.com/maps?q=...&output=embed"
+                placeholder="Paste iframe code, embed link, or search query"
               />
+              
+              {/* Live Map Preview inside modal */}
+              <div style={{ marginTop: 10, borderRadius: 10, overflow: "hidden", border: "1px solid #e2e8f0", height: 180, background: "#f8fafc" }}>
+                <iframe
+                  title="Admin Map Preview"
+                  src={
+                    loc.mapEmbedUrl && (loc.mapEmbedUrl.includes("output=embed") || loc.mapEmbedUrl.includes("/embed?pb="))
+                      ? loc.mapEmbedUrl
+                      : `https://www.google.com/maps?q=${encodeURIComponent(
+                          (loc.name || "Nose Creek Physiotherapy") + " " + (loc.address ? loc.address.replace(/\n/g, ", ") : "8220 Centre St NE #153, Calgary, AB T3K 1J7")
+                        )}&output=embed`
+                  }
+                  style={{ width: "100%", height: "100%", border: 0 }}
+                  loading="lazy"
+                />
+              </div>
             </div>
           </div>
 
