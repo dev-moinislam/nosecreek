@@ -15,7 +15,8 @@ import {
   InboxIcon,
   ServiceIconSvg,
   TeamIcon,
-  HelpCircleIcon
+  HelpCircleIcon,
+  StarIcon
 } from "@/components/admin/AdminIcons";
 
 export default function AdminOverviewPage() {
@@ -131,6 +132,10 @@ export default function AdminOverviewPage() {
           <Link href="/admin/services" className="adm-btn adm-btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <ServiceIconSvg size={16} />
             <span>Manage Services</span>
+          </Link>
+          <Link href="/admin/reviews" className="adm-btn adm-btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <StarIcon size={16} style={{ color: "#f59e0b" }} />
+            <span>Google Reviews</span>
           </Link>
         </div>
       </div>

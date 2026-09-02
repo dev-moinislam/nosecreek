@@ -228,6 +228,7 @@ export interface Testimonial {
   platform: string; // e.g. "Google", "Website"
   date?: string;
   avatar?: string;
+  verified?: boolean;
 }
 
 export interface HomePageData {
