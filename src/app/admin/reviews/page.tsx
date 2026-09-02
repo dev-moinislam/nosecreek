@@ -33,9 +33,13 @@ export default function AdminReviewsPage() {
     count: "545+ Calgary Reviews",
     title: "Real 5-Star Reviews From Our Calgary Patients",
     subtitle: "See what our patients have to say about their recovery journey at Nose Creek Physiotherapy",
-    link: "https://www.nosecreekphysiotherapy.com/reviews/"
+    link: "https://www.nosecreekphysiotherapy.com/reviews/",
+    placeId: "ChIJ3fVbK552b4gRe5eD_q9q_s0",
+    apiKey: ""
   });
   const [savingMeta, setSavingMeta] = useState(false);
+  const [syncingGoogle, setSyncingGoogle] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
   // Edit / Add Modal State
   const [editingReview, setEditingReview] = useState<Testimonial | null>(null);
@@ -68,7 +72,7 @@ export default function AdminReviewsPage() {
 
         const { data: settingsData } = await supabase
           .from("site_settings")
-          .select("google_rating, google_review_count, reviews_title, reviews_subtitle, google_reviews_url")
+          .select("google_rating, google_review_count, reviews_title, reviews_subtitle, google_reviews_url, google_place_id, google_places_api_key, last_google_sync")
           .eq("id", "main")
           .single();
 
@@ -78,8 +82,14 @@ export default function AdminReviewsPage() {
             count: settingsData.google_review_count || "545+ Calgary Reviews",
             title: settingsData.reviews_title || "Real 5-Star Reviews From Our Calgary Patients",
             subtitle: settingsData.reviews_subtitle || "See what our patients have to say about their recovery journey at Nose Creek Physiotherapy",
-            link: settingsData.google_reviews_url || "https://www.nosecreekphysiotherapy.com/reviews/"
+            link: settingsData.google_reviews_url || "https://www.nosecreekphysiotherapy.com/reviews/",
+            placeId: settingsData.google_place_id || "ChIJ3fVbK552b4gRe5eD_q9q_s0",
+            apiKey: settingsData.google_places_api_key || ""
           });
+
+          if (settingsData.last_google_sync) {
+            setSyncStatus(`Last synced from Google: ${new Date(settingsData.last_google_sync).toLocaleString()}`);
+          }
         }
       } catch (e) {
         console.warn("Supabase fetch error, using local fallback", e);
@@ -105,6 +115,8 @@ export default function AdminReviewsPage() {
           reviews_title: metaInfo.title,
           reviews_subtitle: metaInfo.subtitle,
           google_reviews_url: metaInfo.link,
+          google_place_id: metaInfo.placeId,
+          google_places_api_key: metaInfo.apiKey,
           updated_at: new Date().toISOString()
         });
       } catch (e) {
@@ -112,8 +124,46 @@ export default function AdminReviewsPage() {
       }
     }
 
-    setToastMessage("Google Review global header settings saved successfully!");
+    setToastMessage("Google Review configuration saved successfully!");
     setSavingMeta(false);
+  };
+
+  // Trigger real-time Google Places API Fetch & 24h Cache Refresh
+  const handleSyncGoogleNow = async () => {
+    setSyncingGoogle(true);
+    setToastMessage("Contacting Google Places API...");
+
+    try {
+      // First save current placeId and apiKey to DB so API route picks it up
+      if (isSupabaseConfigured && supabase) {
+        await supabase.from("site_settings").upsert({
+          id: "main",
+          google_place_id: metaInfo.placeId,
+          google_places_api_key: metaInfo.apiKey,
+        });
+      }
+
+      const res = await fetch("/api/reviews/google?force=true");
+      const data = await res.json();
+
+      if (data.success && data.reviews) {
+        setReviews(data.reviews);
+        setMetaInfo((prev) => ({
+          ...prev,
+          rating: data.rating || prev.rating,
+          count: data.totalReviews || prev.count
+        }));
+        setSyncStatus(`Live sync completed at ${new Date().toLocaleTimeString()} (24h cache active)`);
+        setToastMessage(`✓ Google Maps sync completed! ${data.reviews.length} reviews loaded.`);
+      } else {
+        throw new Error(data.error || "Failed to fetch from Google Maps");
+      }
+    } catch (err: any) {
+      console.error("Google sync error:", err);
+      setToastMessage(`Notice: ${err.message || "Could not reach Google API. Using verified database reviews."}`);
+    } finally {
+      setSyncingGoogle(false);
+    }
   };
 
   const handleSaveReview = async (review: Testimonial) => {
@@ -215,23 +265,24 @@ export default function AdminReviewsPage() {
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "#0f172a", margin: "0 0 6px 0", display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ color: "#f59e0b" }}>⭐</span>
-            <span>Real 5-Star Reviews &amp; Testimonials</span>
+            <span>Real 5-Star Reviews &amp; Live Google Maps Sync</span>
           </h1>
           <p style={{ fontSize: 13.5, color: "#64748b", margin: 0 }}>
-            Manage Google Maps reviews and patient testimonials displayed across the website in the global carousel.
+            Automated 24-hour cache engine: fetches live Google Maps reviews once daily, serving cached data instantly to prevent site slowdown.
           </p>
         </div>
 
         <div style={{ display: "flex", gap: 10 }}>
           <button
             type="button"
-            onClick={handleSeedDefaults}
+            onClick={handleSyncGoogleNow}
+            disabled={syncingGoogle}
             className="adm-btn adm-btn-secondary"
-            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}
-            title="Restore default verified Google reviews"
+            style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0" }}
+            title="Fetch directly from Google Maps now"
           >
-            <SparklesIcon size={14} style={{ color: "#0284c7" }} />
-            <span>Sync Google Seed Data</span>
+            <SparklesIcon size={14} style={{ color: "#16a34a" }} />
+            <span>{syncingGoogle ? "Fetching Live..." : "🔄 Live Fetch from Google Maps"}</span>
           </button>
 
           <button
@@ -244,8 +295,7 @@ export default function AdminReviewsPage() {
                 rating: 5,
                 platform: "Google",
                 date: "Recent Patient",
-                avatar: "",
-                verified: true
+                avatar: ""
               });
               setIsCreating(true);
             }}
@@ -258,12 +308,49 @@ export default function AdminReviewsPage() {
         </div>
       </div>
 
-      {/* Card 1: Google Rating & Global Banner Settings */}
+      {/* Card 1: Google Places 24h Auto-Sync Engine Settings */}
       <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 16, padding: 22, marginBottom: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}>
-        <h3 style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", margin: "0 0 14px 0", display: "flex", alignItems: "center", gap: 8 }}>
-          <GlobeIcon size={16} style={{ color: "var(--adm-primary)" }} />
-          <span>Global Review Carousel Header &amp; Google Badge</span>
-        </h3>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+          <h3 style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", margin: 0, display: "flex", alignItems: "center", gap: 8 }}>
+            <GlobeIcon size={16} style={{ color: "var(--adm-primary)" }} />
+            <span>Google Places API &amp; 24-Hour Smart Cache Settings</span>
+          </h3>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#f1f5f9", padding: "4px 10px", borderRadius: 6, fontSize: 12, color: "#475569" }}>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e", display: "inline-block" }}></span>
+            <span>24h Cache Engine: <strong>Active</strong></span>
+          </div>
+        </div>
+
+        {syncStatus && (
+          <div style={{ padding: "8px 12px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12, color: "#64748b", marginBottom: 16 }}>
+            ℹ️ {syncStatus}
+          </div>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 14 }}>
+          <div className="adm-form-group" style={{ margin: 0 }}>
+            <label className="adm-form-label">Google Place ID (Nose Creek Physiotherapy)</label>
+            <input
+              type="text"
+              className="adm-input"
+              value={metaInfo.placeId}
+              onChange={(e) => setMetaInfo({ ...metaInfo, placeId: e.target.value })}
+              placeholder="ChIJ3fVbK552b4gRe5eD_q9q_s0"
+            />
+          </div>
+
+          <div className="adm-form-group" style={{ margin: 0 }}>
+            <label className="adm-form-label">Google Places API Key (Optional / Private)</label>
+            <input
+              type="password"
+              className="adm-input"
+              value={metaInfo.apiKey}
+              onChange={(e) => setMetaInfo({ ...metaInfo, apiKey: e.target.value })}
+              placeholder="AIzaSy... (Leave empty to use database cache)"
+            />
+          </div>
+        </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 14 }}>
           <div className="adm-form-group" style={{ margin: 0 }}>
@@ -324,16 +411,18 @@ export default function AdminReviewsPage() {
           />
         </div>
 
-        <button
-          type="button"
-          onClick={handleSaveMeta}
-          disabled={savingMeta}
-          className="adm-btn adm-btn-primary adm-btn-sm"
-          style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
-        >
-          <CheckIcon size={14} />
-          <span>{savingMeta ? "Saving..." : "Save Global Header"}</span>
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button
+            type="button"
+            onClick={handleSaveMeta}
+            disabled={savingMeta}
+            className="adm-btn adm-btn-primary adm-btn-sm"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+          >
+            <CheckIcon size={14} />
+            <span>{savingMeta ? "Saving..." : "Save Settings"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Card 2: Reviews List Table */}
@@ -341,7 +430,7 @@ export default function AdminReviewsPage() {
         <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: "#0f172a" }}>
-              Published Patient Reviews ({reviews.length})
+              Active Patient Reviews ({reviews.length})
             </h3>
           </div>
 
