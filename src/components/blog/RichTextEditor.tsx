@@ -101,7 +101,17 @@ export default function RichTextEditor({
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         
-        // Strip out foreign inline background, background-color, font-family, and font-size
+        // Unwrap fake blockquotes from external CMS that wrap entire article paragraphs
+        const blockquotes = doc.body.querySelectorAll("blockquote");
+        blockquotes.forEach((bq) => {
+          const parent = bq.parentNode;
+          while (bq.firstChild) {
+            parent?.insertBefore(bq.firstChild, bq);
+          }
+          bq.remove();
+        });
+
+        // Strip out foreign inline background, font-family, font-size, and indentation
         const allElements = doc.body.querySelectorAll("*");
         allElements.forEach((el) => {
           const htmlEl = el as HTMLElement;
@@ -110,6 +120,9 @@ export default function RichTextEditor({
             htmlEl.style.background = "";
             htmlEl.style.fontFamily = "";
             htmlEl.style.fontSize = "";
+            htmlEl.style.marginLeft = "";
+            htmlEl.style.paddingLeft = "";
+            htmlEl.style.textIndent = "";
           }
           if (htmlEl.getAttribute && htmlEl.getAttribute("style") === "") {
             htmlEl.removeAttribute("style");

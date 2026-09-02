@@ -23,7 +23,24 @@
   background-color: transparent !important;
 }
 
+.articleBody blockquote,
+.articleBody ol,
+.articleBody ul,
+.articleBody li,
+.articleBody p,
+.articleBody div,
+.articleBody section {
+  padding-left: 0;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0 !important;
+  padding-inline-start: 0 !important;
+  text-indent: 0 !important;
+}
+
 .articleBody p {
+  margin-top: 0;
   margin-bottom: 18px;
   color: #374151;
   line-height: 1.8;
@@ -41,6 +58,8 @@
   color: #111827;
   font-style: normal !important;
   line-height: 1.3;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
 }
 
 .articleBody h1 {
@@ -64,9 +83,26 @@
   margin-bottom: 10px;
 }
 
-.articleBody ul, .articleBody ol {
+.articleBody ul {
   margin-bottom: 20px;
-  padding-left: 24px;
+  padding-left: 20px !important;
+}
+
+.articleBody ol {
+  margin-bottom: 20px;
+  padding-left: 20px !important;
+}
+
+/* Remove list indentation if inside blockquote or paragraph */
+.articleBody blockquote ol,
+.articleBody blockquote ul {
+  padding-left: 0 !important;
+  list-style: none !important;
+}
+
+.articleBody blockquote li {
+  padding-left: 0 !important;
+  list-style: none !important;
 }
 
 .articleBody li {
@@ -89,7 +125,7 @@
   color: #0b5e85;
 }
 
-/* Natural blockquote without forced left border or forced italics */
+/* Natural blockquote without forced left border, italics or indent */
 .articleBody blockquote {
   border: none !important;
   border-left: none !important;
