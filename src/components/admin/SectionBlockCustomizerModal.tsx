@@ -12,6 +12,7 @@ import {
   TrashIcon,
   SparklesIcon
 } from "./AdminIcons";
+import AdminImageUploader from "./AdminImageUploader";
 
 interface SectionBlockCustomizerModalProps {
   isOpen: boolean;
@@ -275,30 +276,15 @@ export default function SectionBlockCustomizerModal({
                 <span>Side Photo &amp; Media Placement</span>
               </div>
 
-              <div className="adm-form-group">
-                <label className="adm-form-label">Image URL / Path</label>
-                <input
-                  type="text"
-                  placeholder="E.g., /images/clinic/reception-one.jpg"
-                  className="adm-input"
-                  value={formData.image || ""}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                />
-              </div>
-
-              {formData.image && (
-                <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12, padding: 8, background: "#fff", borderRadius: 8, border: "1px solid #cbd5e1" }}>
-                  <img
-                    src={formData.image}
-                    alt="Thumbnail"
-                    style={{ width: 60, height: 44, objectFit: "cover", borderRadius: 6 }}
-                    onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
-                  />
-                  <div style={{ fontSize: 12, color: "#475569" }}>
-                    <strong>Image Connected</strong> — Select placement below:
-                  </div>
-                </div>
-              )}
+              <AdminImageUploader
+                label="Side Photo & Media"
+                value={formData.image || ""}
+                onChange={(url) => setFormData({ ...formData, image: url })}
+                folder="homepage"
+                placeholder="/images/clinic/reception-one.jpg"
+                aspectRatioNote="Landscape 16:9 or 4:3 recommended"
+                style={{ marginBottom: 14 }}
+              />
 
               <div className="adm-form-group">
                 <label className="adm-form-label">Image Layout Position</label>

@@ -8,6 +8,7 @@ import teamData from "@/data/team.json";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
 import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 import {
   SearchIcon,
   EyeIcon,
@@ -433,15 +434,15 @@ function TeamEditorModal({
             </div>
           </div>
 
-          <div className="adm-form-group">
-            <label className="adm-form-label">Profile Image Path / URL</label>
-            <input
-              type="text"
-              className="adm-input"
-              value={member.profileImage || ""}
-              onChange={(e) => setMember({ ...member, profileImage: e.target.value })}
-            />
-          </div>
+          <AdminImageUploader
+            label="Profile Photo (Headshot)"
+            value={member.profileImage || ""}
+            onChange={(url) => setMember({ ...member, profileImage: url })}
+            folder="team"
+            placeholder="/images/team/blair-schachterle.jpg"
+            aspectRatioNote="Square 1:1 or Portrait 4:5 recommended"
+            style={{ marginBottom: 14 }}
+          />
 
           <div className="adm-form-group">
             <label className="adm-form-label">Short Summary Bio</label>

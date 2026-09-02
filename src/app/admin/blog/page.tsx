@@ -20,6 +20,7 @@ import {
 } from "@/components/admin/AdminIcons";
 import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 
 export default function AdminBlogPage() {
   const { role, isAdmin } = useRole();
@@ -907,49 +908,14 @@ function BlogEditModal({
 
                 {/* Thumbnail Image input */}
                 <div style={{ background: "#ffffff", padding: 20, borderRadius: 14, border: "1px solid #e2e8f0" }}>
-                  <h4 style={{ fontSize: 15, fontWeight: 700, color: "#0f172a", margin: "0 0 4px 0" }}>
-                    Featured Image / Thumbnail
-                  </h4>
-                  <p style={{ fontSize: 12.5, color: "#64748b", margin: "0 0 12px 0" }}>
-                    Prominently displayed as the top banner on the single blog post page and as the card thumbnail on the blog directory.
-                  </p>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <input
-                      type="text"
-                      value={post.featuredImage || ""}
-                      onChange={(e) => setPost({ ...post, featuredImage: e.target.value })}
-                      placeholder="e.g. /images/clinic/reception-three.jpg or https://..."
-                      style={inputStyle}
-                    />
-
-                    {/* Quick sample pickers */}
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                      {[
-                        "/images/clinic/reception-three.jpg",
-                        "/images/clinic/reception-desktop.jpg",
-                        "/images/clinic/reception-four.jpg",
-                        "/images/clinic/clinic-mobile.jpg"
-                      ].map((img) => (
-                        <button
-                          key={img}
-                          type="button"
-                          onClick={() => setPost({ ...post, featuredImage: img })}
-                          style={{
-                            padding: "4px 8px",
-                            borderRadius: 6,
-                            background: "#f1f5f9",
-                            border: "1px solid #cbd5e1",
-                            fontSize: 11,
-                            cursor: "pointer",
-                            color: "#334155"
-                          }}
-                        >
-                          Use {img.split("/").pop()}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <AdminImageUploader
+                    label="Featured Image / Article Banner"
+                    value={post.featuredImage || ""}
+                    onChange={(url) => setPost({ ...post, featuredImage: url })}
+                    folder="blog"
+                    placeholder="/images/clinic/reception-three.jpg"
+                    aspectRatioNote="Landscape 16:9 recommended (used on cards & top banner)"
+                  />
                 </div>
               </div>
 
@@ -1240,17 +1206,15 @@ function BlogEditModal({
                           </div>
 
                           {/* Image & Position */}
-                          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12 }}>
-                            <div>
-                              <label style={labelStyle}>Section Image URL</label>
-                              <input
-                                type="text"
-                                value={block.image || ""}
-                                onChange={(e) => handleUpdateBlock(index, { image: e.target.value })}
-                                placeholder="e.g. /images/clinic/reception-three.jpg"
-                                style={inputStyle}
-                              />
-                            </div>
+                          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, alignItems: "start" }}>
+                            <AdminImageUploader
+                              label="Section Photo"
+                              value={block.image || ""}
+                              onChange={(url) => handleUpdateBlock(index, { image: url })}
+                              folder="blog"
+                              placeholder="/images/clinic/reception-three.jpg"
+                              aspectRatioNote="Landscape 16:9 or 4:3"
+                            />
                             <div>
                               <label style={labelStyle}>Image Layout Position</label>
                               <select

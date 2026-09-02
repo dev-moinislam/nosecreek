@@ -314,3 +314,30 @@ CREATE POLICY "Public can view and update testimonials" ON testimonials FOR ALL 
 
 DROP POLICY IF EXISTS "Public can view and manage form submissions" ON form_submissions;
 CREATE POLICY "Public can view and manage form submissions" ON form_submissions FOR ALL USING (true) WITH CHECK (true);
+
+-- ==============================================================================
+-- 12. SUPABASE STORAGE BUCKET CONFIGURATION (MEDIA & UPLOADS)
+-- ==============================================================================
+
+-- Create public 'media' bucket for clinic images, blog images, and team photos
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('media', 'media', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Storage policies for media bucket
+DROP POLICY IF EXISTS "Public Media Access" ON storage.objects;
+CREATE POLICY "Public Media Access" ON storage.objects
+FOR SELECT USING (bucket_id = 'media');
+
+DROP POLICY IF EXISTS "Public Media Uploads" ON storage.objects;
+CREATE POLICY "Public Media Uploads" ON storage.objects
+FOR INSERT WITH CHECK (bucket_id = 'media');
+
+DROP POLICY IF EXISTS "Public Media Updates" ON storage.objects;
+CREATE POLICY "Public Media Updates" ON storage.objects
+FOR UPDATE USING (bucket_id = 'media');
+
+DROP POLICY IF EXISTS "Public Media Deletes" ON storage.objects;
+CREATE POLICY "Public Media Deletes" ON storage.objects
+FOR DELETE USING (bucket_id = 'media');
+

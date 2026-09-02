@@ -9,6 +9,7 @@ import LivePreviewPane from "@/components/admin/LivePreviewPane";
 import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomizerModal";
 import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 import {
   SlidersIcon,
   LayoutIcon,
@@ -1011,29 +1012,27 @@ function ConditionEditorModal({
                   <span>Hero Media &amp; Primary Booking Call-to-Action</span>
                 </h4>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                  <div className="adm-form-group" style={{ margin: 0 }}>
-                    <label className="adm-form-label">Hero Image URL</label>
-                    <input
-                      type="text"
-                      className="adm-input"
-                      value={cond.heroImage || ""}
-                      onChange={(e) =>
-                        setCond({
-                          ...cond,
-                          heroImage: e.target.value,
-                          sectionsData: {
-                            ...(cond.sectionsData || {}),
-                            hero: {
-                              ...(cond.sectionsData?.hero || {}),
-                              image: e.target.value
-                            }
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16, alignItems: "start" }}>
+                  <AdminImageUploader
+                    label="Hero Banner Image"
+                    value={cond.heroImage || ""}
+                    onChange={(url) =>
+                      setCond({
+                        ...cond,
+                        heroImage: url,
+                        sectionsData: {
+                          ...(cond.sectionsData || {}),
+                          hero: {
+                            ...(cond.sectionsData?.hero || {}),
+                            image: url
                           }
-                        })
-                      }
-                      placeholder="/images/clinic/reception-one.jpg"
-                    />
-                  </div>
+                        }
+                      })
+                    }
+                    folder="conditions"
+                    placeholder="/images/clinic/reception-three.jpg"
+                    aspectRatioNote="Landscape 16:9 recommended"
+                  />
                   <div className="adm-form-group" style={{ margin: 0 }}>
                     <label className="adm-form-label">Primary Call to Action Button Text</label>
                     <input

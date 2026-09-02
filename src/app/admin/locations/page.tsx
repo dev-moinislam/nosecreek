@@ -6,6 +6,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Location } from "@/types/content";
 import locationsData from "@/data/locations.json";
 import AdminToast from "@/components/admin/AdminToast";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 
 import { EditIcon, CheckIcon, XIcon, PlusIcon, TrashIcon } from "@/components/admin/AdminIcons";
 
@@ -371,6 +372,21 @@ function LocationEditorModal({
                   placeholder="https://www.google.com/maps/dir/..."
                 />
               </div>
+            </div>
+
+            <div>
+              <AdminImageUploader
+                label="Clinic Facility Photo / Exterior Banner"
+                value={(loc.images && loc.images[0]) || loc.image || ""}
+                onChange={(url) => {
+                  const updatedImages = loc.images && loc.images.length > 0 ? [...loc.images] : [""];
+                  updatedImages[0] = url;
+                  setLoc({ ...loc, images: updatedImages, image: url });
+                }}
+                folder="locations"
+                placeholder="/images/clinic/reception-three.jpg"
+                aspectRatioNote="Landscape 16:9 recommended"
+              />
             </div>
 
             <div>
