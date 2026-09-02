@@ -1,6 +1,7 @@
 import React from "react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContactInquiryForm from "@/components/forms/ContactInquiryForm";
+import VisitUsSection from "@/components/content/VisitUsSection";
 import SchemaMarkup from "@/components/seo/SchemaMarkup";
 import settingsData from "@/data/settings.json";
 
@@ -41,76 +42,8 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* ── 3. CALL US & WRITE TO US (2-COLUMN CLEAN INFO BOXES) ── */}
-      <section style={{ padding: "30px 0" }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 20px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 24, alignItems: "stretch" }}>
-            
-            {/* Box 1: Call Us */}
-            <div style={{ background: "#ffffff", borderRadius: 16, border: "1px solid #e2ebf0", padding: "32px 28px", boxShadow: "0 4px 16px rgba(18,60,80,0.04)", display: "flex", flexDirection: "column" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1d2b34", textAlign: "center", margin: "0 0 20px", borderBottom: "2px solid #eef3f6", paddingBottom: 12 }}>
-                Call Us
-              </h2>
-              
-              <div style={{ textAlign: "center", marginBottom: 20 }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#1d2b34", marginBottom: 6 }}>Nose Creek Physiotherapy</div>
-                <div style={{ fontSize: 15.5, color: "#5a6570", marginBottom: 4 }}>
-                  <span style={{ color: "#6faf1c", fontWeight: 700 }}>📞 Phone:</span> <a href="tel:+14032958590" style={{ color: "#1d2b34", fontWeight: 700, textDecoration: "none" }}>403.295.8590</a> / <a href="tel:+15873333229" style={{ color: "#1d2b34", fontWeight: 700, textDecoration: "none" }}>587.333.3229</a>
-                </div>
-                <div style={{ fontSize: 15.5, color: "#5a6570" }}>
-                  <span style={{ color: "#6faf1c", fontWeight: 700 }}>📠 Fax:</span> <strong style={{ color: "#1d2b34" }}>403.516.3271</strong>
-                </div>
-              </div>
-
-              <div style={{ background: "#f8fafc", borderRadius: 12, padding: "16px 20px", marginTop: "auto", border: "1px solid #eef3f6" }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#8a97a1", textTransform: "uppercase", letterSpacing: "0.5px", textAlign: "center", marginBottom: 10 }}>
-                  Clinic Hours
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 14 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#5a6570" }}>Monday – Friday:</span>
-                    <strong style={{ color: "#1d2b34" }}>6:45 AM – 7:15 PM</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#5a6570" }}>Saturday:</span>
-                    <strong style={{ color: "#1d2b34" }}>8:00 AM – 2:00 PM</strong>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#5a6570" }}>Sunday:</span>
-                    <strong style={{ color: "#e63946" }}>Closed</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Box 2: Write To Us & Map */}
-            <div style={{ background: "#ffffff", borderRadius: 16, border: "1px solid #e2ebf0", padding: "32px 28px", boxShadow: "0 4px 16px rgba(18,60,80,0.04)", display: "flex", flexDirection: "column" }}>
-              <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1d2b34", textAlign: "center", margin: "0 0 20px", borderBottom: "2px solid #eef3f6", paddingBottom: 12 }}>
-                Write To Us / Visit
-              </h2>
-
-              <div style={{ textAlign: "center", marginBottom: 16 }}>
-                <div style={{ fontSize: 15.5, color: "#5a6570", lineHeight: 1.5 }}>
-                  <span style={{ color: "#6faf1c", fontWeight: 700 }}>📍 Address:</span><br />
-                  <strong style={{ color: "#1d2b34" }}>8220 Centre St NE #153, Calgary, AB T3K 1J7</strong><br />
-                  <span style={{ fontSize: 13.5, color: "#8a97a1" }}>(In Beddington Co-op Shopping Centre)</span>
-                </div>
-              </div>
-
-              <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid #e2ebf0", height: 210, width: "100%", marginTop: "auto" }}>
-                <iframe
-                  title="Nose Creek Physiotherapy Map"
-                  src="https://www.google.com/maps?q=Nose%20Creek%20Physiotherapy%208220%20Centre%20St%20NE%20Suite%20153%2C%20Calgary%2C%20AB%20T3K%201J7&output=embed"
-                  style={{ width: "100%", height: "100%", border: 0, display: "block" }}
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
+      {/* ── 3. DYNAMIC GLOBAL VISIT US SECTION (SYNCED WITH SUPABASE & ADMIN LOCATIONS) ── */}
+      <VisitUsSection />
 
       {/* ── 4. "STILL THINKING ABOUT BOOKING?" 3 BUTTONS ── */}
       <section style={{ padding: "30px 0 20px" }}>
