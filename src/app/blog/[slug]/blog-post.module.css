@@ -1,5 +1,5 @@
 .articleBody {
-  font-family: 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: inherit;
   color: #2d3748;
   font-size: 1.0625rem;
   line-height: 1.8;
@@ -24,48 +24,49 @@
 }
 
 .articleBody p {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   color: #374151;
   line-height: 1.8;
   font-size: 1.0625rem;
+  font-style: normal;
 }
 
-.articleBody h1 {
+.articleBody h1,
+.articleBody h2,
+.articleBody h3,
+.articleBody h4,
+.articleBody h5,
+.articleBody h6 {
   font-family: 'Poppins', sans-serif;
-  font-weight: 800;
-  font-size: 2rem;
   color: #111827;
-  margin-top: 36px;
-  margin-bottom: 16px;
-  letter-spacing: -0.3px;
-  line-height: 1.25;
-}
-
-.articleBody h2 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 800;
-  font-size: 1.65rem;
-  color: #111827;
-  margin-top: 36px;
-  margin-bottom: 16px;
-  letter-spacing: -0.3px;
-  line-height: 1.25;
-}
-
-.articleBody h3 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: #111827;
-  margin-top: 28px;
-  margin-bottom: 12px;
-  letter-spacing: -0.2px;
+  font-style: normal !important;
   line-height: 1.3;
 }
 
+.articleBody h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 32px;
+  margin-bottom: 14px;
+}
+
+.articleBody h2 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin-top: 28px;
+  margin-bottom: 14px;
+}
+
+.articleBody h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
 .articleBody ul, .articleBody ol {
-  margin-bottom: 24px;
-  padding-left: 26px;
+  margin-bottom: 20px;
+  padding-left: 24px;
 }
 
 .articleBody li {
@@ -81,23 +82,22 @@
 
 .articleBody a {
   color: #0e78a8;
-  font-weight: 600;
   text-decoration: underline;
-  transition: color 0.15s ease;
 }
 
 .articleBody a:hover {
   color: #0b5e85;
 }
 
+/* Natural blockquote without forced left border or forced italics */
 .articleBody blockquote {
-  border-left: 3px solid #0e78a8;
+  border: none !important;
+  border-left: none !important;
   background: transparent !important;
-  padding: 8px 18px;
-  margin: 24px 0;
-  border-radius: 0;
-  font-style: italic;
-  color: #4b5563;
+  padding: 0 !important;
+  margin: 0 0 18px 0 !important;
+  font-style: normal !important;
+  color: inherit !important;
 }
 
 .articleBody img {
@@ -105,5 +105,5 @@
   height: auto;
   border-radius: 12px;
   display: block;
-  margin: 24px 0;
+  margin: 20px 0;
 }
