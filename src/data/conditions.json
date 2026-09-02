@@ -49,7 +49,8 @@
       "ogTitle": "Back Pain Treatment | Nose Creek Physiotherapy",
       "description": "Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.",
       "ogDescription": "End back pain without pills or surgery with evidence-based physical therapy in Calgary."
-    }
+    },
+    "sectionsData": {}
   },
   {
     "id": "neck-shoulder-pain",
@@ -638,5 +639,37 @@
       "description": "Relieve costochondritis, rib subluxations, and thoracic pain with gentle physiotherapy in Calgary.",
       "ogDescription": "Restore painless breathing and rib cage alignment with expert physical therapy."
     }
+  },
+  {
+    "id": "condition-1788302012251",
+    "slug": "new-condition",
+    "name": "Leg pain",
+    "shortDescription": "Customize the summary paragraph, condition category badge, and card thumbnail that appear inside the card tiles on the Homepage",
+    "description": "",
+    "symptoms": [],
+    "treatmentApproach": [],
+    "benefits": [],
+    "customSections": [],
+    "sectionsData": {},
+    "faqs": [],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
+      "symptoms",
+      "treatment_approach",
+      "related_therapies",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "other_links",
+      "bottom_cta"
+    ],
+    "relatedServices": [],
+    "category": "general",
+    "heroImage": "/images/clinic/reception-three.jpg"
   }
 ]

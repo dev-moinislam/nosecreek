@@ -1444,16 +1444,16 @@ VALUES (
   'nose-creek-clinic',
   '123 Nose Creek Gate NW, Calgary, AB T3K 5N4',
   '(403) 555-0199',
-  'nosecreek@beactiveclinic.ca',
-  '{"monday":"8:00 am — 8:00 pm","tuesday":"8:00 am — 8:00 pm","wednesday":"8:00 am — 8:00 pm","thursday":"8:00 am — 8:00 pm","friday":"8:00 am — 8:00 pm","saturday":"8:00 am — 3:00 pm","sunday":"Closed"}'::jsonb,
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d80211.23439401777!2d-114.15049386343513!3d51.134261763138865!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x53716447ab2881a7%3A0x7d6f51be0e6f6630!2sNose%20Creek!5e0!3m2!1sen!2sca!4v1700000000000!5m2!1sen!2sca',
+  'info@nosecreekphysiotherapy.ca',
+  '{"monday":"6:45 am — 7:15 pm","tuesday":"6:45 am — 7:15 pm","wednesday":"6:45 am — 7:15 pm","thursday":"6:45 am — 7:15 pm","friday":"6:45 am — 7:15 pm","saturday":"8:00 am — 2:00 pm","sunday":"Closed"}'::jsonb,
+  'https://www.google.com/maps?q=Nose%20Creek%20Physiotherapy%208220%20Centre%20St%20NE%20Suite%20153%2C%20Calgary%2C%20AB%20T3K%201J7&output=embed',
   '["physiotherapy","chiropractic-care","sports-injury-rehabilitation","massage-therapy"]'::jsonb,
   '["dr-junmo-lee","falgun-patel"]'::jsonb,
   '["review-1","review-2"]'::jsonb,
-  'Located in the heart of Nose Creek in Northwest Calgary, our modern clinic is equipped with the latest physiotherapy modalities, active exercise gym equipment, and comfortable private treatment rooms. We offer ample free parking and are easily accessible by public transit.',
+  'Located in the heart of Nose Creek in Calgary, our modern clinic is equipped with the latest physiotherapy modalities, active exercise gym equipment, and comfortable private treatment rooms.',
   '["/images/locations/nosecreek-exterior.jpg","/images/locations/nosecreek-interior.jpg"]'::jsonb,
   '#booking',
-  '{"title":"BeActive Clinic at Nose Creek NW | Calgary Physiotherapy & Chiropractic","description":"Visit BeActive Chiropractic & Physiotherapy Clinic at Nose Creek Gate NW. Expert care in Northwest Calgary. Free parking, direct insurance billing.","ogTitle":"Nose Creek Clinic NW Calgary | BeActive","ogDescription":"Find location details, maps, hours, and book chiropractic and physical therapy at our Nose Creek clinic."}'::jsonb,
+  '{"title":"Nose Creek Physiotherapy Clinic | Calgary Physiotherapy & Rehabilitation","description":"Visit Nose Creek Physiotherapy Clinic in Calgary. Expert care in Calgary. Free parking, direct insurance billing.","ogTitle":"Nose Creek Physiotherapy Clinic Calgary","ogDescription":"Find location details, maps, hours, and book physical therapy at our Nose Creek clinic."}'::jsonb,
   true
 )
 ON CONFLICT (slug) DO UPDATE SET

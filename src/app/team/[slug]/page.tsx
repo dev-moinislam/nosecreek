@@ -15,6 +15,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const team = await getTeamMembers();
   return team.map((m) => ({

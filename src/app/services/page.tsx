@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ServiceIcon from "@/components/ui/ServiceIcon";
+import ServicesIndexGrid from "@/components/ui/ServicesIndexGrid";
 import { getServices } from "@/lib/api";
 
 export const metadata = {
@@ -73,57 +74,7 @@ export default async function ServicesPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
-            {services.map((svc) => (
-              <Link
-                key={svc.id || svc.slug}
-                href={`/services/${svc.slug}`}
-                style={{ display: "block", textDecoration: "none" }}
-              >
-                <div style={{
-                  background: "#fff",
-                  border: "1px solid #e7edf1",
-                  borderRadius: 18,
-                  padding: 30,
-                  boxShadow: "0 8px 24px rgba(18,60,80,0.06)",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "transform 0.2s, box-shadow 0.2s"
-                }}>
-                  <div style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 14,
-                    background: svc.iconBg || "#e9f5fb",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 20
-                  }}>
-                    <ServiceIcon type={svc.iconType} color={svc.iconColor || "#1c9fd8"} size={28} />
-                  </div>
-                  
-                  <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10, color: "#1d2b34" }}>
-                    {svc.title}
-                  </h3>
-                  
-                  <p style={{ fontSize: 14.5, lineHeight: 1.65, color: "#5a6570", flexGrow: 1, marginBottom: 20 }}>
-                    {svc.shortDescription}
-                  </p>
-                  
-                  <div style={{ borderTop: "1px solid #f0f4f7", paddingTop: 16, marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14.5 }}>
-                      View treatment details &rarr;
-                    </span>
-                    <span style={{ color: "#6faf1c", fontSize: 13, fontWeight: 700, background: "#eef6e4", padding: "4px 10px", borderRadius: 999 }}>
-                      Covered
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <ServicesIndexGrid initialServices={services} />
         </div>
       </section>
 

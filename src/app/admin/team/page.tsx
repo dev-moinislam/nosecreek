@@ -6,6 +6,8 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { TeamMember } from "@/types/content";
 import teamData from "@/data/team.json";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
+import AdminToast from "@/components/admin/AdminToast";
+import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
 import {
   SearchIcon,
   EyeIcon,
@@ -23,6 +25,8 @@ export default function AdminTeamPage() {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ slug: string; name: string } | null>(null);
 
   const fetchTeam = async () => {
     setLoading(true);
@@ -118,27 +122,44 @@ export default function AdminTeamPage() {
     if (typeof window !== "undefined") {
       localStorage.setItem("adm_team", JSON.stringify(all));
     }
-    alert("✓ Team member saved!");
+    try {
+      await fetch("/api/admin/save-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "team", data: all })
+      });
+    } catch {}
+    setToastMessage("✓ Team member saved successfully!");
     setEditingMember(null);
     fetchTeam();
   };
 
-  const handleDelete = async (slug: string) => {
-    if (!canDelete) {
-      alert("In Client Mode, deleting team members is disabled.");
-      return;
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    const { slug, name } = deleteTarget;
+    try {
+      if (isSupabaseConfigured && supabase) {
+        await supabase.from("team_members").delete().eq("slug", slug);
+        await supabase.from("team_members").delete().eq("id", slug);
+      }
+      const all = team.filter((t) => t.slug !== slug);
+      setTeam(all);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_team", JSON.stringify(all));
+      }
+      try {
+        await fetch("/api/admin/save-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "team", data: all })
+        });
+      } catch {}
+      setToastMessage(`✓ Practitioner "${name}" permanently deleted!`);
+    } catch (err: any) {
+      alert("Error deleting practitioner: " + err.message);
+    } finally {
+      setDeleteTarget(null);
     }
-    if (!confirm(`Are you sure you want to delete ${slug}?`)) return;
-    if (isSupabaseConfigured && supabase) {
-      await supabase.from("team_members").delete().eq("slug", slug);
-    }
-    const all = team.filter((t) => t.slug !== slug);
-    setTeam(all);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("adm_team", JSON.stringify(all));
-    }
-    alert("✓ Team member deleted!");
-    fetchTeam();
   };
 
   const filtered = team.filter(
@@ -150,6 +171,14 @@ export default function AdminTeamPage() {
 
   return (
     <div>
+      <AdminToast message={toastMessage} onClose={() => setToastMessage(null)} />
+      <ConfirmDeleteModal
+        isOpen={Boolean(deleteTarget)}
+        itemName={deleteTarget?.name || ""}
+        itemType="Practitioner Profile"
+        onConfirm={handleConfirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 14 }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0, fontFamily: "var(--adm-font-display)" }}>
@@ -269,16 +298,14 @@ export default function AdminTeamPage() {
                         <EditIcon size={13} />
                         <span>Edit</span>
                       </button>
-                      {canDelete && (
-                        <button
-                          onClick={() => handleDelete(member.slug)}
-                          className="adm-btn adm-btn-secondary adm-btn-sm"
-                          style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
-                          title="Delete"
-                        >
-                          <TrashIcon size={13} />
-                        </button>
-                      )}
+                      <button
+                        onClick={() => setDeleteTarget({ slug: member.slug, name: member.name })}
+                        className="adm-btn adm-btn-secondary adm-btn-sm"
+                        style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
+                        title="Delete Team Member"
+                      >
+                        <TrashIcon size={14} />
+                      </button>
                     </td>
                   </tr>
                 ))

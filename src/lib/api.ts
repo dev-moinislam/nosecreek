@@ -5,7 +5,8 @@ import {
   BlogPost,
   Location,
   Condition,
-  Testimonial
+  Testimonial,
+  HomePageData
 } from "@/types/content";
 
 import settingsData from "@/data/settings.json";
@@ -15,6 +16,7 @@ import locationsData from "@/data/locations.json";
 import blogData from "@/data/blog.json";
 import conditionsData from "@/data/conditions.json";
 import testimonialsData from "@/data/testimonials.json";
+import defaultHomeData from "@/data/home.json";
 import { supabase, isSupabaseConfigured } from "./supabase/client";
 
 // Local fallbacks
@@ -25,6 +27,7 @@ const locationsList = locationsData as Location[];
 const blogList = blogData as BlogPost[];
 const conditionsList = conditionsData as Condition[];
 const testimonialsList = testimonialsData as Testimonial[];
+const defaultHomeObj = defaultHomeData as HomePageData;
 
 /**
  * Site-wide settings (Clinic info, business hours, default SEO)
@@ -78,6 +81,7 @@ export async function getServices(): Promise<Service[]> {
           description: d.description || "",
           heroImage: d.hero_image,
           sideImage: d.side_image,
+          cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
           iconType: d.icon_type,
           iconBg: d.icon_bg,
           iconColor: d.icon_color,
@@ -87,7 +91,7 @@ export async function getServices(): Promise<Service[]> {
           symptoms: d.symptoms || [],
           treatmentApproach: d.treatment_approach || [],
           customSections: d.custom_sections || [],
-          sectionsData: d.sections_data || d.sectionsData || {},
+          sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || {},
           faqs: d.faqs || [],
           hiddenSections: d.hidden_sections || [],
           sectionOrder: d.section_order || d.sectionOrder || [],
@@ -103,6 +107,18 @@ export async function getServices(): Promise<Service[]> {
       console.warn("Supabase fetch failed for services, using local fallback", e);
     }
   }
+
+  // Client-side fetch from /api/content (useful in incognito or non-admin sessions)
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/content?type=services");
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) return list;
+      }
+    } catch {}
+  }
+
   return servicesList;
 }
 
@@ -133,7 +149,7 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
           symptoms: data.symptoms || [],
           treatmentApproach: data.treatment_approach || [],
           customSections: data.custom_sections || [],
-          sectionsData: data.sections_data || data.sectionsData || {},
+          sectionsData: data.sections_data || data.seo?.sectionsData || data.sectionsData || {},
           faqs: data.faqs || [],
           hiddenSections: data.hidden_sections || [],
           sectionOrder: data.section_order || data.sectionOrder || [],
@@ -221,6 +237,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
           title: d.title,
           excerpt: d.excerpt || "",
           content: d.content || "",
+          contentBlocks: d.content_blocks || d.contentBlocks || d.seo?.contentBlocks || [],
           featuredImage: d.featured_image || "/images/blog/default.jpg",
           author: d.author || "Blair Schachterle",
           category: d.category || "General",
@@ -306,13 +323,14 @@ export async function getConditions(): Promise<Condition[]> {
           description: d.description || "",
           heroImage: d.hero_image,
           sideImage: d.side_image,
+          cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
           ctaText: d.cta_text,
           ctaMuted: d.cta_muted,
           benefits: d.benefits || [],
           symptoms: d.symptoms || [],
           treatmentApproach: d.treatment_approach || [],
           customSections: d.custom_sections || [],
-          sectionsData: d.sections_data || d.sectionsData || {},
+          sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || {},
           faqs: d.faqs || [],
           hiddenSections: d.hidden_sections || [],
           sectionOrder: d.section_order || d.sectionOrder || [],
@@ -325,6 +343,18 @@ export async function getConditions(): Promise<Condition[]> {
       console.warn("Supabase fetch failed for conditions, using local fallback", e);
     }
   }
+
+  // Client-side fetch from /api/content (useful in incognito or non-admin sessions)
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/content?type=conditions");
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) return list;
+      }
+    } catch {}
+  }
+
   return conditionsList;
 }
 
@@ -346,13 +376,14 @@ export async function getConditionBySlug(slug: string): Promise<Condition | unde
           description: data.description || "",
           heroImage: data.hero_image,
           sideImage: data.side_image,
+          cardImage: data.card_image || data.cardImage || data.seo?.cardImage || null,
           ctaText: data.cta_text,
           ctaMuted: data.cta_muted,
           benefits: data.benefits || [],
           symptoms: data.symptoms || [],
           treatmentApproach: data.treatment_approach || [],
           customSections: data.custom_sections || [],
-          sectionsData: data.sections_data || data.sectionsData || {},
+          sectionsData: data.sections_data || data.seo?.sectionsData || data.sectionsData || {},
           faqs: data.faqs || [],
           hiddenSections: data.hidden_sections || [],
           sectionOrder: data.section_order || data.sectionOrder || [],
@@ -400,4 +431,62 @@ export async function getTestimonialById(id: string): Promise<Testimonial | unde
   const testimonials = await getTestimonials();
   return testimonials.find((t) => t.id === id);
 }
+
+/**
+ * Homepage Structured Content
+ */
+export async function getHomeContent(): Promise<HomePageData> {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      // 1. Check if stored in site_settings row 'main' under home_page_content
+      const { data: mainData } = await supabase
+        .from("site_settings")
+        .select("home_page_content")
+        .eq("id", "main")
+        .single();
+      if (mainData && (mainData as any).home_page_content && Object.keys((mainData as any).home_page_content).length > 0) {
+        return {
+          ...defaultHomeObj,
+          ...(mainData as any).home_page_content
+        };
+      }
+    } catch {}
+
+    try {
+      // 2. Check if stored as key-value pair in site_settings
+      const { data: kvData } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "home_page_content")
+        .single();
+      if (kvData && (kvData as any).value) {
+        return {
+          ...defaultHomeObj,
+          ...(kvData as any).value
+        };
+      }
+    } catch (e) {
+      console.warn("Supabase fetch failed for home_page_content, using local fallback", e);
+    }
+  }
+
+  // Client-side local override
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem("adm_home");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === "object") {
+          return {
+            ...defaultHomeObj,
+            ...parsed
+          };
+        }
+      }
+    } catch {}
+  }
+
+  return defaultHomeObj;
+}
+
 

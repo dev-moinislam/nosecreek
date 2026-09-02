@@ -2,8 +2,8 @@ import React from "react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Page Not Found | BeActive Clinic",
-  description: "Oops! We can't find the page you are looking for. Return to the BeActive homepage to access chiropractic care, physiotherapy, and massage services."
+  title: "Page Not Found | Nose Creek Physiotherapy",
+  description: "Oops! We can't find the page you are looking for. Return to the Nose Creek Physiotherapy homepage to access physiotherapy and rehabilitation services."
 };
 
 export default function NotFound() {

@@ -59,7 +59,14 @@ export default function ThemeCustomizerModal({
   };
 
   return (
-    <div className="adm-modal-overlay" onClick={onClose} style={{ zIndex: 1200 }}>
+    <div
+      className="adm-modal-overlay"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClose();
+      }}
+      style={{ zIndex: 9990 }}
+    >
       <div
         className="adm-modal"
         style={{ maxWidth: 580 }}

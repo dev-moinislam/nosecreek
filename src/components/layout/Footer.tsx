@@ -1,13 +1,31 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import defaultServicesData from "@/data/services.json";
+import { Service } from "@/types/content";
+import { getServices } from "@/lib/api";
 
 export default function Footer() {
-  const serviceLinks = [
-    { label: "Physiotherapy",    href: "https://www.nosecreekphysiotherapy.com/physiotherapy/" },
-    { label: "Massage Therapy",  href: "https://www.nosecreekphysiotherapy.com/massage-therapy-calgary/" },
-    { label: "Acupuncture",      href: "https://www.nosecreekphysiotherapy.com/acupuncture-calgary/" },
-    { label: "Shockwave Therapy",href: "https://www.nosecreekphysiotherapy.com/shockwave-therapy-calgary/" },
-    { label: "Custom Orthotics", href: "https://www.nosecreekphysiotherapy.com/custom-orthotics-calgary/" },
-  ];
+  const [services, setServices] = useState<Service[]>(defaultServicesData as Service[]);
+
+  useEffect(() => {
+    function sync() {
+      try {
+        const saved = localStorage.getItem("adm_services");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) setServices(parsed);
+        }
+      } catch {}
+    }
+    window.addEventListener("servicesUpdated", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("servicesUpdated", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
   const clinicLinks = [
     { label: "About Us",          href: "/about" },
     { label: "Meet the Team",     href: "/team" },
@@ -45,7 +63,16 @@ export default function Footer() {
         <div>
           <div style={headStyle}>Services</div>
           <div style={colStyle}>
-            {serviceLinks.map(l => <a key={l.label} href={l.href} style={{ color: "#a9c1cd" }}>{l.label}</a>)}
+            {services.slice(0, 6).map((s) => (
+              <Link key={s.slug || s.id} href={`/services/${s.slug}`} style={{ color: "#a9c1cd", textDecoration: "none" }}>
+                {s.title}
+              </Link>
+            ))}
+            {services.length > 6 && (
+              <Link href="/services" style={{ color: "#8cc63f", fontWeight: 700, textDecoration: "none", fontSize: 13 }}>
+                View All Services &rarr;
+              </Link>
+            )}
           </div>
         </div>
 

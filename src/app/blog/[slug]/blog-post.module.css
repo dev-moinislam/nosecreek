@@ -1,22 +1,52 @@
 .articleBody {
-  font-family: 'Open Sans', system-ui, sans-serif;
-  color: #3a444d;
+  font-family: 'Open Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #2d3748;
   font-size: 1.0625rem;
   line-height: 1.8;
+  background: transparent;
+}
+
+/* Neutralize any foreign background colors from copied/pasted external rich text */
+.articleBody h1,
+.articleBody h2,
+.articleBody h3,
+.articleBody h4,
+.articleBody h5,
+.articleBody h6,
+.articleBody p,
+.articleBody span,
+.articleBody div,
+.articleBody li,
+.articleBody ol,
+.articleBody ul,
+.articleBody blockquote {
+  background-color: transparent !important;
 }
 
 .articleBody p {
-  margin-bottom: 24px;
-  color: #48535c;
+  margin-bottom: 20px;
+  color: #374151;
   line-height: 1.8;
+  font-size: 1.0625rem;
+}
+
+.articleBody h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 2rem;
+  color: #111827;
+  margin-top: 36px;
+  margin-bottom: 16px;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
 }
 
 .articleBody h2 {
   font-family: 'Poppins', sans-serif;
   font-weight: 800;
-  font-size: 1.75rem;
-  color: #1d2b34;
-  margin-top: 40px;
+  font-size: 1.65rem;
+  color: #111827;
+  margin-top: 36px;
   margin-bottom: 16px;
   letter-spacing: -0.3px;
   line-height: 1.25;
@@ -25,27 +55,27 @@
 .articleBody h3 {
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
-  font-size: 1.35rem;
-  color: #1d2b34;
-  margin-top: 32px;
-  margin-bottom: 14px;
+  font-size: 1.3rem;
+  color: #111827;
+  margin-top: 28px;
+  margin-bottom: 12px;
   letter-spacing: -0.2px;
   line-height: 1.3;
 }
 
 .articleBody ul, .articleBody ol {
-  margin-bottom: 28px;
-  padding-left: 24px;
+  margin-bottom: 24px;
+  padding-left: 26px;
 }
 
 .articleBody li {
-  margin-bottom: 10px;
-  color: #48535c;
+  margin-bottom: 8px;
+  color: #374151;
   line-height: 1.7;
 }
 
-.articleBody strong {
-  color: #1d2b34;
+.articleBody strong, .articleBody b {
+  color: #111827;
   font-weight: 700;
 }
 
@@ -53,6 +83,7 @@
   color: #0e78a8;
   font-weight: 600;
   text-decoration: underline;
+  transition: color 0.15s ease;
 }
 
 .articleBody a:hover {
@@ -60,11 +91,19 @@
 }
 
 .articleBody blockquote {
-  border-left: 4px solid #1c9fd8;
-  background: #f2f8fb;
-  padding: 18px 24px;
-  margin: 28px 0;
-  border-radius: 0 12px 12px 0;
+  border-left: 3px solid #0e78a8;
+  background: transparent !important;
+  padding: 8px 18px;
+  margin: 24px 0;
+  border-radius: 0;
   font-style: italic;
-  color: #1d2b34;
+  color: #4b5563;
+}
+
+.articleBody img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  margin: 24px 0;
 }

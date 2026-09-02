@@ -1,18 +1,40 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Condition } from "@/types/content";
 import defaultConditionsData from "@/data/conditions.json";
+import { getConditions } from "@/lib/api";
 
 interface ConditionTilesProps {
   conditions?: Condition[];
 }
 
 export default function ConditionTiles({ conditions }: ConditionTilesProps) {
-  const displayConditions: Condition[] =
+  const [displayConditions, setDisplayConditions] = useState<Condition[]>(
     conditions && conditions.length > 0
       ? conditions
-      : (defaultConditionsData as Condition[]);
+      : (defaultConditionsData as Condition[])
+  );
+
+  useEffect(() => {
+    function sync() {
+      try {
+        const saved = localStorage.getItem("adm_conditions");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setDisplayConditions(parsed);
+          }
+        }
+      } catch {}
+    }
+    window.addEventListener("conditionsUpdated", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("conditionsUpdated", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 16 }}>

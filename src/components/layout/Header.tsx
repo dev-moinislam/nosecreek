@@ -3,6 +3,11 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import defaultServicesData from "@/data/services.json";
+import defaultConditionsData from "@/data/conditions.json";
+import { Service, Condition } from "@/types/content";
+import { getServices, getConditions } from "@/lib/api";
+
 export default function Header() {
   const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
@@ -13,10 +18,40 @@ export default function Header() {
   const [mobileConditionsOpen, setMobileConditionsOpen] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
 
+  const [dynamicServices, setDynamicServices] = useState<Service[]>(defaultServicesData as Service[]);
+  const [dynamicConditions, setDynamicConditions] = useState<Condition[]>(defaultConditionsData as Condition[]);
+
   const aboutRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
   const conditionsRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  // Dynamic sync of backend services and conditions
+  useEffect(() => {
+    function syncContent() {
+      try {
+        const savedServices = localStorage.getItem("adm_services");
+        if (savedServices) {
+          const parsed = JSON.parse(savedServices);
+          if (Array.isArray(parsed) && parsed.length > 0) setDynamicServices(parsed);
+        }
+        const savedConditions = localStorage.getItem("adm_conditions");
+        if (savedConditions) {
+          const parsed = JSON.parse(savedConditions);
+          if (Array.isArray(parsed) && parsed.length > 0) setDynamicConditions(parsed);
+        }
+      } catch {}
+    }
+
+    window.addEventListener("servicesUpdated", syncContent);
+    window.addEventListener("conditionsUpdated", syncContent);
+    window.addEventListener("storage", syncContent);
+    return () => {
+      window.removeEventListener("servicesUpdated", syncContent);
+      window.removeEventListener("conditionsUpdated", syncContent);
+      window.removeEventListener("storage", syncContent);
+    };
+  }, []);
 
   // Track window hash for anchor links (e.g. #why-choose-us)
   useEffect(() => {
@@ -108,29 +143,18 @@ export default function Header() {
 
   const servicesSubMenuItems = [
     { label: "All Clinical Services", href: "/services" },
-    { label: "Physiotherapy",         href: "/services/physiotherapy" },
-    { label: "Massage Therapy",       href: "/services/massage-therapy" },
-    { label: "Shockwave Therapy",     href: "/services/shockwave-therapy" },
-    { label: "Acupuncture & TCM",     href: "/services/acupuncture" },
-    { label: "Custom Orthotics",      href: "/services/custom-orthotics" },
-    { label: "Knee Bracing",          href: "/services/knee-bracing" },
-    { label: "Pelvic Floor Health",   href: "/services/pelvic-health" },
+    ...dynamicServices.map((s) => ({
+      label: s.title,
+      href: `/services/${s.slug}`
+    }))
   ];
 
-  const conditionsSubMenuItems = [
-    { label: "All Conditions Treated",            href: "/conditions", spanFull: true },
-    { label: "Back Pain",                         href: "/conditions/back-pain" },
-    { label: "Neck & Shoulder Pain",              href: "/conditions/neck-shoulder-pain" },
-    { label: "Knee Pain",                         href: "/conditions/knee-pain" },
-    { label: "Foot Pain & Plantar Fasciitis",     href: "/conditions/foot-pain" },
-    { label: "Sports Injuries",                   href: "/conditions/sports-injury" },
-    { label: "Shoulder Conditions",               href: "/conditions/shoulder-conditions" },
-    { label: "Sciatica & Pinched Nerve",          href: "/conditions/sciatica" },
-    { label: "Hip Pain",                          href: "/conditions/hip-pain" },
-    { label: "Headaches & Migraines",             href: "/conditions/headaches" },
-    { label: "Balance & Falls",                   href: "/conditions/balance-falls" },
-    { label: "Motor Vehicle Accidents (MVA)",     href: "/conditions/motor-vehicle-accidents" },
-    { label: "Workplace Injuries (WCB)",          href: "/conditions/workplace-injuries" },
+  const conditionsSubMenuItems: { label: string; href: string; spanFull?: boolean }[] = [
+    { label: "All Conditions Treated", href: "/conditions", spanFull: true },
+    ...dynamicConditions.map((c) => ({
+      label: c.name,
+      href: `/conditions/${c.slug}`
+    }))
   ];
 
   const isAboutActive = pathname.startsWith("/about") || pathname === "/team";

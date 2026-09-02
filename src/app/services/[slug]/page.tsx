@@ -12,6 +12,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const { getServices } = await import("@/lib/api");
   const services = await getServices();

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import ConditionsIndexGrid from "@/components/ui/ConditionsIndexGrid";
 import { getConditions } from "@/lib/api";
 
 export const metadata = {
@@ -72,69 +73,7 @@ export default async function ConditionsPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
-            {conditions.map((condition) => (
-              <div
-                key={condition.slug || condition.id}
-                style={{
-                  background: "#fff",
-                  border: "1px solid #e7edf1",
-                  borderRadius: 18,
-                  padding: 28,
-                  boxShadow: "0 6px 20px rgba(18,60,80,0.06)",
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column"
-                }}
-              >
-                {condition.category && (
-                  <div style={{
-                    display: "inline-block",
-                    background: "#f2f8fb",
-                    color: "#0e78a8",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.5px",
-                    padding: "4px 10px",
-                    borderRadius: 6,
-                    marginBottom: 14,
-                    width: "fit-content",
-                    fontFamily: "'Poppins',sans-serif"
-                  }}>
-                    {condition.category}
-                  </div>
-                )}
-                
-                <h3 style={{ fontSize: 21, fontWeight: 700, marginBottom: 10, color: "#1d2b34", lineHeight: 1.25 }}>
-                  <Link href={`/conditions/${condition.slug}`} style={{ color: "#1d2b34", textDecoration: "none" }}>
-                    {condition.name}
-                  </Link>
-                </h3>
-                
-                <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "#5a6570", flexGrow: 1, marginBottom: 20 }}>
-                  {condition.shortDescription || condition.description.substring(0, 140) + "..."}
-                </p>
-                
-                <div style={{ borderTop: "1px solid #f0f4f7", paddingTop: 14, marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Link
-                    href={`/conditions/${condition.slug}`}
-                    style={{
-                      color: "#0e78a8",
-                      fontWeight: 700,
-                      fontSize: 14.5,
-                      textDecoration: "none",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6
-                    }}
-                  >
-                    View treatment plan <span>&rarr;</span>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+          <ConditionsIndexGrid initialConditions={conditions} />
         </div>
       </section>
 

@@ -13,6 +13,7 @@ import {
   ConditionIconSvg,
   TeamIcon,
   LocationIconSvg,
+  BlogIconSvg,
   SettingsIcon,
   GlobeIcon,
   ExternalLinkIcon
@@ -56,9 +57,11 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   const allNavItems = [
     { label: "Overview", href: "/admin", icon: <DashboardIcon size={17} />, adminOnly: false },
+    { label: "Homepage", href: "/admin/home", icon: <GlobeIcon size={17} />, adminOnly: false },
     { label: "Leads & Inbox", href: "/admin/leads", icon: <InboxIcon size={17} />, badge: newLeadsCount, adminOnly: false },
     { label: "Services", href: "/admin/services", icon: <ServiceIconSvg size={17} />, adminOnly: false },
     { label: "Conditions", href: "/admin/conditions", icon: <ConditionIconSvg size={17} />, adminOnly: false },
+    { label: "Blog & Articles", href: "/admin/blog", icon: <BlogIconSvg size={17} />, adminOnly: false },
     { label: "Team Members", href: "/admin/team", icon: <TeamIcon size={17} />, adminOnly: false },
     { label: "Locations", href: "/admin/locations", icon: <LocationIconSvg size={17} />, adminOnly: false },
     { label: "Settings & Marketing", href: "/admin/settings", icon: <SettingsIcon size={17} />, adminOnly: true },

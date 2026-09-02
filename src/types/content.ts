@@ -66,6 +66,8 @@ export interface SectionBlockConfig {
   align?: "left" | "center" | "right";
   ctaText?: string;
   ctaHref?: string;
+  buttonText?: string;
+  buttonUrl?: string;
 }
 
 export interface ServiceCustomSection extends SectionBlockConfig {
@@ -80,6 +82,7 @@ export interface Service {
   description: string;
   heroImage?: string | null;
   sideImage?: string | null;
+  cardImage?: string | null;
   iconType?: string;
   iconBg?: string;
   iconColor?: string;
@@ -129,12 +132,34 @@ export interface TeamMember {
   seo?: SEOData;
 }
 
+export type BlogBlockType = "richtext" | "custom_section" | "callout" | "image_banner" | "key_takeaways" | "faq";
+
+export interface BlogContentBlock {
+  id: string;
+  type: BlogBlockType;
+  content?: string; // rich HTML string
+  eyebrow?: string;
+  eyebrowColor?: string;
+  title?: string;
+  subtitle?: string;
+  bullets?: string[];
+  image?: string | null;
+  imagePosition?: "left" | "right" | "top" | "bottom" | "none";
+  background?: "white" | "light" | "teal" | "gradient";
+  align?: "left" | "center" | "right";
+  ctaText?: string;
+  ctaHref?: string;
+  quoteAuthor?: string;
+  faqs?: FAQItem[];
+}
+
 export interface BlogPost {
   id: string;
   slug: string;
   title: string;
   excerpt: string;
   content: string;
+  contentBlocks?: BlogContentBlock[];
   featuredImage: string;
   author: string;
   category: string;
@@ -154,6 +179,11 @@ export interface Location {
   address: string;
   phone: string;
   email: string;
+  eyebrow?: string;
+  title?: string;
+  directionsUrl?: string;
+  hoursList?: { day: string; hours: string; }[];
+  insuranceNote?: string;
   openingHours: OpeningHours;
   mapEmbedUrl?: string;
   services: string[]; // slugs
@@ -173,6 +203,7 @@ export interface Condition {
   description: string;
   heroImage?: string | null;
   sideImage?: string | null;
+  cardImage?: string | null;
   ctaText?: string;
   ctaMuted?: boolean;
   benefits?: string[];
@@ -184,6 +215,7 @@ export interface Condition {
   hiddenSections?: string[];
   sectionOrder?: string[];
   relatedServices?: string[]; // slugs
+  testimonials?: any[];
   category?: string;
   seo?: SEOData;
 }
@@ -197,3 +229,88 @@ export interface Testimonial {
   date?: string;
   avatar?: string;
 }
+
+export interface HomePageData {
+  hero: {
+    eyebrow: string;
+    titleLine1: string;
+    titleLine2: string;
+    description: string;
+    primaryCtaText: string;
+    primaryCtaUrl: string;
+    phone: string;
+    phoneHref: string;
+    badges: string[];
+    image: string;
+    rating: string;
+    reviewCount: string;
+  };
+  quickFacts?: { icon: string; label: string; val: string }[];
+  stats?: { num: string; label: string }[];
+  aboutClinic?: {
+    eyebrow: string;
+    title: string;
+    content: string;
+    linkText: string;
+    linkUrl: string;
+    images?: string[];
+  };
+  director?: {
+    eyebrow: string;
+    title: string;
+    role: string;
+    titleSuffix: string;
+    bio: string;
+    image: string;
+    ctaText: string;
+    ctaUrl: string;
+  };
+  faqs?: { q?: string; a?: string; question?: string; answer?: string }[];
+  decideCtas?: {
+    title?: string;
+    description?: string;
+    discoveryTitle?: string;
+    discoveryDesc?: string;
+    discoveryBtnText?: string;
+    discoveryBtnUrl?: string;
+    phoneTitle?: string;
+    phoneDesc?: string;
+    phoneBtnText?: string;
+    phoneBtnUrl?: string;
+    noteText?: string;
+    costLinkText?: string;
+    costLinkUrl?: string;
+  };
+  workshops?: {
+    title?: string;
+    description?: string;
+    ctaText?: string;
+    ctaUrl?: string;
+    background?: string;
+  };
+  freeReports?: {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    reports?: { title: string; sub: string; label: string; href: string; color?: string; }[];
+  };
+  seoCopy?: {
+    title?: string;
+    paragraph1?: string;
+    paragraph2?: string;
+    areaLinks?: { label: string; href: string; }[];
+  };
+  finalCta?: {
+    title?: string;
+    description?: string;
+    ctaText?: string;
+    ctaUrl?: string;
+    phone?: string;
+    phoneHref?: string;
+  };
+  sectionOrder: string[];
+  hiddenSections: string[];
+  customSections?: ServiceCustomSection[];
+  sectionsData?: Record<string, SectionBlockConfig>;
+}
+

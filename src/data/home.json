@@ -1,0 +1,135 @@
+{
+  "hero": {
+    "eyebrow": "Trusted in Calgary North since 2001",
+    "titleLine1": "Physiotherapy in Calgary North",
+    "titleLine2": "Restore your mobility, strength & balance naturally.",
+    "description": "Serving NW & NE Calgary. Our team of physiotherapists, massage & movement specialists gets you moving faster and feeling better — with less dependence on medication, so you can get back to the life you deserve.",
+    "primaryCtaText": "Book Your Treatment Online",
+    "primaryCtaUrl": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+    "phone": "403.295.8590",
+    "phoneHref": "tel:+14032958590",
+    "badges": [
+      "✓ Extended-health direct billing",
+      "✓ Open 7 days / evenings & Saturdays",
+      "✓ FCAMPT-certified team"
+    ],
+    "image": "/images/clinic/reception-desktop.jpg",
+    "rating": "4.9",
+    "reviewCount": "545 Google reviews"
+  },
+  "quickFacts": [
+    {
+      "icon": "⏱",
+      "label": "Recovery Assessment",
+      "val": "Comprehensive 1-on-1"
+    },
+    {
+      "icon": "💳",
+      "label": "Direct Billing",
+      "val": "Available for Most Insurers"
+    },
+    {
+      "icon": "🩺",
+      "label": "Referral Required",
+      "val": "No Doctor Referral Needed"
+    },
+    {
+      "icon": "📍",
+      "label": "Clinic Location",
+      "val": "Beddington SE (Free Parking)"
+    }
+  ],
+  "stats": [
+    {
+      "num": "2001",
+      "label": "Serving Calgary since"
+    },
+    {
+      "num": "24+",
+      "label": "Years of care"
+    },
+    {
+      "num": "7",
+      "label": "Therapy services"
+    },
+    {
+      "num": "4.9★",
+      "label": "545 Google reviews"
+    }
+  ],
+  "aboutClinic": {
+    "eyebrow": "About Nose Creek Physiotherapy",
+    "title": "A Calgary clinic built on 20+ years of trust",
+    "content": "Blair Schachterle founded Nose Creek Physiotherapy in 2001. The physio and massage therapy clinic first opened in Calgary's Beddington Co-op Shopping Mall with four staff members. The response was overwhelming, and it later expanded to 2,600 square feet with five physiotherapists and two massage therapists. In 2018, we expanded again — taking on more space to meet the demand for our service.",
+    "linkText": "Follow our story →",
+    "linkUrl": "https://www.nosecreekphysiotherapy.com/about/",
+    "images": [
+      "/images/clinic/clinic-mobile.jpg",
+      "/images/clinic/reception-three.jpg",
+      "/images/clinic/reception-four.jpg"
+    ]
+  },
+  "director": {
+    "eyebrow": "Meet the founder",
+    "title": "Blair Schachterle",
+    "role": "Founder & Clinic Director",
+    "titleSuffix": "BScPT, FCAMPT, CIDN",
+    "bio": "Blair graduated from the University of Alberta with a Bachelor of Science in Physical Therapy in 1996. He has earned his Diploma of Advanced Manual and Manipulative Physiotherapy (FCAMPT) and has extensive training in spinal manipulation, IMS, and athletic rehabilitation.",
+    "image": "/images/team/blair-schachterle.jpg",
+    "ctaText": "Meet our team →",
+    "ctaUrl": "/team/blair-schachterle"
+  },
+  "faqs": [
+    {
+      "q": "What other services do you provide?",
+      "a": "Our team provides massage therapy, shockwave therapy, online physiotherapy (tele-health), rehabilitation, foot care and custom orthotics, acute injury management, injury recovery programs and expert advice on pain — all delivered by experienced therapists."
+    },
+    {
+      "q": "What conditions can physiotherapy treat?",
+      "a": "Physiotherapy can help with a wide range of issues including back and neck pain, knee pain, shoulder and joint problems, sports injuries, motor-vehicle injuries, chronic pain, vertigo and balance issues, frozen shoulder, TMJ/jaw dysfunction, soft-tissue and connective-tissue problems, spinal stenosis, pelvic health concerns and limited range of motion."
+    },
+    {
+      "q": "Is physiotherapy covered by my insurance?",
+      "a": "Physiotherapy and many of our other services are covered by extended health insurance plans, and we offer direct billing where available. No doctor referral is needed to start."
+    }
+  ],
+  "sectionOrder": [
+    "hero",
+    "quick_facts",
+    "stats",
+    "services_grid",
+    "conditions",
+    "about_clinic",
+    "director",
+    "team_carousel",
+    "free_reports",
+    "credentials",
+    "reviews",
+    "decide_ctas",
+    "workshops",
+    "seo_copy",
+    "blog_section",
+    "faqs",
+    "final_cta",
+    "location_map"
+  ],
+  "hiddenSections": [],
+  "customSections": [],
+  "sectionsData": {},
+  "seoCopy": {
+    "areaLinks": [
+      {
+        "label": "Calgary NW",
+        "href": "https://www.nosecreekphysiotherapy.com/service-areas/"
+      },
+      {
+        "label": "Calgary NE",
+        "href": "https://www.nosecreekphysiotherapy.com/service-areas/"
+      },
+      {
+        "label": "Beddington",
+        "href": "https://www.nosecreekphysiotherapy.com/beddington/"
+      }
+    ]
+  }
+}

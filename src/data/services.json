@@ -86,7 +86,9 @@
         "question": "What should I wear to my physiotherapy appointment?"
       }
     ],
-    "hiddenSections": [],
+    "hiddenSections": [
+      "faqs"
+    ],
     "sectionOrder": [
       "hero",
       "at_a_glance",
@@ -99,7 +101,8 @@
       "faqs",
       "location_map",
       "decision_ctas",
-      "bottom_cta"
+      "bottom_cta",
+      "testimonials"
     ],
     "relatedServices": [
       "massage-therapy",
@@ -127,7 +130,24 @@
       "ogTitle": "Physiotherapy Services | Nose Creek Physiotherapy",
       "description": "Expert hands-on physiotherapy to restore mobility, strength and balance. Extended health direct billing available in Calgary.",
       "ogDescription": "Restore mobility, strength, and balance naturally with our certified Calgary physiotherapists."
-    }
+    },
+    "sectionsData": {
+      "testimonials": {
+        "title": "545+ Five-Star Reviews in Calgary",
+        "eyebrow": "Real Patient Stories",
+        "eyebrowColor": "#1c9fd8",
+        "subtitle": "",
+        "content": "",
+        "image": "",
+        "imagePosition": "none",
+        "background": "light",
+        "align": "left",
+        "ctaText": "",
+        "ctaHref": "",
+        "bullets": []
+      }
+    },
+    "cardImage": ""
   },
   {
     "id": "massage-therapy",

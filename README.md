@@ -1,4 +1,4 @@
-# BeActive Clinic - Physiotherapy & Chiropractic Next.js Architecture
+# Nose Creek Physiotherapy - Physiotherapy & Rehabilitation Next.js Architecture
 
 A production-ready, highly scalable, and SEO-optimized website architecture for physical therapy and chiropractic clinics. Built with Next.js, TypeScript, and a decoupled Vanilla CSS design system.
 

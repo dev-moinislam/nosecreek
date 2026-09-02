@@ -4,8 +4,8 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { getLocations } from "@/lib/api";
 
 export const metadata = {
-  title: "Our Clinic Locations | Calgary Chiropractic & Physiotherapy",
-  description: "Find a BeActive Clinic near you. View maps, driving directions, phone numbers, opening hours, and practitioners available at our local Calgary branches."
+  title: "Our Clinic Locations | Calgary Physiotherapy & Rehabilitation",
+  description: "Find Nose Creek Physiotherapy Clinic in Calgary. View maps, driving directions, phone numbers, opening hours, and practitioners."
 };
 
 export default async function LocationsPage() {

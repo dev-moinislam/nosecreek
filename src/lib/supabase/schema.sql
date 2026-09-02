@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS services (
   symptoms JSONB DEFAULT '[]'::jsonb,
   treatment_approach JSONB DEFAULT '[]'::jsonb,
   custom_sections JSONB DEFAULT '[]'::jsonb,
+  sections_data JSONB DEFAULT '{}'::jsonb,
   faqs JSONB DEFAULT '[]'::jsonb,
   hidden_sections JSONB DEFAULT '[]'::jsonb,
   section_order JSONB DEFAULT '[]'::jsonb,
@@ -77,6 +78,7 @@ CREATE TABLE IF NOT EXISTS services (
 
 ALTER TABLE services ADD COLUMN IF NOT EXISTS hidden_sections JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE services ADD COLUMN IF NOT EXISTS section_order JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS sections_data JSONB DEFAULT '{}'::jsonb;
 
 DROP TRIGGER IF EXISTS update_services_modtime ON services;
 CREATE TRIGGER update_services_modtime
@@ -100,6 +102,7 @@ CREATE TABLE IF NOT EXISTS conditions (
   symptoms JSONB DEFAULT '[]'::jsonb,
   treatment_approach JSONB DEFAULT '[]'::jsonb,
   custom_sections JSONB DEFAULT '[]'::jsonb,
+  sections_data JSONB DEFAULT '{}'::jsonb,
   faqs JSONB DEFAULT '[]'::jsonb,
   hidden_sections JSONB DEFAULT '[]'::jsonb,
   section_order JSONB DEFAULT '[]'::jsonb,
@@ -111,6 +114,10 @@ CREATE TABLE IF NOT EXISTS conditions (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS hidden_sections JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS section_order JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS sections_data JSONB DEFAULT '{}'::jsonb;
 
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS side_image TEXT;
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS cta_text TEXT DEFAULT 'Book Assessment Online';
