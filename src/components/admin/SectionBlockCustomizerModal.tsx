@@ -10,9 +10,11 @@ import {
   XIcon,
   PlusIcon,
   TrashIcon,
-  SparklesIcon
+  SparklesIcon,
+  LinkIcon
 } from "./AdminIcons";
 import AdminImageUploader from "./AdminImageUploader";
+import InternalLinkPickerModal from "./InternalLinkPickerModal";
 
 interface SectionBlockCustomizerModalProps {
   isOpen: boolean;
@@ -47,6 +49,7 @@ export default function SectionBlockCustomizerModal({
   });
 
   const [newBullet, setNewBullet] = useState("");
+  const [pickerMode, setPickerMode] = useState<"cta" | "content" | null>(null);
 
   useEffect(() => {
     if (config) {
@@ -306,9 +309,31 @@ export default function SectionBlockCustomizerModal({
           {/* 3. Main Narrative Body Paragraphs (Shown on Story, Overview, or Bottom CTA) */}
           {(isMediaRichStory || isBottomCTA || isTestimonials) && (
             <div className="adm-form-group">
-              <label className="adm-form-label">
-                {isBottomCTA ? "Banner Message / Call-to-Action Text" : "Narrative Content (Paragraphs)"}
-              </label>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <label className="adm-form-label" style={{ margin: 0 }}>
+                  {isBottomCTA ? "Banner Message / Call-to-Action Text" : "Narrative Content (Paragraphs)"}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setPickerMode("content")}
+                  style={{
+                    background: "#eff6ff",
+                    border: "1px solid #bfdbfe",
+                    borderRadius: 6,
+                    padding: "3px 8px",
+                    fontSize: 11.5,
+                    fontWeight: 600,
+                    color: "#0369a1",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4
+                  }}
+                >
+                  <LinkIcon size={12} />
+                  <span>+ Insert Internal Page Link</span>
+                </button>
+              </div>
               <textarea
                 className="adm-textarea"
                 style={{ minHeight: isBottomCTA ? 70 : 100 }}
@@ -392,10 +417,32 @@ export default function SectionBlockCustomizerModal({
                 />
               </div>
               <div className="adm-form-group">
-                <label className="adm-form-label">Button URL / Link</label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <label className="adm-form-label" style={{ margin: 0 }}>Button URL / Link</label>
+                  <button
+                    type="button"
+                    onClick={() => setPickerMode("cta")}
+                    style={{
+                      background: "#eff6ff",
+                      border: "1px solid #bfdbfe",
+                      borderRadius: 6,
+                      padding: "3px 8px",
+                      fontSize: 11.5,
+                      fontWeight: 600,
+                      color: "#0369a1",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4
+                    }}
+                  >
+                    <LinkIcon size={12} />
+                    <span>Pick Internal Page</span>
+                  </button>
+                </div>
                 <input
                   type="text"
-                  placeholder="E.g., /contact or https://..."
+                  placeholder="E.g., /services/physiotherapy or /contact#booking"
                   className="adm-input"
                   value={formData.ctaHref || ""}
                   onChange={(e) => setFormData({ ...formData, ctaHref: e.target.value })}
@@ -430,8 +477,33 @@ export default function SectionBlockCustomizerModal({
               <span>Save Block Settings</span>
             </button>
           </div>
-
         </form>
+
+        {/* Internal Link Picker Modal */}
+        <InternalLinkPickerModal
+          isOpen={pickerMode !== null}
+          onClose={() => setPickerMode(null)}
+          onSelect={(url, title) => {
+            if (pickerMode === "cta") {
+              setFormData((prev) => ({
+                ...prev,
+                ctaHref: url,
+                ctaText: prev.ctaText || `Learn More About ${title}`
+              }));
+            } else if (pickerMode === "content") {
+              setFormData((prev) => ({
+                ...prev,
+                content: prev.content
+                  ? `${prev.content} [${title}](${url})`
+                  : `[${title}](${url})`
+              }));
+            }
+            setPickerMode(null);
+          }}
+          initialUrl={formData.ctaHref || ""}
+          modalTitle={pickerMode === "cta" ? "Select Button Destination Link" : "Insert Internal Link into Content"}
+          allowCustomText={true}
+        />
       </div>
     </div>
   );

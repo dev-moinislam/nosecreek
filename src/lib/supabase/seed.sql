@@ -1639,3 +1639,49 @@ ON CONFLICT (id) DO UPDATE SET
   author = EXCLUDED.author,
   text = EXCLUDED.text,
   rating = EXCLUDED.rating;
+
+-- ==============================================================================
+-- 9. SEED ADMIN & CLIENT USERS (HASHED PASSWORDS VIA BCRYPT)
+-- ==============================================================================
+-- Passwords & PINs are stored securely with bcrypt rounds=10.
+-- Master Admin:
+--   Username: admin (or admin@nosecreek.com)
+--   Password: admin123
+--   Quick PIN: 8590
+-- Client Editor:
+--   Username: client (or client@nosecreek.com)
+--   Password: client123
+--   Quick PIN: 1234
+
+INSERT INTO admin_users (username, email, password_hash, pin, full_name, role)
+VALUES (
+  'admin',
+  'admin@nosecreek.com',
+  '$2b$10$LRWASVSiDGpJdZ0IqkSMROxwgBi/s/e4Dyi0H1AdrO6NFHxxYUcqy',
+  '$2b$10$WEiJNS0bE5zCb5qFCBDtL.tKAjGpFbFVOpeiZUeUXgpvP2exBQFS6',
+  'Master Administrator',
+  'admin'
+)
+ON CONFLICT (username) DO UPDATE SET
+  email = EXCLUDED.email,
+  password_hash = EXCLUDED.password_hash,
+  pin = EXCLUDED.pin,
+  full_name = EXCLUDED.full_name,
+  role = EXCLUDED.role;
+
+INSERT INTO client_users (username, email, password_hash, pin, full_name, role)
+VALUES (
+  'client',
+  'client@nosecreek.com',
+  '$2b$10$3AjZM2TOmTbVayeJnV25XOHEoZWiEegYAsd16HAHRABMuAZZguV12',
+  '$2b$10$sMlv32pL3EOaVdWfjeYhaeN9UN7c1K8OWsFv1iMT.UoMed/N0JFpi',
+  'Clinic Manager (Client Mode)',
+  'client'
+)
+ON CONFLICT (username) DO UPDATE SET
+  email = EXCLUDED.email,
+  password_hash = EXCLUDED.password_hash,
+  pin = EXCLUDED.pin,
+  full_name = EXCLUDED.full_name,
+  role = EXCLUDED.role;
+

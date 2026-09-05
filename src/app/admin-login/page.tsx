@@ -108,13 +108,13 @@ export default function AdminLoginPage() {
         <form onSubmit={handleSubmit} style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
             <label style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
-              Admin Email
+              Admin Username or Email
             </label>
             <input
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@nosecreek.com"
+              placeholder="admin or admin@nosecreek.com"
               style={{
                 width: "100%",
                 padding: "11px 14px",

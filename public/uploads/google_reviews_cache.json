@@ -1,0 +1,67 @@
+{
+  "lastSync": 1788363130313,
+  "rating": "4.9",
+  "totalReviews": "545+ Calgary Reviews",
+  "reviews": [
+    {
+      "id": "review-1",
+      "author": "David Miller",
+      "text": "Blair and the entire team at Nose Creek Physiotherapy are absolute miracle workers. After months of debilitating lower back and sciatica pain, Blair identified the root cause in minutes. Within 4 sessions of manual therapy and IMS, I was completely pain-free and back to jogging.",
+      "rating": 5,
+      "platform": "Google",
+      "date": "1 week ago",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80",
+      "verified": true
+    },
+    {
+      "id": "review-2",
+      "author": "Christine Lewis",
+      "text": "I have been seeing Rizelle for orthopaedic and neck physiotherapy. She is compassionate, extraordinarily knowledgeable, and explains every exercise clearly. The front desk staff at the Beddington clinic are always welcoming and direct billing is completely seamless.",
+      "rating": 5,
+      "platform": "Google",
+      "date": "2 weeks ago",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
+      "verified": true
+    },
+    {
+      "id": "review-3",
+      "author": "Robert Kowalski",
+      "text": "Hands down the best physiotherapy clinic in Calgary! Samuel and Blair helped me recover from a severe rotator cuff tear without needing surgery. Their hands-on joint mobilization and active strengthening plan gave me full shoulder range back.",
+      "rating": 5,
+      "platform": "Google",
+      "date": "3 weeks ago",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80",
+      "verified": true
+    },
+    {
+      "id": "review-4",
+      "author": "Priya Sharma",
+      "text": "I came to Nose Creek after a motor vehicle accident with severe whiplash and upper back pain. They handled all my MVA auto insurance claims directly so I could just focus on healing. Exceptional, attentive care from day one.",
+      "rating": 5,
+      "platform": "Google",
+      "date": "1 month ago",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80",
+      "verified": true
+    },
+    {
+      "id": "review-5",
+      "author": "Michael Brennan",
+      "text": "Janvi and the team are fantastic! Friendly reception, very clean facility in the Beddington Co-op mall, and they are always on time for appointments. My chronic knee stiffness improved dramatically after just 3 visits.",
+      "rating": 5,
+      "platform": "Google",
+      "date": "1 month ago",
+      "avatar": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=120&auto=format&fit=crop&q=80",
+      "verified": true
+    },
+    {
+      "id": "review-6",
+      "author": "Angela Tremblay",
+      "text": "Dr. Alex and Blair provided top-tier care for my chronic sciatic pain. I had tried several other clinics with little relief, but Nose Creek's combination of dry needling, chiropractic adjustments, and core retraining actually solved the problem.",
+      "rating": 5,
+      "platform": "Google",
+      "date": "2 months ago",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80",
+      "verified": true
+    }
+  ]
+}

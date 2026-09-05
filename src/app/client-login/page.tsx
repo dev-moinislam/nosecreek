@@ -32,7 +32,7 @@ export default function ClientLoginPage() {
   const handleQuickClient = async () => {
     setLoading(true);
     setError(null);
-    const res = await login("client@nosecreek.com", "client123", "client");
+    const res = await login("client", "client123", "client");
     setLoading(false);
     if (res.success) {
       router.push("/admin");

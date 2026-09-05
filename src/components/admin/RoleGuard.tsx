@@ -59,72 +59,44 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = async (email: string, pass: string, chosenRole?: UserRole): Promise<{ success: boolean; error?: string }> => {
-    const trimmedEmail = email.trim().toLowerCase();
-    const trimmedPass = pass.trim();
+  const login = async (usernameOrEmail: string, passOrPin: string, chosenRole?: UserRole): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const res = await fetch("/api/admin/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usernameOrEmail,
+          passwordOrPin: passOrPin,
+          portal: chosenRole || "admin"
+        })
+      });
 
-    // 1. Check Supabase Auth if configured
-    if (isSupabaseConfigured && supabase) {
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: trimmedEmail,
-          password: trimmedPass
-        });
-        if (!error && data?.user) {
-          const userRole: UserRole =
-            (data.user.user_metadata?.role as UserRole) || chosenRole || "admin";
-          const authUser: AuthUser = {
-            email: data.user.email || trimmedEmail,
-            role: userRole,
-            name: data.user.user_metadata?.full_name || (userRole === "admin" ? "Master Admin" : "Clinic Client")
-          };
-          setUser(authUser);
-          setRoleState(userRole);
+      const data = await res.json();
+      if (res.ok && data.success && data.user) {
+        const authUser: AuthUser = {
+          email: data.user.email || (data.user.role === "admin" ? "admin@nosecreek.com" : "client@nosecreek.com"),
+          role: data.user.role,
+          name: data.user.full_name || (data.user.role === "admin" ? "Master Administrator" : "Clinic Manager")
+        };
+        setUser(authUser);
+        setRoleState(data.user.role);
+        if (typeof window !== "undefined") {
           localStorage.setItem("adm_auth_user", JSON.stringify(authUser));
-          return { success: true };
         }
-      } catch {
-        // fallthrough to standard credentials check
+        return { success: true };
       }
-    }
 
-    // 2. Built-in Master Credentials & PIN Check for 1-Click Instant Access
-    if (
-      (trimmedEmail === "admin@nosecreek.com" && trimmedPass === "admin123") ||
-      trimmedPass === "8590" || // Quick Admin PIN
-      (trimmedEmail === "admin" && trimmedPass === "admin")
-    ) {
-      const authUser: AuthUser = {
-        email: "admin@nosecreek.com",
-        role: "admin",
-        name: "Master Administrator"
+      return {
+        success: false,
+        error: data.error || "Invalid username, password, or PIN."
       };
-      setUser(authUser);
-      setRoleState("admin");
-      localStorage.setItem("adm_auth_user", JSON.stringify(authUser));
-      return { success: true };
-    }
-
-    if (
-      (trimmedEmail === "client@nosecreek.com" && trimmedPass === "client123") ||
-      trimmedPass === "1234" || // Quick Client Safe PIN
-      (trimmedEmail === "client" && trimmedPass === "client")
-    ) {
-      const authUser: AuthUser = {
-        email: "client@nosecreek.com",
-        role: "client",
-        name: "Clinic Manager (Client Mode)"
+    } catch (err: any) {
+      console.error("Login API request failed:", err);
+      return {
+        success: false,
+        error: "Unable to reach authentication server. Please try again."
       };
-      setUser(authUser);
-      setRoleState("client");
-      localStorage.setItem("adm_auth_user", JSON.stringify(authUser));
-      return { success: true };
     }
-
-    return {
-      success: false,
-      error: "Invalid login credentials. Please use your administrator email or access PIN."
-    };
   };
 
   const logout = () => {
@@ -132,6 +104,7 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== "undefined") {
       localStorage.removeItem("adm_auth_user");
     }
+    fetch("/api/admin/auth/logout", { method: "POST" }).catch(() => {});
     if (isSupabaseConfigured && supabase) {
       supabase.auth.signOut().catch(() => {});
     }

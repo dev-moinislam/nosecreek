@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import InternalLinkPickerModal from "@/components/admin/InternalLinkPickerModal";
 
 interface RichTextEditorProps {
   value: string;
@@ -20,6 +21,7 @@ export default function RichTextEditor({
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [showLinkModal, setShowLinkModal] = useState(false);
+  const [showInternalLinkPicker, setShowInternalLinkPicker] = useState(false);
   const [linkUrl, setLinkUrl] = useState("https://");
   const savedSelectionRef = useRef<Range | null>(null);
 
@@ -196,6 +198,21 @@ export default function RichTextEditor({
     setShowLinkModal(false);
   };
 
+  const handleSelectInternalLink = (url: string, title: string) => {
+    restoreSelection();
+    const sel = window.getSelection();
+    const selectedText = sel ? sel.toString().trim() : "";
+    const linkText = selectedText || title;
+
+    const linkHtml = `<a href="${url}" title="${title}" style="color: #0e78a8; text-decoration: underline; font-weight: 600;">${linkText}</a>&nbsp;`;
+    const success = document.execCommand("insertHTML", false, linkHtml);
+    if (!success && editorRef.current) {
+      editorRef.current.innerHTML += linkHtml;
+    }
+    handleInput();
+    setShowInternalLinkPicker(false);
+  };
+
   return (
     <div
       style={{
@@ -336,6 +353,25 @@ export default function RichTextEditor({
           style={{ ...btnStyle, color: "#0284c7", fontWeight: 700 }}
         >
           🔗 Add Link
+        </button>
+
+        <button
+          type="button"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            saveSelection();
+            setShowInternalLinkPicker(true);
+          }}
+          title="Link to Internal Service, Condition, or Clinic Page"
+          style={{
+            ...btnStyle,
+            background: "#eff6ff",
+            color: "#0369a1",
+            borderColor: "#bfdbfe",
+            fontWeight: 700
+          }}
+        >
+          🌐 Link Clinic Page
         </button>
 
         <button
@@ -521,6 +557,30 @@ export default function RichTextEditor({
                 outline: "none"
               }}
             />
+            <div style={{ marginTop: 8 }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLinkModal(false);
+                  setShowInternalLinkPicker(true);
+                }}
+                style={{
+                  background: "#eff6ff",
+                  border: "1px solid #bfdbfe",
+                  borderRadius: 6,
+                  padding: "6px 12px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "#0369a1",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6
+                }}
+              >
+                🌐 Or Browse Internal Services, Conditions &amp; Pages →
+              </button>
+            </div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
@@ -541,6 +601,15 @@ export default function RichTextEditor({
           </div>
         </div>
       )}
+
+      {/* ── INTERNAL LINK PICKER MODAL ── */}
+      <InternalLinkPickerModal
+        isOpen={showInternalLinkPicker}
+        onClose={() => setShowInternalLinkPicker(false)}
+        onSelect={(url, title) => handleSelectInternalLink(url, title)}
+        modalTitle="Insert Clinic Link into Article"
+        allowCustomText={true}
+      />
 
       {/* ── EDITOR BODY ── */}
       {isCodeView ? (

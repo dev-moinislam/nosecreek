@@ -341,3 +341,64 @@ DROP POLICY IF EXISTS "Public Media Deletes" ON storage.objects;
 CREATE POLICY "Public Media Deletes" ON storage.objects
 FOR DELETE USING (bucket_id = 'media');
 
+-- ==============================================================================
+-- 13. AUTHENTICATION & ACCESS CONTROL TABLES (SEPARATE ADMIN & CLIENT ACCOUNTS)
+-- ==============================================================================
+-- These two separate tables store hashed credentials for Master Admins and Client Editors.
+-- You can manually inspect or edit them at any time in the Supabase Table Editor.
+
+-- 13.1 Master Admin Accounts Table
+CREATE TABLE IF NOT EXISTS admin_users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  username TEXT UNIQUE NOT NULL,
+  email TEXT,
+  password_hash TEXT NOT NULL,
+  pin TEXT,
+  full_name TEXT DEFAULT 'Master Administrator',
+  role TEXT DEFAULT 'admin',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS update_admin_users_modtime ON admin_users;
+CREATE TRIGGER update_admin_users_modtime
+BEFORE UPDATE ON admin_users
+FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+-- 13.2 Client Accounts Table
+CREATE TABLE IF NOT EXISTS client_users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  username TEXT UNIQUE NOT NULL,
+  email TEXT,
+  password_hash TEXT NOT NULL,
+  pin TEXT,
+  full_name TEXT DEFAULT 'Clinic Manager',
+  role TEXT DEFAULT 'client',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS update_client_users_modtime ON client_users;
+CREATE TRIGGER update_client_users_modtime
+BEFORE UPDATE ON client_users
+FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+-- 13.3 Row Level Security for User Tables
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE client_users ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow server read admin_users" ON admin_users;
+CREATE POLICY "Allow server read admin_users" ON admin_users FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow server update admin_users" ON admin_users;
+CREATE POLICY "Allow server update admin_users" ON admin_users FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Allow server read client_users" ON client_users;
+CREATE POLICY "Allow server read client_users" ON client_users FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow server update client_users" ON client_users;
+CREATE POLICY "Allow server update client_users" ON client_users FOR UPDATE USING (true);
+
+
