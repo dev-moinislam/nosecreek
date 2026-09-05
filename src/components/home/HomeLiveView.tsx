@@ -9,6 +9,7 @@ import ReviewCarousel from "@/components/ui/ReviewCarousel";
 import ConditionTiles from "@/components/ui/ConditionTiles";
 import HomeServicesGrid from "@/components/ui/HomeServicesGrid";
 import VisitUsSection from "@/components/content/VisitUsSection";
+import FormattedNarrative from "@/components/ui/FormattedNarrative";
 
 interface HomeLiveViewProps {
   initialHomeData: HomePageData;
@@ -748,9 +749,11 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
               </p>
             )}
             {section.content && (
-              <p style={{ marginTop: 16, fontSize: 16, lineHeight: 1.7, color: descColor }}>
-                {section.content}
-              </p>
+              <FormattedNarrative
+                content={section.content}
+                isDark={isDark}
+                paragraphStyle={{ marginTop: 16, fontSize: 16, lineHeight: 1.7, color: descColor }}
+              />
             )}
 
             {section.bullets && section.bullets.length > 0 && (

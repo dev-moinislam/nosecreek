@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import TeamCarousel from "@/components/ui/TeamCarousel";
+import FormattedNarrative from "@/components/ui/FormattedNarrative";
 import { Condition, Service, TeamMember, SectionBlockConfig } from "@/types/content";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import VisitUsSection from "./VisitUsSection";
@@ -280,11 +281,11 @@ export default function ConditionLiveView({
                     </div>
                   )}
 
-                  <div style={{ fontSize: "clamp(15.5px, 1.1vw, 17px)", lineHeight: 1.75, color: isDark ? "#cbdbe4" : "#48535c", marginBottom: 24 }}>
-                    {(cfg?.content || condition.description || "").split("\n\n").map((para, pIdx) => (
-                      <p key={pIdx} style={{ marginBottom: 14 }}>{para}</p>
-                    ))}
-                  </div>
+                  <FormattedNarrative
+                    content={cfg?.content || condition.description || ""}
+                    isDark={isDark}
+                    style={{ fontSize: "clamp(15.5px, 1.1vw, 17px)", lineHeight: 1.75, color: isDark ? "#cbdbe4" : "#48535c", marginBottom: 24 }}
+                  />
 
                   {cfg?.bullets && cfg.bullets.length > 0 && (
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginTop: 20 }}>
@@ -378,11 +379,11 @@ export default function ConditionLiveView({
                           </div>
                         )}
 
-                        <div style={{ fontSize: "clamp(15.5px, 1.1vw, 17px)", lineHeight: 1.75, color: isDark ? "#cbdbe4" : "#48535c", marginBottom: 24 }}>
-                          {(sec.content || "").split("\n\n").map((para, pIdx) => (
-                            <p key={pIdx} style={{ marginBottom: 14 }}>{para}</p>
-                          ))}
-                        </div>
+                        <FormattedNarrative
+                          content={sec.content || ""}
+                          isDark={isDark}
+                          style={{ fontSize: "clamp(15.5px, 1.1vw, 17px)", lineHeight: 1.75, color: isDark ? "#cbdbe4" : "#48535c", marginBottom: 24 }}
+                        />
 
                         {sec.bullets && sec.bullets.length > 0 && (
                           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, marginBottom: 28 }}>
@@ -706,6 +707,19 @@ export default function ConditionLiveView({
                     {c.name} &rarr;
                   </Link>
                 ))}
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 32, flexWrap: "wrap" }}>
+                <Link href="/conditions" style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
+                  Browse All Conditions &rarr;
+                </Link>
+                <span style={{ color: "#cbd5e1" }}>|</span>
+                <Link href="/services" style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
+                  Our Clinical Services &rarr;
+                </Link>
+                <span style={{ color: "#cbd5e1" }}>|</span>
+                <Link href="/" style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
+                  Return to Homepage &rarr;
+                </Link>
               </div>
             </div>
           </section>

@@ -5,7 +5,8 @@ import ServiceLiveView from "@/components/content/ServiceLiveView";
 import {
   getServiceBySlug,
   getTeamMembers,
-  getConditions
+  getConditions,
+  getServices
 } from "@/lib/api";
 
 interface PageProps {
@@ -52,9 +53,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   }
 
   // Cross-reference data
-  const [allTeam, allConditions] = await Promise.all([
+  const [allTeam, allConditions, allServices] = await Promise.all([
     getTeamMembers(),
-    getConditions()
+    getConditions(),
+    getServices()
   ]);
 
   return (
@@ -73,6 +75,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         initialService={service}
         allTeam={allTeam}
         allConditions={allConditions}
+        allServices={allServices}
       />
     </div>
   );
