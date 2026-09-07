@@ -45,9 +45,37 @@
   line-height: 1.5;
 }
 
+/* Global borderless modern scrollbars across Admin panels */
+.adm-app ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.adm-app ::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.adm-app ::-webkit-scrollbar-track,
+.adm-app ::-webkit-scrollbar-track-piece {
+  background: transparent !important;
+}
+
+.adm-app ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+  border: none !important;
+}
+
+.adm-app ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
 /* Sidebar */
 .adm-sidebar {
   width: 260px;
+  flex-shrink: 0;
   background-color: var(--adm-sidebar);
   color: var(--adm-text-white);
   display: flex;
@@ -58,9 +86,11 @@
   z-index: 40;
   border-right: 1px solid var(--adm-border-dark);
   transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .adm-sidebar-brand {
+  flex-shrink: 0;
   padding: 20px 24px;
   display: flex;
   align-items: center;
@@ -69,6 +99,7 @@
 }
 
 .adm-brand-icon {
+  flex-shrink: 0;
   width: 38px;
   height: 38px;
   background: linear-gradient(135deg, var(--adm-primary), #38bdf8);
@@ -100,9 +131,53 @@
   flex: 1;
   padding: 16px 12px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+/* Chrome, Edge, Safari WebKit Scrollbar Styling: Borderless & Transparent Track */
+.adm-sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.adm-sidebar-nav::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.adm-sidebar-nav::-webkit-scrollbar-track,
+.adm-sidebar-nav::-webkit-scrollbar-track-piece {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.adm-sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  border: none !important;
+  transition: background 0.2s ease;
+}
+
+.adm-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.adm-sidebar-nav::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.adm-sidebar-footer {
+  flex-shrink: 0;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--adm-sidebar);
 }
 
 .adm-nav-group-title {
