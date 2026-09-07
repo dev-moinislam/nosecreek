@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,10 +31,12 @@ export async function POST(req: NextRequest) {
     const storagePath = `${folder}/${cleanFileName}`;
 
     let uploadedUrl = "";
+    let uploadErrorMessage = "";
 
     // 1. Try uploading to Supabase Storage Bucket ('media')
-    if (isSupabaseConfigured && supabase) {
+    if (supabaseUrl && supabaseAnonKey && supabaseUrl !== "https://your-project.supabase.co") {
       try {
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("media")
           .upload(storagePath, buffer, {
@@ -44,15 +49,17 @@ export async function POST(req: NextRequest) {
           if (publicData?.publicUrl) {
             uploadedUrl = publicData.publicUrl;
           }
-        } else {
-          console.warn("Supabase Storage bucket upload notice:", uploadError?.message);
+        } else if (uploadError) {
+          uploadErrorMessage = uploadError.message;
+          console.warn("Supabase Storage bucket upload notice:", uploadError.message);
         }
-      } catch (sbErr) {
+      } catch (sbErr: any) {
+        uploadErrorMessage = sbErr?.message || "Storage upload exception";
         console.warn("Supabase upload exception:", sbErr);
       }
     }
 
-    // 2. Also save to local public/uploads for local development and fallback
+    // 2. Also save to local public/uploads for local development and offline fallback
     try {
       const publicUploadsDir = path.join(process.cwd(), "public", "uploads");
       if (!fs.existsSync(publicUploadsDir)) {
@@ -65,11 +72,18 @@ export async function POST(req: NextRequest) {
         uploadedUrl = `/uploads/${cleanFileName}`;
       }
     } catch (fsErr) {
-      console.warn("Local disk write note:", fsErr);
+      // Expected to fail silently on Vercel's read-only serverless filesystem
+      console.warn("Local disk write note (expected on serverless read-only disk):", fsErr);
     }
 
     if (!uploadedUrl) {
-      return NextResponse.json({ error: "Failed to upload image to storage" }, { status: 500 });
+      const hint = !supabaseUrl || !supabaseAnonKey
+        ? "Database/Storage is not configured on Vercel. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel Environment Variables."
+        : uploadErrorMessage
+          ? `Supabase Storage error: ${uploadErrorMessage}. Make sure a public bucket named 'media' exists in Supabase Dashboard -> Storage.`
+          : "Failed to upload image to storage.";
+
+      return NextResponse.json({ error: hint }, { status: 500 });
     }
 
     return NextResponse.json({
