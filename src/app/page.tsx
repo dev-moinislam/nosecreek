@@ -15,6 +15,8 @@ export const metadata = {
     "Physiotherapy in Calgary North (Beddington). Since 2001, restoring mobility, strength & balance naturally. Direct insurance billing, open evenings & Saturdays."
 };
 
+export const revalidate = 0;
+
 export default async function HomePage() {
   const [homeData, allTeam, blogPosts, services, conditions, testimonials] = await Promise.all([
     getHomeContent(),

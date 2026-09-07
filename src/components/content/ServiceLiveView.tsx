@@ -75,7 +75,7 @@ export default function ServiceLiveView({
 }) {
   const [service, setService] = useState<Service>(initialService);
 
-  // Real-time synchronization with local admin updates
+  // Real-time synchronization with local admin updates & live database
   useEffect(() => {
     function syncFromLocal() {
       try {
@@ -85,11 +85,52 @@ export default function ServiceLiveView({
           const found = list.find((s) => s.slug === initialService.slug || s.id === initialService.id);
           if (found) {
             setService(found);
+            return;
           }
         }
       } catch {
         // ignore
       }
+    }
+
+    // 1. Sync from local storage immediately on mount
+    syncFromLocal();
+
+    // 2. Fetch fresh live data from Supabase on mount
+    if (isSupabaseConfigured && supabase) {
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from("services")
+            .select("*")
+            .eq("slug", initialService.slug)
+            .eq("is_published", true)
+            .single();
+
+          if (!error && data) {
+            setService((prev) => ({
+              ...prev,
+              title: data.title || prev.title,
+              heroImage: data.hero_image !== undefined ? data.hero_image : prev.heroImage,
+              sideImage: data.side_image !== undefined ? data.side_image : prev.sideImage,
+              cardImage: data.card_image || data.seo?.cardImage || prev.cardImage,
+              description: data.description || prev.description,
+              shortDescription: data.short_description || prev.shortDescription,
+              benefits: data.benefits || prev.benefits,
+              symptoms: data.symptoms || prev.symptoms,
+              treatmentApproach: data.treatment_approach || prev.treatmentApproach,
+              customSections: data.custom_sections || prev.customSections,
+              sectionsData: data.sections_data || data.seo?.sectionsData || prev.sectionsData,
+              faqs: data.faqs || prev.faqs,
+              hiddenSections: data.hidden_sections || prev.hiddenSections,
+              sectionOrder: data.section_order || prev.sectionOrder,
+              seo: data.seo || prev.seo
+            }));
+          }
+        } catch {
+          // ignore
+        }
+      })();
     }
 
     window.addEventListener("servicesUpdated", syncFromLocal);

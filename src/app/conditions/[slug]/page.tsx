@@ -14,6 +14,7 @@ interface PageProps {
 }
 
 export const dynamicParams = true;
+export const revalidate = 0;
 
 export async function generateStaticParams() {
   const conditions = await getConditions();
