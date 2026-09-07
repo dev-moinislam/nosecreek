@@ -2,97 +2,15 @@
 
 import { useEffect } from "react";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
+import { ThemeColors, defaultTheme, themePresets, adjustHex, buildThemeCss } from "@/lib/theme";
 
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  dark: string;
-  accent: string;
-  bgLight: string;
-}
-
-export const defaultTheme: ThemeColors = {
-  primary: "#1c9fd8",    // Nose Creek Cyan Blue
-  secondary: "#6faf1c",  // Clinical Leaf Green
-  dark: "#12303d",       // Deep Slate Teal
-  accent: "#8cc63f",     // Bright Lime Green
-  bgLight: "#f8fafc"     // Soft Light Background
-};
-
-export const themePresets: { name: string; colors: ThemeColors }[] = [
-  {
-    name: "Classic Nose Creek",
-    colors: {
-      primary: "#1c9fd8",
-      secondary: "#6faf1c",
-      dark: "#12303d",
-      accent: "#8cc63f",
-      bgLight: "#f8fafc"
-    }
-  },
-  {
-    name: "Deep Ocean Navy",
-    colors: {
-      primary: "#0284c7",
-      secondary: "#0d9488",
-      dark: "#0f172a",
-      accent: "#38bdf8",
-      bgLight: "#f0f9ff"
-    }
-  },
-  {
-    name: "Modern Emerald Health",
-    colors: {
-      primary: "#059669",
-      secondary: "#10b981",
-      dark: "#064e3b",
-      accent: "#34d399",
-      bgLight: "#ecfdf5"
-    }
-  },
-  {
-    name: "Royal Purple Clinical",
-    colors: {
-      primary: "#7c3aed",
-      secondary: "#0284c7",
-      dark: "#1e1b4b",
-      accent: "#a855f7",
-      bgLight: "#faf5ff"
-    }
-  },
-  {
-    name: "Warm Sunset Orange",
-    colors: {
-      primary: "#d97706",
-      secondary: "#ea580c",
-      dark: "#292524",
-      accent: "#f59e0b",
-      bgLight: "#fffbeb"
-    }
-  }
-];
-
-function adjustHex(hex: string, amount: number): string {
-  try {
-    let clean = hex.replace("#", "");
-    if (clean.length === 3) {
-      clean = clean.split("").map((c) => c + c).join("");
-    }
-    const num = parseInt(clean, 16);
-    const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-    const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount));
-    const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount));
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-  } catch {
-    return hex;
-  }
-}
+export { defaultTheme, themePresets, buildThemeCss };
+export type { ThemeColors };
 
 export function applyThemeTokens(colors: ThemeColors) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   const primaryDark = adjustHex(colors.primary, -25);
-  const secondaryDark = adjustHex(colors.secondary, -25);
 
   // Set standard tokens on documentElement
   root.style.setProperty("--nc-blue", colors.primary);
@@ -129,32 +47,10 @@ export function applyThemeTokens(colors: ThemeColors) {
     document.head.appendChild(styleEl);
   }
 
-  styleEl.innerHTML = `
-    :root {
-      --nc-blue: ${colors.primary} !important;
-      --nc-blue-dark: ${primaryDark} !important;
-      --primary: ${colors.primary} !important;
-      --primary-hover: ${primaryDark} !important;
-      --color-primary: ${colors.primary} !important;
-      --nc-green: ${colors.secondary} !important;
-      --nc-green-light: ${colors.accent || colors.secondary} !important;
-      --secondary: ${colors.secondary} !important;
-      --secondary-hover: ${colors.accent || colors.secondary} !important;
-      --color-secondary: ${colors.secondary} !important;
-      --accent: ${colors.accent || colors.secondary} !important;
-      --color-accent: ${colors.accent || colors.secondary} !important;
-      --nc-dark: ${colors.dark} !important;
-      --dark: ${colors.dark} !important;
-      --color-dark: ${colors.dark} !important;
-      --nc-bg-blue: ${colors.bgLight || "#f2f8fb"} !important;
-      --bg-offset: ${colors.bgLight || "#f8fafc"} !important;
-      --adm-primary: ${colors.primary} !important;
-      --adm-sidebar: ${colors.dark} !important;
-    }
-  `;
+  styleEl.innerHTML = buildThemeCss(colors);
 }
 
-export default function ThemeApplier() {
+export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeColors }) {
   useEffect(() => {
     function loadAndApplyTheme() {
       try {
@@ -162,9 +58,14 @@ export default function ThemeApplier() {
         if (saved) {
           const colors: ThemeColors = JSON.parse(saved);
           applyThemeTokens(colors);
+          return;
         }
       } catch {
         // ignore
+      }
+
+      if (initialTheme) {
+        applyThemeTokens(initialTheme);
       }
     }
 
@@ -175,18 +76,20 @@ export default function ThemeApplier() {
     if (isSupabaseConfigured && supabase) {
       (async () => {
         try {
-          const { data } = await supabase
+          const { data, error } = await supabase
             .from("site_settings")
-            .select("theme_colors, marketing")
+            .select("marketing")
             .eq("id", "main")
             .single();
 
-          const colors = data?.theme_colors || (data?.marketing as any)?.theme_colors;
-          if (colors) {
-            applyThemeTokens(colors);
-            try {
-              localStorage.setItem("site_theme_colors", JSON.stringify(colors));
-            } catch {}
+          if (!error && data?.marketing) {
+            const colors = (data.marketing as any)?.theme_colors;
+            if (colors) {
+              applyThemeTokens(colors);
+              try {
+                localStorage.setItem("site_theme_colors", JSON.stringify(colors));
+              } catch {}
+            }
           }
         } catch {
           // ignore error
@@ -201,7 +104,7 @@ export default function ThemeApplier() {
       window.removeEventListener("storage", loadAndApplyTheme);
       window.removeEventListener("themeChanged", loadAndApplyTheme);
     };
-  }, []);
+  }, [initialTheme]);
 
   return null;
 }

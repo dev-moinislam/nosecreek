@@ -17,6 +17,7 @@ export default function ThemeCustomizerModal({
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    let found = false;
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("site_theme_colors");
       if (saved) {
@@ -24,10 +25,36 @@ export default function ThemeCustomizerModal({
           const parsed = JSON.parse(saved);
           setColors(parsed);
           setInitialColors(parsed);
+          found = true;
         } catch {
           // ignore
         }
       }
+    }
+
+    if (!found && isSupabaseConfigured && supabase) {
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from("site_settings")
+            .select("marketing")
+            .eq("id", "main")
+            .single();
+
+          if (!error && data?.marketing) {
+            const dbTheme = (data.marketing as any)?.theme_colors;
+            if (dbTheme) {
+              setColors(dbTheme);
+              setInitialColors(dbTheme);
+              try {
+                localStorage.setItem("site_theme_colors", JSON.stringify(dbTheme));
+              } catch {}
+            }
+          }
+        } catch {
+          // ignore
+        }
+      })();
     }
   }, [isOpen]);
 
@@ -77,17 +104,12 @@ export default function ThemeCustomizerModal({
           const { error } = await supabase
             .from("site_settings")
             .update({
-              theme_colors: colors,
               marketing: mergedMarketing
             })
             .eq("id", "main");
 
           if (error) {
-            // Fallback if theme_colors column is not in DB table
-            await supabase
-              .from("site_settings")
-              .update({ marketing: mergedMarketing })
-              .eq("id", "main");
+            console.warn("Supabase marketing theme update error:", error);
           }
         } catch (dbErr) {
           console.warn("Supabase theme sync error, saved locally:", dbErr);

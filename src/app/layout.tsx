@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SiteLayout from "@/components/layout/SiteLayout";
 import ThemeApplier from "@/components/theme/ThemeApplier";
+import { buildThemeCss, ThemeColors } from "@/lib/theme";
 import { RoleProvider } from "@/components/admin/RoleGuard";
 import settingsData from "@/data/settings.json";
+import { getSiteSettings } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: {
@@ -45,15 +47,27 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+  const serverThemeColors = ((settings as any)?.marketing?.theme_colors || (settings as any)?.themeColors) as ThemeColors | undefined;
+  const serverThemeCss = serverThemeColors ? buildThemeCss(serverThemeColors) : null;
+
   return (
     <html lang="en">
+      <head>
+        {serverThemeCss && (
+          <style
+            id="nc-ssr-theme-style"
+            dangerouslySetInnerHTML={{ __html: serverThemeCss }}
+          />
+        )}
+      </head>
       <body>
-        <ThemeApplier />
+        <ThemeApplier initialTheme={serverThemeColors} />
         <RoleProvider>
           <SiteLayout>{children}</SiteLayout>
         </RoleProvider>
