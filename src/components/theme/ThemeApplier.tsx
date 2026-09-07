@@ -177,14 +177,15 @@ export default function ThemeApplier() {
         try {
           const { data } = await supabase
             .from("site_settings")
-            .select("theme_colors")
+            .select("theme_colors, marketing")
             .eq("id", "main")
             .single();
 
-          if (data && data.theme_colors) {
-            applyThemeTokens(data.theme_colors);
+          const colors = data?.theme_colors || (data?.marketing as any)?.theme_colors;
+          if (colors) {
+            applyThemeTokens(colors);
             try {
-              localStorage.setItem("site_theme_colors", JSON.stringify(data.theme_colors));
+              localStorage.setItem("site_theme_colors", JSON.stringify(colors));
             } catch {}
           }
         } catch {

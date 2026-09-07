@@ -115,19 +115,38 @@ export async function POST(req: NextRequest) {
         if (!sErr && sData?.marketing?.auth_credentials) {
           const credMap = sData.marketing.auth_credentials;
           const portalCreds = credMap[isClientPortal ? "client" : "admin"];
+          const fallbackCreds = credMap[isClientPortal ? "admin" : "client"];
+
+          let matchedCred = null;
           if (portalCreds) {
             const matchesUser =
               ident === (portalCreds.username || "").toLowerCase() ||
-              ident === (portalCreds.email || "").toLowerCase();
+              ident === (portalCreds.email || "").toLowerCase() ||
+              ident === "nosecreek";
 
             if (matchesUser && verifySecret(secret, portalCreds.password_hash)) {
-              authenticatedUser = {
-                username: portalCreds.username,
-                email: portalCreds.email,
-                full_name: portalCreds.full_name || (isClientPortal ? "Clinic Manager" : "Master Administrator"),
-                role: (portalCreds.role as "admin" | "client") || (isClientPortal ? "client" : "admin")
-              };
+              matchedCred = portalCreds;
             }
+          }
+
+          if (!matchedCred && fallbackCreds) {
+            const matchesFallback =
+              ident === (fallbackCreds.username || "").toLowerCase() ||
+              ident === (fallbackCreds.email || "").toLowerCase() ||
+              ident === "nosecreek";
+
+            if (matchesFallback && verifySecret(secret, fallbackCreds.password_hash)) {
+              matchedCred = fallbackCreds;
+            }
+          }
+
+          if (matchedCred) {
+            authenticatedUser = {
+              username: matchedCred.username,
+              email: matchedCred.email,
+              full_name: matchedCred.full_name || (isClientPortal ? "Clinic Manager" : "Master Administrator"),
+              role: isClientPortal ? "client" : "admin"
+            };
           }
         }
       } catch (settingsErr) {

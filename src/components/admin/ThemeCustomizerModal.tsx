@@ -62,18 +62,31 @@ export default function ThemeCustomizerModal({
 
       if (isSupabaseConfigured && supabase) {
         try {
+          // Fetch existing marketing data to safely merge
+          const { data: cur } = await supabase
+            .from("site_settings")
+            .select("marketing")
+            .eq("id", "main")
+            .single();
+
+          const mergedMarketing = {
+            ...(cur?.marketing || {}),
+            theme_colors: colors
+          };
+
           const { error } = await supabase
             .from("site_settings")
-            .update({ theme_colors: colors })
+            .update({
+              theme_colors: colors,
+              marketing: mergedMarketing
+            })
             .eq("id", "main");
 
           if (error) {
-            // If theme_colors column is pending in DB, store inside marketing payload
+            // Fallback if theme_colors column is not in DB table
             await supabase
               .from("site_settings")
-              .update({
-                marketing: { theme_colors: colors }
-              })
+              .update({ marketing: mergedMarketing })
               .eq("id", "main");
           }
         } catch (dbErr) {
