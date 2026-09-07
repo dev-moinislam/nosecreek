@@ -6,6 +6,9 @@ export interface SEOData {
   ogDescription?: string;
   ogImage?: string;
   noIndex?: boolean;
+  cardImage?: string | null;
+  sectionsData?: any;
+  [key: string]: any;
 }
 
 export interface FAQItem {

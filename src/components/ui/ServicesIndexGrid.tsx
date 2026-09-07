@@ -18,39 +18,63 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
   );
 
   useEffect(() => {
-    function sync() {
+    let isMounted = true;
+
+    async function syncServices() {
       try {
-        const saved = localStorage.getItem("adm_services");
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map<string, Service>();
-            (defaultServicesData as Service[]).forEach((s) => map.set(s.slug, s));
-            parsed.forEach((p) => {
-              if (map.has(p.slug)) {
-                map.set(p.slug, { ...map.get(p.slug)!, ...p });
-              } else {
-                map.set(p.slug, p);
+        // 1. Fetch fresh authoritative list from Supabase / API
+        const fresh = await getServices();
+        let list = Array.isArray(fresh) && fresh.length > 0 ? fresh : (initialServices || (defaultServicesData as Service[]));
+
+        // 2. Overlay any active localStorage draft updates
+        if (typeof window !== "undefined") {
+          const saved = localStorage.getItem("adm_services");
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                const map = new Map<string, Service>();
+                list.forEach((s) => map.set(s.slug, s));
+                parsed.forEach((p) => {
+                  if (map.has(p.slug)) {
+                    const existing = map.get(p.slug)!;
+                    const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : existing.cardImage;
+                    const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : existing.heroImage;
+                    map.set(p.slug, { ...existing, ...p, cardImage, heroImage });
+                  } else {
+                    map.set(p.slug, p);
+                  }
+                });
+                list = Array.from(map.values());
               }
-            });
-            setServices(Array.from(map.values()));
+            } catch {}
           }
         }
-      } catch {}
+
+        if (isMounted) {
+          setServices(list);
+        }
+      } catch (err) {
+        console.warn("Failed to sync services in ServicesIndexGrid", err);
+      }
     }
-    sync();
-    window.addEventListener("servicesUpdated", sync);
-    window.addEventListener("storage", sync);
+
+    syncServices();
+    window.addEventListener("servicesUpdated", syncServices);
+    window.addEventListener("storage", syncServices);
     return () => {
-      window.removeEventListener("servicesUpdated", sync);
-      window.removeEventListener("storage", sync);
+      isMounted = false;
+      window.removeEventListener("servicesUpdated", syncServices);
+      window.removeEventListener("storage", syncServices);
     };
-  }, []);
+  }, [initialServices]);
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
       {services.map((svc) => {
-        const imageSrc = svc.cardImage || null;
+        const imageSrc = (svc.cardImage && svc.cardImage.trim() !== "")
+          ? svc.cardImage
+          : (svc.heroImage && svc.heroImage.trim() !== "" ? svc.heroImage : null);
         const hasImage = Boolean(imageSrc && imageSrc.trim() !== "");
         return (
           <Link

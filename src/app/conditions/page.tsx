@@ -9,6 +9,9 @@ export const metadata = {
   description: "Explore the wide range of musculoskeletal, spinal, and sports injury conditions treated at Nose Creek Physiotherapy in Calgary NW & NE."
 };
 
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 const eyebrow = (text: string, color = "#1c9fd8") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
     {text}

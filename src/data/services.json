@@ -7,7 +7,7 @@
     "description": "Our physiotherapy services are designed to help you regain motion, strength, and functionality. We address acute or chronic pain, post-surgical recovery, sports injuries, and mobility restrictions using evidence-based clinical techniques, manual manipulation, and progressive exercise rehabilitation.",
     "heroImage": "/uploads/services-post-surgery_rehabilitation-1788707357516.webp",
     "sideImage": "/images/clinic/reception-four.jpg",
-    "cardImage": "",
+    "cardImage": "https://vrhrqljixrsckdkstier.supabase.co/storage/v1/object/public/media/services/services-images-1788797959736.jpg",
     "iconType": "heart-pulse",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -178,7 +178,67 @@
       "title": "Physiotherapy in Calgary North | Nose Creek Physiotherapy",
       "ogTitle": "Physiotherapy Services | Nose Creek Physiotherapy",
       "description": "Expert hands-on physiotherapy to restore mobility, strength and balance. Extended health direct billing available in Calgary.",
-      "ogDescription": "Restore mobility, strength, and balance naturally with our certified Calgary physiotherapists."
+      "ogDescription": "Restore mobility, strength, and balance naturally with our certified Calgary physiotherapists.",
+      "cardImage": "https://vrhrqljixrsckdkstier.supabase.co/storage/v1/object/public/media/services/services-images-1788797959736.jpg",
+      "sectionsData": {
+        "hero": {
+          "image": "/uploads/services-post-surgery_rehabilitation-1788707357516.webp",
+          "bullets": [
+            "Direct Billing Available",
+            "No Referral Needed",
+            "Free Dedicated Parking"
+          ],
+          "ctaText": "More about physiotherapy"
+        },
+        "benefits": {
+          "align": "left",
+          "image": "",
+          "title": "key benifit",
+          "bullets": [
+            "amar",
+            "nam",
+            "moin"
+          ],
+          "content": "",
+          "ctaHref": "",
+          "ctaText": "",
+          "eyebrow": "proven clinic protocal",
+          "subtitle": "",
+          "background": "white",
+          "eyebrowColor": "#1c9fd8",
+          "imagePosition": "none"
+        },
+        "testimonials": {
+          "align": "left",
+          "image": "",
+          "title": "545+ Five-Star Reviews in Calgary",
+          "bullets": [],
+          "content": "hi i am moin",
+          "ctaHref": "",
+          "ctaText": "",
+          "eyebrow": "Real Patient Stories kmn aso",
+          "subtitle": "",
+          "background": "light",
+          "eyebrowColor": "#1c9fd8",
+          "imagePosition": "none"
+        },
+        "custom_sections": {
+          "align": "left",
+          "image": "/uploads/homepage-post-surgery_rehabilitation-1788639532821.webp",
+          "title": "custom visual",
+          "bullets": [
+            "key"
+          ],
+          "content": "ki koro tumi",
+          "ctaHref": "#homepage",
+          "ctaText": "book now",
+          "eyebrow": "proven clinic",
+          "subtitle": "nothing",
+          "background": "white",
+          "eyebrowColor": "#1c9fd8",
+          "imagePosition": "top"
+        }
+      }
     }
   },
   {
@@ -189,7 +249,7 @@
     "description": "Our Registered Massage Therapy (RMT) treatments utilize deep tissue techniques, trigger point release, and myofascial therapy to relieve tension, reduce physiological stress, and accelerate musculoskeletal recovery.",
     "heroImage": "/images/clinic/reception-four.jpg",
     "sideImage": "/images/clinic/reception-three.jpg",
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "sparkles",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
@@ -276,10 +336,11 @@
       "review-2"
     ],
     "seo": {
-      "title": "Registered Massage Therapy (RMT) Calgary | Nose Creek",
-      "ogTitle": "Registered Massage Therapy | Nose Creek Physiotherapy",
-      "description": "Therapeutic, deep tissue, and relaxation massage therapy by Registered Massage Therapists in Calgary NW & NE.",
-      "ogDescription": "Soothe muscle tension and speed injury recovery with our licensed RMTs in Calgary."
+      "title": "Massage Therapy Calgary North | Nose Creek Physiotherapy",
+      "ogTitle": "Registered Massage Therapy | Calgary NE & NW",
+      "description": "Relieve tension, melt knots, and reduce stress with 2200-hour Registered Massage Therapists in Calgary North. Direct billing available.",
+      "ogDescription": "Soothe muscle tension and speed injury recovery with our licensed RMTs in Calgary.",
+      "cardImage": ""
     }
   },
   {
@@ -290,7 +351,7 @@
     "description": "Our Traditional Chinese Medicine (TCM) and anatomical medical acupuncture treatments stimulate specific neuro-pathways, release deep intramuscular trigger points, and encourage the nervous system to release natural pain-relieving endorphins.",
     "heroImage": "/images/clinic/clinic-mobile.jpg",
     "sideImage": null,
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "needle",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
@@ -351,10 +412,11 @@
     ],
     "testimonials": [],
     "seo": {
-      "title": "Acupuncture & TCM in Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Acupuncture Treatment | Nose Creek Physiotherapy",
-      "description": "Licensed acupuncture and TCM treatments in Calgary to relieve chronic pain, headaches, and muscle tension naturally.",
-      "ogDescription": "Ease chronic pain, headaches, and muscle tension with licensed acupuncture care in Calgary."
+      "title": "Acupuncture Calgary North | Nose Creek Physiotherapy",
+      "ogTitle": "TCM Acupuncture & Pain Relief | Calgary NE & NW",
+      "description": "Traditional Chinese Medicine acupuncture by Dr. Eileen Wei in Calgary North. Effective relief for chronic pain, migraines, insomnia, and stress.",
+      "ogDescription": "Ease chronic pain, headaches, and muscle tension with licensed acupuncture care in Calgary.",
+      "cardImage": ""
     }
   },
   {
@@ -365,7 +427,7 @@
     "description": "At Nose Creek Physiotherapy in Calgary North, our chiropractic care focuses on the vital relationship between your spine, nervous system, and musculoskeletal health. Dr. Alex Toutant combines gentle spinal manipulations, soft tissue mobilization, cupping, and active rehabilitation to help you move faster, reduce joint stiffness, and live an active, medication-free life.",
     "heroImage": "/images/clinic/reception-desktop.jpg",
     "sideImage": "/images/clinic/reception-three.jpg",
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "shield",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -464,7 +526,8 @@
       "title": "Chiropractor Calgary North | Nose Creek Physiotherapy",
       "ogTitle": "Chiropractic Care Calgary North | Dr. Alex Toutant",
       "description": "Expert chiropractic care by Dr. Alex Toutant in Calgary North. Gentle spinal adjustments, cupping, and active rehabilitation. Direct billing available.",
-      "ogDescription": "Rediscover your mobility and reduce pain with chiropractic care at Nose Creek."
+      "ogDescription": "Rediscover your mobility and reduce pain with chiropractic care at Nose Creek.",
+      "cardImage": ""
     }
   },
   {
@@ -475,7 +538,7 @@
     "description": "Extracorporeal Shockwave Therapy (ESWT) delivers acoustic soundwaves deep into injured tendons and soft tissues, stimulating blood vessel formation, breaking down calcifications, and reactivating the body's natural cellular repair cycle.",
     "heroImage": "/images/clinic/reception-three.jpg",
     "sideImage": "/images/clinic/reception-desktop.jpg",
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "zap",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -557,10 +620,11 @@
     ],
     "testimonials": [],
     "seo": {
-      "title": "Shockwave Therapy Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Shockwave Therapy Calgary | Nose Creek",
-      "description": "Advanced non-invasive shockwave therapy to heal chronic plantar fasciitis, tennis elbow, and calcific tendinopathy in Calgary.",
-      "ogDescription": "Heal stubborn tendon pain and calcifications with acoustic shockwave treatments."
+      "title": "Shockwave Therapy Calgary North | Nose Creek Physiotherapy",
+      "ogTitle": "Radial Shockwave Therapy Calgary | ESWT",
+      "description": "Non-invasive shockwave therapy in Calgary North to dissolve calcified tendons and heal plantar fasciitis and tennis elbow. Included in regular physio rates.",
+      "ogDescription": "Heal stubborn tendon pain and calcifications with acoustic shockwave treatments.",
+      "cardImage": ""
     }
   },
   {
@@ -571,7 +635,7 @@
     "description": "Custom foot orthotics are precision medical appliances made to support and align your feet, ankles, and entire lower body kinetic chain, redistributing pressure and reducing strain on your knees, hips, and lower back.",
     "heroImage": "/images/clinic/reception-desktop.jpg",
     "sideImage": null,
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "footprints",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -633,10 +697,11 @@
     ],
     "testimonials": [],
     "seo": {
-      "title": "Custom Foot Orthotics Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Custom Orthotics Calgary | Nose Creek",
-      "description": "Customized orthotic insoles to correct foot alignment and alleviate heel, knee, and lower back pain in Calgary.",
-      "ogDescription": "Restore proper gait and foot alignment with custom-made medical orthotics."
+      "title": "Custom Foot Orthotics Calgary North | Nose Creek Physiotherapy",
+      "ogTitle": "Custom Foot Orthotics Calgary | The Orthotics Group",
+      "description": "Computerized 3D foot scanning and custom orthotics in Calgary North. Alleviate heel pain, flat feet, and back pain. Insurance covered.",
+      "ogDescription": "Restore proper gait and foot alignment with custom-made medical orthotics.",
+      "cardImage": ""
     }
   },
   {
@@ -647,7 +712,7 @@
     "description": "A concussion can leave you feeling uncertain, frustrated, and unsure where to turn next. At Nose Creek Physiotherapy, our Concussion Clinic in Calgary is certified under the Shift Concussion framework. We provide comprehensive multidisciplinary evaluation of neck movement, balance, visual-vestibular function, and cognitive load to guide you safely back to work, school, and sports.",
     "heroImage": "/images/clinic/reception-desktop.jpg",
     "sideImage": null,
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "shield",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
@@ -748,7 +813,8 @@
       "title": "Concussion Clinic Calgary North | Nose Creek Physiotherapy",
       "ogTitle": "Shift Concussion Certified Clinic | Calgary NE & NW",
       "description": "Evidence-based concussion rehabilitation in Calgary North. Certified Shift Concussion care for sports injuries, whiplash, and lingering post-concussion symptoms.",
-      "ogDescription": "Clarity, guidance, and structured progression for concussion recovery in Calgary."
+      "ogDescription": "Clarity, guidance, and structured progression for concussion recovery in Calgary.",
+      "cardImage": ""
     }
   },
   {
@@ -759,7 +825,7 @@
     "description": "We provide custom and specialized knee braces, including spring-loaded and unloader braces for osteoarthritis, ligament instability (ACL, MCL, PCL), and sports protection, allowing you to stay active with confidence and reduced joint pain.",
     "heroImage": "/images/clinic/reception-four.jpg",
     "sideImage": null,
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "shield",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
@@ -838,7 +904,24 @@
       "title": "Custom Knee Bracing & Osteoarthritis Braces | Calgary",
       "ogTitle": "Knee Bracing Solutions | Nose Creek Physiotherapy",
       "description": "Custom knee bracing, spring-loaded braces, and unloader braces for knee osteoarthritis and ACL stability in Calgary.",
-      "ogDescription": "Protect your knees, reduce osteoarthritis pain, and return to sports with custom bracing."
+      "ogDescription": "Protect your knees, reduce osteoarthritis pain, and return to sports with custom bracing.",
+      "cardImage": "",
+      "sectionsData": {
+        "testimonials": {
+          "align": "left",
+          "image": "",
+          "title": "545+ Five-Star Reviews in Calgary",
+          "bullets": [],
+          "content": "",
+          "ctaHref": "",
+          "ctaText": "",
+          "eyebrow": "Real Patient Stories",
+          "subtitle": "",
+          "background": "light",
+          "eyebrowColor": "#1c9fd8",
+          "imagePosition": "none"
+        }
+      }
     }
   },
   {
@@ -849,7 +932,7 @@
     "description": "Specialized pelvic floor physiotherapy to evaluate and treat pelvic floor muscle dysfunction, bladder incontinence, pelvic organ prolapse, pre/post-natal recovery, and chronic pelvic girdle discomfort in a private, supportive environment.",
     "heroImage": "/images/clinic/clinic-mobile.jpg",
     "sideImage": null,
-    "cardImage": null,
+    "cardImage": "",
     "iconType": "user-check",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -911,7 +994,8 @@
       "title": "Pelvic Floor Physiotherapy Calgary | Nose Creek Physiotherapy",
       "ogTitle": "Pelvic Floor Physiotherapy | Nose Creek",
       "description": "Specialized pelvic health and women's health physiotherapy in Calgary for incontinence, prolapse, and post-partum recovery.",
-      "ogDescription": "Strengthen your core and solve bladder leakage with certified pelvic floor physiotherapy in Calgary."
+      "ogDescription": "Strengthen your core and solve bladder leakage with certified pelvic floor physiotherapy in Calgary.",
+      "cardImage": ""
     }
   }
 ]

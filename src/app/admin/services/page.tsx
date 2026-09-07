@@ -197,7 +197,10 @@ export default function AdminServicesPage() {
                 fresh.forEach((f) => map.set(f.slug, f));
                 parsed.forEach((p) => {
                   if (map.has(p.slug)) {
-                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                    const serverItem = map.get(p.slug)!;
+                    const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : (serverItem.cardImage || "");
+                    const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : (serverItem.heroImage || "");
+                    map.set(p.slug, { ...serverItem, ...p, cardImage, heroImage });
                   } else {
                     map.set(p.slug, p);
                   }
@@ -231,7 +234,10 @@ export default function AdminServicesPage() {
                 current.forEach((c) => map.set(c.slug, c));
                 parsed.forEach((p) => {
                   if (map.has(p.slug)) {
-                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                    const currentItem = map.get(p.slug)!;
+                    const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : (currentItem.cardImage || "");
+                    const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : (currentItem.heroImage || "");
+                    map.set(p.slug, { ...currentItem, ...p, cardImage, heroImage });
                   } else {
                     map.set(p.slug, p);
                   }
@@ -1670,7 +1676,16 @@ function ServiceEditorModal({
                       <AdminImageUploader
                         label="Card Thumbnail Image (Optional — leave empty for clean Icon style)"
                         value={service.cardImage || ""}
-                        onChange={(url) => setService({ ...service, cardImage: url })}
+                        onChange={(url) =>
+                          setService({
+                            ...service,
+                            cardImage: url,
+                            seo: {
+                              ...(service.seo || {}),
+                              cardImage: url
+                            }
+                          })
+                        }
                         folder="services"
                         placeholder="Upload thumbnail or enter image URL..."
                         aspectRatioNote="Landscape 16:9 or 4:3 (Leave empty for Icon style)"

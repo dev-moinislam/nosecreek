@@ -8,6 +8,9 @@ export const metadata = {
   description: "Get to know the highly qualified physiotherapists, chiropractors, and massage therapists at Nose Creek Physiotherapy in Calgary."
 };
 
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 export default async function TeamPage() {
   const team = await getTeamMembers();
 
