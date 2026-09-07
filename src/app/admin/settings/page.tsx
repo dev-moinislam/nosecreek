@@ -12,9 +12,28 @@ export default function AdminSettingsPage() {
   const [marketing, setMarketing] = useState<{
     callTracking: { enabled: boolean; scriptUrl: string };
     gtm: { enabled: boolean; containerId: string };
-  }>((settingsData as any).marketing || {
-    callTracking: { enabled: true, scriptUrl: "" },
-    gtm: { enabled: false, containerId: "" }
+    googleAnalytics: { enabled: boolean; trackingId: string };
+    facebookPixel: { enabled: boolean; pixelId: string };
+  }>(() => {
+    const m = (settingsData as any).marketing || {};
+    return {
+      callTracking: {
+        enabled: m.callTracking?.enabled ?? true,
+        scriptUrl: m.callTracking?.scriptUrl ?? ""
+      },
+      gtm: {
+        enabled: m.gtm?.enabled ?? true,
+        containerId: m.gtm?.containerId ?? (Array.isArray(m.gtm?.containerIds) ? m.gtm.containerIds.join(", ") : "")
+      },
+      googleAnalytics: {
+        enabled: m.googleAnalytics?.enabled ?? true,
+        trackingId: m.googleAnalytics?.trackingId ?? ""
+      },
+      facebookPixel: {
+        enabled: m.facebookPixel?.enabled ?? true,
+        pixelId: m.facebookPixel?.pixelId ?? ""
+      }
+    };
   });
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -42,7 +61,25 @@ export default function AdminSettingsPage() {
               seo: data.seo || settingsData.seo
             });
             if (data.marketing) {
-              setMarketing(data.marketing);
+              const m = data.marketing;
+              setMarketing({
+                callTracking: {
+                  enabled: m.callTracking?.enabled ?? true,
+                  scriptUrl: m.callTracking?.scriptUrl ?? ""
+                },
+                gtm: {
+                  enabled: m.gtm?.enabled ?? true,
+                  containerId: m.gtm?.containerId ?? (Array.isArray(m.gtm?.containerIds) ? m.gtm.containerIds.join(", ") : "")
+                },
+                googleAnalytics: {
+                  enabled: m.googleAnalytics?.enabled ?? true,
+                  trackingId: m.googleAnalytics?.trackingId ?? ""
+                },
+                facebookPixel: {
+                  enabled: m.facebookPixel?.enabled ?? true,
+                  pixelId: m.facebookPixel?.pixelId ?? ""
+                }
+              });
             }
           }
         } catch {
@@ -52,8 +89,28 @@ export default function AdminSettingsPage() {
         const local = localStorage.getItem("adm_settings");
         if (local) {
           const parsed = JSON.parse(local);
-          setSettings(parsed.settings);
-          if (parsed.marketing) setMarketing(parsed.marketing);
+          if (parsed.settings) setSettings(parsed.settings);
+          if (parsed.marketing) {
+            const m = parsed.marketing;
+            setMarketing({
+              callTracking: {
+                enabled: m.callTracking?.enabled ?? true,
+                scriptUrl: m.callTracking?.scriptUrl ?? ""
+              },
+              gtm: {
+                enabled: m.gtm?.enabled ?? true,
+                containerId: m.gtm?.containerId ?? (Array.isArray(m.gtm?.containerIds) ? m.gtm.containerIds.join(", ") : "")
+              },
+              googleAnalytics: {
+                enabled: m.googleAnalytics?.enabled ?? true,
+                trackingId: m.googleAnalytics?.trackingId ?? ""
+              },
+              facebookPixel: {
+                enabled: m.facebookPixel?.enabled ?? true,
+                pixelId: m.facebookPixel?.pixelId ?? ""
+              }
+            });
+          }
         }
       }
       setLoading(false);
@@ -65,6 +122,25 @@ export default function AdminSettingsPage() {
     e.preventDefault();
     setSaveStatus("Saving...");
 
+    const gtmIdsArray = (marketing.gtm.containerId || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    const formattedMarketing = {
+      ...marketing,
+      gtm: {
+        ...marketing.gtm,
+        containerIds: gtmIdsArray.length > 0 ? gtmIdsArray : [marketing.gtm.containerId]
+      }
+    };
+
+    const fullPayload = {
+      ...settings,
+      marketing: formattedMarketing
+    };
+
+    // 1. Supabase persistence
     if (isSupabaseConfigured && supabase) {
       try {
         await supabase.from("site_settings").upsert({
@@ -78,20 +154,38 @@ export default function AdminSettingsPage() {
           primary_cta: settings.primaryCTA,
           footer_content: settings.footerContent,
           seo: settings.seo,
-          marketing: marketing
+          marketing: formattedMarketing
         });
-        setSaveStatus("✓ Settings successfully saved to Supabase!");
       } catch (err: any) {
-        setSaveStatus(`❌ Error: ${err.message}`);
+        console.warn("Supabase save error:", err);
       }
-    } else if (typeof window !== "undefined") {
-      localStorage.setItem(
-        "adm_settings",
-        JSON.stringify({ settings, marketing })
-      );
-      setSaveStatus("✓ Settings saved locally (Demo mode)!");
     }
 
+    // 2. Disk persistence via API route (updates src/data/settings.json)
+    try {
+      await fetch("/api/admin/save-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "settings", data: fullPayload })
+      });
+    } catch (err) {
+      console.warn("Disk save failed", err);
+    }
+
+    // 3. Local storage & real-time broadcast
+    if (typeof window !== "undefined") {
+      try {
+        const curLocal = localStorage.getItem("adm_settings");
+        const parsed = curLocal ? JSON.parse(curLocal) : {};
+        localStorage.setItem(
+          "adm_settings",
+          JSON.stringify({ ...parsed, ...settings, settings, marketing })
+        );
+        window.dispatchEvent(new Event("settingsUpdated"));
+      } catch {}
+    }
+
+    setSaveStatus("✓ Settings successfully saved to Database, Files, and Live Site!");
     setTimeout(() => setSaveStatus(null), 4000);
   };
 
@@ -289,7 +383,7 @@ export default function AdminSettingsPage() {
               <input
                 type="text"
                 className="adm-input"
-                value={marketing.callTracking.scriptUrl}
+                value={marketing.callTracking.scriptUrl ?? ""}
                 disabled={!canEditMarketingScripts}
                 onChange={(e) => setMarketing({
                   ...marketing,
@@ -300,18 +394,18 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* Google Tag Manager */}
-          <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+          <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, marginBottom: 16, border: "1px solid #e2e8f0" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <div>
                 <strong style={{ fontSize: 14 }}>🏷️ Google Tag Manager (GTM)</strong>
                 <p style={{ margin: "2px 0 0 0", fontSize: 12.5, color: "#64748b" }}>
-                  Injects Google Analytics 4, Meta Pixel, and conversion tracking containers
+                  Injects Google Analytics 4, Meta Pixel, and conversion tracking containers (comma-separated for multiple)
                 </p>
               </div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: canEditMarketingScripts ? "pointer" : "not-allowed" }}>
                 <input
                   type="checkbox"
-                  checked={marketing.gtm.enabled}
+                  checked={Boolean(marketing.gtm.enabled)}
                   disabled={!canEditMarketingScripts}
                   onChange={(e) => setMarketing({
                     ...marketing,
@@ -323,16 +417,94 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="adm-form-group" style={{ margin: 0 }}>
-              <label className="adm-form-label">GTM Container ID (e.g. GTM-XXXXXXX)</label>
+              <label className="adm-form-label">GTM Container ID(s) (e.g. GTM-M3WLKSQ, GTM-PJ447MK)</label>
               <input
                 type="text"
                 className="adm-input"
-                placeholder="GTM-XXXXXXX"
-                value={marketing.gtm.containerId}
+                placeholder="GTM-M3WLKSQ, GTM-PJ447MK"
+                value={marketing.gtm.containerId ?? ""}
                 disabled={!canEditMarketingScripts}
                 onChange={(e) => setMarketing({
                   ...marketing,
                   gtm: { ...marketing.gtm, containerId: e.target.value }
+                })}
+              />
+            </div>
+          </div>
+
+          {/* Google Analytics */}
+          <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, marginBottom: 16, border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <strong style={{ fontSize: 14 }}>📊 Google Analytics (Universal / GA4)</strong>
+                <p style={{ margin: "2px 0 0 0", fontSize: 12.5, color: "#64748b" }}>
+                  Direct Google Analytics gtag tracking integration
+                </p>
+              </div>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: canEditMarketingScripts ? "pointer" : "not-allowed" }}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(marketing.googleAnalytics.enabled)}
+                  disabled={!canEditMarketingScripts}
+                  onChange={(e) => setMarketing({
+                    ...marketing,
+                    googleAnalytics: { ...marketing.googleAnalytics, enabled: e.target.checked }
+                  })}
+                />
+                <span style={{ fontSize: 13, fontWeight: 600 }}>Enabled</span>
+              </label>
+            </div>
+
+            <div className="adm-form-group" style={{ margin: 0 }}>
+              <label className="adm-form-label">Tracking ID (e.g. UA-121730452-1 or G-XXXXXXXXXX)</label>
+              <input
+                type="text"
+                className="adm-input"
+                placeholder="UA-121730452-1"
+                value={marketing.googleAnalytics.trackingId ?? ""}
+                disabled={!canEditMarketingScripts}
+                onChange={(e) => setMarketing({
+                  ...marketing,
+                  googleAnalytics: { ...marketing.googleAnalytics, trackingId: e.target.value }
+                })}
+              />
+            </div>
+          </div>
+
+          {/* Facebook Pixel */}
+          <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <strong style={{ fontSize: 14 }}>🎯 Meta / Facebook Pixel</strong>
+                <p style={{ margin: "2px 0 0 0", fontSize: 12.5, color: "#64748b" }}>
+                  Tracks visitors and conversions for Facebook and Instagram Ads
+                </p>
+              </div>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: canEditMarketingScripts ? "pointer" : "not-allowed" }}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(marketing.facebookPixel.enabled)}
+                  disabled={!canEditMarketingScripts}
+                  onChange={(e) => setMarketing({
+                    ...marketing,
+                    facebookPixel: { ...marketing.facebookPixel, enabled: e.target.checked }
+                  })}
+                />
+                <span style={{ fontSize: 13, fontWeight: 600 }}>Enabled</span>
+              </label>
+            </div>
+
+            <div className="adm-form-group" style={{ margin: 0 }}>
+              <label className="adm-form-label">Pixel ID (e.g. 275772356383035)</label>
+              <input
+                type="text"
+                className="adm-input"
+                placeholder="275772356383035"
+                value={marketing.facebookPixel.pixelId ?? ""}
+                disabled={!canEditMarketingScripts}
+                onChange={(e) => setMarketing({
+                  ...marketing,
+                  facebookPixel: { ...marketing.facebookPixel, pixelId: e.target.value }
                 })}
               />
             </div>

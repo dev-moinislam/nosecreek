@@ -16,12 +16,14 @@ export interface FAQItem {
 export interface SocialLinks {
   facebook?: string;
   instagram?: string;
+  youtube?: string;
   tiktok?: string;
   twitter?: string;
   linkedin?: string;
 }
 
 export interface OpeningHours {
+  weekdays?: string;
   monday?: string;
   tuesday?: string;
   wednesday?: string;
@@ -87,6 +89,7 @@ export interface Service {
   iconBg?: string;
   iconColor?: string;
   ctaText?: string;
+  ctaHref?: string;
   ctaMuted?: boolean;
   benefits?: string[];
   symptoms?: string[];
@@ -205,6 +208,7 @@ export interface Condition {
   sideImage?: string | null;
   cardImage?: string | null;
   ctaText?: string;
+  ctaHref?: string;
   ctaMuted?: boolean;
   benefits?: string[];
   symptoms?: string[];

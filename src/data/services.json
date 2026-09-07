@@ -5,8 +5,9 @@
     "title": "Physiotherapy",
     "shortDescription": "Expert, hands-on physio to restore mobility, strength and balance — while minimizing your dependence on medication.",
     "description": "Our physiotherapy services are designed to help you regain motion, strength, and functionality. We address acute or chronic pain, post-surgical recovery, sports injuries, and mobility restrictions using evidence-based clinical techniques, manual manipulation, and progressive exercise rehabilitation.",
-    "heroImage": "/images/clinic/reception-desktop.jpg",
+    "heroImage": "/uploads/services-post-surgery_rehabilitation-1788707357516.webp",
     "sideImage": "/images/clinic/reception-four.jpg",
+    "cardImage": "",
     "iconType": "heart-pulse",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -43,15 +44,16 @@
           "Spinal traction and mechanical decompression strategies",
           "Safe and gentle techniques tailored to your comfort"
         ],
-        "content": "At Nose Creek Physiotherapy, our manual therapists are Fellows of the Canadian Academy of Manipulative Physiotherapy (FCAMPT) — representing the highest internationally recognized standard in orthopaedic physical therapy. We don't just hand you a sheet of exercises; we use targeted hands-on mobilizations to free stiff joints and calm irritated nerve roots on your very first visit.",
+        "content": "At Nose Creek Physiotherapy, our manual therapists are Fellows of the Canadian Academy of Manipulative Physiotherapy (FCAMPT) — representing the highest internationally recognized standard in orthopaedic physical therapy. We don't just hand you a sheet of exercises; we use targeted hands-on mobilizations to free stiff joints and calm irritated nerve roots on your very first visit. [Contact Us & Directions](/contact)",
         "ctaHref": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
         "ctaText": "Book An Assessment Online →",
         "eyebrow": "Advanced Clinical Technique",
         "imageAlt": "Physiotherapist performing manual joint mobilization",
         "subtitle": "Direct spinal and extremity joint mobilization to unlock restricted motion.",
-        "background": "white",
+        "background": "light",
         "eyebrowColor": "#6faf1c",
-        "imagePosition": "right"
+        "imagePosition": "top",
+        "align": "left"
       },
       {
         "id": "dry-needling-ims",
@@ -67,11 +69,64 @@
         "eyebrow": "Deep Muscle Release",
         "imageAlt": "IMS Dry Needling treatment at Nose Creek Physiotherapy",
         "subtitle": "Relieve deep, chronic muscle spasms that stretching cannot reach.",
-        "background": "light",
+        "background": "white",
         "eyebrowColor": "#1c9fd8",
         "imagePosition": "left"
       }
     ],
+    "sectionsData": {
+      "testimonials": {
+        "title": "545+ Five-Star Reviews in Calgary",
+        "eyebrow": "Real Patient Stories",
+        "eyebrowColor": "#1c9fd8",
+        "subtitle": "",
+        "content": "",
+        "image": "",
+        "imagePosition": "none",
+        "background": "light",
+        "align": "left",
+        "ctaText": "",
+        "ctaHref": "",
+        "bullets": []
+      },
+      "custom_sections": {
+        "title": "custom visual",
+        "eyebrow": "proven clinic",
+        "eyebrowColor": "#1c9fd8",
+        "subtitle": "nothing",
+        "content": "ki koro tumi",
+        "image": "/uploads/homepage-post-surgery_rehabilitation-1788639532821.webp",
+        "imagePosition": "top",
+        "background": "white",
+        "align": "left",
+        "ctaText": "book now",
+        "ctaHref": "#homepage",
+        "bullets": [
+          "key"
+        ]
+      },
+      "benefits": {
+        "title": "key benifit",
+        "eyebrow": "proven clinic protocal",
+        "eyebrowColor": "#1c9fd8",
+        "subtitle": "",
+        "content": "",
+        "image": "",
+        "imagePosition": "none",
+        "background": "white",
+        "align": "left",
+        "ctaText": "",
+        "ctaHref": "",
+        "bullets": [
+          "amar",
+          "nam",
+          "moin"
+        ]
+      },
+      "hero": {
+        "image": "/uploads/services-post-surgery_rehabilitation-1788707357516.webp"
+      }
+    },
     "faqs": [
       {
         "answer": "No, in Alberta you do not need a physician referral to see a licensed physiotherapist. You can book an appointment directly with our clinic. (Some private insurance plans may request one for claim reimbursement).",
@@ -86,23 +141,17 @@
         "question": "What should I wear to my physiotherapy appointment?"
       }
     ],
-    "hiddenSections": [
-      "faqs"
-    ],
+    "hiddenSections": [],
     "sectionOrder": [
       "hero",
-      "at_a_glance",
-      "clinical_overview",
-      "custom_sections",
+      "custom-0",
+      "custom-1",
       "benefits",
       "symptoms",
       "treatment_approach",
-      "team_carousel",
       "faqs",
-      "location_map",
-      "decision_ctas",
-      "bottom_cta",
-      "testimonials"
+      "testimonials",
+      "custom_sections"
     ],
     "relatedServices": [
       "massage-therapy",
@@ -130,24 +179,7 @@
       "ogTitle": "Physiotherapy Services | Nose Creek Physiotherapy",
       "description": "Expert hands-on physiotherapy to restore mobility, strength and balance. Extended health direct billing available in Calgary.",
       "ogDescription": "Restore mobility, strength, and balance naturally with our certified Calgary physiotherapists."
-    },
-    "sectionsData": {
-      "testimonials": {
-        "title": "545+ Five-Star Reviews in Calgary",
-        "eyebrow": "Real Patient Stories",
-        "eyebrowColor": "#1c9fd8",
-        "subtitle": "",
-        "content": "",
-        "image": "",
-        "imagePosition": "none",
-        "background": "light",
-        "align": "left",
-        "ctaText": "",
-        "ctaHref": "",
-        "bullets": []
-      }
-    },
-    "cardImage": ""
+    }
   },
   {
     "id": "massage-therapy",
@@ -157,6 +189,7 @@
     "description": "Our Registered Massage Therapy (RMT) treatments utilize deep tissue techniques, trigger point release, and myofascial therapy to relieve tension, reduce physiological stress, and accelerate musculoskeletal recovery.",
     "heroImage": "/images/clinic/reception-four.jpg",
     "sideImage": "/images/clinic/reception-three.jpg",
+    "cardImage": null,
     "iconType": "sparkles",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
@@ -200,6 +233,7 @@
         "imagePosition": "right"
       }
     ],
+    "sectionsData": {},
     "faqs": [
       {
         "answer": "Yes, all massage therapists at Nose Creek are fully registered (2200-Hour RMTs) and can provide official receipts for extended health insurance reimbursement.",
@@ -211,7 +245,14 @@
       }
     ],
     "hiddenSections": [],
-    "sectionOrder": [],
+    "sectionOrder": [
+      "hero",
+      "custom-0",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
     "relatedServices": [
       "physiotherapy",
       "acupuncture",
@@ -242,6 +283,191 @@
     }
   },
   {
+    "id": "acupuncture",
+    "slug": "acupuncture",
+    "title": "Acupuncture",
+    "shortDescription": "Certified practitioners stimulate specific points to balance energy and ease a wide range of ailments.",
+    "description": "Our Traditional Chinese Medicine (TCM) and anatomical medical acupuncture treatments stimulate specific neuro-pathways, release deep intramuscular trigger points, and encourage the nervous system to release natural pain-relieving endorphins.",
+    "heroImage": "/images/clinic/clinic-mobile.jpg",
+    "sideImage": null,
+    "cardImage": null,
+    "iconType": "needle",
+    "iconBg": "#eef6e4",
+    "iconColor": "#6faf1c",
+    "ctaText": "Learn more →",
+    "ctaMuted": false,
+    "benefits": [
+      "Stimulates endorphin release for natural pain relief",
+      "Relaxes deep muscle trigger points and chronic spasms",
+      "Balances autonomic nervous system response and reduces stress",
+      "Reduces inflammation and supports overall recovery"
+    ],
+    "symptoms": [
+      "Chronic neck, back, and joint pain",
+      "Persistent tension headaches and migraine episodes",
+      "Sciatica and radiating nerve discomfort",
+      "Muscle tightness resistant to conventional stretching"
+    ],
+    "treatmentApproach": [
+      "Comprehensive diagnostic assessment of symptoms and tension points",
+      "Insertion of ultra-thin, single-use sterile micro-needles",
+      "Gentle manual stimulation or optional electro-acupuncture for nerve modulation",
+      "Relaxing 20–30 minute resting phase in a private treatment room"
+    ],
+    "customSections": [],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "answer": "Acupuncture needles are hair-thin and most patients feel only a slight prick or dull warmth on insertion. Many patients find the experience deeply relaxing.",
+        "question": "Does acupuncture hurt?"
+      },
+      {
+        "answer": "Yes, acupuncture provided by licensed practitioners is covered by most extended health plans in Alberta.",
+        "question": "Is acupuncture covered by extended health insurance?"
+      }
+    ],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy"
+    ],
+    "relatedConditions": [
+      "neck-shoulder-pain",
+      "back-pain"
+    ],
+    "teamMembers": [
+      "dr-eileen-wei",
+      "blair-schachterle"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
+    "testimonials": [],
+    "seo": {
+      "title": "Acupuncture & TCM in Calgary | Nose Creek Physiotherapy",
+      "ogTitle": "Acupuncture Treatment | Nose Creek Physiotherapy",
+      "description": "Licensed acupuncture and TCM treatments in Calgary to relieve chronic pain, headaches, and muscle tension naturally.",
+      "ogDescription": "Ease chronic pain, headaches, and muscle tension with licensed acupuncture care in Calgary."
+    }
+  },
+  {
+    "id": "chiropractic",
+    "slug": "chiropractic",
+    "title": "Chiropractic Care",
+    "shortDescription": "Non-invasive, drug-free spinal adjustments and extremity care by Dr. Alex Toutant to restore spinal alignment, optimize nervous system function, and relieve pain.",
+    "description": "At Nose Creek Physiotherapy in Calgary North, our chiropractic care focuses on the vital relationship between your spine, nervous system, and musculoskeletal health. Dr. Alex Toutant combines gentle spinal manipulations, soft tissue mobilization, cupping, and active rehabilitation to help you move faster, reduce joint stiffness, and live an active, medication-free life.",
+    "heroImage": "/images/clinic/reception-desktop.jpg",
+    "sideImage": "/images/clinic/reception-three.jpg",
+    "cardImage": null,
+    "iconType": "shield",
+    "iconBg": "#e9f5fb",
+    "iconColor": "#1c9fd8",
+    "ctaText": "Book Chiropractic Session →",
+    "ctaMuted": false,
+    "benefits": [
+      "Precision spinal adjustments to restore proper vertebral alignment and nerve conduction",
+      "Accelerates recovery from sports injuries, motor vehicle accidents, and chronic desk strain",
+      "Improves range of motion, flexibility, and overall functional mobility",
+      "Combines adjustments with active release therapy, cupping, and acupuncture",
+      "Proactive wellness care and routine checkups to prevent future injury recurrence",
+      "Complete initial clinical exam: medical history, orthopaedic testing, and referral review"
+    ],
+    "symptoms": [
+      "Lower back pain, sciatica, and sacroiliac (SI) joint dysfunction",
+      "Neck pain, upper back tension, and postural forward head carriage",
+      "Extremity joint stiffness in shoulders, hips, and knees",
+      "Tension headaches and cervicogenic migraines originating in the neck",
+      "Chronic muscle tightness resistant to conventional stretching",
+      "Desk posture strain, computer slouch, and repetitive occupational aches"
+    ],
+    "treatmentApproach": [
+      "Comprehensive orthopaedic, neurological, and physical assessment",
+      "Targeted spinal adjustments and extremity joint mobilizations",
+      "Myofascial cupping, soft tissue therapy, and active release",
+      "Proactive wellness maintenance to keep you active and symptom-free"
+    ],
+    "customSections": [
+      {
+        "id": "proactive-wellness-care",
+        "image": "/images/clinic/reception-three.jpg",
+        "title": "Stay Active: Don't Sit on the Sidelines of Life",
+        "bullets": [
+          "Spinal manipulations & mobilizations to ensure fluid biomechanics",
+          "Cupping therapy & targeted soft tissue release to decongest fascia",
+          "Integrative modalities combining chiro with physiotherapy and massage",
+          "Doctors of Chiropractic with 7+ years of accredited clinical education"
+        ],
+        "content": "We believe in proactive care to keep you functioning optimally rather than treating issues only after they flare up. Once you achieve your higher level of function, routine check-ups throughout the year maintain that quality of life. You worked hard to get pain-free—we want you to stay active, play with your grandchildren, and participate fully with your friends.",
+        "ctaHref": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+        "ctaText": "Book Your Chiropractic Assessment →",
+        "eyebrow": "Proactive vs. Reactive Care",
+        "imageAlt": "Chiropractor Dr. Alex Toutant at Nose Creek Physiotherapy",
+        "subtitle": "Routine clinical tune-ups to keep you functioning at your absolute best.",
+        "background": "white",
+        "eyebrowColor": "#6faf1c",
+        "imagePosition": "right"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "answer": "Chiropractic care is a non-invasive, drug-free treatment focusing on the health of the spine, nervous system, and musculoskeletal system (bones, joints, muscles, tendons, ligaments). Through spinal manipulations, mobilizations, soft tissue therapy, and cupping, Dr. Alex Toutant restores spinal alignment, reduces nerve irritation, and optimizes total body mobility.",
+        "question": "What Is Chiropractic Care?"
+      },
+      {
+        "answer": "Yes. By restoring proper spinal alignment and joint biomechanics, chiropractic care eliminates abnormal compensations and uneven wear-and-tear across joints. This optimizes posture and muscle coordination, significantly lowering the risk of recurring back, neck, and joint injuries.",
+        "question": "Can Chiropractic Care Prevent Future Injuries?"
+      },
+      {
+        "answer": "You can maximize your results by staying consistent with your treatment plan, performing your prescribed home mobility stretches and core exercises, maintaining ergonomic posture at work, staying well-hydrated, and attending proactive wellness checkups throughout the year.",
+        "question": "How Can I Maximize the Benefits of Chiropractic Care?"
+      },
+      {
+        "answer": "In the initial recovery phase, visits are often scheduled 1 to 2 times per week to reduce acute pain and mobilize restricted joints. As function improves, appointments transition to maintenance and proactive wellness visits every 4 to 6 weeks to keep you moving at your highest level.",
+        "question": "How Often Should I See a Chiropractor?"
+      }
+    ],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "custom-0",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture"
+    ],
+    "relatedConditions": [
+      "back-pain",
+      "neck-shoulder-pain"
+    ],
+    "teamMembers": [
+      "dr-alex-toutant",
+      "blair-schachterle"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
+    "testimonials": [],
+    "seo": {
+      "title": "Chiropractor Calgary North | Nose Creek Physiotherapy",
+      "ogTitle": "Chiropractic Care Calgary North | Dr. Alex Toutant",
+      "description": "Expert chiropractic care by Dr. Alex Toutant in Calgary North. Gentle spinal adjustments, cupping, and active rehabilitation. Direct billing available.",
+      "ogDescription": "Rediscover your mobility and reduce pain with chiropractic care at Nose Creek."
+    }
+  },
+  {
     "id": "shockwave-therapy",
     "slug": "shockwave-therapy",
     "title": "Shockwave Therapy",
@@ -249,6 +475,7 @@
     "description": "Extracorporeal Shockwave Therapy (ESWT) delivers acoustic soundwaves deep into injured tendons and soft tissues, stimulating blood vessel formation, breaking down calcifications, and reactivating the body's natural cellular repair cycle.",
     "heroImage": "/images/clinic/reception-three.jpg",
     "sideImage": "/images/clinic/reception-desktop.jpg",
+    "cardImage": null,
     "iconType": "zap",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -292,6 +519,7 @@
         "imagePosition": "left"
       }
     ],
+    "sectionsData": {},
     "faqs": [
       {
         "answer": "You may experience mild discomfort during the 5-minute treatment, but our therapists adjust the intensity so it is always tolerable. Discomfort stops immediately when the pulses finish.",
@@ -303,7 +531,14 @@
       }
     ],
     "hiddenSections": [],
-    "sectionOrder": [],
+    "sectionOrder": [
+      "hero",
+      "custom-0",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
     "relatedServices": [
       "physiotherapy",
       "custom-orthotics"
@@ -329,73 +564,6 @@
     }
   },
   {
-    "id": "acupuncture",
-    "slug": "acupuncture",
-    "title": "Acupuncture",
-    "shortDescription": "Certified practitioners stimulate specific points to balance energy and ease a wide range of ailments.",
-    "description": "Our Traditional Chinese Medicine (TCM) and anatomical medical acupuncture treatments stimulate specific neuro-pathways, release deep intramuscular trigger points, and encourage the nervous system to release natural pain-relieving endorphins.",
-    "heroImage": "/images/clinic/clinic-mobile.jpg",
-    "sideImage": null,
-    "iconType": "needle",
-    "iconBg": "#eef6e4",
-    "iconColor": "#6faf1c",
-    "ctaText": "Learn more →",
-    "ctaMuted": false,
-    "benefits": [
-      "Stimulates endorphin release for natural pain relief",
-      "Relaxes deep muscle trigger points and chronic spasms",
-      "Balances autonomic nervous system response and reduces stress",
-      "Reduces inflammation and supports overall recovery"
-    ],
-    "symptoms": [
-      "Chronic neck, back, and joint pain",
-      "Persistent tension headaches and migraine episodes",
-      "Sciatica and radiating nerve discomfort",
-      "Muscle tightness resistant to conventional stretching"
-    ],
-    "treatmentApproach": [
-      "Comprehensive diagnostic assessment of symptoms and tension points",
-      "Insertion of ultra-thin, single-use sterile micro-needles",
-      "Gentle manual stimulation or optional electro-acupuncture for nerve modulation",
-      "Relaxing 20–30 minute resting phase in a private treatment room"
-    ],
-    "customSections": [],
-    "faqs": [
-      {
-        "answer": "Acupuncture needles are hair-thin and most patients feel only a slight prick or dull warmth on insertion. Many patients find the experience deeply relaxing.",
-        "question": "Does acupuncture hurt?"
-      },
-      {
-        "answer": "Yes, acupuncture provided by licensed practitioners is covered by most extended health plans in Alberta.",
-        "question": "Is acupuncture covered by extended health insurance?"
-      }
-    ],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy"
-    ],
-    "relatedConditions": [
-      "neck-shoulder-pain",
-      "back-pain"
-    ],
-    "teamMembers": [
-      "dr-eileen-wei",
-      "blair-schachterle"
-    ],
-    "locations": [
-      "nose-creek-clinic"
-    ],
-    "testimonials": [],
-    "seo": {
-      "title": "Acupuncture & TCM in Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Acupuncture Treatment | Nose Creek Physiotherapy",
-      "description": "Licensed acupuncture and TCM treatments in Calgary to relieve chronic pain, headaches, and muscle tension naturally.",
-      "ogDescription": "Ease chronic pain, headaches, and muscle tension with licensed acupuncture care in Calgary."
-    }
-  },
-  {
     "id": "custom-orthotics",
     "slug": "custom-orthotics",
     "title": "Custom Orthotics",
@@ -403,6 +571,7 @@
     "description": "Custom foot orthotics are precision medical appliances made to support and align your feet, ankles, and entire lower body kinetic chain, redistributing pressure and reducing strain on your knees, hips, and lower back.",
     "heroImage": "/images/clinic/reception-desktop.jpg",
     "sideImage": null,
+    "cardImage": null,
     "iconType": "footprints",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -427,6 +596,7 @@
       "Fitting, footwear review, and follow-up adjustments"
     ],
     "customSections": [],
+    "sectionsData": {},
     "faqs": [
       {
         "answer": "High-quality custom orthotics typically last 2 to 4 years depending on your daily wear, body weight, and activity level.",
@@ -438,7 +608,13 @@
       }
     ],
     "hiddenSections": [],
-    "sectionOrder": [],
+    "sectionOrder": [
+      "hero",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
     "relatedServices": [
       "physiotherapy",
       "shockwave-therapy",
@@ -464,6 +640,118 @@
     }
   },
   {
+    "id": "concussion-clinic",
+    "slug": "concussion-clinic",
+    "title": "Concussion Clinic",
+    "shortDescription": "Shift Concussion certified clinical care in Calgary North — providing clarity, structured assessment, and safe return-to-activity progression.",
+    "description": "A concussion can leave you feeling uncertain, frustrated, and unsure where to turn next. At Nose Creek Physiotherapy, our Concussion Clinic in Calgary is certified under the Shift Concussion framework. We provide comprehensive multidisciplinary evaluation of neck movement, balance, visual-vestibular function, and cognitive load to guide you safely back to work, school, and sports.",
+    "heroImage": "/images/clinic/reception-desktop.jpg",
+    "sideImage": null,
+    "cardImage": null,
+    "iconType": "shield",
+    "iconBg": "#eef6e4",
+    "iconColor": "#6faf1c",
+    "ctaText": "Book Concussion Assessment →",
+    "ctaMuted": false,
+    "benefits": [
+      "Shift Concussion certified evidence-based clinical protocols",
+      "Comprehensive evaluation of cervical spine, vestibular-ocular, and balance systems",
+      "Structured Return-to-Learn, Return-to-Work, and Return-to-Sport roadmaps",
+      "Cervical spine manual therapy to treat whiplash-induced tension headaches",
+      "Calm, one-on-one, unrushed appointments with clear reassurance and education",
+      "Assistance navigating auto insurance (MVC), WCB, and school accommodation forms"
+    ],
+    "symptoms": [
+      "Persistent headaches, neck tension, and dizziness following head or body impact",
+      "Difficulty focusing, reading, or tolerating phone, tablet, and computer screens",
+      "Brain fog, fatigue, and feeling overwhelmed in noisy or bright environments",
+      "Balance instability, nausea, and lightheadedness with rapid head movement",
+      "Irritability, mood swings, and sleep disruption following a concussion",
+      "Prolonged symptoms lasting weeks or months after a sport injury or car accident"
+    ],
+    "treatmentApproach": [
+      "Initial Assessment: Injury history, symptom triggers, and cognitive demands",
+      "Screening: Cervical spine, vestibular-ocular reflex, and balance testing",
+      "Active Reintegration: Structured return-to-learn, return-to-work, and return-to-sport"
+    ],
+    "customSections": [
+      {
+        "id": "shift-concussion-approach",
+        "image": "/images/clinic/clinic-mobile.jpg",
+        "title": "Clarity, Structure & Active Recovery",
+        "bullets": [
+          "Certified Shift Concussion management framework",
+          "One-on-one appointments focused on explanation, education, and reassurance",
+          "Targeted exercises for neck stiffness and dizziness triggers",
+          "Evidence-based strategies for gradual screen and reading tolerance"
+        ],
+        "content": "A concussion is a mild traumatic brain injury caused by a force to the head or body that disrupts how brain systems function. Without guidance, many people fall into one of two traps: pushing too hard and flaring symptoms, or avoiding activity altogether out of fear. Both prolong recovery. At our Calgary clinic, we evaluate your vision, balance, neck movement, and activity tolerance to establish a safe, progressive recovery plan.",
+        "ctaHref": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+        "ctaText": "Book A Concussion Assessment Online →",
+        "eyebrow": "Shift Concussion Certified",
+        "imageAlt": "Concussion rehabilitation at Nose Creek Physiotherapy Calgary",
+        "subtitle": "Why rest alone is not enough — safe, structured progression tailored to you.",
+        "background": "white",
+        "eyebrowColor": "#1c9fd8",
+        "imagePosition": "left"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "answer": "While many concussions resolve within 2 to 4 weeks with proper guided care, some individuals experience symptoms that last for months. Recovery is rarely a straight line. Structured assessment under the Shift Concussion framework helps identify specific visual, balance, or neck impairments and prevents symptoms from becoming chronic.",
+        "question": "How Long Do Concussion Symptoms Usually Last?"
+      },
+      {
+        "answer": "Yes, under clinical supervision. Complete dark-room rest is no longer recommended by concussion science. Sub-symptom threshold exercise (such as light stationary cycling or walking) increases cerebral blood flow and speeds recovery, provided you stay below the threshold that flares your symptoms.",
+        "question": "Can I Exercise If I Still Have Concussion Symptoms?"
+      },
+      {
+        "answer": "Yes, symptom fluctuation is completely normal. Factors like poor sleep, cognitive load at school or work, screen exposure, or physical fatigue can temporarily elevate symptoms. Our clinic teaches pacing strategies to help you navigate these daily fluctuations.",
+        "question": "Is It Normal for Symptoms to Change Day to Day?"
+      },
+      {
+        "answer": "If symptoms spike, it usually indicates that an activity exceeded your current neurological or physical threshold. This is a normal part of recovery. We simply adjust your activity pacing, treat any cervical neck restrictions, and gradually re-advance your boundaries.",
+        "question": "What Happens If Concussion Symptoms Return After Improvement?"
+      },
+      {
+        "answer": "You do not need to wait or assume it is too late. Even if your concussion occurred months ago, a structured assessment evaluates your neck mobility, vestibular balance, and visual tracking to find and resolve the lingering drivers of your headaches and brain fog.",
+        "question": "What If My Concussion Happened Months Ago?"
+      }
+    ],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "custom-0",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "chiropractic",
+      "massage-therapy"
+    ],
+    "relatedConditions": [
+      "neck-shoulder-pain"
+    ],
+    "teamMembers": [
+      "blair-schachterle",
+      "rizelle-manzano"
+    ],
+    "locations": [
+      "nose-creek-clinic"
+    ],
+    "testimonials": [],
+    "seo": {
+      "title": "Concussion Clinic Calgary North | Nose Creek Physiotherapy",
+      "ogTitle": "Shift Concussion Certified Clinic | Calgary NE & NW",
+      "description": "Evidence-based concussion rehabilitation in Calgary North. Certified Shift Concussion care for sports injuries, whiplash, and lingering post-concussion symptoms.",
+      "ogDescription": "Clarity, guidance, and structured progression for concussion recovery in Calgary."
+    }
+  },
+  {
     "id": "knee-bracing",
     "slug": "knee-bracing",
     "title": "Knee Bracing",
@@ -471,6 +759,7 @@
     "description": "We provide custom and specialized knee braces, including spring-loaded and unloader braces for osteoarthritis, ligament instability (ACL, MCL, PCL), and sports protection, allowing you to stay active with confidence and reduced joint pain.",
     "heroImage": "/images/clinic/reception-four.jpg",
     "sideImage": null,
+    "cardImage": null,
     "iconType": "shield",
     "iconBg": "#eef6e4",
     "iconColor": "#6faf1c",
@@ -495,6 +784,22 @@
       "Integration with knee-strengthening physiotherapy exercises"
     ],
     "customSections": [],
+    "sectionsData": {
+      "testimonials": {
+        "title": "545+ Five-Star Reviews in Calgary",
+        "eyebrow": "Real Patient Stories",
+        "eyebrowColor": "#1c9fd8",
+        "subtitle": "",
+        "content": "",
+        "image": "",
+        "imagePosition": "none",
+        "background": "light",
+        "align": "left",
+        "ctaText": "",
+        "ctaHref": "",
+        "bullets": []
+      }
+    },
     "faqs": [
       {
         "answer": "Spring-loaded knee braces store energy during knee bending and return it during knee extension, taking up to 40% of the mechanical load off your joint when standing up or climbing stairs.",
@@ -506,7 +811,14 @@
       }
     ],
     "hiddenSections": [],
-    "sectionOrder": [],
+    "sectionOrder": [
+      "hero",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs",
+      "testimonials"
+    ],
     "relatedServices": [
       "physiotherapy",
       "custom-orthotics"
@@ -537,6 +849,7 @@
     "description": "Specialized pelvic floor physiotherapy to evaluate and treat pelvic floor muscle dysfunction, bladder incontinence, pelvic organ prolapse, pre/post-natal recovery, and chronic pelvic girdle discomfort in a private, supportive environment.",
     "heroImage": "/images/clinic/clinic-mobile.jpg",
     "sideImage": null,
+    "cardImage": null,
     "iconType": "user-check",
     "iconBg": "#e9f5fb",
     "iconColor": "#1c9fd8",
@@ -561,6 +874,7 @@
       "Gradual return to running, gym workouts, and daily living"
     ],
     "customSections": [],
+    "sectionsData": {},
     "faqs": [
       {
         "answer": "Your therapist takes a detailed history of your symptoms and, with your consent, assesses your pelvic floor muscles, breathing, posture, and core coordination in a private room.",
@@ -572,7 +886,13 @@
       }
     ],
     "hiddenSections": [],
-    "sectionOrder": [],
+    "sectionOrder": [
+      "hero",
+      "benefits",
+      "symptoms",
+      "treatment_approach",
+      "faqs"
+    ],
     "relatedServices": [
       "physiotherapy"
     ],

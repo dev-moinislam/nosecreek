@@ -47,6 +47,43 @@ import {
   LinkIcon
 } from "@/components/admin/AdminIcons";
 
+export function getDefaultServiceOrder(s: Service): string[] {
+  const list: string[] = ["hero"];
+  if (s.customSections && s.customSections.length > 0) {
+    s.customSections.forEach((_, i) => list.push(`custom-${i}`));
+  }
+  if ((s.benefits && s.benefits.length > 0) || (s.sectionsData?.benefits?.bullets && s.sectionsData.benefits.bullets.length > 0)) {
+    list.push("benefits");
+  }
+  if ((s.symptoms && s.symptoms.length > 0) || (s.sectionsData?.symptoms?.bullets && s.sectionsData.symptoms.bullets.length > 0)) {
+    list.push("symptoms");
+  }
+  if ((s.treatmentApproach && s.treatmentApproach.length > 0) || (s.sectionsData?.treatment_approach?.bullets && s.sectionsData.treatment_approach.bullets.length > 0)) {
+    list.push("treatment_approach");
+  }
+  if (s.faqs && s.faqs.length > 0) {
+    list.push("faqs");
+  }
+  if (s.sectionsData) {
+    Object.keys(s.sectionsData).forEach((k) => {
+      if (!list.includes(k) && k !== "hero" && !k.startsWith("custom-")) {
+        list.push(k);
+      }
+    });
+  }
+  return list;
+}
+
+export function sanitizeServiceOrder(s: Service): Service {
+  if (s.sectionOrder && s.sectionOrder.includes("at_a_glance") && (!s.sectionsData || !s.sectionsData.at_a_glance)) {
+    return { ...s, sectionOrder: getDefaultServiceOrder(s) };
+  }
+  if (!s.sectionOrder || s.sectionOrder.length === 0) {
+    return { ...s, sectionOrder: getDefaultServiceOrder(s) };
+  }
+  return s;
+}
+
 const defaultServiceSectionOrder = [
   "hero",
   "at_a_glance",
@@ -103,6 +140,11 @@ const sectionDefinitions: Record<string, { title: string; desc: string; category
     desc: "Interactive scrolling carousel of registered physiotherapists & staff.",
     category: "Team"
   },
+  testimonials: {
+    title: "Patient Reviews & Google Reviews Widget",
+    desc: "Live Google reviews widget and patient 5-star testimonials.",
+    category: "Social Proof"
+  },
   faqs: {
     title: "Frequently Asked Questions (Accordion)",
     desc: "Interactive accordion answering patient questions & insurance.",
@@ -140,20 +182,33 @@ export default function AdminServicesPage() {
     async function load() {
       setLoading(true);
       try {
-        let list: Service[] = [];
+        // Always fetch authoritative services from server/DB
+        const fresh = await getServices();
+        let list = fresh.map(sanitizeServiceOrder);
+
         if (typeof window !== "undefined") {
           const saved = localStorage.getItem("adm_services");
           if (saved) {
             try {
               const parsed = JSON.parse(saved);
               if (Array.isArray(parsed) && parsed.length > 0) {
-                list = parsed;
+                // Merge authoritative fresh services with any existing local edits
+                const map = new Map<string, Service>();
+                fresh.forEach((f) => map.set(f.slug, f));
+                parsed.forEach((p) => {
+                  if (map.has(p.slug)) {
+                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                  } else {
+                    map.set(p.slug, p);
+                  }
+                });
+                list = Array.from(map.values()).map(sanitizeServiceOrder);
               }
             } catch {}
           }
-        }
-        if (list.length === 0) {
-          list = await getServices();
+          // Immediately update localStorage with complete list to fix stale 7-item caches
+          localStorage.setItem("adm_services", JSON.stringify(list));
+          window.dispatchEvent(new Event("servicesUpdated"));
         }
         setServices(list);
       } catch (err) {
@@ -170,7 +225,20 @@ export default function AdminServicesPage() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed)) setServices(parsed);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setServices((current) => {
+                const map = new Map<string, Service>();
+                current.forEach((c) => map.set(c.slug, c));
+                parsed.forEach((p) => {
+                  if (map.has(p.slug)) {
+                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                  } else {
+                    map.set(p.slug, p);
+                  }
+                });
+                return Array.from(map.values());
+              });
+            }
           } catch {}
         }
       }
@@ -395,10 +463,10 @@ export default function AdminServicesPage() {
             <thead>
               <tr>
                 <th>Service Name</th>
-                <th>URL Slug</th>
-                <th>Sections &amp; FAQs</th>
-                <th>Key Benefits</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th style={{ whiteSpace: "nowrap" }}>URL Slug</th>
+                <th style={{ whiteSpace: "nowrap" }}>Sections &amp; FAQs</th>
+                <th style={{ whiteSpace: "nowrap" }}>Key Benefits</th>
+                <th style={{ textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -423,21 +491,23 @@ export default function AdminServicesPage() {
                         {service.shortDescription || "Clinical treatment"}
                       </div>
                     </td>
-                    <td>
-                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a" }}>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a", whiteSpace: "nowrap" }}>
                         /services/{service.slug}
                       </code>
                     </td>
-                    <td>
-                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, marginRight: 6 }}>
-                        {service.customSections?.length || 0} Sections
-                      </span>
-                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6 }}>
-                        {service.faqs?.length || 0} FAQs
-                      </span>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                          {service.customSections?.length || 0} Sections
+                        </span>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                          {service.faqs?.length || 0} FAQs
+                        </span>
+                      </div>
                     </td>
-                    <td>
-                      <span style={{ fontSize: 12.5, color: "#475569" }}>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <span style={{ fontSize: 12.5, color: "#475569", whiteSpace: "nowrap" }}>
                         {service.benefits?.length || 0} highlights
                       </span>
                     </td>
@@ -520,11 +590,13 @@ function ServiceEditorModal({
   onDelete: (slug: string) => void;
   onPreview: (slug: string) => void;
 }) {
+  const initialOrder = initialService.sectionOrder && initialService.sectionOrder.length > 0
+    ? sanitizeServiceOrder(initialService).sectionOrder!
+    : getDefaultServiceOrder(initialService);
+
   const [service, setService] = useState<Service>({
     ...initialService,
-    sectionOrder: initialService.sectionOrder && initialService.sectionOrder.length > 0
-      ? initialService.sectionOrder
-      : defaultServiceSectionOrder,
+    sectionOrder: initialOrder,
     sectionsData: initialService.sectionsData || {}
   });
 
@@ -536,12 +608,82 @@ function ServiceEditorModal({
   // Drag & Drop reordering state
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [deleteSectionKey, setDeleteSectionKey] = useState<string | null>(null);
 
   // Section Ordering & Visibility helpers (Hero banner is configured in Tab 1)
-  const rawOrder = service.sectionOrder && service.sectionOrder.length > 0
+  const baseOrder = service.sectionOrder && service.sectionOrder.length > 0
     ? service.sectionOrder
-    : defaultServiceSectionOrder;
-  const currentOrder = rawOrder.filter((k) => k !== "hero");
+    : getDefaultServiceOrder(service);
+
+  // Expand "custom_sections" into individual custom-0, custom-1, etc.
+  const expandedOrder: string[] = [];
+  const customCount = service.customSections?.length || 0;
+  baseOrder.forEach((k) => {
+    if (k === "custom_sections") {
+      if (customCount > 0) {
+        for (let i = 0; i < customCount; i++) {
+          if (!expandedOrder.includes(`custom-${i}`)) {
+            expandedOrder.push(`custom-${i}`);
+          }
+        }
+      }
+    } else {
+      expandedOrder.push(k);
+    }
+  });
+
+  // Ensure all existing custom sections are represented in order
+  for (let i = 0; i < customCount; i++) {
+    const customKey = `custom-${i}`;
+    if (!expandedOrder.includes(customKey)) {
+      expandedOrder.push(customKey);
+    }
+  }
+
+  // Filter out custom- keys that are beyond customCount
+  const validOrder = expandedOrder.filter((k) => {
+    if (k.startsWith("custom-")) {
+      const idx = parseInt(k.replace("custom-", ""), 10);
+      return idx >= 0 && idx < customCount;
+    }
+    return true;
+  });
+
+  const isSectionActiveOnPage = (key: string) => {
+    if (key === "hero") return false;
+    if ((service.hiddenSections || []).includes(key)) return false;
+
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      return Boolean(service.customSections && service.customSections[idx]);
+    }
+    if (key === "custom_sections") {
+      return Boolean(service.customSections && service.customSections.length > 0);
+    }
+    if (key === "benefits") {
+      const hasBullets = Boolean(service.sectionsData?.benefits?.bullets && service.sectionsData.benefits.bullets.length > 0);
+      const hasBenefits = Boolean(service.benefits && service.benefits.length > 0);
+      return hasBullets || hasBenefits;
+    }
+    if (key === "symptoms") {
+      const hasBullets = Boolean(service.sectionsData?.symptoms?.bullets && service.sectionsData.symptoms.bullets.length > 0);
+      const hasSymptoms = Boolean(service.symptoms && service.symptoms.length > 0);
+      return hasBullets || hasSymptoms;
+    }
+    if (key === "treatment_approach") {
+      const hasBullets = Boolean(service.sectionsData?.treatment_approach?.bullets && service.sectionsData.treatment_approach.bullets.length > 0);
+      const hasApproach = Boolean(service.treatmentApproach && service.treatmentApproach.length > 0);
+      return hasBullets || hasApproach;
+    }
+    if (key === "faqs") {
+      return Boolean(service.faqs && service.faqs.length > 0);
+    }
+
+    // Any other template section must be explicitly added or configured
+    return Boolean(service.sectionOrder && service.sectionOrder.includes(key));
+  };
+
+  const currentOrder = validOrder.filter(isSectionActiveOnPage);
 
   const hiddenSections = service.hiddenSections || [];
   const isSectionHidden = (key: string) => hiddenSections.includes(key);
@@ -562,9 +704,12 @@ function ServiceEditorModal({
     setService((prev) => ({ ...prev, sectionOrder: ["hero", ...newOrder] }));
   };
 
-  const [deleteSectionKey, setDeleteSectionKey] = useState<string | null>(null);
-
   const deleteSection = (key: string) => {
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      removeCustomSection(idx);
+      return;
+    }
     setDeleteSectionKey(key);
   };
 
@@ -610,16 +755,236 @@ function ServiceEditorModal({
     setDragOverIndex(null);
   };
 
-  // Block Customizer Save Handler
+  // Dynamic Bidirectional Section Data Resolver (Syncs with frontend and dashboard fields)
+  const getServiceEffectiveConfig = (key: string): SectionBlockConfig => {
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      const c = service.customSections?.[idx];
+      return {
+        title: c?.title || "",
+        subtitle: c?.subtitle || "",
+        eyebrow: c?.eyebrow || "",
+        eyebrowColor: c?.eyebrowColor || "#1c9fd8",
+        content: c?.content || "",
+        image: c?.image || "",
+        imagePosition: c?.imagePosition || "right",
+        background: c?.background || "white",
+        align: c?.align || "left",
+        ctaText: c?.ctaText || "",
+        ctaHref: c?.ctaHref || "",
+        bullets: c?.bullets ? [...c.bullets] : []
+      };
+    }
+
+    const cur = service.sectionsData?.[key] || {};
+
+    if (key === "benefits") {
+      const bullets = (cur.bullets && cur.bullets.length > 0)
+        ? cur.bullets
+        : (service.benefits && service.benefits.length > 0 ? service.benefits : []);
+      return {
+        ...cur,
+        title: cur.title || `Key Benefits of Our ${service.title} Care`,
+        eyebrow: cur.eyebrow || "Proven Clinical Outcomes",
+        eyebrowColor: cur.eyebrowColor || "#8cc63f",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: [...bullets]
+      };
+    }
+
+    if (key === "symptoms") {
+      const bullets = (cur.bullets && cur.bullets.length > 0)
+        ? cur.bullets
+        : (service.symptoms && service.symptoms.length > 0 ? service.symptoms : []);
+      return {
+        ...cur,
+        title: cur.title || `Conditions & Complaints We Treat with ${service.title}`,
+        eyebrow: cur.eyebrow || "Targeted Relief",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: [...bullets]
+      };
+    }
+
+    if (key === "treatment_approach") {
+      const bullets = (cur.bullets && cur.bullets.length > 0)
+        ? cur.bullets
+        : (service.treatmentApproach && service.treatmentApproach.length > 0 ? service.treatmentApproach : []);
+      const stepCount = bullets.length || 4;
+      return {
+        ...cur,
+        title: cur.title || `Our ${stepCount}-Step Approach to ${service.title}`,
+        eyebrow: cur.eyebrow || "Clinical Process",
+        eyebrowColor: cur.eyebrowColor || "#8cc63f",
+        subtitle: cur.subtitle || "Clear, transparent clinical care designed around your specific recovery goals.",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "light",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: [...bullets]
+      };
+    }
+
+    if (key === "clinical_overview") {
+      return {
+        ...cur,
+        title: cur.title || `Understanding ${service.title} & How We Help`,
+        eyebrow: cur.eyebrow || "Clinical Care & Methodology",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || service.description || "",
+        image: cur.image || service.sideImage || service.heroImage || "",
+        imagePosition: cur.imagePosition || (cur.image || service.sideImage ? "right" : "none"),
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: cur.bullets ? [...cur.bullets] : []
+      };
+    }
+
+    if (key === "at_a_glance") {
+      const defaultBullets = [
+        "Initial Assessment: 60-Minute Comprehensive",
+        "Direct Billing: Direct to 15+ Insurers",
+        "Referral: No Doctor Referral Needed",
+        "Location: Beddington SE (Free Parking)"
+      ];
+      return {
+        ...cur,
+        title: cur.title || "Treatment At-A-Glance",
+        eyebrow: cur.eyebrow || "Summary",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "light",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: (cur.bullets && cur.bullets.length > 0) ? [...cur.bullets] : defaultBullets
+      };
+    }
+
+    if (key === "decision_ctas") {
+      return {
+        ...cur,
+        title: cur.title || "Want help deciding if physio is right for you?",
+        eyebrow: cur.eyebrow || "Not Sure Where to Start?",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first.",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: cur.bullets ? [...cur.bullets] : []
+      };
+    }
+
+    if (key === "bottom_cta") {
+      return {
+        ...cur,
+        title: cur.title || `Ready to Start Your ${service.title} Care?`,
+        eyebrow: cur.eyebrow || "Take The First Step Today",
+        eyebrowColor: cur.eyebrowColor || "#8cc63f",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "Book your appointment online in under two minutes, or give us a call — we'd love to help you get back to the life you deserve.",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "teal",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || service.ctaText || "Book Your Treatment Online",
+        ctaHref: cur.ctaHref || service.ctaHref || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+        bullets: cur.bullets ? [...cur.bullets] : []
+      };
+    }
+
+    if (key === "hero") {
+      return {
+        ...cur,
+        title: cur.title || `${service.title} in Calgary North`,
+        eyebrow: cur.eyebrow || "Evidence-Based Clinical Care · Calgary North",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || service.shortDescription || "",
+        image: cur.image || service.heroImage || "",
+        imagePosition: cur.imagePosition || "right",
+        background: cur.background || "light",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || service.ctaText || "Book Your Treatment Online",
+        ctaHref: cur.ctaHref || service.ctaHref || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+        bullets: cur.bullets ? [...cur.bullets] : ["Direct Billing to Insurance", "No Physician Referral Needed", "Free On-Site Parking"]
+      };
+    }
+
+    return cur;
+  };
+
+  // Block Customizer Save Handler — Synchronizes both sectionsData and root service entities
   const handleSaveBlockConfig = (updatedCfg: SectionBlockConfig) => {
     if (!customizingBlockKey) return;
-    setService((prev) => ({
-      ...prev,
-      sectionsData: {
+    setService((prev) => {
+      const newSectionsData = {
         ...(prev.sectionsData || {}),
         [customizingBlockKey]: updatedCfg
+      };
+
+      const syncUpdates: Partial<Service> = {};
+
+      if (customizingBlockKey === "benefits" && updatedCfg.bullets) {
+        syncUpdates.benefits = [...updatedCfg.bullets];
       }
-    }));
+      if (customizingBlockKey === "symptoms" && updatedCfg.bullets) {
+        syncUpdates.symptoms = [...updatedCfg.bullets];
+      }
+      if (customizingBlockKey === "treatment_approach" && updatedCfg.bullets) {
+        syncUpdates.treatmentApproach = [...updatedCfg.bullets];
+      }
+      if (customizingBlockKey === "clinical_overview") {
+        if (updatedCfg.content) syncUpdates.description = updatedCfg.content;
+        if (updatedCfg.image) syncUpdates.sideImage = updatedCfg.image;
+      }
+      if (customizingBlockKey === "hero") {
+        if (updatedCfg.content) syncUpdates.shortDescription = updatedCfg.content;
+        if (updatedCfg.image) syncUpdates.heroImage = updatedCfg.image;
+      }
+
+      let newCustomSections = prev.customSections ? [...prev.customSections] : [];
+      if (customizingBlockKey.startsWith("custom-")) {
+        const idx = parseInt(customizingBlockKey.replace("custom-", ""), 10);
+        if (newCustomSections[idx]) {
+          newCustomSections[idx] = { ...newCustomSections[idx], ...updatedCfg };
+        }
+      }
+
+      return {
+        ...prev,
+        ...syncUpdates,
+        sectionsData: newSectionsData,
+        customSections: newCustomSections
+      };
+    });
   };
 
   // Hero Section Trust Badges helpers
@@ -680,18 +1045,39 @@ function ServiceEditorModal({
 
   const addBenefit = () => {
     if (!newBenefit.trim()) return;
-    setService((prev) => ({
-      ...prev,
-      benefits: [...(prev.benefits || []), newBenefit.trim()]
-    }));
+    const item = newBenefit.trim();
+    setService((prev) => {
+      const updatedBenefits = [...(prev.benefits || []), item];
+      return {
+        ...prev,
+        benefits: updatedBenefits,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          benefits: {
+            ...(prev.sectionsData?.benefits || {}),
+            bullets: updatedBenefits
+          }
+        }
+      };
+    });
     setNewBenefit("");
   };
 
   const removeBenefit = (idx: number) => {
-    setService((prev) => ({
-      ...prev,
-      benefits: prev.benefits?.filter((_, i) => i !== idx)
-    }));
+    setService((prev) => {
+      const updatedBenefits = prev.benefits?.filter((_, i) => i !== idx) || [];
+      return {
+        ...prev,
+        benefits: updatedBenefits,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          benefits: {
+            ...(prev.sectionsData?.benefits || {}),
+            bullets: updatedBenefits
+          }
+        }
+      };
+    });
   };
 
   const addFaq = () => {
@@ -731,14 +1117,18 @@ function ServiceEditorModal({
     };
 
     setService((prev) => {
+      const newCustomSections = [...(prev.customSections || []), newSec];
+      const newIdx = newCustomSections.length - 1;
       const order = prev.sectionOrder || defaultServiceSectionOrder;
-      const newOrder = order.includes("custom_sections") ? order : [...order, "custom_sections"];
+      const cleanOrder = order.filter((k) => k !== "custom_sections");
+      const customKey = `custom-${newIdx}`;
+      const newOrder = cleanOrder.includes(customKey) ? cleanOrder : [...cleanOrder, customKey];
       const curHidden = prev.hiddenSections || [];
       return {
         ...prev,
-        customSections: [...(prev.customSections || []), newSec],
+        customSections: newCustomSections,
         sectionOrder: newOrder,
-        hiddenSections: curHidden.filter((k) => k !== "custom_sections")
+        hiddenSections: curHidden.filter((k) => k !== customKey && k !== "custom_sections")
       };
     });
     setActiveTab("layout");
@@ -753,10 +1143,36 @@ function ServiceEditorModal({
   };
 
   const removeCustomSection = (idx: number) => {
-    setService((prev) => ({
-      ...prev,
-      customSections: prev.customSections?.filter((_, i) => i !== idx)
-    }));
+    setService((prev) => {
+      const filteredSections = prev.customSections?.filter((_, i) => i !== idx) || [];
+      const deletedKey = `custom-${idx}`;
+      
+      const updateKeys = (keys: string[]) => {
+        return keys
+          .filter((k) => k !== deletedKey && k !== "custom_sections")
+          .map((k) => {
+            if (k.startsWith("custom-")) {
+              const num = parseInt(k.replace("custom-", ""), 10);
+              if (num > idx) {
+                return `custom-${num - 1}`;
+              }
+            }
+            return k;
+          });
+      };
+
+      const curOrder = prev.sectionOrder || defaultServiceSectionOrder;
+      const newOrder = updateKeys(curOrder);
+      const curHidden = prev.hiddenSections || [];
+      const newHidden = updateKeys(curHidden);
+
+      return {
+        ...prev,
+        customSections: filteredSections,
+        sectionOrder: newOrder,
+        hiddenSections: newHidden
+      };
+    });
   };
 
   // Apply Section Template Helper
@@ -764,22 +1180,57 @@ function ServiceEditorModal({
     setShowAddSectionModal(false);
 
     if (template.isCustom) {
-      const newIndex = service.customSections?.length || 0;
       addCustomSectionWithPreset(template.preset);
-      // Immediately open info update box for this newly created custom section
-      setCustomizingBlockKey(`custom-${newIndex}`);
       return;
     }
 
     const key = template.id;
     setService((prev) => {
       const curHidden = prev.hiddenSections || [];
-      const order = prev.sectionOrder || defaultServiceSectionOrder;
-      const newOrder = order.includes(key) ? order : [...order, key];
+      const order = prev.sectionOrder && prev.sectionOrder.length > 0 ? prev.sectionOrder : currentOrder;
+      const cleanOrder = order.filter((k) => k !== key && k !== "hero");
+      const newOrder = ["hero", ...cleanOrder, key];
       const curSectionsData = prev.sectionsData || {};
+
+      let updatedFields: Partial<Service> = {};
+      if (key === "benefits" && (!prev.benefits || prev.benefits.length === 0)) {
+        updatedFields.benefits = template.preset?.bullets || [
+          "Targeted pain relief & accelerated tissue healing",
+          "One-on-one care with registered therapists",
+          "Direct billing to all major insurance plans"
+        ];
+      }
+      if (key === "symptoms" && (!prev.symptoms || prev.symptoms.length === 0)) {
+        updatedFields.symptoms = template.preset?.bullets || [
+          "Persistent localized pain and joint restriction",
+          "Muscle stiffness, spasms, and mobility limits",
+          "Post-injury rehabilitation and flare-up prevention"
+        ];
+      }
+      if (key === "treatment_approach" && (!prev.treatmentApproach || prev.treatmentApproach.length === 0)) {
+        updatedFields.treatmentApproach = template.preset?.bullets || [
+          "Comprehensive physical assessment & biomechanical evaluation",
+          "Targeted manual therapy, joint mobilization & soft tissue release",
+          "Progressive therapeutic exercise prescription",
+          "Long-term injury prevention & home management protocol"
+        ];
+      }
+      if (key === "faqs" && (!prev.faqs || prev.faqs.length === 0)) {
+        updatedFields.faqs = [
+          {
+            question: `Do I need a doctor's referral for ${prev.title || "this treatment"}?`,
+            answer: "No, in Alberta you do not need a doctor's referral to begin treatment. You can book directly with our registered team."
+          },
+          {
+            question: "Is this treatment covered by extended health insurance?",
+            answer: "Yes, our services are covered by most extended health benefit plans, WCB, and auto insurance (MVA). We offer direct billing."
+          }
+        ];
+      }
 
       return {
         ...prev,
+        ...updatedFields,
         hiddenSections: curHidden.filter((k) => k !== key),
         sectionOrder: newOrder,
         sectionsData: {
@@ -807,10 +1258,12 @@ function ServiceEditorModal({
         onConfirm={() => {
           if (deleteSectionKey) {
             setService((prev) => {
-              const curOrder = prev.sectionOrder && prev.sectionOrder.length > 0 ? prev.sectionOrder : defaultServiceSectionOrder;
+              const curOrder = prev.sectionOrder && prev.sectionOrder.length > 0 ? prev.sectionOrder : currentOrder;
+              const curHidden = prev.hiddenSections || [];
               return {
                 ...prev,
-                sectionOrder: curOrder.filter((k) => k !== deleteSectionKey)
+                sectionOrder: curOrder.filter((k) => k !== deleteSectionKey),
+                hiddenSections: curHidden.includes(deleteSectionKey) ? curHidden : [...curHidden, deleteSectionKey]
               };
             });
             setDeleteSectionKey(null);
@@ -1213,19 +1666,17 @@ function ServiceEditorModal({
                       </div>
                     </div>
 
-                    <div className="adm-form-group" style={{ margin: 0 }}>
-                      <label className="adm-form-label">
-                        Card Thumbnail Image (Optional)
-                      </label>
-                      <input
-                        type="text"
-                        className="adm-input"
+                    <div>
+                      <AdminImageUploader
+                        label="Card Thumbnail Image (Optional — leave empty for clean Icon style)"
                         value={service.cardImage || ""}
-                        onChange={(e) => setService({ ...service, cardImage: e.target.value })}
-                        placeholder="Leave empty for Icon only, or enter image URL (e.g. /images/clinic/reception-three.jpg)"
+                        onChange={(url) => setService({ ...service, cardImage: url })}
+                        folder="services"
+                        placeholder="Upload thumbnail or enter image URL..."
+                        aspectRatioNote="Landscape 16:9 or 4:3 (Leave empty for Icon style)"
                       />
-                      <span style={{ fontSize: 11.5, color: "#64748b", marginTop: 3, display: "block" }}>
-                        Leave blank to show the clean Icon style, or provide an image URL to show an image thumbnail banner on the card.
+                      <span style={{ fontSize: 11.5, color: "#64748b", marginTop: 4, display: "block" }}>
+                        Leave blank to display the clean Icon style, or upload an image to show an image thumbnail banner on directory &amp; home cards.
                       </span>
                     </div>
 
@@ -1365,11 +1816,20 @@ function ServiceEditorModal({
               {/* Reorderable Sections List with Drag & Drop */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {currentOrder.map((key, idx) => {
-                  const secDef = sectionDefinitions[key] || {
-                    title: key,
-                    desc: "Custom page section block",
-                    category: "Block"
-                  };
+                  const isCustomStory = key.startsWith("custom-") || key === "custom_sections";
+                  let secTitle = sectionDefinitions[key]?.title || key;
+                  let secDesc = sectionDefinitions[key]?.desc || "Custom page section block";
+
+                  if (key.startsWith("custom-")) {
+                    const cIdx = parseInt(key.replace("custom-", ""), 10);
+                    const story = service.customSections?.[cIdx];
+                    secTitle = `Custom Story #${cIdx + 1}: ${story?.title || "Visual Storytelling Section"}`;
+                    secDesc = story?.subtitle || story?.eyebrow || "Draggable visual storytelling block (content edited in card below)";
+                  } else if (key === "custom_sections") {
+                    secTitle = "Visual Storytelling Sections";
+                    secDesc = "Custom storytelling blocks with photo, text, and bullets";
+                  }
+
                   const hidden = isSectionHidden(key);
                   const hasCustomConfig = Boolean(service.sectionsData?.[key]);
                   const isBeingDragged = draggedIndex === idx;
@@ -1440,8 +1900,8 @@ function ServiceEditorModal({
 
                         <div>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                            <strong style={{ fontSize: 13.5, color: hidden ? "#64748b" : "#1e293b" }}>
-                              {secDef.title}
+                            <strong style={{ fontSize: 13.5, color: "#1e293b" }}>
+                              {secTitle}
                             </strong>
                             <span
                               style={{
@@ -1449,27 +1909,28 @@ function ServiceEditorModal({
                                 fontWeight: 700,
                                 padding: "2px 8px",
                                 borderRadius: 999,
-                                background: hidden ? "#fee2e2" : "#dcfce7",
-                                color: hidden ? "#991b1b" : "#166534"
+                                background: "#dcfce7",
+                                color: "#166534"
                               }}
                             >
-                              {hidden ? "Hidden" : "Active"}
+                              Active
                             </span>
-                            {key === "custom_sections" && (
+                            {isCustomStory && (
                               <span
                                 style={{
                                   fontSize: 10.5,
                                   fontWeight: 700,
                                   padding: "2px 6px",
                                   borderRadius: 4,
-                                  background: "#e0f2fe",
-                                  color: "#0369a1"
+                                  background: "#f0fdf4",
+                                  color: "#166534",
+                                  border: "1px solid #bbf7d0"
                                 }}
                               >
-                                {service.customSections?.length || 0} Custom Stories
+                                Visual Story
                               </span>
                             )}
-                            {hasCustomConfig && (
+                            {hasCustomConfig && !isCustomStory && (
                               <span
                                 style={{
                                   fontSize: 10.5,
@@ -1485,28 +1946,30 @@ function ServiceEditorModal({
                             )}
                           </div>
                           <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-                            {secDef.desc}
+                            {secDesc}
                           </div>
                         </div>
                       </div>
 
-                      {/* Right side: Customize, Reorder, Visibility */}
+                      {/* Right side: Customize, Reorder, Remove */}
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         
-                        {/* Universal Section Block Customizer Button */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCustomizingBlockKey(key);
-                          }}
-                          className="adm-btn adm-btn-secondary adm-btn-sm"
-                          style={{ display: "flex", alignItems: "center", gap: 5 }}
-                          title="Customize image, position, background, title, and highlights"
-                        >
-                          <SlidersIcon size={13} />
-                          <span>Customize Block</span>
-                        </button>
+                        {/* Universal Section Block Customizer Button - Hidden for custom stories because content is edited in the dedicated card manager below */}
+                        {!isCustomStory && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCustomizingBlockKey(key);
+                            }}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                            style={{ display: "flex", alignItems: "center", gap: 5 }}
+                            title="Customize image, position, background, title, and highlights"
+                          >
+                            <SlidersIcon size={13} />
+                            <span>Customize Block</span>
+                          </button>
+                        )}
 
                         {/* Master Admin: Move Up & Move Down */}
                         {isAdmin && (
@@ -1550,19 +2013,7 @@ function ServiceEditorModal({
                           </div>
                         )}
 
-                        {/* Hide / Restore Toggle */}
-                        <button
-                          type="button"
-                          onClick={() => toggleSectionVisibility(key)}
-                          className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
-                          style={{ minWidth: 84, display: "flex", alignItems: "center", gap: 5 }}
-                          title={hidden ? "Restore this section to live view" : "Hide this section from live view"}
-                        >
-                          {hidden ? <EyeIcon size={13} /> : <EyeOffIcon size={13} />}
-                          <span>{hidden ? "Restore" : "Hide"}</span>
-                        </button>
-
-                        {/* Delete Section */}
+                        {/* Remove Section from Page Layout */}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -1574,14 +2025,18 @@ function ServiceEditorModal({
                             border: "1px solid #fca5a5",
                             color: "#dc2626",
                             borderRadius: 6,
-                            padding: "6px 8px",
+                            padding: "6px 10px",
                             cursor: "pointer",
                             display: "flex",
-                            alignItems: "center"
+                            alignItems: "center",
+                            gap: 5,
+                            fontSize: 12.5,
+                            fontWeight: 600
                           }}
-                          title="Delete this section from page layout"
+                          title="Remove this section from page layout"
                         >
-                          <TrashIcon size={14} />
+                          <TrashIcon size={13} />
+                          <span>Remove</span>
                         </button>
                       </div>
                     </div>
@@ -2208,8 +2663,8 @@ function ServiceEditorModal({
                   {[
                     {
                       id: "testimonials",
-                      title: "Patient Testimonials & Reviews Grid",
-                      desc: "5-star Google review quotes and patient recovery stories.",
+                      title: "Patient Reviews & Google Reviews Widget",
+                      desc: "Live Google reviews widget and patient 5-star testimonials.",
                       iconComponent: <StarIcon size={18} />,
                       iconBg: "#fef3c7",
                       iconColor: "#d97706",
@@ -2353,11 +2808,7 @@ function ServiceEditorModal({
               ? service.customSections?.[parseInt(customizingBlockKey.replace("custom-", ""), 10)]?.title || "Custom Story Section"
               : sectionDefinitions[customizingBlockKey]?.title || customizingBlockKey
           }
-          config={
-            customizingBlockKey.startsWith("custom-")
-              ? service.customSections?.[parseInt(customizingBlockKey.replace("custom-", ""), 10)]
-              : service.sectionsData?.[customizingBlockKey]
-          }
+          config={getServiceEffectiveConfig(customizingBlockKey)}
           onSave={(cfg) => {
             if (customizingBlockKey.startsWith("custom-")) {
               const idx = parseInt(customizingBlockKey.replace("custom-", ""), 10);

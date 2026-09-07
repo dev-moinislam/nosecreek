@@ -69,7 +69,74 @@ export async function GET(req: NextRequest) {
     let placeRating = "4.9";
     let placeReviewCount = "545+ Calgary Reviews";
 
-    // 3. If Google Places API Key and Place ID exist, call Google Places Details API
+    // 3. Fetch from TheReviewsPlace / Google live feed (Widget ID: 26258 or from settings)
+    try {
+      let widgetId = "26258";
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data: sData } = await supabase.from("site_settings").select("reviews_widget_code").eq("id", "main").single();
+          const match = sData?.reviews_widget_code?.match(/data-rw-(?:masonry|flash|badge)=["']?(\d+)["']?/i);
+          if (match && match[1]) widgetId = match[1];
+        } catch {}
+      }
+
+      const rwResponse = await fetch(`https://api.thereviewsplace.com/v1/widgets/posts/${widgetId}`, { next: { revalidate: 86400 } });
+      const rwData = await rwResponse.json();
+
+      if (rwData && Array.isArray(rwData.items) && rwData.items.length > 0) {
+        fetchedReviews = rwData.items.map((it: any) => {
+          let cleanText = (it.text || "")
+            .replace(/<br\s*\/?>/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          let postDate = "Verified Patient";
+          if (it.posted_on) {
+            const dPart = it.posted_on.split(" ")[0];
+            if (dPart && dPart !== "0000-00-00") postDate = dPart;
+          }
+
+          return {
+            id: `google-${it.id}`,
+            author: (it.from_name || "Verified Patient").trim(),
+            text: cleanText,
+            rating: it.rating_value || 5,
+            platform: "Google",
+            date: postDate,
+            avatar: it.from_image || it.from_image_file || "",
+            verified: true
+          };
+        });
+
+        // Sync to Supabase Testimonials table
+        if (isSupabaseConfigured && supabase) {
+          for (const rev of fetchedReviews) {
+            await supabase.from("testimonials").upsert({
+              id: rev.id,
+              author: rev.author,
+              text: rev.text,
+              rating: rev.rating,
+              platform: rev.platform,
+              date: rev.date,
+              avatar: rev.avatar || null,
+              is_published: true,
+              updated_at: new Date().toISOString()
+            });
+          }
+
+          await supabase.from("site_settings").upsert({
+            id: "main",
+            google_rating: placeRating,
+            google_review_count: placeReviewCount,
+            last_google_sync: new Date().toISOString()
+          });
+        }
+      }
+    } catch (rwErr) {
+      console.warn("TheReviewsPlace API fetch error, falling back:", rwErr);
+    }
+
+    // 4. If Google Places API Key and Place ID exist, optionally call Google Places Details API directly
     if (apiKey && placeId) {
       try {
         const googleUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
@@ -81,49 +148,8 @@ export async function GET(req: NextRequest) {
 
         if (googleData.status === "OK" && googleData.result) {
           const result = googleData.result;
-          placeRating = result.rating ? result.rating.toFixed(1) : "4.9";
-          placeReviewCount = result.user_ratings_total ? `${result.user_ratings_total}+ Calgary Reviews` : "545+ Calgary Reviews";
-
-          if (result.reviews && Array.isArray(result.reviews) && result.reviews.length > 0) {
-            // Map Google reviews to standard format (filtering 4-5 stars)
-            fetchedReviews = result.reviews
-              .filter((r: any) => (r.rating || 5) >= 4)
-              .map((r: any, idx: number) => ({
-                id: `google-${r.time || idx}-${Date.now()}`,
-                author: r.author_name || "Google Reviewer",
-                text: r.text || "",
-                rating: r.rating || 5,
-                platform: "Google",
-                date: r.relative_time_description || "Recent",
-                avatar: r.profile_photo_url || "",
-                verified: true,
-              }));
-
-            // Sync to Supabase Testimonials table
-            if (isSupabaseConfigured && supabase) {
-              for (const rev of fetchedReviews) {
-                await supabase.from("testimonials").upsert({
-                  id: rev.id,
-                  author: rev.author,
-                  text: rev.text,
-                  rating: rev.rating,
-                  platform: rev.platform,
-                  date: rev.date,
-                  avatar: rev.avatar || null,
-                  is_published: true,
-                  updated_at: new Date().toISOString(),
-                });
-              }
-
-              // Update site settings
-              await supabase.from("site_settings").upsert({
-                id: "main",
-                google_rating: placeRating,
-                google_review_count: placeReviewCount,
-                last_google_sync: new Date().toISOString(),
-              });
-            }
-          }
+          placeRating = result.rating ? result.rating.toFixed(1) : placeRating;
+          placeReviewCount = result.user_ratings_total ? `${result.user_ratings_total}+ Calgary Reviews` : placeReviewCount;
         }
       } catch (gErr) {
         console.warn("Google Places API call notice:", gErr);

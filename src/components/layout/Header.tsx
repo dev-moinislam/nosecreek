@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 
 import defaultServicesData from "@/data/services.json";
 import defaultConditionsData from "@/data/conditions.json";
-import { Service, Condition } from "@/types/content";
+import defaultSettingsData from "@/data/settings.json";
+import { Service, Condition, SiteSettings } from "@/types/content";
 import { getServices, getConditions } from "@/lib/api";
 
 export default function Header() {
@@ -18,6 +19,7 @@ export default function Header() {
   const [mobileConditionsOpen, setMobileConditionsOpen] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
 
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettingsData as SiteSettings);
   const [dynamicServices, setDynamicServices] = useState<Service[]>(defaultServicesData as Service[]);
   const [dynamicConditions, setDynamicConditions] = useState<Condition[]>(defaultConditionsData as Condition[]);
 
@@ -26,27 +28,60 @@ export default function Header() {
   const conditionsRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  // Dynamic sync of backend services and conditions
+  // Dynamic sync of backend services, conditions, and site settings
   useEffect(() => {
     function syncContent() {
       try {
+        const savedSettings = localStorage.getItem("adm_settings");
+        if (savedSettings) {
+          const parsed = JSON.parse(savedSettings);
+          const s = parsed.settings || parsed;
+          if (s && (s.contact || s.clinicName || s.primaryCTA || s.bookingUrl)) {
+            setSiteSettings((prev) => ({ ...prev, ...s }));
+          }
+        }
         const savedServices = localStorage.getItem("adm_services");
         if (savedServices) {
           const parsed = JSON.parse(savedServices);
-          if (Array.isArray(parsed) && parsed.length > 0) setDynamicServices(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map<string, Service>();
+            (defaultServicesData as Service[]).forEach((s) => map.set(s.slug, s));
+            parsed.forEach((p) => {
+              if (map.has(p.slug)) {
+                map.set(p.slug, { ...map.get(p.slug)!, ...p });
+              } else {
+                map.set(p.slug, p);
+              }
+            });
+            setDynamicServices(Array.from(map.values()));
+          }
         }
         const savedConditions = localStorage.getItem("adm_conditions");
         if (savedConditions) {
           const parsed = JSON.parse(savedConditions);
-          if (Array.isArray(parsed) && parsed.length > 0) setDynamicConditions(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map<string, Condition>();
+            (defaultConditionsData as Condition[]).forEach((c) => map.set(c.slug, c));
+            parsed.forEach((p) => {
+              if (map.has(p.slug)) {
+                map.set(p.slug, { ...map.get(p.slug)!, ...p });
+              } else {
+                map.set(p.slug, p);
+              }
+            });
+            setDynamicConditions(Array.from(map.values()));
+          }
         }
       } catch {}
     }
+    syncContent();
 
+    window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);
     window.addEventListener("conditionsUpdated", syncContent);
     window.addEventListener("storage", syncContent);
     return () => {
+      window.removeEventListener("settingsUpdated", syncContent);
       window.removeEventListener("servicesUpdated", syncContent);
       window.removeEventListener("conditionsUpdated", syncContent);
       window.removeEventListener("storage", syncContent);
@@ -181,8 +216,10 @@ export default function Header() {
             <span>Rated 4.9 / 5 from 545 Google reviews</span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px 22px" }}>
-            <span>Direct billing available · Open 6:45am–7:15pm</span>
-            <a href="tel:+14032958590" style={{ color: "#8cc63f", fontWeight: 700, textDecoration: "none" }}>403.295.8590</a>
+            <span>Direct billing available · {siteSettings.openingHours?.weekdays ? `Open ${siteSettings.openingHours.weekdays}` : "Open 6:45am–7:15pm"}</span>
+            <a href={`tel:${(siteSettings.contact?.phone || "403.295.8590").replace(/[^0-9+]/g, "")}`} style={{ color: "#8cc63f", fontWeight: 700, textDecoration: "none" }}>
+              {siteSettings.contact?.phone || "403.295.8590"}
+            </a>
           </div>
         </div>
       </div>
@@ -535,7 +572,7 @@ export default function Header() {
           {/* Book CTA & Mobile Burger */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, flex: "0 0 auto" }}>
             <a
-              href="https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+              href={siteSettings.bookingUrl || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"}
               target="_blank"
               rel="noopener noreferrer"
               className="header-book-btn"
@@ -548,7 +585,7 @@ export default function Header() {
                 textDecoration: "none"
               }}
             >
-              Book Online
+              {siteSettings.primaryCTA || "Book Online"}
             </a>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -798,7 +835,7 @@ export default function Header() {
             </Link>
 
             <a
-              href="https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+              href={siteSettings.bookingUrl || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -811,7 +848,7 @@ export default function Header() {
                 textDecoration: "none"
               }}
             >
-              Book Your Appointment Online
+              {siteSettings.primaryCTA || "Book Your Appointment Online"}
             </a>
           </div>
         )}
@@ -819,17 +856,17 @@ export default function Header() {
 
       {/* ─── MOBILE STICKY BOTTOM ACTION BAR ─── */}
       <div className="mobile-bottom-bar">
-        <a href="tel:403-295-8590" className="call-btn" aria-label="Call Nose Creek Physiotherapy">
+        <a href={`tel:${(siteSettings.contact?.phone || "403-295-8590").replace(/[^0-9+]/g, "")}`} className="call-btn" aria-label="Call Nose Creek Physiotherapy">
           Call
         </a>
         <a
-          href="https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+          href={siteSettings.bookingUrl || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"}
           target="_blank"
           rel="noopener noreferrer"
           className="book-btn"
           aria-label="Book appointment online"
         >
-          Book Online
+          {siteSettings.primaryCTA || "Book Online"}
         </a>
       </div>
     </>

@@ -2,25 +2,50 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import defaultServicesData from "@/data/services.json";
-import { Service } from "@/types/content";
+import defaultSettingsData from "@/data/settings.json";
+import { Service, SiteSettings } from "@/types/content";
 import { getServices } from "@/lib/api";
 
 export default function Footer() {
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettingsData as SiteSettings);
   const [services, setServices] = useState<Service[]>(defaultServicesData as Service[]);
 
   useEffect(() => {
     function sync() {
       try {
+        const savedSettings = localStorage.getItem("adm_settings");
+        if (savedSettings) {
+          const parsed = JSON.parse(savedSettings);
+          const s = parsed.settings || parsed;
+          if (s && (s.contact || s.clinicName || s.bookingUrl || s.socialLinks || s.footerContent)) {
+            setSiteSettings((prev) => ({ ...prev, ...s }));
+          }
+        }
         const saved = localStorage.getItem("adm_services");
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) setServices(parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const map = new Map<string, Service>();
+            (defaultServicesData as Service[]).forEach((s) => map.set(s.slug, s));
+            parsed.forEach((p) => {
+              if (map.has(p.slug)) {
+                map.set(p.slug, { ...map.get(p.slug)!, ...p });
+              } else {
+                map.set(p.slug, p);
+              }
+            });
+            setServices(Array.from(map.values()));
+          }
         }
       } catch {}
     }
+    sync();
+
+    window.addEventListener("settingsUpdated", sync);
     window.addEventListener("servicesUpdated", sync);
     window.addEventListener("storage", sync);
     return () => {
+      window.removeEventListener("settingsUpdated", sync);
       window.removeEventListener("servicesUpdated", sync);
       window.removeEventListener("storage", sync);
     };
@@ -45,7 +70,12 @@ export default function Footer() {
   ];
 
   const getStartedLinks = [
-    { label: "Book Assessment Online", href: "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington", highlight: true, external: true },
+    {
+      label: "Book Assessment Online",
+      href: siteSettings.bookingUrl || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+      highlight: true,
+      external: true
+    },
     { label: "Free Discovery Session", href: "/contact?consult=discovery", highlight: false },
     { label: "Free Phone Consultation",href: "/contact?consult=phone", highlight: false },
     { label: "Clinic Contact & Map",   href: "/contact", highlight: false },
@@ -54,6 +84,11 @@ export default function Footer() {
 
   const colStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 9, fontSize: 13.5 };
   const headStyle: React.CSSProperties = { fontFamily: "'Poppins',sans-serif", fontWeight: 700, color: "#fff", fontSize: 14, marginBottom: 14 };
+
+  const phoneText = siteSettings.contact?.phone || "403.295.8590";
+  const addressLines = siteSettings.contact?.address
+    ? siteSettings.contact.address.split("\n")
+    : ["#22, 8120 Beddington Blvd NW", "Calgary, AB T3K 2A8, Canada"];
 
   return (
     <footer style={{ background: "#0d2530", color: "#a9c1cd", paddingTop: "clamp(44px,5vw,64px)" }}>
@@ -69,10 +104,18 @@ export default function Footer() {
             />
           </Link>
           <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "#94a3b8" }}>
-            #22, 8120 Beddington Blvd NW<br />Calgary, AB T3K 2A8, Canada
+            {addressLines.map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                {idx < addressLines.length - 1 && <br />}
+              </React.Fragment>
+            ))}
           </p>
-          <a href="tel:+14032958590" style={{ display: "inline-block", marginTop: 8, color: "#8cc63f", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15, textDecoration: "none" }}>
-            403.295.8590
+          <a
+            href={`tel:${phoneText.replace(/[^0-9+]/g, "")}`}
+            style={{ display: "inline-block", marginTop: 8, color: "#8cc63f", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15, textDecoration: "none" }}
+          >
+            {phoneText}
           </a>
           <div style={{ marginTop: 14 }}>
             <Link href="/contact#map" style={{ color: "#38bdf8", fontSize: 13, textDecoration: "underline", textUnderlineOffset: 3 }}>
@@ -150,16 +193,45 @@ export default function Footer() {
             ))}
           </div>
           <div style={{ display: "flex", gap: 14, marginTop: 18 }}>
-            <a href="https://www.facebook.com/nosecreekphysio" target="_blank" rel="noopener noreferrer" style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}>Facebook</a>
+            <a
+              href={siteSettings.socialLinks?.facebook || "https://www.facebook.com/nosecreekphysio"}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}
+            >
+              Facebook
+            </a>
             <span style={{ color: "#475569" }}>·</span>
-            <a href="https://www.instagram.com/nosecreekphysio" target="_blank" rel="noopener noreferrer" style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}>Instagram</a>
+            <a
+              href={siteSettings.socialLinks?.instagram || "https://www.instagram.com/nosecreekphysio"}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}
+            >
+              Instagram
+            </a>
+            {siteSettings.socialLinks?.youtube && (
+              <>
+                <span style={{ color: "#475569" }}>·</span>
+                <a
+                  href={siteSettings.socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}
+                >
+                  YouTube
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       <div style={{ borderTop: "1px solid #1c3a47", marginTop: 44 }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 24px", display: "flex", flexWrap: "wrap", gap: "10px 24px", justifyContent: "space-between", fontSize: 13, color: "#7b95a2" }}>
-          <span>© 2001–2026 Nose Creek Physiotherapy. All rights reserved. Calgary, Alberta.</span>
+          <span>
+            {siteSettings.footerContent || `© 2001–${new Date().getFullYear()} ${siteSettings.clinicName || "Nose Creek Physiotherapy"}. All rights reserved. Calgary, Alberta.`}
+          </span>
           <div style={{ display: "flex", gap: 20 }}>
             <Link href="/" style={{ color: "#7b95a2", textDecoration: "none" }}>Home</Link>
             <Link href="/services" style={{ color: "#7b95a2", textDecoration: "none" }}>Services</Link>

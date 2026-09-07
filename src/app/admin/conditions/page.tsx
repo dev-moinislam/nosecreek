@@ -45,6 +45,43 @@ import {
   SparklesIcon
 } from "@/components/admin/AdminIcons";
 
+export function getDefaultConditionOrder(c: Condition): string[] {
+  const list: string[] = ["hero"];
+  if (c.customSections && c.customSections.length > 0) {
+    c.customSections.forEach((_, i) => list.push(`custom-${i}`));
+  }
+  if ((c.benefits && c.benefits.length > 0) || (c.sectionsData?.benefits?.bullets && c.sectionsData.benefits.bullets.length > 0)) {
+    list.push("benefits");
+  }
+  if ((c.symptoms && c.symptoms.length > 0) || (c.sectionsData?.symptoms?.bullets && c.sectionsData.symptoms.bullets.length > 0)) {
+    list.push("symptoms");
+  }
+  if ((c.treatmentApproach && c.treatmentApproach.length > 0) || (c.sectionsData?.treatment_approach?.bullets && c.sectionsData.treatment_approach.bullets.length > 0)) {
+    list.push("treatment_approach");
+  }
+  if (c.faqs && c.faqs.length > 0) {
+    list.push("faqs");
+  }
+  if (c.sectionsData) {
+    Object.keys(c.sectionsData).forEach((k) => {
+      if (!list.includes(k) && k !== "hero" && !k.startsWith("custom-")) {
+        list.push(k);
+      }
+    });
+  }
+  return list;
+}
+
+export function sanitizeConditionOrder(c: Condition): Condition {
+  if (c.sectionOrder && c.sectionOrder.includes("at_a_glance") && (!c.sectionsData || !c.sectionsData.at_a_glance)) {
+    return { ...c, sectionOrder: getDefaultConditionOrder(c) };
+  }
+  if (!c.sectionOrder || c.sectionOrder.length === 0) {
+    return { ...c, sectionOrder: getDefaultConditionOrder(c) };
+  }
+  return c;
+}
+
 const defaultConditionSectionOrder = [
   "hero",
   "at_a_glance",
@@ -98,8 +135,8 @@ const conditionSectionDefs: Record<string, { title: string; desc: string; catego
     category: "Services"
   },
   testimonials: {
-    title: "Patient Testimonials & Reviews Grid",
-    desc: "Real patient 5-star quotes, ratings, and recovery success stories.",
+    title: "Patient Reviews & Google Reviews Widget",
+    desc: "Live Google reviews widget and patient 5-star testimonials.",
     category: "Social Proof"
   },
   team_carousel: {
@@ -147,17 +184,29 @@ export default function AdminConditionsPage() {
   const fetchConditions = async () => {
     setLoading(true);
     try {
-      let data = await getConditions();
+      const fresh = await getConditions();
+      let data = fresh.map(sanitizeConditionOrder);
       if (typeof window !== "undefined") {
         const saved = localStorage.getItem("adm_conditions");
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              data = parsed;
+              const map = new Map<string, Condition>();
+              fresh.forEach((c) => map.set(c.slug, c));
+              parsed.forEach((p) => {
+                if (map.has(p.slug)) {
+                  map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                } else {
+                  map.set(p.slug, p);
+                }
+              });
+              data = Array.from(map.values()).map(sanitizeConditionOrder);
             }
           } catch {}
         }
+        localStorage.setItem("adm_conditions", JSON.stringify(data));
+        window.dispatchEvent(new Event("conditionsUpdated"));
       }
       setConditions(data);
     } catch {
@@ -176,7 +225,20 @@ export default function AdminConditionsPage() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed)) setConditions(parsed);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setConditions((current) => {
+                const map = new Map<string, Condition>();
+                current.forEach((c) => map.set(c.slug, c));
+                parsed.forEach((p) => {
+                  if (map.has(p.slug)) {
+                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                  } else {
+                    map.set(p.slug, p);
+                  }
+                });
+                return Array.from(map.values());
+              });
+            }
           } catch {}
         }
       }
@@ -216,7 +278,7 @@ export default function AdminConditionsPage() {
           related_services: cond.relatedServices || [],
           hero_image: cond.heroImage || null,
           side_image: cond.sideImage || null,
-          seo: { ...(cond.seo || {}), sectionsData: cond.sectionsData || {} },
+          seo: { ...(cond.seo || {}), cardImage: cond.cardImage || null, sectionsData: cond.sectionsData || {} },
           is_published: true,
           updated_at: new Date().toISOString()
         };
@@ -391,23 +453,22 @@ export default function AdminConditionsPage() {
             <thead>
               <tr>
                 <th>Condition Name</th>
-                <th>Category</th>
-                <th>URL Slug</th>
-                <th>Sections &amp; FAQs</th>
-                <th>Key Symptoms</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th style={{ whiteSpace: "nowrap" }}>URL Slug</th>
+                <th style={{ whiteSpace: "nowrap" }}>Sections &amp; FAQs</th>
+                <th style={{ whiteSpace: "nowrap" }}>Key Symptoms</th>
+                <th style={{ textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "#64748b" }}>
+                  <td colSpan={5} style={{ textAlign: "center", padding: 36, color: "#64748b" }}>
                     Loading conditions data...
                   </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: 36, color: "#64748b" }}>
+                  <td colSpan={5} style={{ textAlign: "center", padding: 36, color: "#64748b" }}>
                     No conditions found.
                   </td>
                 </tr>
@@ -415,31 +476,33 @@ export default function AdminConditionsPage() {
                 filtered.map((cond) => (
                   <tr key={cond.slug}>
                     <td>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{cond.name}</div>
-                      <div style={{ fontSize: 12, color: "#64748b", maxWidth: 260, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{cond.name}</div>
+                        <span style={{ fontSize: 11, fontWeight: 700, textTransform: "capitalize", background: "#f1f5f9", color: "#475569", padding: "2px 7px", borderRadius: 4, whiteSpace: "nowrap" }}>
+                          {cond.category || "General"}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 12, color: "#64748b", maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {cond.shortDescription || cond.description?.slice(0, 70)}
                       </div>
                     </td>
-                    <td>
-                      <span style={{ fontSize: 11.5, fontWeight: 700, textTransform: "capitalize", background: "#f1f5f9", padding: "3px 8px", borderRadius: 6 }}>
-                        {cond.category || "General"}
-                      </span>
-                    </td>
-                    <td>
-                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a" }}>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a", whiteSpace: "nowrap" }}>
                         /conditions/{cond.slug}
                       </code>
                     </td>
-                    <td>
-                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, marginRight: 6 }}>
-                        {cond.customSections?.length || 0} Sections
-                      </span>
-                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6 }}>
-                        {cond.faqs?.length || 0} FAQs
-                      </span>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                          {cond.customSections?.length || 0} Sections
+                        </span>
+                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                          {cond.faqs?.length || 0} FAQs
+                        </span>
+                      </div>
                     </td>
-                    <td>
-                      <span style={{ fontSize: 12.5, color: "#475569" }}>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <span style={{ fontSize: 12.5, color: "#475569", whiteSpace: "nowrap" }}>
                         {cond.symptoms?.length || 0} symptom points
                       </span>
                     </td>
@@ -522,11 +585,13 @@ function ConditionEditorModal({
   onDelete: (slug: string) => void;
   onPreview: (slug: string) => void;
 }) {
+  const initialOrder = initialCondition.sectionOrder && initialCondition.sectionOrder.length > 0
+    ? sanitizeConditionOrder(initialCondition).sectionOrder!
+    : getDefaultConditionOrder(initialCondition);
+
   const [cond, setCond] = useState<Condition>({
     ...initialCondition,
-    sectionOrder: initialCondition.sectionOrder && initialCondition.sectionOrder.length > 0
-      ? initialCondition.sectionOrder
-      : defaultConditionSectionOrder,
+    sectionOrder: initialOrder,
     sectionsData: initialCondition.sectionsData || {}
   });
 
@@ -540,10 +605,79 @@ function ConditionEditorModal({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   // Section Ordering & Visibility helpers (Hero banner is configured in Tab 1)
-  const rawOrder = cond.sectionOrder && cond.sectionOrder.length > 0
+  const baseOrder = cond.sectionOrder && cond.sectionOrder.length > 0
     ? cond.sectionOrder
-    : defaultConditionSectionOrder;
-  const currentOrder = rawOrder.filter((k) => k !== "hero");
+    : getDefaultConditionOrder(cond);
+
+  // Expand "custom_sections" into individual custom-0, custom-1, etc.
+  const expandedOrder: string[] = [];
+  const customCount = cond.customSections?.length || 0;
+  baseOrder.forEach((k) => {
+    if (k === "custom_sections") {
+      if (customCount > 0) {
+        for (let i = 0; i < customCount; i++) {
+          if (!expandedOrder.includes(`custom-${i}`)) {
+            expandedOrder.push(`custom-${i}`);
+          }
+        }
+      }
+    } else {
+      expandedOrder.push(k);
+    }
+  });
+
+  // Ensure all existing custom sections are represented in order
+  for (let i = 0; i < customCount; i++) {
+    const customKey = `custom-${i}`;
+    if (!expandedOrder.includes(customKey)) {
+      expandedOrder.push(customKey);
+    }
+  }
+
+  // Filter out custom- keys that are beyond customCount
+  const validOrder = expandedOrder.filter((k) => {
+    if (k.startsWith("custom-")) {
+      const idx = parseInt(k.replace("custom-", ""), 10);
+      return idx >= 0 && idx < customCount;
+    }
+    return true;
+  });
+
+  const isSectionActiveOnPage = (key: string) => {
+    if (key === "hero") return false;
+    if ((cond.hiddenSections || []).includes(key)) return false;
+
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      return Boolean(cond.customSections && cond.customSections[idx]);
+    }
+    if (key === "custom_sections") {
+      return Boolean(cond.customSections && cond.customSections.length > 0);
+    }
+    if (key === "benefits") {
+      const hasBullets = Boolean(cond.sectionsData?.benefits?.bullets && cond.sectionsData.benefits.bullets.length > 0);
+      const hasBenefits = Boolean(cond.benefits && cond.benefits.length > 0);
+      return hasBullets || hasBenefits;
+    }
+    if (key === "symptoms") {
+      const hasBullets = Boolean(cond.sectionsData?.symptoms?.bullets && cond.sectionsData.symptoms.bullets.length > 0);
+      const hasSymptoms = Boolean(cond.symptoms && cond.symptoms.length > 0);
+      return hasBullets || hasSymptoms;
+    }
+    if (key === "treatment_approach") {
+      const hasBullets = Boolean(cond.sectionsData?.treatment_approach?.bullets && cond.sectionsData.treatment_approach.bullets.length > 0);
+      const hasApproach = Boolean(cond.treatmentApproach && cond.treatmentApproach.length > 0);
+      return hasBullets || hasApproach;
+    }
+    if (key === "faqs") {
+      return Boolean(cond.faqs && cond.faqs.length > 0);
+    }
+
+    // Any other template section must be explicitly added or configured
+    return Boolean(cond.sectionOrder && cond.sectionOrder.includes(key));
+  };
+
+  const currentOrder = validOrder.filter(isSectionActiveOnPage);
 
   const hiddenSections = cond.hiddenSections || [];
   const isSectionHidden = (key: string) => hiddenSections.includes(key);
@@ -567,6 +701,11 @@ function ConditionEditorModal({
   const [deleteSectionKey, setDeleteSectionKey] = useState<string | null>(null);
 
   const deleteSection = (key: string) => {
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      removeCustomSection(idx);
+      return;
+    }
     setDeleteSectionKey(key);
   };
 
@@ -581,12 +720,14 @@ function ConditionEditorModal({
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (!isAdmin) return;
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", index.toString());
   };
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
+    if (!isAdmin) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
     if (dragOverIndex !== index) {
@@ -595,6 +736,7 @@ function ConditionEditorModal({
   };
 
   const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    if (!isAdmin) return;
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === dropIndex) {
       setDraggedIndex(null);
@@ -609,16 +751,236 @@ function ConditionEditorModal({
     setDragOverIndex(null);
   };
 
-  // Block Customizer Save Handler
+  // Dynamic Bidirectional Section Data Resolver (Syncs with frontend and dashboard fields)
+  const getConditionEffectiveConfig = (key: string): SectionBlockConfig => {
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      const c = cond.customSections?.[idx];
+      return {
+        title: c?.title || "",
+        subtitle: c?.subtitle || "",
+        eyebrow: c?.eyebrow || "",
+        eyebrowColor: c?.eyebrowColor || "#1c9fd8",
+        content: c?.content || "",
+        image: c?.image || "",
+        imagePosition: c?.imagePosition || "right",
+        background: c?.background || "white",
+        align: c?.align || "left",
+        ctaText: c?.ctaText || "",
+        ctaHref: c?.ctaHref || "",
+        bullets: c?.bullets ? [...c.bullets] : []
+      };
+    }
+
+    const cur = cond.sectionsData?.[key] || {};
+
+    if (key === "benefits") {
+      const bullets = (cur.bullets && cur.bullets.length > 0)
+        ? cur.bullets
+        : (cond.benefits && cond.benefits.length > 0 ? cond.benefits : []);
+      return {
+        ...cur,
+        title: cur.title || `Key Benefits of Treating ${cond.name}`,
+        eyebrow: cur.eyebrow || "Proven Clinical Outcomes",
+        eyebrowColor: cur.eyebrowColor || "#8cc63f",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: [...bullets]
+      };
+    }
+
+    if (key === "symptoms") {
+      const bullets = (cur.bullets && cur.bullets.length > 0)
+        ? cur.bullets
+        : (cond.symptoms && cond.symptoms.length > 0 ? cond.symptoms : []);
+      return {
+        ...cur,
+        title: cur.title || `Key Warning Signs & Symptoms of ${cond.name}`,
+        eyebrow: cur.eyebrow || "Common Symptoms",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: [...bullets]
+      };
+    }
+
+    if (key === "treatment_approach") {
+      const bullets = (cur.bullets && cur.bullets.length > 0)
+        ? cur.bullets
+        : (cond.treatmentApproach && cond.treatmentApproach.length > 0 ? cond.treatmentApproach : []);
+      const stepCount = bullets.length || 4;
+      return {
+        ...cur,
+        title: cur.title || `Our ${stepCount}-Step Recovery Protocol for ${cond.name}`,
+        eyebrow: cur.eyebrow || "Clinical Process",
+        eyebrowColor: cur.eyebrowColor || "#8cc63f",
+        subtitle: cur.subtitle || "Targeted, evidence-based care designed to relieve pain and restore full function.",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "light",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: [...bullets]
+      };
+    }
+
+    if (key === "clinical_overview") {
+      return {
+        ...cur,
+        title: cur.title || `Understanding ${cond.name} & How Physiotherapy Helps`,
+        eyebrow: cur.eyebrow || "Clinical Care & Methodology",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || cond.description || "",
+        image: cur.image || cond.sideImage || cond.heroImage || "",
+        imagePosition: cur.imagePosition || (cur.image || cond.sideImage ? "right" : "none"),
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: cur.bullets ? [...cur.bullets] : []
+      };
+    }
+
+    if (key === "at_a_glance") {
+      const defaultBullets = [
+        "Initial Assessment: 60-Minute Comprehensive",
+        "Direct Billing: Direct to 15+ Insurers",
+        "Referral: No Doctor Referral Needed",
+        "Location: Beddington SE (Free Parking)"
+      ];
+      return {
+        ...cur,
+        title: cur.title || "Treatment At-A-Glance",
+        eyebrow: cur.eyebrow || "Summary",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "light",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: (cur.bullets && cur.bullets.length > 0) ? [...cur.bullets] : defaultBullets
+      };
+    }
+
+    if (key === "decision_ctas") {
+      return {
+        ...cur,
+        title: cur.title || `Want help deciding if treatment for ${cond.name} is right for you?`,
+        eyebrow: cur.eyebrow || "Not Sure Where to Start?",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first.",
+        content: cur.content || "",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "white",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || "",
+        ctaHref: cur.ctaHref || "",
+        bullets: cur.bullets ? [...cur.bullets] : []
+      };
+    }
+
+    if (key === "bottom_cta") {
+      return {
+        ...cur,
+        title: cur.title || `Ready to Overcome Your ${cond.name}?`,
+        eyebrow: cur.eyebrow || "Take The First Step Today",
+        eyebrowColor: cur.eyebrowColor || "#8cc63f",
+        subtitle: cur.subtitle || "",
+        content: cur.content || "Book your comprehensive assessment online in under two minutes, or give us a call — we're ready to help you recover.",
+        image: cur.image || "",
+        imagePosition: cur.imagePosition || "none",
+        background: cur.background || "teal",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || cond.ctaText || "Book Your Assessment Online",
+        ctaHref: cur.ctaHref || cond.ctaHref || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+        bullets: cur.bullets ? [...cur.bullets] : []
+      };
+    }
+
+    if (key === "hero") {
+      return {
+        ...cur,
+        title: cur.title || `${cond.name} Treatment in Calgary North`,
+        eyebrow: cur.eyebrow || "Targeted Physiotherapy & Rehabilitation · Calgary North",
+        eyebrowColor: cur.eyebrowColor || "#1c9fd8",
+        subtitle: cur.subtitle || "",
+        content: cur.content || cond.shortDescription || "",
+        image: cur.image || cond.heroImage || "",
+        imagePosition: cur.imagePosition || "right",
+        background: cur.background || "light",
+        align: cur.align || "left",
+        ctaText: cur.ctaText || cond.ctaText || "Book Your Assessment Online",
+        ctaHref: cur.ctaHref || cond.ctaHref || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+        bullets: (cur.bullets && cur.bullets.length > 0) ? [...cur.bullets] : [...heroBullets]
+      };
+    }
+
+    return cur;
+  };
+
+  // Block Customizer Save Handler — Synchronizes both sectionsData and root condition entities
   const handleSaveBlockConfig = (updatedCfg: SectionBlockConfig) => {
     if (!customizingBlockKey) return;
-    setCond((prev) => ({
-      ...prev,
-      sectionsData: {
+    setCond((prev) => {
+      const newSectionsData = {
         ...(prev.sectionsData || {}),
         [customizingBlockKey]: updatedCfg
+      };
+
+      const syncUpdates: Partial<Condition> = {};
+
+      if (customizingBlockKey === "benefits" && updatedCfg.bullets) {
+        syncUpdates.benefits = [...updatedCfg.bullets];
       }
-    }));
+      if (customizingBlockKey === "symptoms" && updatedCfg.bullets) {
+        syncUpdates.symptoms = [...updatedCfg.bullets];
+      }
+      if (customizingBlockKey === "treatment_approach" && updatedCfg.bullets) {
+        syncUpdates.treatmentApproach = [...updatedCfg.bullets];
+      }
+      if (customizingBlockKey === "clinical_overview") {
+        if (updatedCfg.content) syncUpdates.description = updatedCfg.content;
+        if (updatedCfg.image) syncUpdates.sideImage = updatedCfg.image;
+      }
+      if (customizingBlockKey === "hero") {
+        if (updatedCfg.content) syncUpdates.shortDescription = updatedCfg.content;
+        if (updatedCfg.image) syncUpdates.heroImage = updatedCfg.image;
+      }
+
+      let newCustomSections = prev.customSections ? [...prev.customSections] : [];
+      if (customizingBlockKey.startsWith("custom-")) {
+        const idx = parseInt(customizingBlockKey.replace("custom-", ""), 10);
+        if (newCustomSections[idx]) {
+          newCustomSections[idx] = { ...newCustomSections[idx], ...updatedCfg };
+        }
+      }
+
+      return {
+        ...prev,
+        ...syncUpdates,
+        sectionsData: newSectionsData,
+        customSections: newCustomSections
+      };
+    });
   };
 
   // Hero Section Trust Badges helpers
@@ -676,22 +1038,76 @@ function ConditionEditorModal({
   const [newSymptom, setNewSymptom] = useState("");
   const addSymptom = () => {
     if (!newSymptom.trim()) return;
-    setCond((prev) => ({ ...prev, symptoms: [...(prev.symptoms || []), newSymptom.trim()] }));
+    const item = newSymptom.trim();
+    setCond((prev) => {
+      const updated = [...(prev.symptoms || []), item];
+      return {
+        ...prev,
+        symptoms: updated,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          symptoms: {
+            ...(prev.sectionsData?.symptoms || {}),
+            bullets: updated
+          }
+        }
+      };
+    });
     setNewSymptom("");
   };
   const removeSymptom = (idx: number) => {
-    setCond((prev) => ({ ...prev, symptoms: prev.symptoms?.filter((_, i) => i !== idx) }));
+    setCond((prev) => {
+      const updated = prev.symptoms?.filter((_, i) => i !== idx) || [];
+      return {
+        ...prev,
+        symptoms: updated,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          symptoms: {
+            ...(prev.sectionsData?.symptoms || {}),
+            bullets: updated
+          }
+        }
+      };
+    });
   };
 
   // Treatment steps helpers
   const [newStep, setNewStep] = useState("");
   const addStep = () => {
     if (!newStep.trim()) return;
-    setCond((prev) => ({ ...prev, treatmentApproach: [...(prev.treatmentApproach || []), newStep.trim()] }));
+    const item = newStep.trim();
+    setCond((prev) => {
+      const updated = [...(prev.treatmentApproach || []), item];
+      return {
+        ...prev,
+        treatmentApproach: updated,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          treatment_approach: {
+            ...(prev.sectionsData?.treatment_approach || {}),
+            bullets: updated
+          }
+        }
+      };
+    });
     setNewStep("");
   };
   const removeStep = (idx: number) => {
-    setCond((prev) => ({ ...prev, treatmentApproach: prev.treatmentApproach?.filter((_, i) => i !== idx) }));
+    setCond((prev) => {
+      const updated = prev.treatmentApproach?.filter((_, i) => i !== idx) || [];
+      return {
+        ...prev,
+        treatmentApproach: updated,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          treatment_approach: {
+            ...(prev.sectionsData?.treatment_approach || {}),
+            bullets: updated
+          }
+        }
+      };
+    });
   };
 
   // FAQs helpers
@@ -711,11 +1127,38 @@ function ConditionEditorModal({
   const [newBenefit, setNewBenefit] = useState("");
   const addBenefit = () => {
     if (!newBenefit.trim()) return;
-    setCond((prev) => ({ ...prev, benefits: [...(prev.benefits || []), newBenefit.trim()] }));
+    const item = newBenefit.trim();
+    setCond((prev) => {
+      const updated = [...(prev.benefits || []), item];
+      return {
+        ...prev,
+        benefits: updated,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          benefits: {
+            ...(prev.sectionsData?.benefits || {}),
+            bullets: updated
+          }
+        }
+      };
+    });
     setNewBenefit("");
   };
   const removeBenefit = (idx: number) => {
-    setCond((prev) => ({ ...prev, benefits: prev.benefits?.filter((_, i) => i !== idx) }));
+    setCond((prev) => {
+      const updated = prev.benefits?.filter((_, i) => i !== idx) || [];
+      return {
+        ...prev,
+        benefits: updated,
+        sectionsData: {
+          ...(prev.sectionsData || {}),
+          benefits: {
+            ...(prev.sectionsData?.benefits || {}),
+            bullets: updated
+          }
+        }
+      };
+    });
   };
 
   // Custom Sections Helper
@@ -738,14 +1181,18 @@ function ConditionEditorModal({
     };
 
     setCond((prev) => {
+      const newCustomSections = [...(prev.customSections || []), newSec];
+      const newIdx = newCustomSections.length - 1;
       const order = prev.sectionOrder || defaultConditionSectionOrder;
-      const newOrder = order.includes("custom_sections") ? order : [...order, "custom_sections"];
+      const cleanOrder = order.filter((k) => k !== "custom_sections");
+      const customKey = `custom-${newIdx}`;
+      const newOrder = cleanOrder.includes(customKey) ? cleanOrder : [...cleanOrder, customKey];
       const curHidden = prev.hiddenSections || [];
       return {
         ...prev,
-        customSections: [...(prev.customSections || []), newSec],
+        customSections: newCustomSections,
         sectionOrder: newOrder,
-        hiddenSections: curHidden.filter((k) => k !== "custom_sections")
+        hiddenSections: curHidden.filter((k) => k !== customKey && k !== "custom_sections")
       };
     });
     setActiveTab("layout");
@@ -760,10 +1207,36 @@ function ConditionEditorModal({
   };
 
   const removeCustomSection = (idx: number) => {
-    setCond((prev) => ({
-      ...prev,
-      customSections: prev.customSections?.filter((_, i) => i !== idx)
-    }));
+    setCond((prev) => {
+      const filteredSections = prev.customSections?.filter((_, i) => i !== idx) || [];
+      const deletedKey = `custom-${idx}`;
+      
+      const updateKeys = (keys: string[]) => {
+        return keys
+          .filter((k) => k !== deletedKey && k !== "custom_sections")
+          .map((k) => {
+            if (k.startsWith("custom-")) {
+              const num = parseInt(k.replace("custom-", ""), 10);
+              if (num > idx) {
+                return `custom-${num - 1}`;
+              }
+            }
+            return k;
+          });
+      };
+
+      const curOrder = prev.sectionOrder || defaultConditionSectionOrder;
+      const newOrder = updateKeys(curOrder);
+      const curHidden = prev.hiddenSections || [];
+      const newHidden = updateKeys(curHidden);
+
+      return {
+        ...prev,
+        customSections: filteredSections,
+        sectionOrder: newOrder,
+        hiddenSections: newHidden
+      };
+    });
   };
 
   // Apply Section Template Helper
@@ -771,22 +1244,57 @@ function ConditionEditorModal({
     setShowAddSectionModal(false);
 
     if (template.isCustom) {
-      const newIndex = cond.customSections?.length || 0;
       addCustomSectionWithPreset(template.preset);
-      // Immediately open info update box for this newly created custom section
-      setCustomizingBlockKey(`custom-${newIndex}`);
       return;
     }
 
     const key = template.id;
     setCond((prev) => {
       const curHidden = prev.hiddenSections || [];
-      const order = prev.sectionOrder || defaultConditionSectionOrder;
-      const newOrder = order.includes(key) ? order : [...order, key];
+      const order = prev.sectionOrder && prev.sectionOrder.length > 0 ? prev.sectionOrder : currentOrder;
+      const cleanOrder = order.filter((k) => k !== key && k !== "hero");
+      const newOrder = ["hero", ...cleanOrder, key];
       const curSectionsData = prev.sectionsData || {};
+
+      let updatedFields: Partial<Condition> = {};
+      if (key === "benefits" && (!prev.benefits || prev.benefits.length === 0)) {
+        updatedFields.benefits = template.preset?.bullets || [
+          "Targeted pain relief & accelerated tissue healing",
+          "One-on-one care with registered clinical specialists",
+          "Direct billing to all major insurance plans"
+        ];
+      }
+      if (key === "symptoms" && (!prev.symptoms || prev.symptoms.length === 0)) {
+        updatedFields.symptoms = template.preset?.bullets || [
+          "Persistent localized pain and joint restriction",
+          "Muscle stiffness, spasms, and mobility limits",
+          "Post-injury rehabilitation and flare-up prevention"
+        ];
+      }
+      if (key === "treatment_approach" && (!prev.treatmentApproach || prev.treatmentApproach.length === 0)) {
+        updatedFields.treatmentApproach = template.preset?.bullets || [
+          "Comprehensive physical assessment & biomechanical evaluation",
+          "Targeted manual therapy, joint mobilization & soft tissue release",
+          "Progressive therapeutic exercise prescription",
+          "Long-term injury prevention & home management protocol"
+        ];
+      }
+      if (key === "faqs" && (!prev.faqs || prev.faqs.length === 0)) {
+        updatedFields.faqs = [
+          {
+            question: `Do I need a doctor's referral for ${prev.name || "this condition"} treatment?`,
+            answer: "No, in Alberta you do not need a doctor's referral to begin physiotherapy or rehabilitation treatment. You can book directly with our team."
+          },
+          {
+            question: "Is treatment covered by health insurance?",
+            answer: "Yes, our treatments are covered by most extended health benefit plans, WCB, and auto insurance (MVA). We offer direct billing."
+          }
+        ];
+      }
 
       return {
         ...prev,
+        ...updatedFields,
         hiddenSections: curHidden.filter((k) => k !== key),
         sectionOrder: newOrder,
         sectionsData: {
@@ -814,10 +1322,12 @@ function ConditionEditorModal({
         onConfirm={() => {
           if (deleteSectionKey) {
             setCond((prev) => {
-              const curOrder = prev.sectionOrder && prev.sectionOrder.length > 0 ? prev.sectionOrder : defaultConditionSectionOrder;
+              const curOrder = prev.sectionOrder && prev.sectionOrder.length > 0 ? prev.sectionOrder : currentOrder;
+              const curHidden = prev.hiddenSections || [];
               return {
                 ...prev,
-                sectionOrder: curOrder.filter((k) => k !== deleteSectionKey)
+                sectionOrder: curOrder.filter((k) => k !== deleteSectionKey),
+                hiddenSections: curHidden.includes(deleteSectionKey) ? curHidden : [...curHidden, deleteSectionKey]
               };
             });
             setDeleteSectionKey(null);
@@ -1190,33 +1700,34 @@ function ConditionEditorModal({
                       />
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                      <div className="adm-form-group" style={{ margin: 0 }}>
-                        <label className="adm-form-label">Condition Category</label>
-                        <select
-                          className="adm-input"
-                          value={cond.category || "Spine & Back"}
-                          onChange={(e) => setCond({ ...cond, category: e.target.value })}
-                        >
-                          <option value="Spine & Back">Spine &amp; Back</option>
-                          <option value="Joint & Extremity">Joint &amp; Extremity</option>
-                          <option value="Sports Injury">Sports Injury</option>
-                          <option value="Head & Neck">Head &amp; Neck</option>
-                          <option value="Workplace & MVA">Workplace &amp; MVA</option>
-                          <option value="General Recovery">General Recovery</option>
-                        </select>
-                      </div>
+                    <div className="adm-form-group" style={{ margin: 0 }}>
+                      <label className="adm-form-label">Condition Category Badge</label>
+                      <select
+                        className="adm-input"
+                        value={cond.category || "Spine & Back"}
+                        onChange={(e) => setCond({ ...cond, category: e.target.value })}
+                      >
+                        <option value="Spine & Back">Spine &amp; Back</option>
+                        <option value="Joint & Extremity">Joint &amp; Extremity</option>
+                        <option value="Sports Injury">Sports Injury</option>
+                        <option value="Head & Neck">Head &amp; Neck</option>
+                        <option value="Workplace & MVA">Workplace &amp; MVA</option>
+                        <option value="General Recovery">General Recovery</option>
+                      </select>
+                    </div>
 
-                      <div className="adm-form-group" style={{ margin: 0 }}>
-                        <label className="adm-form-label">Card Thumbnail Image</label>
-                        <input
-                          type="text"
-                          className="adm-input"
-                          value={cond.heroImage || ""}
-                          onChange={(e) => setCond({ ...cond, heroImage: e.target.value })}
-                          placeholder="/images/clinic/reception-three.jpg"
-                        />
-                      </div>
+                    <div>
+                      <AdminImageUploader
+                        label="Card Thumbnail Image (Optional — leave empty for Badge only)"
+                        value={cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : (cond.heroImage || "")}
+                        onChange={(url) => setCond({ ...cond, cardImage: url })}
+                        folder="conditions"
+                        placeholder="Upload thumbnail or enter image URL..."
+                        aspectRatioNote="Landscape 16:9 or 4:3 (Leave empty for Badge style)"
+                      />
+                      <span style={{ fontSize: 11.5, color: "#64748b", marginTop: 4, display: "block" }}>
+                        Leave blank to show the clean category pill badge, or upload an image to display an image header on the condition card.
+                      </span>
                     </div>
                   </div>
 
@@ -1225,11 +1736,11 @@ function ConditionEditorModal({
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
                       Live Preview on /conditions Directory
                     </div>
-                    {Boolean(cond.heroImage && cond.heroImage.trim() !== "") ? (
+                    {Boolean((cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : cond.heroImage) && (cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : cond.heroImage)?.trim() !== "") ? (
                       <div style={{ background: "#fff", border: "1px solid #e7edf1", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 20px rgba(18,60,80,0.06)", display: "flex", flexDirection: "column" }}>
                         <div style={{ height: 110, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb" }}>
                           <img
-                            src={cond.heroImage!}
+                            src={(cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : cond.heroImage)!}
                             alt={cond.name}
                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                             onError={(e) => {
@@ -1307,11 +1818,20 @@ function ConditionEditorModal({
               {/* Reorderable Sections List with Drag & Drop */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {currentOrder.map((key, idx) => {
-                  const secDef = conditionSectionDefs[key] || {
-                    title: key,
-                    desc: "Custom page section block",
-                    category: "Block"
-                  };
+                  const isCustomStory = key.startsWith("custom-") || key === "custom_sections";
+                  let secTitle = conditionSectionDefs[key]?.title || key;
+                  let secDesc = conditionSectionDefs[key]?.desc || "Custom page section block";
+
+                  if (key.startsWith("custom-")) {
+                    const cIdx = parseInt(key.replace("custom-", ""), 10);
+                    const story = cond.customSections?.[cIdx];
+                    secTitle = `Custom Story #${cIdx + 1}: ${story?.title || "Visual Storytelling Section"}`;
+                    secDesc = story?.subtitle || story?.eyebrow || "Draggable visual storytelling block (content edited in card below)";
+                  } else if (key === "custom_sections") {
+                    secTitle = "Visual Storytelling Sections";
+                    secDesc = "Custom storytelling blocks with photo, text, and bullets";
+                  }
+
                   const hidden = isSectionHidden(key);
                   const hasCustomConfig = Boolean(cond.sectionsData?.[key]);
                   const isBeingDragged = draggedIndex === idx;
@@ -1382,8 +1902,8 @@ function ConditionEditorModal({
 
                         <div>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                            <strong style={{ fontSize: 13.5, color: hidden ? "#64748b" : "#1e293b" }}>
-                              {secDef.title}
+                            <strong style={{ fontSize: 13.5, color: "#1e293b" }}>
+                              {secTitle}
                             </strong>
                             <span
                               style={{
@@ -1391,27 +1911,28 @@ function ConditionEditorModal({
                                 fontWeight: 700,
                                 padding: "2px 8px",
                                 borderRadius: 999,
-                                background: hidden ? "#fee2e2" : "#dcfce7",
-                                color: hidden ? "#991b1b" : "#166534"
+                                background: "#dcfce7",
+                                color: "#166534"
                               }}
                             >
-                              {hidden ? "Hidden" : "Active"}
+                              Active
                             </span>
-                            {key === "custom_sections" && (
+                            {isCustomStory && (
                               <span
                                 style={{
                                   fontSize: 10.5,
                                   fontWeight: 700,
                                   padding: "2px 6px",
                                   borderRadius: 4,
-                                  background: "#e0f2fe",
-                                  color: "#0369a1"
+                                  background: "#f0fdf4",
+                                  color: "#166534",
+                                  border: "1px solid #bbf7d0"
                                 }}
                               >
-                                {cond.customSections?.length || 0} Custom Stories
+                                Visual Story
                               </span>
                             )}
-                            {hasCustomConfig && (
+                            {hasCustomConfig && !isCustomStory && (
                               <span
                                 style={{
                                   fontSize: 10.5,
@@ -1427,25 +1948,28 @@ function ConditionEditorModal({
                             )}
                           </div>
                           <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-                            {secDef.desc}
+                            {secDesc}
                           </div>
                         </div>
                       </div>
 
-                      {/* Right side: Customize, Visibility */}
+                      {/* Right side: Customize, Reorder, Remove */}
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCustomizingBlockKey(key);
-                          }}
-                          className="adm-btn adm-btn-secondary adm-btn-sm"
-                          style={{ display: "flex", alignItems: "center", gap: 5 }}
-                        >
-                          <SlidersIcon size={13} />
-                          <span>Customize Block</span>
-                        </button>
+                        {!isCustomStory && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCustomizingBlockKey(key);
+                            }}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                            style={{ display: "flex", alignItems: "center", gap: 5 }}
+                            title="Customize image, position, background, title, and highlights"
+                          >
+                            <SlidersIcon size={13} />
+                            <span>Customize Block</span>
+                          </button>
+                        )}
 
                         {/* Master Admin: Move Up & Move Down */}
                         {isAdmin && (
@@ -1489,19 +2013,7 @@ function ConditionEditorModal({
                           </div>
                         )}
 
-                        {/* Hide / Restore Toggle */}
-                        <button
-                          type="button"
-                          onClick={() => toggleSectionVisibility(key)}
-                          className={`adm-btn adm-btn-sm ${hidden ? "adm-btn-primary" : "adm-btn-secondary"}`}
-                          style={{ minWidth: 84, display: "flex", alignItems: "center", gap: 5 }}
-                          title={hidden ? "Restore this section to live view" : "Hide this section from live view"}
-                        >
-                          {hidden ? <EyeIcon size={13} /> : <EyeOffIcon size={13} />}
-                          <span>{hidden ? "Restore" : "Hide"}</span>
-                        </button>
-
-                        {/* Delete Section */}
+                        {/* Remove Section from Condition Page Layout */}
                         <button
                           type="button"
                           onClick={(e) => {
@@ -1513,14 +2025,18 @@ function ConditionEditorModal({
                             border: "1px solid #fca5a5",
                             color: "#dc2626",
                             borderRadius: 6,
-                            padding: "6px 8px",
+                            padding: "6px 10px",
                             cursor: "pointer",
                             display: "flex",
-                            alignItems: "center"
+                            alignItems: "center",
+                            gap: 5,
+                            fontSize: 12,
+                            fontWeight: 600
                           }}
-                          title="Delete this section from condition page layout"
+                          title="Remove this section from condition page layout"
                         >
-                          <TrashIcon size={14} />
+                          <TrashIcon size={13} />
+                          <span>Remove</span>
                         </button>
                       </div>
                     </div>
@@ -2235,8 +2751,8 @@ function ConditionEditorModal({
                   {[
                     {
                       id: "testimonials",
-                      title: "Patient Testimonials & Reviews Grid",
-                      desc: "5-star Google review quotes and patient recovery stories.",
+                      title: "Patient Reviews & Google Reviews Widget",
+                      desc: "Live Google reviews widget and patient 5-star testimonials.",
                       iconComponent: <StarIcon size={18} />,
                       iconBg: "#fef3c7",
                       iconColor: "#d97706",
@@ -2389,11 +2905,7 @@ function ConditionEditorModal({
               ? cond.customSections?.[parseInt(customizingBlockKey.replace("custom-", ""), 10)]?.title || "Custom Story Section"
               : conditionSectionDefs[customizingBlockKey]?.title || customizingBlockKey
           }
-          config={
-            customizingBlockKey.startsWith("custom-")
-              ? cond.customSections?.[parseInt(customizingBlockKey.replace("custom-", ""), 10)]
-              : cond.sectionsData?.[customizingBlockKey]
-          }
+          config={getConditionEffectiveConfig(customizingBlockKey)}
           onSave={(cfg: SectionBlockConfig) => {
             if (customizingBlockKey.startsWith("custom-")) {
               const idx = parseInt(customizingBlockKey.replace("custom-", ""), 10);

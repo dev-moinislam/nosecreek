@@ -7,19 +7,17 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 // Precomputed fallback bcrypt hashes for emergency / offline dev
 const FALLBACK_ADMIN = {
-  username: "admin",
+  username: "nosecreek-admin",
   email: "admin@nosecreek.com",
-  password_hash: "$2b$10$LRWASVSiDGpJdZ0IqkSMROxwgBi/s/e4Dyi0H1AdrO6NFHxxYUcqy", // admin123
-  pin_hash: "$2b$10$WEiJNS0bE5zCb5qFCBDtL.tKAjGpFbFVOpeiZUeUXgpvP2exBQFS6", // 8590
+  password_hash: "$2b$10$iYI06kE6lK2l3RF/KMgDhOf/Aeh8GY1hjwIcmQS9nDBLzbs5ctj26",
   full_name: "Master Administrator",
   role: "admin" as const
 };
 
 const FALLBACK_CLIENT = {
-  username: "client",
+  username: "nosecreek",
   email: "client@nosecreek.com",
-  password_hash: "$2b$10$3AjZM2TOmTbVayeJnV25XOHEoZWiEegYAsd16HAHRABMuAZZguV12", // client123
-  pin_hash: "$2b$10$sMlv32pL3EOaVdWfjeYhaeN9UN7c1K8OWsFv1iMT.UoMed/N0JFpi", // 1234
+  password_hash: "$2b$10$1pI9LKG4S6Jkno2FTtk1OO8pG.7LdOx0DDeh1FMPwmVq8pu8LE5om",
   full_name: "Clinic Manager (Client Mode)",
   role: "client" as const
 };
@@ -69,6 +67,7 @@ export async function POST(req: NextRequest) {
           auth: { persistSession: false }
         });
 
+        // 1a. Check primary table (admin_users or client_users)
         const { data: users, error: dbError } = await supabase
           .from(tableName)
           .select("*")
@@ -109,6 +108,34 @@ export async function POST(req: NextRequest) {
             }
           }
         }
+
+        // 1b. If not found in primary table or table does not exist, check Supabase site_settings
+        if (!authenticatedUser) {
+          const { data: sData, error: sErr } = await supabase
+            .from("site_settings")
+            .select("marketing")
+            .eq("id", "main")
+            .single();
+
+          if (!sErr && sData?.marketing?.auth_credentials) {
+            const credMap = sData.marketing.auth_credentials;
+            const portalCreds = credMap[isClientPortal ? "client" : "admin"];
+            if (portalCreds) {
+              const matchesUser =
+                ident === (portalCreds.username || "").toLowerCase() ||
+                ident === (portalCreds.email || "").toLowerCase();
+
+              if (matchesUser && verifySecret(secret, portalCreds.password_hash)) {
+                authenticatedUser = {
+                  username: portalCreds.username,
+                  email: portalCreds.email,
+                  full_name: portalCreds.full_name || (isClientPortal ? "Clinic Manager" : "Master Administrator"),
+                  role: (portalCreds.role as "admin" | "client") || (isClientPortal ? "client" : "admin")
+                };
+              }
+            }
+          }
+        }
       } catch (connErr) {
         console.warn("[Auth] Supabase query failed, evaluating fallback:", connErr);
       }
@@ -117,13 +144,11 @@ export async function POST(req: NextRequest) {
     // 2. Fallback check for resilience
     if (!authenticatedUser) {
       const fallback = isClientPortal ? FALLBACK_CLIENT : FALLBACK_ADMIN;
-      const isUsernameMatch = ident === fallback.username || ident === fallback.email;
+      const isUsernameMatch = ident === fallback.username.toLowerCase() || ident === fallback.email.toLowerCase();
 
       if (isUsernameMatch) {
         const isPassValid = verifySecret(secret, fallback.password_hash);
-        const isPinValid = verifySecret(secret, fallback.pin_hash);
-
-        if (isPassValid || isPinValid) {
+        if (isPassValid) {
           authenticatedUser = {
             username: fallback.username,
             email: fallback.email,
@@ -139,9 +164,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: isClientPortal
-            ? "Invalid client manager credentials or PIN."
-            : "Invalid administrator credentials or PIN."
+          error: "Invalid username/email or password."
         },
         { status: 401 }
       );

@@ -6,15 +6,22 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SchemaMarkup from "@/components/seo/SchemaMarkup";
 import MarketingScripts from "@/components/marketing/MarketingScripts";
+import FloatingReviewsWidget from "@/components/ui/FloatingReviewsWidget";
 import settingsData from "@/data/settings.json";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdminRoute = pathname?.startsWith("/admin");
+  
+  // Exclude all Admin, Portal, and Login routes (/admin, /client-login, /admin-login)
+  // from public website Header, Footer, Schema markup, Floating widget, or Marketing trackers.
+  const isPortalOrLoginRoute =
+    pathname?.startsWith("/admin") ||
+    pathname === "/client-login" ||
+    pathname?.startsWith("/client-login/") ||
+    pathname === "/admin-login" ||
+    pathname?.startsWith("/admin-login/");
 
-  // If this is any Admin route (/admin, /admin/leads, /admin/services, /admin/login, etc.),
-  // do NOT render public website Header, Footer, Schema markup, or Marketing trackers.
-  if (isAdminRoute) {
+  if (isPortalOrLoginRoute) {
     return <>{children}</>;
   }
 
@@ -26,6 +33,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Footer />
       <SchemaMarkup type="MedicalBusiness" data={settingsData} />
       <MarketingScripts />
+      <FloatingReviewsWidget />
     </>
   );
 }

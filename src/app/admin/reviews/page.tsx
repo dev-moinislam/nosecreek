@@ -27,15 +27,24 @@ export default function AdminReviewsPage() {
   const [search, setSearch] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Global Review Bar Metadata
+  const DEFAULT_MASONRY_WIDGET_CODE = `<div data-rw-masonry="26258"></div>
+<script>var script = document.createElement("script");script.type = "module";script.src = "https://widgets.thereviewsplace.com/2.0/rw-widget-masonry.js";document.getElementsByTagName("head")[0].appendChild(script);</script>`;
+
+  const DEFAULT_FLOATING_WIDGET_CODE = `<div data-rw-flash="49021"></div>
+<script>var script = document.createElement("script");script.type = "module";script.src = "https://widgets.revue.us/2.0/rw-widget-flash.js";document.getElementsByTagName("head")[0].appendChild(script);</script>`;
+
+  // Global Review Bar Metadata, Masonry Grid Embed & Floating Corner Widget Embed
   const [metaInfo, setMetaInfo] = useState({
     rating: "4.9",
     count: "545+ Calgary Reviews",
     title: "Real 5-Star Reviews From Our Calgary Patients",
     subtitle: "See what our patients have to say about their recovery journey at Nose Creek Physiotherapy",
-    link: "https://www.nosecreekphysiotherapy.com/reviews/",
+    link: "https://www.google.com/maps/place/Nose+Creek+Physiotherapy/@51.126316,-114.0695037,17z/data=!3m1!5s0x537165d72e2e9a4f:0xf87800e6f2762f39!4m8!3m7!1s0x537165d74effbead:0xbe7dc01542416295!8m2!3d51.126316!4d-114.0695037!9m1!1b1!16s%2Fg%2F1tgps902?hl=en-US",
     placeId: "ChIJ3fVbK552b4gRe5eD_q9q_s0",
-    apiKey: ""
+    apiKey: "",
+    widgetCode: DEFAULT_MASONRY_WIDGET_CODE,
+    floatingReviewsEnabled: true,
+    floatingReviewsCode: DEFAULT_FLOATING_WIDGET_CODE
   });
   const [savingMeta, setSavingMeta] = useState(false);
   const [syncingGoogle, setSyncingGoogle] = useState(false);
@@ -49,6 +58,29 @@ export default function AdminReviewsPage() {
   const fetchReviews = async () => {
     setLoading(true);
     let currentReviews = defaultTestimonialsData as Testimonial[];
+
+    // First load from localStorage for instant preview
+    try {
+      const curLocal = localStorage.getItem("adm_settings");
+      if (curLocal) {
+        const parsed = JSON.parse(curLocal);
+        let loadedWidgetCode = parsed.reviewsWidgetCode;
+        if (loadedWidgetCode && loadedWidgetCode.includes("rw-widget-flash") && !loadedWidgetCode.includes("rw-widget-masonry")) {
+          loadedWidgetCode = DEFAULT_MASONRY_WIDGET_CODE;
+        }
+        setMetaInfo((prev) => ({
+          ...prev,
+          rating: parsed.googleRating || prev.rating,
+          count: parsed.googleReviewCount || prev.count,
+          title: parsed.reviewsTitle || prev.title,
+          subtitle: parsed.reviewsSubtitle || prev.subtitle,
+          link: parsed.googleReviewsUrl || prev.link,
+          widgetCode: loadedWidgetCode || prev.widgetCode,
+          floatingReviewsEnabled: typeof parsed.floatingReviewsEnabled === "boolean" ? parsed.floatingReviewsEnabled : prev.floatingReviewsEnabled,
+          floatingReviewsCode: parsed.floatingReviewsCode || prev.floatingReviewsCode
+        }));
+      }
+    } catch {}
 
     if (isSupabaseConfigured && supabase) {
       try {
@@ -72,20 +104,27 @@ export default function AdminReviewsPage() {
 
         const { data: settingsData } = await supabase
           .from("site_settings")
-          .select("google_rating, google_review_count, reviews_title, reviews_subtitle, google_reviews_url, google_place_id, google_places_api_key, last_google_sync")
+          .select("google_rating, google_review_count, reviews_title, reviews_subtitle, google_reviews_url, google_place_id, google_places_api_key, last_google_sync, reviews_widget_code, floating_reviews_enabled, floating_reviews_code")
           .eq("id", "main")
           .single();
 
         if (settingsData) {
-          setMetaInfo({
-            rating: settingsData.google_rating || "4.9",
-            count: settingsData.google_review_count || "545+ Calgary Reviews",
-            title: settingsData.reviews_title || "Real 5-Star Reviews From Our Calgary Patients",
-            subtitle: settingsData.reviews_subtitle || "See what our patients have to say about their recovery journey at Nose Creek Physiotherapy",
-            link: settingsData.google_reviews_url || "https://www.nosecreekphysiotherapy.com/reviews/",
-            placeId: settingsData.google_place_id || "ChIJ3fVbK552b4gRe5eD_q9q_s0",
-            apiKey: settingsData.google_places_api_key || ""
-          });
+          let loadedWidgetCode = settingsData.reviews_widget_code;
+          if (loadedWidgetCode && loadedWidgetCode.includes("rw-widget-flash") && !loadedWidgetCode.includes("rw-widget-masonry")) {
+            loadedWidgetCode = DEFAULT_MASONRY_WIDGET_CODE;
+          }
+          setMetaInfo((prev) => ({
+            rating: settingsData.google_rating || prev.rating,
+            count: settingsData.google_review_count || prev.count,
+            title: settingsData.reviews_title || prev.title,
+            subtitle: settingsData.reviews_subtitle || prev.subtitle,
+            link: settingsData.google_reviews_url || prev.link,
+            placeId: settingsData.google_place_id || prev.placeId,
+            apiKey: settingsData.google_places_api_key || prev.apiKey,
+            widgetCode: loadedWidgetCode || prev.widgetCode,
+            floatingReviewsEnabled: typeof settingsData.floating_reviews_enabled === "boolean" ? settingsData.floating_reviews_enabled : prev.floatingReviewsEnabled,
+            floatingReviewsCode: settingsData.floating_reviews_code || prev.floatingReviewsCode
+          }));
 
           if (settingsData.last_google_sync) {
             setSyncStatus(`Last synced from Google: ${new Date(settingsData.last_google_sync).toLocaleString()}`);
@@ -117,6 +156,9 @@ export default function AdminReviewsPage() {
           google_reviews_url: metaInfo.link,
           google_place_id: metaInfo.placeId,
           google_places_api_key: metaInfo.apiKey,
+          reviews_widget_code: metaInfo.widgetCode,
+          floating_reviews_enabled: metaInfo.floatingReviewsEnabled,
+          floating_reviews_code: metaInfo.floatingReviewsCode,
           updated_at: new Date().toISOString()
         });
       } catch (e) {
@@ -124,7 +166,26 @@ export default function AdminReviewsPage() {
       }
     }
 
-    setToastMessage("Google Review configuration saved successfully!");
+    // Also sync to localStorage adm_settings & broadcast settingsUpdated for instant client preview
+    try {
+      const curLocal = localStorage.getItem("adm_settings");
+      const parsed = curLocal ? JSON.parse(curLocal) : {};
+      const merged = {
+        ...parsed,
+        googleRating: metaInfo.rating,
+        googleReviewCount: metaInfo.count,
+        reviewsTitle: metaInfo.title,
+        reviewsSubtitle: metaInfo.subtitle,
+        googleReviewsUrl: metaInfo.link,
+        reviewsWidgetCode: metaInfo.widgetCode,
+        floatingReviewsEnabled: metaInfo.floatingReviewsEnabled,
+        floatingReviewsCode: metaInfo.floatingReviewsCode
+      };
+      localStorage.setItem("adm_settings", JSON.stringify(merged));
+      window.dispatchEvent(new Event("settingsUpdated"));
+    } catch {}
+
+    setToastMessage("Google Review configurations & scripts saved successfully!");
     setSavingMeta(false);
   };
 
@@ -304,6 +365,158 @@ export default function AdminReviewsPage() {
           >
             <PlusIcon size={16} />
             <span>Add Patient Review</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Card 1: Draggable Inline Reviews Grid Widget (Masonry) */}
+      <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 16, padding: 24, marginBottom: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <h3 style={{ fontSize: 16.5, fontWeight: 800, color: "#0f172a", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ color: "#f59e0b", fontSize: 18 }}>⭐</span>
+              <span>1. Dedicated Reviews Page Grid Widget (Masonry)</span>
+            </h3>
+            <p style={{ fontSize: 13, color: "#64748b", margin: 0, maxWidth: 820, lineHeight: 1.5 }}>
+              This script and container (<code>&lt;div data-rw-masonry=...&gt;</code> + <code>rw-widget-masonry.js</code>) powers the authentic 3-column review card grid on the <strong>Reviews page (/reviews)</strong>. On other pages (<strong>Home</strong>, <strong>Services</strong>, <strong>Conditions</strong>), reviews appear as a sleek interactive <strong>Carousel</strong> with left/right scroll controls.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "4px 10px", borderRadius: 999, fontSize: 12, fontWeight: 700 }}>
+              ✓ PageSpeed Optimized (Lazy Loaded)
+            </span>
+            <button
+              type="button"
+              onClick={() => setMetaInfo({ ...metaInfo, widgetCode: DEFAULT_MASONRY_WIDGET_CODE })}
+              className="adm-btn adm-btn-secondary adm-btn-sm"
+              style={{ fontSize: 12 }}
+            >
+              Reset to Masonry Default
+            </button>
+          </div>
+        </div>
+
+        <div className="adm-form-group" style={{ marginBottom: 14 }}>
+          <label className="adm-form-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>Masonry Grid HTML &amp; &lt;script&gt; Embed Code</span>
+            <span style={{ fontSize: 11.5, color: "#94a3b8", fontWeight: 400 }}>Supports &lt;div data-rw-masonry=&quot;26258&quot;&gt; and rw-widget-masonry.js script</span>
+          </label>
+          <textarea
+            className="adm-textarea"
+            rows={4}
+            value={metaInfo.widgetCode}
+            onChange={(e) => setMetaInfo({ ...metaInfo, widgetCode: e.target.value })}
+            style={{
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+              fontSize: 13,
+              lineHeight: 1.5,
+              background: "#0f172a",
+              color: "#38bdf8",
+              border: "1px solid #1e293b",
+              borderRadius: 10,
+              padding: "12px 14px"
+            }}
+            placeholder='<div data-rw-masonry="26258"></div>&#10;<script>var script = document.createElement("script");script.type = "module";script.src = "https://widgets.thereviewsplace.com/2.0/rw-widget-masonry.js";document.getElementsByTagName("head")[0].appendChild(script);</script>'
+          />
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", gap: 14, fontSize: 12.5, color: "#64748b" }}>
+            <span>⚡ Script only loads when section scrolls into viewport</span>
+            <span>·</span>
+            <span>🔄 Instant sync across all draggable blocks</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveMeta}
+            disabled={savingMeta}
+            className="adm-btn adm-btn-primary adm-btn-sm"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 700 }}
+          >
+            <CheckIcon size={14} />
+            <span>{savingMeta ? "Saving..." : "Save Masonry Widget"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Card 2: Sitewide Floating Corner Review Badge (Flash Popup) */}
+      <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 16, padding: 24, marginBottom: 24, boxShadow: "0 1px 4px rgba(0,0,0,0.03)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+          <div>
+            <h3 style={{ fontSize: 16.5, fontWeight: 800, color: "#0f172a", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 18 }}>💬</span>
+              <span>2. Sitewide Floating Corner Review Badge (Flash Popup)</span>
+            </h3>
+            <p style={{ fontSize: 13, color: "#64748b", margin: 0, maxWidth: 820, lineHeight: 1.5 }}>
+              This widget (<code>&lt;div data-rw-flash=...&gt;</code> + <code>rw-widget-flash.js</code>) pins a floating 5-star Google review popup to the bottom-left corner of the screen across <strong>all public pages</strong> of the website.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* Toggle Switch */}
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, fontWeight: 700, color: metaInfo.floatingReviewsEnabled ? "#166534" : "#64748b" }}>
+              <input
+                type="checkbox"
+                checked={metaInfo.floatingReviewsEnabled}
+                onChange={(e) => setMetaInfo({ ...metaInfo, floatingReviewsEnabled: e.target.checked })}
+                style={{ width: 17, height: 17, cursor: "pointer" }}
+              />
+              <span>{metaInfo.floatingReviewsEnabled ? "✓ Active on All Pages" : "Disabled Sitewide"}</span>
+            </label>
+
+            <button
+              type="button"
+              onClick={() => setMetaInfo({ ...metaInfo, floatingReviewsCode: DEFAULT_FLOATING_WIDGET_CODE })}
+              className="adm-btn adm-btn-secondary adm-btn-sm"
+              style={{ fontSize: 12 }}
+            >
+              Reset to Flash Default
+            </button>
+          </div>
+        </div>
+
+        <div className="adm-form-group" style={{ marginBottom: 14 }}>
+          <label className="adm-form-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>Floating Flash HTML &amp; &lt;script&gt; Embed Code</span>
+            <span style={{ fontSize: 11.5, color: "#94a3b8", fontWeight: 400 }}>Supports &lt;div data-rw-flash=&quot;49021&quot;&gt; and rw-widget-flash.js script</span>
+          </label>
+          <textarea
+            className="adm-textarea"
+            rows={4}
+            value={metaInfo.floatingReviewsCode}
+            onChange={(e) => setMetaInfo({ ...metaInfo, floatingReviewsCode: e.target.value })}
+            style={{
+              fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+              fontSize: 13,
+              lineHeight: 1.5,
+              background: "#0f172a",
+              color: "#38bdf8",
+              border: "1px solid #1e293b",
+              borderRadius: 10,
+              padding: "12px 14px"
+            }}
+            placeholder='<div data-rw-flash="49021"></div>&#10;<script>var script = document.createElement("script");script.type = "module";script.src = "https://widgets.revue.us/2.0/rw-widget-flash.js";document.getElementsByTagName("head")[0].appendChild(script);</script>'
+          />
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", gap: 14, fontSize: 12.5, color: "#64748b" }}>
+            <span>⚡ Defers loading by 2.5s / user interaction (0ms PageSpeed impact)</span>
+            <span>·</span>
+            <span>📍 Pinned to bottom-left corner of all pages</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveMeta}
+            disabled={savingMeta}
+            className="adm-btn adm-btn-primary adm-btn-sm"
+            style={{ display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 700 }}
+          >
+            <CheckIcon size={14} />
+            <span>{savingMeta ? "Saving..." : "Save Floating Widget"}</span>
           </button>
         </div>
       </div>

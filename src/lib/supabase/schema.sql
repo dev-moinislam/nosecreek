@@ -31,9 +31,20 @@ CREATE TABLE IF NOT EXISTS site_settings (
   footer_content TEXT,
   seo JSONB NOT NULL DEFAULT '{}'::jsonb,
   marketing JSONB NOT NULL DEFAULT '{"callTracking": {"enabled": true, "scriptUrl": ""}, "gtm": {"enabled": false, "containerId": ""}}'::jsonb,
+  google_rating TEXT DEFAULT '4.9',
+  google_review_count TEXT DEFAULT '545+ Calgary Reviews',
+  reviews_title TEXT DEFAULT 'Real 5-Star Reviews From Our Calgary Patients',
+  reviews_subtitle TEXT DEFAULT 'See what our patients have to say about their recovery journey at Nose Creek Physiotherapy',
+  google_reviews_url TEXT DEFAULT 'https://www.nosecreekphysiotherapy.com/reviews/',
+  google_place_id TEXT DEFAULT 'ChIJ3fVbK552b4gRe5eD_q9q_s0',
+  google_places_api_key TEXT,
+  reviews_widget_code TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS reviews_widget_code TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS floating_reviews_enabled BOOLEAN DEFAULT true;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS floating_reviews_code TEXT;
 
 DROP TRIGGER IF EXISTS update_site_settings_modtime ON site_settings;
 CREATE TRIGGER update_site_settings_modtime

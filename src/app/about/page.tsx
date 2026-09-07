@@ -41,18 +41,18 @@ export default async function AboutPage() {
               </p>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-                <a
-                  href="https://www.nosecreekphysiotherapy.com/free-discovery-session/"
-                  style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#6faf1c", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "14px 26px", borderRadius: 9, boxShadow: "0 10px 24px rgba(111,175,28,0.32)" }}
+                <Link
+                  href="/contact"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#6faf1c", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "14px 26px", borderRadius: 9, boxShadow: "0 10px 24px rgba(111,175,28,0.32)", textDecoration: "none" }}
                 >
                   Apply For A FREE Discovery Session →
-                </a>
-                <a
-                  href="https://www.nosecreekphysiotherapy.com/telephone-consultation/"
-                  style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#fff", color: "#0e78a8", border: "2px solid #cfe6f2", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "12px 22px", borderRadius: 9 }}
+                </Link>
+                <Link
+                  href="/contact"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#fff", color: "#0e78a8", border: "2px solid #cfe6f2", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "12px 22px", borderRadius: 9, textDecoration: "none" }}
                 >
                   Request A Phone Consult
-                </a>
+                </Link>
               </div>
 
               <div style={{ marginTop: 22, display: "flex", flexWrap: "wrap", gap: "6px 18px", fontSize: 13.5, color: "#5a6570", fontWeight: 600 }}>
@@ -354,20 +354,20 @@ export default async function AboutPage() {
               <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                 Unsure if Physiotherapy is right for you? Come in and chat with us first. Completely free, no-obligation, and risk-free on your part.
               </p>
-              <a href="https://www.nosecreekphysiotherapy.com/free-discovery-session/"
-                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9 }}>
+              <Link href="/contact"
+                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                 Apply For A Free Discovery Session →
-              </a>
+              </Link>
             </div>
             <div style={{ background: "linear-gradient(160deg,#1c9fd8,#1179ab)", color: "#fff", borderRadius: 20, padding: 34 }}>
               <h3 style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>Inquire About Cost &amp; Availability</h3>
               <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                 Want to know treatment costs, direct billing options, and upcoming appointment availability at our clinic? Complete our quick inquiry form.
               </p>
-              <a href="https://www.nosecreekphysiotherapy.com/inquire/"
-                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9 }}>
+              <Link href="/contact"
+                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                 Inquire About Cost &amp; Availability →
-              </a>
+              </Link>
             </div>
           </div>
         </div>

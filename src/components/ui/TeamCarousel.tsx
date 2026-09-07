@@ -6,9 +6,11 @@ import defaultTeamData from "@/data/team.json";
 
 interface TeamCarouselProps {
   members?: TeamMember[];
+  customEyebrow?: string;
+  customTitle?: string;
 }
 
-export default function TeamCarousel({ members }: TeamCarouselProps) {
+export default function TeamCarousel({ members, customEyebrow, customTitle }: TeamCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // If members prop is provided, use it; otherwise fallback to defaultTeamData
@@ -29,10 +31,10 @@ export default function TeamCarousel({ members }: TeamCarouselProps) {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-end", justifyContent: "space-between", marginBottom: 32 }}>
           <div>
             <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color: "#1c9fd8", letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase", marginBottom: 12 }}>
-              Meet the team
+              {customEyebrow || "Meet the team"}
             </div>
             <h2 style={{ fontSize: "clamp(26px,3.6vw,42px)", fontWeight: 800, letterSpacing: "-0.5px" }}>
-              The rest of the Nose Creek team
+              {customTitle || "The rest of the Nose Creek team"}
             </h2>
           </div>
           <div style={{ display: "flex", gap: 10 }}>

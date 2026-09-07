@@ -9,7 +9,7 @@ import { ShieldIcon } from "@/components/admin/AdminIcons";
 export default function AdminLoginPage() {
   const router = useRouter();
   const { login } = useRole();
-  const [email, setEmail] = useState("admin@nosecreek.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -25,19 +25,7 @@ export default function AdminLoginPage() {
     if (res.success) {
       router.push("/admin");
     } else {
-      setError(res.error || "Invalid administrator credentials or PIN.");
-    }
-  };
-
-  const handleQuickPin = async (pin: string) => {
-    setLoading(true);
-    setError(null);
-    const res = await login("admin@nosecreek.com", pin, "admin");
-    setLoading(false);
-    if (res.success) {
-      router.push("/admin");
-    } else {
-      setError("Incorrect Master PIN.");
+      setError(res.error || "Invalid username/email or password.");
     }
   };
 
@@ -114,7 +102,7 @@ export default function AdminLoginPage() {
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin or admin@nosecreek.com"
+              placeholder="e.g. nosecreek-admin or admin@nosecreek.com"
               style={{
                 width: "100%",
                 padding: "11px 14px",
@@ -129,13 +117,13 @@ export default function AdminLoginPage() {
 
           <div>
             <label style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
-              Password or Master PIN
+              Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               style={{
                 width: "100%",
                 padding: "11px 14px",
@@ -167,57 +155,6 @@ export default function AdminLoginPage() {
             {loading ? "Authenticating..." : "Sign In to Master Admin →"}
           </button>
         </form>
-
-        {/* 1-Click Quick PIN Login */}
-        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #f1f5f9" }}>
-          <span style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 10 }}>
-            Quick Admin Access:
-          </span>
-          <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
-            <button
-              type="button"
-              onClick={() => handleQuickPin("8590")}
-              style={{
-                background: "#f8fafc",
-                border: "1px solid #cbd5e1",
-                borderRadius: 6,
-                padding: "6px 14px",
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#1e293b",
-                cursor: "pointer"
-              }}
-            >
-              🔑 1-Click PIN (8590)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickPin("admin123")}
-              style={{
-                background: "#f8fafc",
-                border: "1px solid #cbd5e1",
-                borderRadius: 6,
-                padding: "6px 14px",
-                fontSize: 12.5,
-                fontWeight: 600,
-                color: "#1e293b",
-                cursor: "pointer"
-              }}
-            >
-              ⚡ Quick Admin Demo
-            </button>
-          </div>
-        </div>
-
-        {/* Client Portal Link */}
-        <div style={{ marginTop: 20 }}>
-          <a
-            href="/client-login"
-            style={{ fontSize: 12.5, color: "#6faf1c", fontWeight: 600, textDecoration: "none" }}
-          >
-            Switch to Client Portal Login &rarr;
-          </a>
-        </div>
       </div>
     </div>
   );

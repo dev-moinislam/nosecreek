@@ -9,7 +9,7 @@ import { UserIcon } from "@/components/admin/AdminIcons";
 export default function ClientLoginPage() {
   const router = useRouter();
   const { login } = useRole();
-  const [email, setEmail] = useState("client@nosecreek.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -25,19 +25,7 @@ export default function ClientLoginPage() {
     if (res.success) {
       router.push("/admin");
     } else {
-      setError(res.error || "Invalid client passcode or credentials.");
-    }
-  };
-
-  const handleQuickClient = async () => {
-    setLoading(true);
-    setError(null);
-    const res = await login("client", "client123", "client");
-    setLoading(false);
-    if (res.success) {
-      router.push("/admin");
-    } else {
-      setError("Failed to log in as Client.");
+      setError(res.error || "Invalid username/email or password.");
     }
   };
 
@@ -85,7 +73,7 @@ export default function ClientLoginPage() {
           Client Content Portal
         </h1>
         <p style={{ fontSize: 13.5, color: "#64748b", margin: "0 0 24px" }}>
-          Safe editing mode for clinic staff to update service texts, photos, bios, and reply to leads.
+          Sign in with your client credentials to manage clinic content, team bios, and patient inquiries.
         </p>
 
         {error && (
@@ -108,13 +96,13 @@ export default function ClientLoginPage() {
         <form onSubmit={handleSubmit} style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 16 }}>
           <div>
             <label style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
-              Client Email or Username
+              Username or Email
             </label>
             <input
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="client@nosecreek.com"
+              placeholder="e.g. nosecreek or client@nosecreek.com"
               style={{
                 width: "100%",
                 padding: "11px 14px",
@@ -129,13 +117,13 @@ export default function ClientLoginPage() {
 
           <div>
             <label style={{ display: "block", fontSize: 12.5, fontWeight: 700, color: "#334155", marginBottom: 6 }}>
-              Client Passcode
+              Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               style={{
                 width: "100%",
                 padding: "11px 14px",
@@ -164,43 +152,9 @@ export default function ClientLoginPage() {
               marginTop: 6
             }}
           >
-            {loading ? "Logging in..." : "Enter Client Dashboard →"}
+            {loading ? "Logging in..." : "Sign In to Client Portal →"}
           </button>
         </form>
-
-        {/* 1-Click Quick Client Login */}
-        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid #f1f5f9" }}>
-          <span style={{ fontSize: 12, color: "#64748b", display: "block", marginBottom: 10 }}>
-            Quick Client Access:
-          </span>
-          <button
-            type="button"
-            onClick={handleQuickClient}
-            style={{
-              background: "#f0fdf4",
-              border: "1px solid #bbf7d0",
-              borderRadius: 6,
-              padding: "8px 18px",
-              fontSize: 13,
-              fontWeight: 600,
-              color: "#166534",
-              cursor: "pointer",
-              width: "100%"
-            }}
-          >
-            🌿 1-Click Instant Client Login
-          </button>
-        </div>
-
-        {/* Master Admin Link */}
-        <div style={{ marginTop: 20 }}>
-          <a
-            href="/admin-login"
-            style={{ fontSize: 12.5, color: "#0284c7", fontWeight: 600, textDecoration: "none" }}
-          >
-            Master Admin Login &rarr;
-          </a>
-        </div>
       </div>
     </div>
   );

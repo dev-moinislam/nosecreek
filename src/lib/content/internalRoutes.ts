@@ -136,149 +136,28 @@ export const LOCATION_ROUTES: InternalRouteItem[] = [
   }
 ];
 
-// 4. Default Services List
-export const DEFAULT_SERVICE_ROUTES: InternalRouteItem[] = [
-  {
-    id: "srv-physiotherapy",
-    title: "Physiotherapy",
-    url: "/services/physiotherapy",
-    category: "service",
-    badge: "Service",
-    description: "Evidence-based manual therapy, joint mobilization, and exercise rehab."
-  },
-  {
-    id: "srv-chiropractic-care",
-    title: "Chiropractic Care",
-    url: "/services/chiropractic-care",
-    category: "service",
-    badge: "Service",
-    description: "Gentle spinal adjustments, active release, and nervous system balance."
-  },
-  {
-    id: "srv-massage-therapy",
-    title: "Registered Massage Therapy (RMT)",
-    url: "/services/massage-therapy",
-    category: "service",
-    badge: "Service",
-    description: "Deep tissue, trigger point release, and relaxation massage."
-  },
-  {
-    id: "srv-pelvic-floor",
-    title: "Pelvic Floor Physiotherapy",
-    url: "/services/pelvic-floor-physiotherapy",
-    category: "service",
-    badge: "Service",
-    description: "Specialized rehabilitation for incontinence, pelvic pain, and postpartum recovery."
-  },
-  {
-    id: "srv-acupuncture",
-    title: "Acupuncture & Dry Needling (IMS)",
-    url: "/services/acupuncture",
-    category: "service",
-    badge: "Service",
-    description: "Gunn IMS and medical acupuncture for chronic nerve and muscle pain."
-  },
-  {
-    id: "srv-vestibular",
-    title: "Vestibular & Concussion Rehab",
-    url: "/services/vestibular-rehabilitation",
-    category: "service",
-    badge: "Service",
-    description: "Treatment for vertigo, BPPV, balance disorders, and post-concussion syndrome."
-  },
-  {
-    id: "srv-custom-orthotics",
-    title: "Custom Orthotics & Biomechanics",
-    url: "/services/custom-orthotics",
-    category: "service",
-    badge: "Service",
-    description: "Computerized gait analysis and custom foot orthotics."
-  },
-  {
-    id: "srv-tmj-therapy",
-    title: "TMJ & Jaw Pain Therapy",
-    url: "/services/tmj-therapy",
-    category: "service",
-    badge: "Service",
-    description: "Relief for jaw clicking, clenching, locking, and facial pain."
-  },
-  {
-    id: "srv-shockwave",
-    title: "Shockwave Therapy",
-    url: "/services/shockwave-therapy",
-    category: "service",
-    badge: "Service",
-    description: "Acoustic soundwaves for plantar fasciitis, tendinitis, and calcification."
-  }
-];
+import servicesData from "@/data/services.json";
+import conditionsData from "@/data/conditions.json";
 
-// 5. Default Conditions List
-export const DEFAULT_CONDITION_ROUTES: InternalRouteItem[] = [
-  {
-    id: "cnd-back-pain",
-    title: "Back Pain & Sciatica Relief",
-    url: "/conditions/back-pain-relief",
-    category: "condition",
-    badge: "Condition",
-    description: "Relief for disc herniation, spinal stenosis, and lower back tightness."
-  },
-  {
-    id: "cnd-neck-pain",
-    title: "Neck Pain & Whiplash Relief",
-    url: "/conditions/neck-pain-relief",
-    category: "condition",
-    badge: "Condition",
-    description: "Restoring neck motion after auto accidents, poor posture, and disc issues."
-  },
-  {
-    id: "cnd-shoulder-pain",
-    title: "Shoulder Pain & Rotator Cuff",
-    url: "/conditions/shoulder-pain",
-    category: "condition",
-    badge: "Condition",
-    description: "Treating rotator cuff tears, frozen shoulder, and impingement."
-  },
-  {
-    id: "cnd-knee-hip",
-    title: "Knee & Hip Pain Relief",
-    url: "/conditions/knee-hip-pain",
-    category: "condition",
-    badge: "Condition",
-    description: "Care for meniscus tears, osteoarthritis, runner's knee, and bursitis."
-  },
-  {
-    id: "cnd-headaches",
-    title: "Headaches & Migraines",
-    url: "/conditions/headaches",
-    category: "condition",
-    badge: "Condition",
-    description: "Relieving cervicogenic headaches and tension originating in the upper neck."
-  },
-  {
-    id: "cnd-sports-injuries",
-    title: "Sports Injuries & Return to Play",
-    url: "/conditions/sports-injuries",
-    category: "condition",
-    badge: "Condition",
-    description: "Fast-track rehabilitation for ligament sprains, muscle strains, and athletic injury."
-  },
-  {
-    id: "cnd-mva",
-    title: "Motor Vehicle Accident (MVA / Whiplash)",
-    url: "/conditions/motor-vehicle-accident",
-    category: "condition",
-    badge: "Condition",
-    description: "Direct-billed Alberta auto insurance rehabilitation with zero out-of-pocket costs."
-  },
-  {
-    id: "cnd-chronic-pain",
-    title: "Chronic Pain Management",
-    url: "/conditions/chronic-pain",
-    category: "condition",
-    badge: "Condition",
-    description: "Comprehensive multi-disciplinary protocols for persistent pain syndromes."
-  }
-];
+// 4. Default Services List (derived from active clinic services)
+export const DEFAULT_SERVICE_ROUTES: InternalRouteItem[] = (servicesData as any[]).map((s) => ({
+  id: `srv-${s.slug || s.id}`,
+  title: s.title || s.name,
+  url: `/services/${s.slug}`,
+  category: "service" as const,
+  badge: "Service",
+  description: s.shortDescription || `Specialized ${s.title} treatments at Nose Creek.`
+}));
+
+// 5. Default Conditions List (derived from active clinic conditions)
+export const DEFAULT_CONDITION_ROUTES: InternalRouteItem[] = (conditionsData as any[]).map((c) => ({
+  id: `cnd-${c.slug || c.id}`,
+  title: c.name || c.title,
+  url: `/conditions/${c.slug}`,
+  category: "condition" as const,
+  badge: "Condition",
+  description: c.shortDescription || `Targeted care for ${c.name || c.title}.`
+}));
 
 // Helper to get all routes dynamically with optional localStorage overrides
 export function getAllInternalRoutes(customServices?: any[], customConditions?: any[]): InternalRouteItem[] {
@@ -301,14 +180,20 @@ export function getAllInternalRoutes(customServices?: any[], customConditions?: 
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          serviceRoutes = parsed.map((s) => ({
-            id: `srv-${s.slug || s.id}`,
-            title: s.title || s.name,
-            url: `/services/${s.slug}`,
-            category: "service",
-            badge: "Service",
-            description: s.shortDescription || `Specialized ${s.title} treatments at Nose Creek.`
-          }));
+          const map = new Map<string, InternalRouteItem>();
+          DEFAULT_SERVICE_ROUTES.forEach((r) => map.set(r.id, r));
+          parsed.forEach((s) => {
+            const id = `srv-${s.slug || s.id}`;
+            map.set(id, {
+              id,
+              title: s.title || s.name,
+              url: `/services/${s.slug}`,
+              category: "service",
+              badge: "Service",
+              description: s.shortDescription || `Specialized ${s.title} treatments at Nose Creek.`
+            });
+          });
+          serviceRoutes = Array.from(map.values());
         }
       }
     } catch {}
@@ -330,24 +215,46 @@ export function getAllInternalRoutes(customServices?: any[], customConditions?: 
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          conditionRoutes = parsed.map((c) => ({
-            id: `cnd-${c.slug || c.id}`,
-            title: c.name || c.title,
-            url: `/conditions/${c.slug}`,
-            category: "condition",
-            badge: "Condition",
-            description: c.shortDescription || `Targeted care for ${c.name || c.title}.`
-          }));
+          const map = new Map<string, InternalRouteItem>();
+          DEFAULT_CONDITION_ROUTES.forEach((r) => map.set(r.id, r));
+          parsed.forEach((c) => {
+            const id = `cnd-${c.slug || c.id}`;
+            map.set(id, {
+              id,
+              title: c.name || c.title,
+              url: `/conditions/${c.slug}`,
+              category: "condition",
+              badge: "Condition",
+              description: c.shortDescription || `Targeted care for ${c.name || c.title}.`
+            });
+          });
+          conditionRoutes = Array.from(map.values());
         }
       }
     } catch {}
   }
 
-  return [
+  const allItems: InternalRouteItem[] = [
     ...CORE_PAGES,
     ...serviceRoutes,
     ...conditionRoutes,
     ...LOCATION_ROUTES,
     ...ANCHOR_LINKS
   ];
+
+  // Strictly deduplicate by both ID and URL to guarantee unique React keys
+  const seenIds = new Set<string>();
+  const seenUrls = new Set<string>();
+  const uniqueItems: InternalRouteItem[] = [];
+
+  for (const item of allItems) {
+    if (!item.id || !item.url) continue;
+    if (!seenIds.has(item.id) && !seenUrls.has(item.url)) {
+      seenIds.add(item.id);
+      seenUrls.add(item.url);
+      uniqueItems.push(item);
+    }
+  }
+
+  return uniqueItems;
 }

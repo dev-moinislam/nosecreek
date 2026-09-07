@@ -22,6 +22,7 @@ export default function RichTextEditor({
   const [imageUrl, setImageUrl] = useState("");
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showInternalLinkPicker, setShowInternalLinkPicker] = useState(false);
+  const [linkPickerTab, setLinkPickerTab] = useState<"internal" | "external">("internal");
   const [linkUrl, setLinkUrl] = useState("https://");
   const savedSelectionRef = useRef<Range | null>(null);
 
@@ -103,55 +104,35 @@ export default function RichTextEditor({
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         
-        // Unwrap fake blockquotes from external CMS that wrap entire article paragraphs
-        const blockquotes = doc.body.querySelectorAll("blockquote");
-        blockquotes.forEach((bq) => {
-          const parent = bq.parentNode;
-          while (bq.firstChild) {
-            parent?.insertBefore(bq.firstChild, bq);
-          }
-          bq.remove();
-        });
-
         // Strip out foreign inline background, font-family, font-size, and indentation
         const allElements = doc.body.querySelectorAll("*");
         allElements.forEach((el) => {
           const htmlEl = el as HTMLElement;
           if (htmlEl.style) {
-            htmlEl.style.backgroundColor = "";
-            htmlEl.style.background = "";
-            htmlEl.style.fontFamily = "";
-            htmlEl.style.fontSize = "";
-            htmlEl.style.marginLeft = "";
-            htmlEl.style.paddingLeft = "";
-            htmlEl.style.textIndent = "";
-          }
-          if (htmlEl.getAttribute && htmlEl.getAttribute("style") === "") {
-            htmlEl.removeAttribute("style");
+            htmlEl.style.removeProperty("background");
+            htmlEl.style.removeProperty("background-color");
+            htmlEl.style.removeProperty("font-family");
+            htmlEl.style.removeProperty("font-size");
+            htmlEl.style.removeProperty("text-indent");
+            htmlEl.style.removeProperty("margin-inline-start");
+            htmlEl.style.removeProperty("margin-inline-end");
+            htmlEl.style.removeProperty("padding-inline-start");
           }
         });
 
-        document.execCommand("insertHTML", false, doc.body.innerHTML);
+        const cleaned = doc.body.innerHTML;
+        document.execCommand("insertHTML", false, cleaned);
+        handleInput();
+        return;
       } catch {
-        // Fallback to text lines
-        const paragraphs = text
-          .split(/\r?\n\r?\n/)
-          .map((p) => p.trim())
-          .filter(Boolean)
-          .map((p) => `<p>${p.replace(/\r?\n/g, "<br>")}</p>`)
-          .join("");
-        document.execCommand("insertHTML", false, paragraphs || text);
+        // fallback
       }
-    } else if (text) {
-      const paragraphs = text
-        .split(/\r?\n\r?\n/)
-        .map((p) => p.trim())
-        .filter(Boolean)
-        .map((p) => `<p>${p.replace(/\r?\n/g, "<br>")}</p>`)
-        .join("");
-      document.execCommand("insertHTML", false, paragraphs || text);
     }
-    handleInput();
+
+    if (text) {
+      document.execCommand("insertText", false, text);
+      handleInput();
+    }
   };
 
   const handleInsertQuote = () => {
@@ -160,8 +141,8 @@ export default function RichTextEditor({
     }
     const sel = window.getSelection();
     const selectedText = sel ? sel.toString() : "";
-    const text = selectedText || "Highlight patient advice or clinical quote here...";
-    const quoteHtml = `<blockquote style="border-left: 3px solid #0e78a8; padding: 8px 16px; margin: 18px 0; color: #475569; font-style: italic;">${text}</blockquote><p><br></p>`;
+    const quoteContent = selectedText || "Insert clinical quote or patient takeaway here...";
+    const quoteHtml = `<blockquote style="border-left: 4px solid #0e78a8; margin: 16px 0; padding: 12px 18px; background: #f0f9ff; color: #0f172a; font-style: italic; font-size: 1.05rem;"><p style="margin: 0;">${quoteContent}</p></blockquote><p></p>`;
     document.execCommand("insertHTML", false, quoteHtml);
     handleInput();
   };
@@ -169,24 +150,19 @@ export default function RichTextEditor({
   const handleInsertImage = () => {
     if (!imageUrl.trim()) return;
     restoreSelection();
-    const cleanUrl = imageUrl.trim();
-    const imgHtml = `<div style="margin: 24px 0; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.08);"><img src="${cleanUrl}" alt="Clinical article visual" style="width: 100%; max-height: 480px; object-fit: cover; display: block;" /></div><p><br></p>`;
-    
-    const success = document.execCommand("insertHTML", false, imgHtml);
-    if (!success && editorRef.current) {
-      editorRef.current.innerHTML += imgHtml;
-    }
+    const imgHtml = `<figure style="margin: 20px 0; text-align: center;"><img src="${imageUrl.trim()}" alt="Clinical reference" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" /><figcaption style="font-size: 12px; color: #64748b; margin-top: 6px;">Nose Creek Physiotherapy</figcaption></figure><p></p>`;
+    document.execCommand("insertHTML", false, imgHtml);
     handleInput();
     setImageUrl("");
     setShowImageModal(false);
   };
 
   const handleInsertLink = () => {
-    if (!linkUrl.trim()) return;
+    if (!linkUrl.trim() || linkUrl === "https://") return;
     restoreSelection();
-    const cleanLink = linkUrl.trim();
     const sel = window.getSelection();
-    const selectedText = sel ? sel.toString() : "";
+    const selectedText = sel ? sel.toString().trim() : "";
+    const cleanLink = linkUrl.trim();
     
     if (!selectedText) {
       document.execCommand("insertHTML", false, `<a href="${cleanLink}" target="_blank" rel="noopener noreferrer" style="color: #0e78a8; text-decoration: underline; font-weight: 600;">${cleanLink}</a>&nbsp;`);
@@ -198,13 +174,20 @@ export default function RichTextEditor({
     setShowLinkModal(false);
   };
 
-  const handleSelectInternalLink = (url: string, title: string) => {
+  const handleSelectLink = (
+    url: string,
+    title: string,
+    _item?: any,
+    options?: { isExternal?: boolean; openInNewTab?: boolean }
+  ) => {
     restoreSelection();
     const sel = window.getSelection();
     const selectedText = sel ? sel.toString().trim() : "";
     const linkText = selectedText || title;
+    const isExternal = options?.isExternal ?? (url.startsWith("http://") || url.startsWith("https://"));
+    const targetAttr = isExternal || options?.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : "";
 
-    const linkHtml = `<a href="${url}" title="${title}" style="color: #0e78a8; text-decoration: underline; font-weight: 600;">${linkText}</a>&nbsp;`;
+    const linkHtml = `<a href="${url}" title="${title}"${targetAttr} style="color: #0e78a8; text-decoration: underline; font-weight: 600;">${linkText}</a>&nbsp;`;
     const success = document.execCommand("insertHTML", false, linkHtml);
     if (!success && editorRef.current) {
       editorRef.current.innerHTML += linkHtml;
@@ -347,12 +330,13 @@ export default function RichTextEditor({
           onMouseDown={(e) => {
             e.preventDefault();
             saveSelection();
-            setShowLinkModal(true);
+            setLinkPickerTab("external");
+            setShowInternalLinkPicker(true);
           }}
-          title="Insert Link"
+          title="Insert External Web Link (e.g., medical studies, partner sites)"
           style={{ ...btnStyle, color: "#0284c7", fontWeight: 700 }}
         >
-          🔗 Add Link
+          🔗 Add Web Link
         </button>
 
         <button
@@ -360,6 +344,7 @@ export default function RichTextEditor({
           onMouseDown={(e) => {
             e.preventDefault();
             saveSelection();
+            setLinkPickerTab("internal");
             setShowInternalLinkPicker(true);
           }}
           title="Link to Internal Service, Condition, or Clinic Page"
@@ -602,13 +587,14 @@ export default function RichTextEditor({
         </div>
       )}
 
-      {/* ── INTERNAL LINK PICKER MODAL ── */}
+      {/* ── UNIVERSAL LINK PICKER MODAL (INTERNAL & EXTERNAL) ── */}
       <InternalLinkPickerModal
         isOpen={showInternalLinkPicker}
         onClose={() => setShowInternalLinkPicker(false)}
-        onSelect={(url, title) => handleSelectInternalLink(url, title)}
-        modalTitle="Insert Clinic Link into Article"
+        onSelect={(url, title, _item, options) => handleSelectLink(url, title, _item, options)}
+        modalTitle="Insert Link into Article"
         allowCustomText={true}
+        defaultTab={linkPickerTab}
       />
 
       {/* ── EDITOR BODY ── */}

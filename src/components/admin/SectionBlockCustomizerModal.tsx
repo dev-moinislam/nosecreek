@@ -15,6 +15,7 @@ import {
 } from "./AdminIcons";
 import AdminImageUploader from "./AdminImageUploader";
 import InternalLinkPickerModal from "./InternalLinkPickerModal";
+import LinkedContentEditor from "./LinkedContentEditor";
 
 interface SectionBlockCustomizerModalProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export default function SectionBlockCustomizerModal({
   onSave
 }: SectionBlockCustomizerModalProps) {
   const [formData, setFormData] = useState<SectionBlockConfig>({
-    title: config?.title || "",
+    title: config?.title || sectionDefaultTitle || "",
     eyebrow: config?.eyebrow || "",
     eyebrowColor: config?.eyebrowColor || "#1c9fd8",
     subtitle: config?.subtitle || "",
@@ -54,7 +55,7 @@ export default function SectionBlockCustomizerModal({
   useEffect(() => {
     if (config) {
       setFormData({
-        title: config.title || "",
+        title: config.title || sectionDefaultTitle || "",
         eyebrow: config.eyebrow || "",
         eyebrowColor: config.eyebrowColor || "#1c9fd8",
         subtitle: config.subtitle || "",
@@ -69,7 +70,7 @@ export default function SectionBlockCustomizerModal({
       });
     } else {
       setFormData({
-        title: "",
+        title: sectionDefaultTitle || "",
         eyebrow: "",
         eyebrowColor: "#1c9fd8",
         subtitle: "",
@@ -83,7 +84,7 @@ export default function SectionBlockCustomizerModal({
         bullets: []
       });
     }
-  }, [config, sectionKey]);
+  }, [config, sectionKey, sectionDefaultTitle]);
 
   if (!isOpen) return null;
 
@@ -101,6 +102,7 @@ export default function SectionBlockCustomizerModal({
   const isTestimonials = sectionKey === "testimonials";
   const isBottomCTA = sectionKey === "bottom_cta";
   const isDecisionCTAs = sectionKey === "decision_ctas";
+  const isHero = sectionKey === "hero";
 
   // Dynamic Bullet section header & placeholder
   const listLabel = isBenefits
@@ -135,6 +137,49 @@ export default function SectionBlockCustomizerModal({
   const handleRemoveBullet = (idx: number) => {
     const updated = (formData.bullets || []).filter((_, i) => i !== idx);
     setFormData({ ...formData, bullets: updated });
+  };
+
+  const renderBulletText = (b: string, bIdx: number) => {
+    const prefix = isRoadmap ? `Step ${bIdx + 1}: ` : `✓ `;
+    const match = b.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (!match) {
+      return (
+        <span style={{ color: "#334155" }}>
+          {prefix}{b}
+        </span>
+      );
+    }
+    const isInternal =
+      match[2].startsWith("/") ||
+      match[2].startsWith("#") ||
+      match[2].includes("nosecreekphysiotherapy.com");
+    const before = b.substring(0, match.index);
+    const after = b.substring(match.index! + match[0].length);
+
+    return (
+      <span style={{ color: "#334155", display: "inline-flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+        <span>{prefix}{before}</span>
+        <span
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+            padding: "1px 6px",
+            borderRadius: 6,
+            background: isInternal ? "#e0f2fe" : "#dcfce7",
+            border: `1px solid ${isInternal ? "#bae6fd" : "#bbf7d0"}`,
+            color: isInternal ? "#0369a1" : "#15803d",
+            fontWeight: 700,
+            fontSize: "0.92em"
+          }}
+        >
+          <span>{isInternal ? "🌐" : "🔗"}</span>
+          <span>[{match[1]}]</span>
+          <code style={{ fontSize: "0.85em", opacity: 0.85 }}>({match[2]})</code>
+        </span>
+        <span>{after}</span>
+      </span>
+    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -193,10 +238,15 @@ export default function SectionBlockCustomizerModal({
               <LayoutIcon size={18} />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
-                Edit Section: {sectionDefaultTitle}
-              </h3>
-              <div style={{ fontSize: 12, color: "#64748b" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
+                  Edit Section: {sectionDefaultTitle}
+                </h3>
+                <span style={{ background: "#ecfdf5", color: "#059669", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, border: "1px solid #a7f3d0" }}>
+                  ✓ Live Frontend Synced
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
                 {isMediaRichStory
                   ? "Customize text, side photo, placement, and bullet points."
                   : isListSection
@@ -306,12 +356,18 @@ export default function SectionBlockCustomizerModal({
             </div>
           )}
 
-          {/* 3. Main Narrative Body Paragraphs (Shown on Story, Overview, or Bottom CTA) */}
-          {(isMediaRichStory || isBottomCTA || isTestimonials) && (
+          {/* 3. Main Narrative Body Paragraphs (Shown on Story, Overview, Hero, Decision CTAs, or Bottom CTA) */}
+          {(isMediaRichStory || isBottomCTA || isTestimonials || isDecisionCTAs || isHero) && (
             <div className="adm-form-group">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                 <label className="adm-form-label" style={{ margin: 0 }}>
-                  {isBottomCTA ? "Banner Message / Call-to-Action Text" : "Narrative Content (Paragraphs)"}
+                  {isHero
+                    ? "Hero Intro Subheading / Description"
+                    : isDecisionCTAs
+                    ? "Call-to-Action Subtitle / Description"
+                    : isBottomCTA
+                    ? "Banner Message / Call-to-Action Text"
+                    : "Narrative Content (Paragraphs)"}
                 </label>
                 <button
                   type="button"
@@ -331,15 +387,15 @@ export default function SectionBlockCustomizerModal({
                   }}
                 >
                   <LinkIcon size={12} />
-                  <span>+ Insert Internal Page Link</span>
+                  <span>🔗 + Insert Link (Internal / External)</span>
                 </button>
               </div>
-              <textarea
-                className="adm-textarea"
-                style={{ minHeight: isBottomCTA ? 70 : 100 }}
-                placeholder="Enter description for this section. Separate paragraphs with double enter..."
+              <LinkedContentEditor
                 value={formData.content || ""}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                onChange={(val) => setFormData({ ...formData, content: val })}
+                onOpenLinkPicker={() => setPickerMode("content")}
+                minHeight={isBottomCTA ? 80 : 120}
+                placeholder="Enter description for this section. Separate paragraphs with double enter..."
               />
             </div>
           )}
@@ -386,9 +442,7 @@ export default function SectionBlockCustomizerModal({
                         fontSize: 13.5
                       }}
                     >
-                      <span style={{ color: "#334155" }}>
-                        {isRoadmap ? `Step ${bIdx + 1}: ${b}` : `✓ ${b}`}
-                      </span>
+                      {renderBulletText(b, bIdx)}
                       <button
                         type="button"
                         onClick={() => handleRemoveBullet(bIdx)}
@@ -403,8 +457,8 @@ export default function SectionBlockCustomizerModal({
             </div>
           )}
 
-          {/* 5. Call to Action Button (Shown on Story, Overview, or Bottom CTA) */}
-          {(isMediaRichStory || isBottomCTA) && (
+          {/* 5. Call to Action Button (Shown on Story, Overview, Hero, Decision CTAs, or Bottom CTA) */}
+          {(isMediaRichStory || isBottomCTA || isDecisionCTAs || isHero) && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div className="adm-form-group">
                 <label className="adm-form-label">Button Text (Optional)</label>
@@ -437,12 +491,12 @@ export default function SectionBlockCustomizerModal({
                     }}
                   >
                     <LinkIcon size={12} />
-                    <span>Pick Internal Page</span>
+                    <span>🔗 Pick Link (Internal / External)</span>
                   </button>
                 </div>
                 <input
                   type="text"
-                  placeholder="E.g., /services/physiotherapy or /contact#booking"
+                  placeholder="E.g., /services/physiotherapy or https://example.com"
                   className="adm-input"
                   value={formData.ctaHref || ""}
                   onChange={(e) => setFormData({ ...formData, ctaHref: e.target.value })}
@@ -479,16 +533,16 @@ export default function SectionBlockCustomizerModal({
           </div>
         </form>
 
-        {/* Internal Link Picker Modal */}
+        {/* Universal Link Picker Modal (Internal & External) */}
         <InternalLinkPickerModal
           isOpen={pickerMode !== null}
           onClose={() => setPickerMode(null)}
-          onSelect={(url, title) => {
+          onSelect={(url, title, _item, options) => {
             if (pickerMode === "cta") {
               setFormData((prev) => ({
                 ...prev,
                 ctaHref: url,
-                ctaText: prev.ctaText || `Learn More About ${title}`
+                ctaText: prev.ctaText || (options?.isExternal ? title : `Learn More About ${title}`)
               }));
             } else if (pickerMode === "content") {
               setFormData((prev) => ({
@@ -501,7 +555,7 @@ export default function SectionBlockCustomizerModal({
             setPickerMode(null);
           }}
           initialUrl={formData.ctaHref || ""}
-          modalTitle={pickerMode === "cta" ? "Select Button Destination Link" : "Insert Internal Link into Content"}
+          modalTitle={pickerMode === "cta" ? "Select Button Destination Link" : "Insert Link into Content"}
           allowCustomText={true}
         />
       </div>

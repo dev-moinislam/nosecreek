@@ -24,7 +24,16 @@ export default function HomeServicesGrid({ initialServices }: HomeServicesGridPr
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setServices(parsed);
+            const map = new Map<string, Service>();
+            (defaultServicesData as Service[]).forEach((s) => map.set(s.slug, s));
+            parsed.forEach((p) => {
+              if (map.has(p.slug)) {
+                map.set(p.slug, { ...map.get(p.slug)!, ...p });
+              } else {
+                map.set(p.slug, p);
+              }
+            });
+            setServices(Array.from(map.values()));
           }
         }
       } catch {}

@@ -38,8 +38,17 @@
       "scriptUrl": "https://cdn.calltrk.com/companies/208038913/2a4e80164caeb8bbc760/12/swap.js"
     },
     "gtm": {
-      "enabled": false,
-      "containerId": ""
+      "enabled": true,
+      "containerId": "GTM-M3WLKSQ, GTM-PJ447MK",
+      "containerIds": ["GTM-M3WLKSQ", "GTM-PJ447MK"]
+    },
+    "googleAnalytics": {
+      "enabled": true,
+      "trackingId": "UA-121730452-1"
+    },
+    "facebookPixel": {
+      "enabled": true,
+      "pixelId": "275772356383035"
     }
   }
 }

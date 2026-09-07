@@ -14,14 +14,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = settingsData.seo.canonicalUrl.replace(/\/$/, "");
 
   // Static pages
-  const staticPages = ["", "/about", "/services", "/team", "/conditions", "/locations", "/blog", "/contact"].map(
-    (route) => ({
-      url: `${baseUrl}${route}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: route === "" ? 1.0 : 0.8
-    })
-  );
+  const staticPages = [
+    "",
+    "/about",
+    "/services",
+    "/team",
+    "/conditions",
+    "/locations",
+    "/blog",
+    "/contact",
+    "/reviews",
+    "/workshops"
+  ].map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: route === "" ? 1.0 : 0.8
+  }));
 
   // Fetch dynamic content
   const [services, team, posts, locations, conditions] = await Promise.all([

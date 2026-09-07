@@ -26,6 +26,22 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true
+  },
+  formatDetection: {
+    telephone: false
+  },
+  verification: {
+    google: [
+      "VdGWvsNmPysBfWw1MpJIQm94R_Lb1ll_mKLYEw-NnPg",
+      "Xypr33c-GZbfb5iCkpnk_NXoEs2pjpUyPTPpFglIol8",
+      "LJFmcK_xs2gq47oE17mVlpakVzJBD4Ss7AR8SvcgeA8"
+    ],
+    other: {
+      "msvalidate.01": [
+        "05FF7C5576F0BF31E798C271D8097CB3",
+        "CE71D0049F828E7D8D023D99CB4961E5"
+      ]
+    }
   }
 };
 

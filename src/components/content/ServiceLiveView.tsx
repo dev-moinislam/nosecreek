@@ -9,6 +9,8 @@ import FormattedNarrative from "@/components/ui/FormattedNarrative";
 import { Service, TeamMember, Condition, SectionBlockConfig } from "@/types/content";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import VisitUsSection from "./VisitUsSection";
+import CustomStorySection from "./CustomStorySection";
+import ReviewCarousel from "@/components/ui/ReviewCarousel";
 
 const eyebrowEl = (text: string, color = "#1c9fd8") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
@@ -32,6 +34,33 @@ const defaultServiceSectionOrder = [
   "decision_ctas",
   "bottom_cta"
 ];
+
+const getDefaultServiceOrder = (s: Service): string[] => {
+  const list: string[] = ["hero"];
+  if (s.customSections && s.customSections.length > 0) {
+    s.customSections.forEach((_, i) => list.push(`custom-${i}`));
+  }
+  if ((s.benefits && s.benefits.length > 0) || (s.sectionsData?.benefits?.bullets && s.sectionsData.benefits.bullets.length > 0)) {
+    list.push("benefits");
+  }
+  if ((s.symptoms && s.symptoms.length > 0) || (s.sectionsData?.symptoms?.bullets && s.sectionsData.symptoms.bullets.length > 0)) {
+    list.push("symptoms");
+  }
+  if ((s.treatmentApproach && s.treatmentApproach.length > 0) || (s.sectionsData?.treatment_approach?.bullets && s.sectionsData.treatment_approach.bullets.length > 0)) {
+    list.push("treatment_approach");
+  }
+  if (s.faqs && s.faqs.length > 0) {
+    list.push("faqs");
+  }
+  if (s.sectionsData) {
+    Object.keys(s.sectionsData).forEach((k) => {
+      if (!list.includes(k) && k !== "hero" && !k.startsWith("custom-")) {
+        list.push(k);
+      }
+    });
+  }
+  return list;
+};
 
 export default function ServiceLiveView({
   initialService,
@@ -72,9 +101,27 @@ export default function ServiceLiveView({
   }, [initialService]);
 
   const isHidden = (key: string) => (service.hiddenSections || []).includes(key);
-  const order = service.sectionOrder && service.sectionOrder.length > 0
+  const rawOrder = service.sectionOrder && service.sectionOrder.length > 0
     ? service.sectionOrder
-    : defaultServiceSectionOrder;
+    : getDefaultServiceOrder(service);
+
+  const order = rawOrder.filter((key) => {
+    if (key === "hero") return true;
+    if (isHidden(key)) return false;
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      return Boolean(service.customSections && service.customSections[idx]);
+    }
+    if (key === "custom_sections") return Boolean(service.customSections && service.customSections.length > 0);
+    if (key === "benefits") return Boolean((service.sectionsData?.benefits?.bullets?.length) || (service.benefits?.length));
+    if (key === "symptoms") return Boolean((service.sectionsData?.symptoms?.bullets?.length) || (service.symptoms?.length));
+    if (key === "treatment_approach") return Boolean((service.sectionsData?.treatment_approach?.bullets?.length) || (service.treatmentApproach?.length));
+    if (key === "faqs") return Boolean(service.faqs?.length);
+    if (rawOrder.includes("at_a_glance") && (!service.sectionsData || !service.sectionsData.at_a_glance)) {
+      return Boolean(service.sectionsData?.[key]);
+    }
+    return true;
+  });
 
   const getCustomConfig = (key: string): SectionBlockConfig | undefined => {
     return (service.sectionsData || {})[key];
@@ -83,6 +130,30 @@ export default function ServiceLiveView({
   // Render individual section block with full layout, image & background flexibility
   const renderSection = (key: string) => {
     if (isHidden(key)) return null;
+
+    // Handle Custom Storytelling Sections
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      const customSec = service.customSections?.[idx];
+      if (!customSec) return null;
+      const merged = { ...customSec, ...(service.sectionsData?.[key] || {}) };
+      return <CustomStorySection key={key} section={merged} />;
+    }
+
+    if (key === "custom_sections") {
+      if (order.some((k) => k.startsWith("custom-"))) return null;
+      if (!service.customSections || service.customSections.length === 0) return null;
+      return (
+        <React.Fragment key="custom_sections">
+          {service.customSections.map((sec, idx) => {
+            const blockKey = `custom-${idx}`;
+            const merged = { ...sec, ...(service.sectionsData?.[blockKey] || {}) };
+            return <CustomStorySection key={sec.id || blockKey} section={merged} />;
+          })}
+        </React.Fragment>
+      );
+    }
+
     const cfg = getCustomConfig(key);
 
     switch (key) {
@@ -115,7 +186,7 @@ export default function ServiceLiveView({
 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
                     <a
-                      href="https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+                      href={cfg?.ctaHref || service.ctaHref || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -192,7 +263,27 @@ export default function ServiceLiveView({
           </section>
         );
 
-      case "at_a_glance":
+      case "at_a_glance": {
+        const atGlanceItems =
+          cfg?.bullets && cfg.bullets.length > 0
+            ? cfg.bullets.map((b: any) => {
+                if (typeof b === "object" && b !== null && (b.label || b.val || b.title)) {
+                  return { icon: b.icon || "⏱", label: b.label || b.title || "Feature", val: b.val || b.description || "" };
+                }
+                const str = String(b);
+                const parts = str.split(":");
+                if (parts.length > 1) {
+                  return { icon: "⏱", label: parts[0].trim(), val: parts.slice(1).join(":").trim() };
+                }
+                return { icon: "⏱", label: "Highlight", val: str.trim() };
+              })
+            : [
+                { icon: "⏱", label: "Recovery Assessment", val: "Comprehensive 1-on-1" },
+                { icon: "💳", label: "Direct Billing", val: "Available for Most Insurers" },
+                { icon: "🩺", label: "Referral Required", val: "No Doctor Referral Needed" },
+                { icon: "📍", label: "Clinic Location", val: "Beddington SE (Free Parking)" },
+              ];
+
         return (
           <section key="at_a_glance" style={{ background: cfg?.background === "teal" ? "#12303d" : cfg?.background === "white" ? "#fff" : "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1", padding: "24px 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
@@ -203,12 +294,7 @@ export default function ServiceLiveView({
                 </div>
               )}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-                {[
-                  { icon: "⏱", label: "Recovery Assessment", val: "Comprehensive 1-on-1" },
-                  { icon: "💳", label: "Direct Billing", val: "Available for Most Insurers" },
-                  { icon: "🩺", label: "Referral Required", val: "No Doctor Referral Needed" },
-                  { icon: "📍", label: "Clinic Location", val: "Beddington SE (Free Parking)" },
-                ].map((item, idx) => (
+                {atGlanceItems.map((item, idx) => (
                   <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: cfg?.background === "teal" ? "rgba(255,255,255,0.08)" : "#fff", borderRadius: 12, border: cfg?.background === "teal" ? "1px solid rgba(255,255,255,0.15)" : "1px solid #d7e6ef", boxShadow: "0 4px 12px rgba(18,60,80,0.04)" }}>
                     <span style={{ fontSize: 24 }}>{item.icon}</span>
                     <div>
@@ -221,6 +307,7 @@ export default function ServiceLiveView({
             </div>
           </section>
         );
+      }
 
       case "clinical_overview": {
         const bgStyle =
@@ -295,7 +382,12 @@ export default function ServiceLiveView({
 
                   {cfg?.ctaText && cfg?.ctaHref && (
                     <div style={{ marginTop: 24 }}>
-                      <a href={cfg.ctaHref} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#1c9fd8", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                      <a
+                        href={cfg.ctaHref}
+                        target={cfg.ctaHref.startsWith("http") ? "_blank" : undefined}
+                        rel={cfg.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#1c9fd8", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}
+                      >
                         {cfg.ctaText} &rarr;
                       </a>
                     </div>
@@ -319,106 +411,6 @@ export default function ServiceLiveView({
         );
       }
 
-      case "custom_sections":
-        if (!service.customSections || service.customSections.length === 0) return null;
-        return (
-          <div key="custom_sections">
-            {service.customSections.map((sec, idx) => {
-              const bgStyle =
-                sec.background === "teal"
-                  ? { background: "#12303d", color: "#ffffff" }
-                  : sec.background === "light"
-                  ? { background: "#f2f8fb", color: "#1d2b34" }
-                  : { background: "#ffffff", color: "#1d2b34" };
-
-              const isDark = sec.background === "teal";
-              const isImageLeft = sec.imagePosition === "left";
-              const isImageNone = sec.imagePosition === "none" || !sec.image;
-              const isImageTop = sec.imagePosition === "top";
-              const isImageBottom = sec.imagePosition === "bottom";
-
-              return (
-                <section key={sec.id || idx} style={{ ...bgStyle, padding: "clamp(56px, 7vw, 96px) 0", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
-                  <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-                    
-                    {isImageTop && sec.image && (
-                      <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
-                        <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      </div>
-                    )}
-
-                    <div
-                      style={{
-                        display: isImageNone || isImageTop || isImageBottom ? "block" : "grid",
-                        gridTemplateColumns: isImageNone ? "1fr" : "repeat(auto-fit, minmax(320px, 1fr))",
-                        gap: "clamp(32px, 5vw, 64px)",
-                        alignItems: "center"
-                      }}
-                    >
-                      {isImageLeft && sec.image && (
-                        <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-                          <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                        </div>
-                      )}
-
-                      <div style={{ maxWidth: isImageNone ? 880 : "none" }}>
-                        {sec.eyebrow && eyebrowEl(sec.eyebrow, sec.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
-
-                        <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.15, marginBottom: 18 }}>
-                          {sec.title}
-                        </h2>
-
-                        {sec.subtitle && (
-                          <div style={{ fontSize: 18, fontWeight: 600, color: isDark ? "#93c5fd" : "#0e78a8", marginBottom: 18 }}>
-                            {sec.subtitle}
-                          </div>
-                        )}
-
-                        <FormattedNarrative
-                          content={sec.content || ""}
-                          isDark={isDark}
-                          style={{ fontSize: "clamp(15.5px, 1.1vw, 17px)", lineHeight: 1.75, color: isDark ? "#cbdbe4" : "#48535c", marginBottom: 24 }}
-                        />
-
-                        {sec.bullets && sec.bullets.length > 0 && (
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, marginBottom: 28 }}>
-                            {sec.bullets.map((bullet, bIdx) => (
-                              <div key={bIdx} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                                <span style={{ color: isDark ? "#8cc63f" : "#6faf1c", fontWeight: 800, fontSize: 16, lineHeight: 1.2 }}>✓</span>
-                                <span style={{ fontSize: 14.5, color: isDark ? "#e2e8f0" : "#334155", fontWeight: 500 }}>{bullet}</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        {sec.ctaText && sec.ctaHref && (
-                          <a
-                            href={sec.ctaHref}
-                            style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#1c9fd8", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}
-                          >
-                            {sec.ctaText} &rarr;
-                          </a>
-                        )}
-                      </div>
-
-                      {!isImageLeft && !isImageNone && !isImageTop && !isImageBottom && sec.image && (
-                        <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-                          <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                        </div>
-                      )}
-                    </div>
-
-                    {isImageBottom && sec.image && (
-                      <div style={{ marginTop: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
-                        <img src={sec.image} alt={sec.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      </div>
-                    )}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        );
 
       case "benefits": {
         const benefitsList = (cfg?.bullets && cfg.bullets.length > 0) ? cfg.bullets : (service.benefits || []);
@@ -480,15 +472,38 @@ export default function ServiceLiveView({
         const approachList = (cfg?.bullets && cfg.bullets.length > 0) ? cfg.bullets : (service.treatmentApproach || []);
         if (approachList.length === 0) return null;
         const isLight = cfg?.background === "light" || cfg?.background === "white";
+        const stepCount = approachList.length;
+        
+        // Smart dynamic title tailored to the service and actual step count
+        const dynamicTitle = cfg?.title || (
+          service.slug === "custom-orthotics"
+            ? `Our ${stepCount}-Stage Precision Custom Fitting Process`
+            : service.slug === "concussion-clinic"
+            ? `Our ${stepCount}-Phase Shift Concussion Protocol`
+            : service.slug === "shockwave-therapy"
+            ? `How Shockwave Therapy is Administered (${stepCount} Phases)`
+            : service.slug === "massage-therapy"
+            ? "What to Expect During Your Treatment Session"
+            : service.slug === "knee-bracing"
+            ? `Our ${stepCount}-Step Custom Bracing & Fitting Trial`
+            : `Our ${stepCount}-Step Approach to ${service.title}`
+        );
+
         return (
           <section key="treatment_approach" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: isLight ? (cfg?.background === "white" ? "#fff" : "#f2f8fb") : "#12303d", color: isLight ? "#1d2b34" : "#fff" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 48px" }}>
-                {eyebrowEl(cfg?.eyebrow || "Our Clinical Roadmap", cfg?.eyebrowColor || "#8cc63f")}
-                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: isLight ? "#1d2b34" : "#fff", letterSpacing: "-0.5px" }}>
-                  {cfg?.title || "Your 4-Step Journey to Pain Relief & Recovery"}
+                {eyebrowEl(cfg?.eyebrow || "Clinical Process", cfg?.eyebrowColor || "#8cc63f")}
+                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.8vw, 42px)", fontWeight: 800, color: isLight ? "#1d2b34" : "#fff", letterSpacing: "-0.5px" }}>
+                  {dynamicTitle}
                 </h2>
-                {cfg?.subtitle && <p style={{ fontSize: 16, color: isLight ? "#5a6570" : "#cbdbe4", marginTop: 12, lineHeight: 1.6 }}>{cfg.subtitle}</p>}
+                {cfg?.subtitle ? (
+                  <p style={{ fontSize: 16, color: isLight ? "#5a6570" : "#cbdbe4", marginTop: 12, lineHeight: 1.6 }}>{cfg.subtitle}</p>
+                ) : (
+                  <p style={{ fontSize: 15.5, color: isLight ? "#5a6570" : "#cbdbe4", marginTop: 10, lineHeight: 1.6 }}>
+                    Clear, transparent clinical care designed around your specific recovery goals.
+                  </p>
+                )}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
                 {approachList.map((step, i) => (
@@ -509,7 +524,7 @@ export default function ServiceLiveView({
       case "team_carousel":
         return (
           <div key="team_carousel">
-            <TeamCarousel members={allTeam} />
+            <TeamCarousel members={allTeam} customEyebrow={cfg?.eyebrow} customTitle={cfg?.title} />
           </div>
         );
 
@@ -667,74 +682,27 @@ export default function ServiceLiveView({
         );
 
       case "testimonials": {
-        const testList = service.testimonials && service.testimonials.length > 0 ? service.testimonials : [
-          {
-            name: "Sarah M.",
-            quote: `The team at Nose Creek Physiotherapy helped me fully regain my mobility. The care and attention to detail were exceptional!`,
-            condition: "Full Functional Recovery",
-            borderColor: "#1c9fd8",
-            meta: "Beddington Patient"
-          },
-          {
-            name: "David K.",
-            quote: `One-on-one registered care and advanced modalities made a huge difference. I was back to running in weeks.`,
-            condition: "Sports Injury Rehabilitation",
-            borderColor: "#6faf1c",
-            meta: "Calgary North"
-          },
-          {
-            name: "Elena R.",
-            quote: `Direct insurance billing and friendly professional staff. Highest recommendation in North Calgary!`,
-            condition: "Spinal & Postural Care",
-            borderColor: "#1c9fd8",
-            meta: "Thorncliffe Resident"
-          }
-        ];
-        const isDark = cfg?.background === "teal";
-        const bgStyle = isDark ? { background: "#12303d", color: "#fff" } : cfg?.background === "light" ? { background: "#f2f8fb", color: "#1d2b34" } : { background: "#fff", color: "#1d2b34" };
-
         return (
-          <section key="testimonials" style={{ ...bgStyle, padding: "clamp(56px, 7vw, 96px) 0", borderTop: "1px solid #e7edf1" }}>
-            <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
-              <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 44px" }}>
-                {eyebrowEl(cfg?.eyebrow || "Real patient stories", cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#6faf1c"))}
-                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px" }}>
-                  {cfg?.title || "What people just like you are saying"}
-                </h2>
-                {cfg?.subtitle && <p style={{ fontSize: 16, color: isDark ? "#cbd5e1" : "#5a6570", marginTop: 12, lineHeight: 1.6 }}>{cfg.subtitle}</p>}
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 26 }}>
-                {testList.map((t: any, i: number) => (
-                  <div key={i} style={{ background: isDark ? "rgba(255,255,255,0.06)" : "#fff", borderRadius: 18, padding: 30, boxShadow: "0 10px 30px rgba(18,60,80,0.07)", borderTop: `4px solid ${t.borderColor || (i % 2 === 0 ? "#1c9fd8" : "#6faf1c")}`, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                    <div>
-                      <div style={{ color: "#f6c945", fontSize: 18, letterSpacing: 2, marginBottom: 14 }}>★★★★★</div>
-                      <p style={{ fontSize: 16, lineHeight: 1.7, color: isDark ? "#e2e8f0" : "#3a444d" }}>
-                        &ldquo;{t.quote || t.content}&rdquo;
-                      </p>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 22, borderTop: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid #f1f5f9", paddingTop: 14 }}>
-                      <div>
-                        <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color: isDark ? "#fff" : "#1d2b34" }}>{t.name || "Verified Patient"}</div>
-                        <div style={{ fontSize: 13, color: isDark ? "#93c5fd" : "#7a848d" }}>{t.meta || t.condition || "Calgary Patient"}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
+          <ReviewCarousel
+            key="testimonials"
+            id="service-reviews"
+            title={cfg?.title || "Real 5-Star Reviews From Our Calgary Patients"}
+            subtitle={cfg?.subtitle || "See what our patients have to say about their recovery journey at Nose Creek Physiotherapy"}
+          />
         );
       }
 
       case "decision_ctas":
         return (
-          <section key="decision_ctas" style={{ padding: "clamp(56px, 7vw, 96px) 0" }}>
+          <section key="decision_ctas" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: cfg?.background === "teal" ? "#12303d" : cfg?.background === "light" ? "#f8fafc" : "#ffffff" }}>
             <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 40px" }}>
-                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.8vw, 42px)", fontWeight: 800, letterSpacing: "-0.5px" }}>Want help deciding if physio is right for you?</h2>
-                <p style={{ marginTop: 14, fontSize: 16, color: "#5a6570", lineHeight: 1.6 }}>
-                  Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first.
+                {cfg?.eyebrow && eyebrowEl(cfg.eyebrow, cfg.eyebrowColor || "#1c9fd8")}
+                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.8vw, 42px)", fontWeight: 800, letterSpacing: "-0.5px", color: cfg?.background === "teal" ? "#fff" : "#1d2b34" }}>
+                  {cfg?.title || "Want help deciding if physio is right for you?"}
+                </h2>
+                <p style={{ marginTop: 14, fontSize: 16, color: cfg?.background === "teal" ? "#cbdbe4" : "#5a6570", lineHeight: 1.6 }}>
+                  {cfg?.subtitle || cfg?.content || "Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first."}
                 </p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
@@ -776,7 +744,7 @@ export default function ServiceLiveView({
               </p>
               <div style={{ marginTop: 30, display: "flex", flexWrap: "wrap", gap: 14, justifyContent: "center" }}>
                 <a
-                  href="https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+                  href={cfg?.ctaHref || service.ctaHref || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{

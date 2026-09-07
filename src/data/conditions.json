@@ -25,18 +25,8 @@
     "hiddenSections": [],
     "sectionOrder": [
       "hero",
-      "at_a_glance",
-      "clinical_overview",
-      "custom_sections",
       "symptoms",
-      "treatment_approach",
-      "related_therapies",
-      "team_carousel",
-      "faqs",
-      "location_map",
-      "decision_ctas",
-      "other_links",
-      "bottom_cta"
+      "treatment_approach"
     ],
     "relatedServices": [
       "physiotherapy",
@@ -50,7 +40,22 @@
       "description": "Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.",
       "ogDescription": "End back pain without pills or surgery with evidence-based physical therapy in Calgary."
     },
-    "sectionsData": {}
+    "sectionsData": {
+      "testimonials": {
+        "title": "Calgary Patients Relieved from Back Pain",
+        "eyebrow": "Real Patient Stories",
+        "eyebrowColor": "#1c9fd8",
+        "subtitle": "",
+        "content": "how have you been [Back Pain](/conditions/back-pain)",
+        "image": "",
+        "imagePosition": "none",
+        "background": "light",
+        "align": "left",
+        "ctaText": "",
+        "ctaHref": "",
+        "bullets": []
+      }
+    }
   },
   {
     "id": "neck-shoulder-pain",
@@ -654,19 +659,7 @@
     "faqs": [],
     "hiddenSections": [],
     "sectionOrder": [
-      "hero",
-      "at_a_glance",
-      "clinical_overview",
-      "custom_sections",
-      "symptoms",
-      "treatment_approach",
-      "related_therapies",
-      "team_carousel",
-      "faqs",
-      "location_map",
-      "decision_ctas",
-      "other_links",
-      "bottom_cta"
+      "hero"
     ],
     "relatedServices": [],
     "category": "general",

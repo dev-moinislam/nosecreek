@@ -40,7 +40,8 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
       {conditions.map((condition) => {
-        const hasImage = Boolean(condition.heroImage && condition.heroImage.trim() !== "");
+        const cardImg = condition.cardImage !== undefined && condition.cardImage !== null ? condition.cardImage : condition.heroImage;
+        const hasImage = Boolean(cardImg && cardImg.trim() !== "");
         return (
           <div
             key={condition.slug || condition.id}
@@ -59,7 +60,7 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
             {hasImage && (
               <div style={{ height: 160, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb", marginBottom: 18 }}>
                 <img
-                  src={condition.heroImage!}
+                  src={cardImg!}
                   alt={condition.name}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
