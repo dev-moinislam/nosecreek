@@ -211,7 +211,7 @@ export default function SectionBlockCustomizerModal({
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
-          maxWidth: 680,
+          maxWidth: 720,
           maxHeight: "90vh",
           backgroundColor: "#ffffff",
           borderRadius: 16,
@@ -233,21 +233,37 @@ export default function SectionBlockCustomizerModal({
             background: "#f8fafc"
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ padding: 8, background: "#e0f2fe", borderRadius: 8, color: "#0369a1", display: "flex" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0, marginRight: 16 }}>
+            <div style={{ padding: 8, background: "#e0f2fe", borderRadius: 8, color: "#0369a1", display: "flex", flexShrink: 0 }}>
               <LayoutIcon size={18} />
             </div>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", rowGap: 4 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#0f172a", lineHeight: 1.3 }}>
                   Edit Section: {sectionDefaultTitle}
                 </h3>
-                <span style={{ background: "#ecfdf5", color: "#059669", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 12, border: "1px solid #a7f3d0" }}>
+                <span
+                  style={{
+                    background: "#ecfdf5",
+                    color: "#059669",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: "2px 8px",
+                    borderRadius: 12,
+                    border: "1px solid #a7f3d0",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                    display: "inline-flex",
+                    alignItems: "center"
+                  }}
+                >
                   ✓ Live Frontend Synced
                 </span>
               </div>
-              <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
-                {isMediaRichStory
+              <div style={{ fontSize: 12, color: "#64748b", marginTop: 3 }}>
+                {isTestimonials
+                  ? "Manage title, subtitle hook, and container background style."
+                  : isMediaRichStory
                   ? "Customize text, side photo, placement, and bullet points."
                   : isListSection
                   ? "Manage section title, theme background, and item points."
@@ -260,7 +276,7 @@ export default function SectionBlockCustomizerModal({
           <button
             type="button"
             onClick={onClose}
-            style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: 6, display: "flex" }}
+            style={{ background: "none", border: "none", color: "#64748b", cursor: "pointer", padding: 6, display: "flex", flexShrink: 0 }}
           >
             <XIcon size={20} />
           </button>
