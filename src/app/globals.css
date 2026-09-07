@@ -31,6 +31,24 @@ details[open] .faqPlus{transform:rotate(45deg)}
   --nc-muted:#5a6570;
   --nc-card-shadow:0 6px 20px rgba(18,60,80,0.05);
   --nc-card-shadow-hover:0 14px 34px rgba(18,60,80,0.12);
+
+  /* Semantic Theme Tokens mapped for global layouts & components */
+  --primary: var(--nc-blue);
+  --primary-hover: var(--nc-blue-dark);
+  --color-primary: var(--nc-blue);
+  --secondary: var(--nc-green);
+  --secondary-hover: var(--nc-green-light);
+  --color-secondary: var(--nc-green);
+  --accent: var(--nc-green-light);
+  --color-accent: var(--nc-green-light);
+  --dark: var(--nc-dark);
+  --color-dark: var(--nc-dark);
+  --bg-light: #ffffff;
+  --bg-offset: var(--nc-bg-blue);
+  --color-bg-light: var(--nc-bg-blue);
+  --border-color: var(--nc-border);
+  --text-dark: #12303d;
+  --text-light: #ffffff;
 }
 
 /* ─── SMOOTH MENU & ACCORDION ANIMATIONS ─── */

@@ -4,7 +4,7 @@ import React from "react";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
 import { ServiceCustomSection } from "@/types/content";
 
-const eyebrow = (text: string, color = "#1c9fd8") => (
+const eyebrow = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase", marginBottom: 12 }}>
     {text}
   </div>
@@ -13,13 +13,13 @@ const eyebrow = (text: string, color = "#1c9fd8") => (
 export default function CustomStorySection({ section }: { section: ServiceCustomSection }) {
   const isDark = section.background === "teal";
   const bg = section.background === "teal"
-    ? "#12303d"
+    ? "var(--dark, #12303d)"
     : section.background === "light"
     ? "#f8fafc"
     : "#ffffff";
   const textColor = isDark ? "#ffffff" : "#1d2b34";
   const descColor = isDark ? "#cbdbe4" : "#48535c";
-  const eyebrowColor = section.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8");
+  const eyebrowColor = section.eyebrowColor || (isDark ? "var(--accent, #8cc63f)" : "var(--primary, #1c9fd8)");
 
   const imagePosition = section.imagePosition || (section.image ? "right" : "none");
   const hasImage = Boolean(section.image && imagePosition !== "none");
@@ -95,8 +95,8 @@ export default function CustomStorySection({ section }: { section: ServiceCustom
                   href={section.buttonUrl || section.ctaHref || "#"}
                   style={{
                     display: "inline-block",
-                    background: isDark ? "#8cc63f" : "#1c9fd8",
-                    color: isDark ? "#12303d" : "#fff",
+                    background: isDark ? "var(--accent, #8cc63f)" : "var(--primary, #1c9fd8)",
+                    color: isDark ? "var(--dark, #12303d)" : "#fff",
                     fontFamily: "'Poppins',sans-serif",
                     fontWeight: 700,
                     padding: "13px 26px",

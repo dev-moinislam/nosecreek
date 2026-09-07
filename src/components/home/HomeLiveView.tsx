@@ -20,7 +20,7 @@ interface HomeLiveViewProps {
   testimonials: Testimonial[];
 }
 
-const eyebrow = (text: string, color = "#1c9fd8") => (
+const eyebrow = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase", marginBottom: 12 }}>
     {text}
   </div>
@@ -125,13 +125,13 @@ export default function HomeLiveView({
                     href={ctaBtnUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ display: "inline-flex", alignItems: "center", gap: 9, background: "#6faf1c", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16.5, padding: "16px 28px", borderRadius: 10, boxShadow: "0 10px 24px rgba(111,175,28,0.32)" }}
+                    style={{ display: "inline-flex", alignItems: "center", gap: 9, background: "var(--secondary, #6faf1c)", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16.5, padding: "16px 28px", borderRadius: 10, boxShadow: "0 10px 24px rgba(0,0,0,0.18)" }}
                   >
                     {ctaBtnText}
                   </a>
                   <a
                     href={h.phoneHref || `tel:${h.phone}`}
-                    style={{ display: "inline-flex", alignItems: "center", gap: 9, background: "#fff", color: "#0e78a8", border: "2px solid #cfe6f2", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16.5, padding: "14px 26px", borderRadius: 10 }}
+                    style={{ display: "inline-flex", alignItems: "center", gap: 9, background: "#fff", color: "var(--primary, #0e78a8)", border: "2px solid var(--border-color, #cfe6f2)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16.5, padding: "14px 26px", borderRadius: 10 }}
                   >
                     Call {h.phone}
                   </a>
@@ -191,11 +191,11 @@ export default function HomeLiveView({
       case "stats": {
         const stats = homeData.stats || defaultHomeData.stats;
         return (
-          <section key="stats" style={{ background: "#12303d", color: "#eaf3f8" }}>
+          <section key="stats" style={{ background: "var(--dark, #12303d)", color: "#eaf3f8" }}>
             <div style={{ maxWidth: 1100, margin: "0 auto", padding: "clamp(30px,4vw,44px) 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 24, textAlign: "center" }}>
               {stats.map((s, idx) => (
                 <div key={idx}>
-                  <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 800, fontSize: "clamp(28px,3.4vw,38px)", color: "#8cc63f" }}>{s.num}</div>
+                  <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 800, fontSize: "clamp(28px,3.4vw,38px)", color: "var(--accent, #8cc63f)" }}>{s.num}</div>
                   <div style={{ fontSize: 13.5, color: "#b9cdd8", fontWeight: 600, marginTop: 4 }}>{s.label}</div>
                 </div>
               ))}
@@ -309,11 +309,11 @@ export default function HomeLiveView({
                   src={image}
                   alt={`${title}, ${role}`}
                   referrerPolicy="no-referrer"
-                  style={{ width: "min(300px,80%)", aspectRatio: "1/1", objectFit: "cover", borderRadius: "50%", border: "6px solid #1c9fd8", margin: "0 auto", boxShadow: "0 20px 50px rgba(0,0,0,0.3)" }}
+                  style={{ width: "min(300px,80%)", aspectRatio: "1/1", objectFit: "cover", borderRadius: "50%", border: "6px solid var(--primary, #1c9fd8)", margin: "0 auto", boxShadow: "0 20px 50px rgba(0,0,0,0.3)" }}
                 />
               </div>
               <div>
-                {eyebrow(eyebrowText, cfg?.eyebrowColor || "#8cc63f")}
+                {eyebrow(eyebrowText, cfg?.eyebrowColor || "var(--accent, #8cc63f)")}
                 <h2 style={{ fontSize: "clamp(26px,3.6vw,40px)", fontWeight: 800, color: textColor, letterSpacing: "-0.5px" }}>{title}</h2>
                 <p style={{ marginTop: 6, fontSize: 14, color: isDark ? "#9fc9d9" : "#64748b", fontWeight: 600 }}>
                   {role}
@@ -322,7 +322,7 @@ export default function HomeLiveView({
                   {bio}
                 </p>
                 <a href={ctaUrl || `/team/blair-schachterle`}
-                  style={{ display: "inline-block", marginTop: 22, background: isDark ? "#1c9fd8" : "#0e78a8", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                  style={{ display: "inline-block", marginTop: 22, background: isDark ? "var(--accent, #8cc63f)" : "var(--primary, #0e78a8)", color: isDark ? "var(--dark, #12303d)" : "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                   {ctaText || "Meet our team →"}
                 </a>
               </div>
@@ -451,23 +451,23 @@ export default function HomeLiveView({
                 </p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
-                <div style={{ background: "linear-gradient(160deg,#6faf1c,#5c9515)", color: "#fff", borderRadius: 20, padding: 34 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--secondary, #6faf1c), var(--secondary-hover, #5c9515))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>{discTitle}</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                     {discDesc}
                   </p>
                   <a href={discUrl}
-                    style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                    style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--secondary-hover, #5c9515)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     {discBtn}
                   </a>
                 </div>
-                <div style={{ background: "linear-gradient(160deg,#1c9fd8,#1179ab)", color: "#fff", borderRadius: 20, padding: 34 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>{phoneTitle}</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                     {phoneDesc}
                   </p>
                   <a href={phoneUrl}
-                    style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                    style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--primary-hover, #1179ab)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     {phoneBtn}
                   </a>
                 </div>
@@ -476,7 +476,7 @@ export default function HomeLiveView({
                 {decide?.noteText || "There is no treatment given at a discovery session — it's for you to ask questions and for us to confirm whether we can help."}
               </p>
               <div style={{ textAlign: "center", marginTop: 20 }}>
-                <a href={decide?.costLinkUrl || "https://www.nosecreekphysiotherapy.com/inquire/"} style={{ color: "#0e78a8", fontFamily: "'Poppins',sans-serif", fontWeight: 700 }}>
+                <a href={decide?.costLinkUrl || "https://www.nosecreekphysiotherapy.com/inquire/"} style={{ color: "var(--primary, #0e78a8)", fontFamily: "'Poppins',sans-serif", fontWeight: 700 }}>
                   {decide?.costLinkText || "Just want to know cost & availability? Inquire here →"}
                 </a>
               </div>
@@ -499,14 +499,14 @@ export default function HomeLiveView({
         return (
           <section key="workshops" style={{ background: bg, padding: "clamp(44px,5vw,70px) 0" }}>
             <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 24px", textAlign: "center" }}>
-              <h2 style={{ fontSize: "clamp(24px,3.4vw,36px)", fontWeight: 800, color: isDark ? "#8cc63f" : "#3a6412" }}>
+              <h2 style={{ fontSize: "clamp(24px,3.4vw,36px)", fontWeight: 800, color: isDark ? "var(--accent, #8cc63f)" : "var(--secondary-hover, #3a6412)" }}>
                 {title}
               </h2>
               <p style={{ marginTop: 14, fontSize: 16, color: isDark ? "#cbdbe4" : "#4d6b28", lineHeight: 1.6 }}>
                 {desc}
               </p>
               <a href={btnUrl}
-                style={{ display: "inline-block", marginTop: 24, background: "#6faf1c", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16, padding: "15px 30px", borderRadius: 10, boxShadow: "0 10px 24px rgba(111,175,28,0.28)", textDecoration: "none" }}>
+                style={{ display: "inline-block", marginTop: 24, background: "var(--secondary, #6faf1c)", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16, padding: "15px 30px", borderRadius: 10, boxShadow: "0 10px 24px rgba(111,175,28,0.28)", textDecoration: "none" }}>
                 {btnText}
               </a>
             </div>
@@ -773,8 +773,8 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
                   href={section.buttonUrl || section.ctaHref || "#"}
                   style={{
                     display: "inline-block",
-                    background: isDark ? "#8cc63f" : "#1c9fd8",
-                    color: isDark ? "#12303d" : "#fff",
+                    background: isDark ? "var(--accent, #8cc63f)" : "var(--primary, #1c9fd8)",
+                    color: isDark ? "var(--dark, #12303d)" : "#fff",
                     fontFamily: "'Poppins',sans-serif",
                     fontWeight: 700,
                     padding: "13px 26px",

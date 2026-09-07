@@ -50,6 +50,8 @@ export interface SiteSettings {
   primaryCTA: string;
   footerContent: string;
   seo: SEOData;
+  themeColors?: Record<string, string>;
+  theme_colors?: Record<string, string>;
 }
 
 export interface SectionBlockConfig {

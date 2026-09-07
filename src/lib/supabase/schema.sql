@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS reviews_widget_code TEXT;
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS floating_reviews_enabled BOOLEAN DEFAULT true;
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS floating_reviews_code TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS theme_colors JSONB;
 
 DROP TRIGGER IF EXISTS update_site_settings_modtime ON site_settings;
 CREATE TRIGGER update_site_settings_modtime

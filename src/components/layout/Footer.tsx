@@ -91,7 +91,7 @@ export default function Footer() {
     : ["#22, 8120 Beddington Blvd NW", "Calgary, AB T3K 2A8, Canada"];
 
   return (
-    <footer style={{ background: "#0d2530", color: "#a9c1cd", paddingTop: "clamp(44px,5vw,64px)" }}>
+    <footer style={{ background: "var(--dark, #0d2530)", color: "#a9c1cd", paddingTop: "clamp(44px,5vw,64px)" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 32 }}>
         {/* Column 1: Clinic Identity */}
         <div>
@@ -113,12 +113,12 @@ export default function Footer() {
           </p>
           <a
             href={`tel:${phoneText.replace(/[^0-9+]/g, "")}`}
-            style={{ display: "inline-block", marginTop: 8, color: "#8cc63f", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15, textDecoration: "none" }}
+            style={{ display: "inline-block", marginTop: 8, color: "var(--accent, #8cc63f)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15, textDecoration: "none" }}
           >
             {phoneText}
           </a>
           <div style={{ marginTop: 14 }}>
-            <Link href="/contact#map" style={{ color: "#38bdf8", fontSize: 13, textDecoration: "underline", textUnderlineOffset: 3 }}>
+            <Link href="/contact#map" style={{ color: "var(--primary, #38bdf8)", fontSize: 13, textDecoration: "underline", textUnderlineOffset: 3 }}>
               View Interactive Map &rarr;
             </Link>
           </div>
@@ -133,7 +133,7 @@ export default function Footer() {
                 {s.title}
               </Link>
             ))}
-            <Link href="/services" style={{ color: "#8cc63f", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
+            <Link href="/services" style={{ color: "var(--accent, #8cc63f)", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
               View All Services &rarr;
             </Link>
           </div>
@@ -148,7 +148,7 @@ export default function Footer() {
                 {c.label}
               </Link>
             ))}
-            <Link href="/conditions" style={{ color: "#8cc63f", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
+            <Link href="/conditions" style={{ color: "var(--accent, #8cc63f)", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
               View All Conditions &rarr;
             </Link>
           </div>
@@ -177,7 +177,7 @@ export default function Footer() {
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: l.highlight ? "#8cc63f" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
+                  style={{ color: l.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
                 >
                   {l.label}
                 </a>
@@ -185,7 +185,7 @@ export default function Footer() {
                 <Link
                   key={l.label}
                   href={l.href}
-                  style={{ color: l.highlight ? "#8cc63f" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
+                  style={{ color: l.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
                 >
                   {l.label}
                 </Link>
@@ -197,7 +197,7 @@ export default function Footer() {
               href={siteSettings.socialLinks?.facebook || "https://www.facebook.com/nosecreekphysio"}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}
+              style={{ color: "var(--primary, #38bdf8)", fontSize: 13, textDecoration: "none" }}
             >
               Facebook
             </a>
@@ -206,7 +206,7 @@ export default function Footer() {
               href={siteSettings.socialLinks?.instagram || "https://www.instagram.com/nosecreekphysio"}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}
+              style={{ color: "var(--primary, #38bdf8)", fontSize: 13, textDecoration: "none" }}
             >
               Instagram
             </a>
@@ -217,7 +217,7 @@ export default function Footer() {
                   href={siteSettings.socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "#38bdf8", fontSize: 13, textDecoration: "none" }}
+                  style={{ color: "var(--primary, #38bdf8)", fontSize: 13, textDecoration: "none" }}
                 >
                   YouTube
                 </a>

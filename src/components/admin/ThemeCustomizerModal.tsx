@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ThemeColors, defaultTheme, themePresets } from "@/components/theme/ThemeApplier";
+import { ThemeColors, defaultTheme, themePresets, applyThemeTokens } from "@/components/theme/ThemeApplier";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import { PaletteIcon, CheckIcon, XIcon } from "./AdminIcons";
 
@@ -13,6 +13,7 @@ export default function ThemeCustomizerModal({
   onClose: () => void;
 }) {
   const [colors, setColors] = useState<ThemeColors>(defaultTheme);
+  const [initialColors, setInitialColors] = useState<ThemeColors>(defaultTheme);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -20,7 +21,9 @@ export default function ThemeCustomizerModal({
       const saved = localStorage.getItem("site_theme_colors");
       if (saved) {
         try {
-          setColors(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          setColors(parsed);
+          setInitialColors(parsed);
         } catch {
           // ignore
         }
@@ -32,6 +35,18 @@ export default function ThemeCustomizerModal({
 
   const handleApplyPreset = (presetColors: ThemeColors) => {
     setColors(presetColors);
+    applyThemeTokens(presetColors);
+  };
+
+  const handleColorUpdate = (key: keyof ThemeColors, value: string) => {
+    const updated = { ...colors, [key]: value };
+    setColors(updated);
+    applyThemeTokens(updated);
+  };
+
+  const handleCancel = () => {
+    applyThemeTokens(initialColors);
+    onClose();
   };
 
   const handleSave = async () => {
@@ -42,14 +57,31 @@ export default function ThemeCustomizerModal({
         window.dispatchEvent(new Event("themeChanged"));
       }
 
+      // Apply to live document
+      applyThemeTokens(colors);
+
       if (isSupabaseConfigured && supabase) {
-        await supabase
-          .from("site_settings")
-          .update({ theme_colors: colors })
-          .eq("id", "main");
+        try {
+          const { error } = await supabase
+            .from("site_settings")
+            .update({ theme_colors: colors })
+            .eq("id", "main");
+
+          if (error) {
+            // If theme_colors column is pending in DB, store inside marketing payload
+            await supabase
+              .from("site_settings")
+              .update({
+                marketing: { theme_colors: colors }
+              })
+              .eq("id", "main");
+          }
+        } catch (dbErr) {
+          console.warn("Supabase theme sync error, saved locally:", dbErr);
+        }
       }
 
-      alert("✓ Brand color theme saved and applied to entire website!");
+      setInitialColors(colors);
       onClose();
     } catch (err) {
       console.error("Failed to save theme colors", err);
@@ -63,13 +95,13 @@ export default function ThemeCustomizerModal({
       className="adm-modal-overlay"
       onClick={(e) => {
         e.stopPropagation();
-        onClose();
+        handleCancel();
       }}
       style={{ zIndex: 9990 }}
     >
       <div
         className="adm-modal"
-        style={{ maxWidth: 580 }}
+        style={{ maxWidth: 600 }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="adm-modal-header">
@@ -87,7 +119,7 @@ export default function ThemeCustomizerModal({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleCancel}
             style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", padding: 4 }}
           >
             <XIcon size={20} />
@@ -137,32 +169,32 @@ export default function ThemeCustomizerModal({
                 <input
                   type="color"
                   value={colors.primary}
-                  onChange={(e) => setColors({ ...colors, primary: e.target.value })}
+                  onChange={(e) => handleColorUpdate("primary", e.target.value)}
                   style={{ width: 42, height: 38, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }}
                 />
                 <input
                   type="text"
                   className="adm-input"
                   value={colors.primary}
-                  onChange={(e) => setColors({ ...colors, primary: e.target.value })}
+                  onChange={(e) => handleColorUpdate("primary", e.target.value)}
                 />
               </div>
             </div>
 
             <div className="adm-form-group">
-              <label className="adm-form-label">Secondary / Leaf Color</label>
+              <label className="adm-form-label">Secondary / Leaf Green</label>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <input
                   type="color"
                   value={colors.secondary}
-                  onChange={(e) => setColors({ ...colors, secondary: e.target.value })}
+                  onChange={(e) => handleColorUpdate("secondary", e.target.value)}
                   style={{ width: 42, height: 38, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }}
                 />
                 <input
                   type="text"
                   className="adm-input"
                   value={colors.secondary}
-                  onChange={(e) => setColors({ ...colors, secondary: e.target.value })}
+                  onChange={(e) => handleColorUpdate("secondary", e.target.value)}
                 />
               </div>
             </div>
@@ -173,14 +205,14 @@ export default function ThemeCustomizerModal({
                 <input
                   type="color"
                   value={colors.dark}
-                  onChange={(e) => setColors({ ...colors, dark: e.target.value })}
+                  onChange={(e) => handleColorUpdate("dark", e.target.value)}
                   style={{ width: 42, height: 38, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }}
                 />
                 <input
                   type="text"
                   className="adm-input"
                   value={colors.dark}
-                  onChange={(e) => setColors({ ...colors, dark: e.target.value })}
+                  onChange={(e) => handleColorUpdate("dark", e.target.value)}
                 />
               </div>
             </div>
@@ -191,38 +223,41 @@ export default function ThemeCustomizerModal({
                 <input
                   type="color"
                   value={colors.accent}
-                  onChange={(e) => setColors({ ...colors, accent: e.target.value })}
+                  onChange={(e) => handleColorUpdate("accent", e.target.value)}
                   style={{ width: 42, height: 38, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }}
                 />
                 <input
                   type="text"
                   className="adm-input"
                   value={colors.accent}
-                  onChange={(e) => setColors({ ...colors, accent: e.target.value })}
+                  onChange={(e) => handleColorUpdate("accent", e.target.value)}
                 />
               </div>
             </div>
           </div>
 
           {/* Live Preview Sample */}
-          <div style={{ marginTop: 14, background: colors.bgLight, border: "1px solid #e2e8f0", borderRadius: 10, padding: 14 }}>
+          <div style={{ marginTop: 14, background: colors.bgLight || "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 10, padding: 14 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px" }}>Live Color Sample:</span>
-            <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div style={{ background: colors.primary, color: "#fff", padding: "8px 16px", borderRadius: 6, fontSize: 13, fontWeight: 700 }}>
-                Primary Button
+                Primary Color
               </div>
               <div style={{ background: colors.secondary, color: "#fff", padding: "8px 16px", borderRadius: 6, fontSize: 13, fontWeight: 700 }}>
-                Secondary Accent
+                Secondary Color
               </div>
               <div style={{ background: colors.dark, color: "#fff", padding: "8px 16px", borderRadius: 6, fontSize: 13, fontWeight: 700 }}>
                 Dark Header
+              </div>
+              <div style={{ background: colors.accent, color: "#fff", padding: "8px 16px", borderRadius: 6, fontSize: 13, fontWeight: 700 }}>
+                Accent
               </div>
             </div>
           </div>
         </div>
 
         <div className="adm-modal-footer">
-          <button type="button" onClick={onClose} className="adm-btn adm-btn-secondary">
+          <button type="button" onClick={handleCancel} className="adm-btn adm-btn-secondary">
             Cancel
           </button>
           <button type="button" onClick={handleSave} disabled={saving} className="adm-btn adm-btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}>

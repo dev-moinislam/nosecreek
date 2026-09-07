@@ -12,7 +12,7 @@ import VisitUsSection from "./VisitUsSection";
 import CustomStorySection from "./CustomStorySection";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
 
-const eyebrowEl = (text: string, color = "#1c9fd8") => (
+const eyebrowEl = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
     {text}
   </div>
@@ -217,8 +217,8 @@ export default function ConditionLiveView({
 
               <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(32px, 4vw, 56px)", alignItems: "center" }}>
                 <div>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#e6f4ea", color: "#5c9515", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "7px 14px", borderRadius: 999, marginBottom: 20 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block" }} />
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--nc-bg-blue, #e6f4ea)", color: "var(--secondary-hover, #5c9515)", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "7px 14px", borderRadius: 999, marginBottom: 20 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--secondary, #6faf1c)", display: "inline-block" }} />
                     {cfg?.eyebrow || "Targeted Clinical Care · Calgary North NW & NE"}
                   </div>
 
@@ -239,7 +239,7 @@ export default function ConditionLiveView({
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 9,
-                        background: "#6faf1c",
+                        background: "var(--secondary, #6faf1c)",
                         color: "#fff",
                         fontFamily: "'Poppins',sans-serif",
                         fontWeight: 700,
@@ -259,8 +259,8 @@ export default function ConditionLiveView({
                         alignItems: "center",
                         gap: 9,
                         background: "#fff",
-                        color: "#0e78a8",
-                        border: "2px solid #cfe6f2",
+                        color: "var(--primary, #0e78a8)",
+                        border: "2px solid var(--border-color, #cfe6f2)",
                         fontFamily: "'Poppins',sans-serif",
                         fontWeight: 700,
                         fontSize: 16.5,
@@ -281,7 +281,7 @@ export default function ConditionLiveView({
                       "Free On-Site Parking"
                     ]).map((b, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ color: "#6faf1c", fontWeight: 800 }}>✓</span>
+                        <span style={{ color: "var(--secondary, #6faf1c)", fontWeight: 800 }}>✓</span>
                         <span>{b}</span>
                       </div>
                     ))}
@@ -419,7 +419,7 @@ export default function ConditionLiveView({
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginTop: 20 }}>
                       {cfg.bullets.map((b, i) => (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14.5, color: isDark ? "#e2e8f0" : "#334155", fontWeight: 500 }}>
-                          <span style={{ color: isDark ? "#8cc63f" : "#6faf1c", fontWeight: 800 }}>✓</span>
+                          <span style={{ color: isDark ? "var(--accent, #8cc63f)" : "var(--secondary, #6faf1c)", fontWeight: 800 }}>✓</span>
                           <span>{b}</span>
                         </div>
                       ))}
@@ -432,7 +432,7 @@ export default function ConditionLiveView({
                         href={cfg.ctaHref}
                         target={cfg.ctaHref.startsWith("http") ? "_blank" : undefined}
                         rel={cfg.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
-                        style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#1c9fd8", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--primary, #1c9fd8)", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}
                       >
                         {cfg.ctaText} &rarr;
                       </a>
@@ -476,7 +476,7 @@ export default function ConditionLiveView({
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
                 {benefitsList.map((b, i) => (
                   <div key={i} style={{ background: isDark ? "rgba(255,255,255,0.06)" : "#fff", padding: "20px 24px", borderRadius: 12, border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #e2e8f0", display: "flex", alignItems: "flex-start", gap: 14 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: isDark ? "#8cc63f" : "#e6f4ea", color: isDark ? "#12303d" : "#5c9515", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, flexShrink: 0 }}>✓</div>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: isDark ? "var(--accent, #8cc63f)" : "var(--nc-bg-blue, #e6f4ea)", color: isDark ? "var(--dark, #12303d)" : "var(--secondary-hover, #5c9515)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, flexShrink: 0 }}>✓</div>
                     <div style={{ fontSize: 15, fontWeight: 600, color: isDark ? "#fff" : "#1e293b", lineHeight: 1.5 }}>{b}</div>
                   </div>
                 ))}
@@ -495,7 +495,7 @@ export default function ConditionLiveView({
           <section key="symptoms" style={{ ...bgStyle, padding: "clamp(56px, 7vw, 96px) 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ maxWidth: 860, marginBottom: 40 }}>
-                {eyebrowEl(cfg?.eyebrow || "Common Symptoms", cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
+                {eyebrowEl(cfg?.eyebrow || "Common Symptoms", cfg?.eyebrowColor || (isDark ? "var(--accent, #8cc63f)" : "var(--primary, #1c9fd8)"))}
                 <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px" }}>
                   {cfg?.title || `Key Warning Signs & Symptoms of ${condition.name}`}
                 </h2>
@@ -504,7 +504,7 @@ export default function ConditionLiveView({
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
                 {symptomsList.map((s, i) => (
                   <div key={i} style={{ background: isDark ? "rgba(255,255,255,0.06)" : "#fff", padding: "18px 22px", borderRadius: 14, border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid #e7edf1", boxShadow: "0 6px 18px rgba(18,60,80,0.04)", display: "flex", alignItems: "center", gap: 12 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block", flexShrink: 0 }} />
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--secondary, #6faf1c)", display: "inline-block", flexShrink: 0 }} />
                     <span style={{ fontSize: 15, fontWeight: 600, color: isDark ? "#fff" : "#1d2b34" }}>{s}</span>
                   </div>
                 ))}
@@ -522,7 +522,7 @@ export default function ConditionLiveView({
           <section key="treatment_approach" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: isLight ? (cfg?.background === "white" ? "#fff" : "#f2f8fb") : "#12303d", color: isLight ? "#1d2b34" : "#fff" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 48px" }}>
-                {eyebrowEl(cfg?.eyebrow || "Proven Clinical Approach", cfg?.eyebrowColor || "#8cc63f")}
+                {eyebrowEl(cfg?.eyebrow || "Proven Clinical Approach", cfg?.eyebrowColor || "var(--accent, #8cc63f)")}
                 <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: isLight ? "#1d2b34" : "#fff", letterSpacing: "-0.5px" }}>
                   {cfg?.title || "Our 4-Step Recovery Protocol"}
                 </h2>
@@ -531,7 +531,7 @@ export default function ConditionLiveView({
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
                 {approachList.map((step, i) => (
                   <div key={i} style={{ background: isLight ? "#fff" : "rgba(255,255,255,0.06)", border: isLight ? "1px solid #e7edf1" : "1px solid rgba(255,255,255,0.12)", padding: 28, borderRadius: 16, boxShadow: "0 6px 20px rgba(18,60,80,0.05)" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#6faf1c", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 17, marginBottom: 18 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--secondary, #6faf1c)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 17, marginBottom: 18 }}>
                       {i + 1}
                     </div>
                     <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, fontWeight: 700, color: isLight ? "#1d2b34" : "#fff", marginBottom: 10 }}>Step {i + 1}</h3>
@@ -647,21 +647,21 @@ export default function ConditionLiveView({
                 </p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-                <div style={{ background: "linear-gradient(160deg, #6faf1c, #5c9515)", color: "#fff", borderRadius: 20, padding: 34 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--secondary, #6faf1c), var(--secondary-hover, #5c9515))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>Free Discovery Session</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                     Unsure if physiotherapy will resolve your {condition.name}? Come in, see the clinic and find out for yourself how we can help — no treatment, no pressure.
                   </p>
-                  <a href="/contact" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                  <a href="/contact" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--secondary-hover, #5c9515)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     Apply for a Free Discovery Session &rarr;
                   </a>
                 </div>
-                <div style={{ background: "linear-gradient(160deg, #1c9fd8, #1179ab)", color: "#fff", borderRadius: 20, padding: 34 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>Talk to a Physio First</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                     Have questions about your {condition.name} and want to be 100% sure we can help before booking? Schedule a free phone consult with our clinical team.
                   </p>
-                  <a href="tel:4032958590" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                  <a href="tel:4032958590" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--primary-hover, #1179ab)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     Arrange a free phone consult &rarr;
                   </a>
                 </div>
@@ -678,7 +678,7 @@ export default function ConditionLiveView({
           <section key="other_links" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#f2f8fb", borderTop: "1px solid #e7edf1" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ textAlign: "center", marginBottom: 36 }}>
-                {eyebrowEl(cfg?.eyebrow || "Complete Pain Care", cfg?.eyebrowColor || "#1c9fd8")}
+                {eyebrowEl(cfg?.eyebrow || "Complete Pain Care", cfg?.eyebrowColor || "var(--primary, #1c9fd8)")}
                 <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.2vw, 38px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
                   {cfg?.title || "Other Conditions We Treat in Calgary"}
                 </h2>
@@ -695,15 +695,15 @@ export default function ConditionLiveView({
                 ))}
               </div>
               <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 32, flexWrap: "wrap" }}>
-                <Link href="/conditions" style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
+                <Link href="/conditions" style={{ color: "var(--primary, #0e78a8)", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
                   Browse All Conditions &rarr;
                 </Link>
                 <span style={{ color: "#cbd5e1" }}>|</span>
-                <Link href="/services" style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
+                <Link href="/services" style={{ color: "var(--primary, #0e78a8)", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
                   Our Clinical Services &rarr;
                 </Link>
                 <span style={{ color: "#cbd5e1" }}>|</span>
-                <Link href="/" style={{ color: "#0e78a8", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
+                <Link href="/" style={{ color: "var(--primary, #0e78a8)", fontWeight: 700, fontSize: 14, textDecoration: "underline", textUnderlineOffset: 4 }}>
                   Return to Homepage &rarr;
                 </Link>
               </div>
@@ -713,7 +713,7 @@ export default function ConditionLiveView({
 
       case "bottom_cta":
         return (
-          <section key="bottom_cta" style={{ background: "linear-gradient(120deg, #1c9fd8, #1179ab)", color: "#fff" }}>
+          <section key="bottom_cta" style={{ background: "linear-gradient(120deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff" }}>
             <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(48px, 6vw, 80px) 24px", textAlign: "center" }}>
               <h2 style={{ fontFamily: "'Poppins',sans-serif", color: "#fff", fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.12 }}>
                 {cfg?.title || `Stop Living With ${condition.name}`}
@@ -727,8 +727,8 @@ export default function ConditionLiveView({
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    background: "#8cc63f",
-                    color: "#12303d",
+                    background: "var(--accent, #8cc63f)",
+                    color: "var(--dark, #12303d)",
                     fontFamily: "'Poppins',sans-serif",
                     fontWeight: 700,
                     fontSize: 17,

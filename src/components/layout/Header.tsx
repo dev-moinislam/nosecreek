@@ -200,7 +200,7 @@ export default function Header() {
     <>
       {/* ── Utility Top Bar ── */}
       <div style={{
-        background: "#12303d",
+        background: "var(--dark, #12303d)",
         color: "#e8f2f7",
         fontSize: "13.5px",
         fontWeight: 600,
@@ -578,7 +578,7 @@ export default function Header() {
               className="header-book-btn"
               style={{
                 display: "inline-block",
-                background: "#6faf1c", color: "#fff",
+                background: "var(--secondary, #6faf1c)", color: "#fff",
                 fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 14.5,
                 padding: "10px 18px", borderRadius: 8,
                 boxShadow: "0 6px 16px rgba(111,175,28,0.32)",
@@ -841,7 +841,7 @@ export default function Header() {
               style={{
                 marginTop: 8,
                 textAlign: "center",
-                background: "#6faf1c", color: "#fff",
+                background: "var(--secondary, #6faf1c)", color: "#fff",
                 fontWeight: 700, fontSize: 15,
                 padding: "12px 18px", borderRadius: 8,
                 boxShadow: "0 6px 16px rgba(111,175,28,0.32)",

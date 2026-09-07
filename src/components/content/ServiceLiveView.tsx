@@ -12,7 +12,7 @@ import VisitUsSection from "./VisitUsSection";
 import CustomStorySection from "./CustomStorySection";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
 
-const eyebrowEl = (text: string, color = "#1c9fd8") => (
+const eyebrowEl = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
     {text}
   </div>
@@ -212,8 +212,8 @@ export default function ServiceLiveView({
 
               <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(32px, 4vw, 56px)", alignItems: "center" }}>
                 <div>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#e6f4ea", color: "#5c9515", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "7px 14px", borderRadius: 999, marginBottom: 20 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block" }} />
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--nc-bg-blue, #e6f4ea)", color: "var(--secondary-hover, #5c9515)", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "7px 14px", borderRadius: 999, marginBottom: 20 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--secondary, #6faf1c)", display: "inline-block" }} />
                     {cfg?.eyebrow || "Evidence-Based Clinical Care · Calgary North"}
                   </div>
 
@@ -234,7 +234,7 @@ export default function ServiceLiveView({
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 9,
-                        background: "#6faf1c",
+                        background: "var(--secondary, #6faf1c)",
                         color: "#fff",
                         fontFamily: "'Poppins',sans-serif",
                         fontWeight: 700,
@@ -254,8 +254,8 @@ export default function ServiceLiveView({
                         alignItems: "center",
                         gap: 9,
                         background: "#fff",
-                        color: "#0e78a8",
-                        border: "2px solid #cfe6f2",
+                        color: "var(--primary, #0e78a8)",
+                        border: "2px solid var(--border-color, #cfe6f2)",
                         fontFamily: "'Poppins',sans-serif",
                         fontWeight: 700,
                         fontSize: 16.5,
@@ -276,7 +276,7 @@ export default function ServiceLiveView({
                       "Free Dedicated Parking"
                     ]).map((b, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <span style={{ color: "#6faf1c", fontWeight: 800 }}>✓</span>
+                        <span style={{ color: "var(--secondary, #6faf1c)", fontWeight: 800 }}>✓</span>
                         <span>{b}</span>
                       </div>
                     ))}
@@ -414,7 +414,7 @@ export default function ServiceLiveView({
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10, marginTop: 20 }}>
                       {cfg.bullets.map((b, i) => (
                         <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14.5, color: isDark ? "#e2e8f0" : "#334155", fontWeight: 500 }}>
-                          <span style={{ color: isDark ? "#8cc63f" : "#6faf1c", fontWeight: 800 }}>✓</span>
+                          <span style={{ color: isDark ? "var(--accent, #8cc63f)" : "var(--secondary, #6faf1c)", fontWeight: 800 }}>✓</span>
                           <span>{b}</span>
                         </div>
                       ))}
@@ -427,7 +427,7 @@ export default function ServiceLiveView({
                         href={cfg.ctaHref}
                         target={cfg.ctaHref.startsWith("http") ? "_blank" : undefined}
                         rel={cfg.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
-                        style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#1c9fd8", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--primary, #1c9fd8)", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}
                       >
                         {cfg.ctaText} &rarr;
                       </a>
@@ -747,21 +747,21 @@ export default function ServiceLiveView({
                 </p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
-                <div style={{ background: "linear-gradient(160deg, #6faf1c, #5c9515)", color: "#fff", borderRadius: 20, padding: 34 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--secondary, #6faf1c), var(--secondary-hover, #5c9515))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>Free Discovery Session</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                     Unsure if {service.title} will work for you, or had a bad experience elsewhere? Come in, see the clinic and find out for yourself how we can help — no treatment, no pressure.
                   </p>
-                  <a href="/contact" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                  <a href="/contact" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--secondary-hover, #5c9515)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     Apply for a Free Discovery Session &rarr;
                   </a>
                 </div>
-                <div style={{ background: "linear-gradient(160deg, #1c9fd8, #1179ab)", color: "#fff", borderRadius: 20, padding: 34 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>Talk to a Physio First</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                     Have questions about {service.title} and want to be 100% sure we can help before booking? Schedule a free phone consult with our clinical team.
                   </p>
-                  <a href="tel:4032958590" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                  <a href="tel:4032958590" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--primary-hover, #1179ab)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     Arrange a free phone consult &rarr;
                   </a>
                 </div>
@@ -775,7 +775,7 @@ export default function ServiceLiveView({
 
       case "bottom_cta":
         return (
-          <section key="bottom_cta" style={{ background: "linear-gradient(120deg, #1c9fd8, #1179ab)", color: "#fff" }}>
+          <section key="bottom_cta" style={{ background: "linear-gradient(120deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff" }}>
             <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(48px, 6vw, 80px) 24px", textAlign: "center" }}>
               <h2 style={{ fontFamily: "'Poppins',sans-serif", color: "#fff", fontSize: "clamp(28px, 4vw, 46px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.12 }}>
                 {cfg?.title || `Ready to Start Your ${service.title} Care?`}
@@ -789,8 +789,8 @@ export default function ServiceLiveView({
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    background: "#8cc63f",
-                    color: "#12303d",
+                    background: "var(--accent, #8cc63f)",
+                    color: "var(--dark, #12303d)",
                     fontFamily: "'Poppins',sans-serif",
                     fontWeight: 700,
                     fontSize: 17,
