@@ -191,6 +191,7 @@ export default function SectionBlockCustomizerModal({
 
   return (
     <div
+      className="adm-modal-overlay"
       style={{
         position: "fixed",
         inset: 0,
@@ -199,8 +200,7 @@ export default function SectionBlockCustomizerModal({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 9999,
-        padding: 16
+        zIndex: 9999
       }}
       onClick={(e) => {
         e.stopPropagation();
@@ -208,11 +208,12 @@ export default function SectionBlockCustomizerModal({
       }}
     >
       <div
+        className="adm-modal wide"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           maxWidth: 720,
-          maxHeight: "90vh",
+          maxHeight: "92vh",
           backgroundColor: "#ffffff",
           borderRadius: 16,
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)",

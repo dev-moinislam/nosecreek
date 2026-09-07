@@ -17,7 +17,8 @@ import {
   SettingsIcon,
   StarIcon,
   GlobeIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  XIcon
 } from "./AdminIcons";
 
 interface AdminSidebarProps {
@@ -72,15 +73,33 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const visibleNavItems = allNavItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
-    <aside className={`adm-sidebar ${isOpen ? "open" : ""}`}>
-      {/* Brand Header */}
-      <div className="adm-sidebar-brand">
-        <div className="adm-brand-icon">NC</div>
-        <div className="adm-brand-info">
-          <h2>Nose Creek</h2>
-          <span>{isAdmin ? "Admin Master" : "Client Safe Editor"}</span>
+    <>
+      {/* Mobile Drawer Blur Backdrop */}
+      {isOpen && (
+        <div
+          className="adm-sidebar-backdrop"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside className={`adm-sidebar ${isOpen ? "open" : ""}`}>
+        {/* Brand Header */}
+        <div className="adm-sidebar-brand">
+          <div className="adm-brand-icon">NC</div>
+          <div className="adm-brand-info">
+            <h2>Nose Creek</h2>
+            <span>{isAdmin ? "Admin Master" : "Client Safe Editor"}</span>
+          </div>
+          <button
+            type="button"
+            className="adm-sidebar-close"
+            onClick={onClose}
+            aria-label="Close menu drawer"
+          >
+            <XIcon size={18} />
+          </button>
         </div>
-      </div>
 
       {/* Navigation */}
       <nav className="adm-sidebar-nav">
@@ -143,5 +162,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         </div>
       </div>
     </aside>
+    </>
   );
 }
