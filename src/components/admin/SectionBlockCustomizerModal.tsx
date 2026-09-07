@@ -269,18 +269,43 @@ export default function SectionBlockCustomizerModal({
         {/* Form Body */}
         <form onSubmit={handleSubmit} style={{ overflowY: "auto", padding: "20px 24px", flex: 1, display: "flex", flexDirection: "column", gap: 18 }}>
           
-          {/* 1. Header & Typography */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-            <div className="adm-form-group">
-              <label className="adm-form-label">Eyebrow Badge (Optional)</label>
-              <input
-                type="text"
-                placeholder="E.g., Proven Clinical Protocol"
-                className="adm-input"
-                value={formData.eyebrow || ""}
-                onChange={(e) => setFormData({ ...formData, eyebrow: e.target.value })}
-              />
+          {/* Friendly Note for Testimonials & Google Reviews */}
+          {isTestimonials && (
+            <div
+              style={{
+                background: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                borderRadius: 10,
+                padding: "12px 16px",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                fontSize: 13,
+                color: "#166534",
+                lineHeight: 1.5
+              }}
+            >
+              <span style={{ fontSize: 20 }}>⭐</span>
+              <div>
+                <strong>Dynamic Reviews Feed:</strong> Patient testimonials and Google 5-star ratings are automatically loaded from your reviews database. You can customize the Section Title, Subtitle, and Background theme below.
+              </div>
             </div>
+          )}
+
+          {/* 1. Header & Typography */}
+          <div style={{ display: "grid", gridTemplateColumns: isTestimonials ? "1fr" : "1fr 1fr", gap: 14 }}>
+            {!isTestimonials && (
+              <div className="adm-form-group">
+                <label className="adm-form-label">Eyebrow Badge (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="E.g., Proven Clinical Protocol"
+                  className="adm-input"
+                  value={formData.eyebrow || ""}
+                  onChange={(e) => setFormData({ ...formData, eyebrow: e.target.value })}
+                />
+              </div>
+            )}
 
             <div className="adm-form-group">
               <label className="adm-form-label">Custom Section Title</label>
@@ -357,7 +382,7 @@ export default function SectionBlockCustomizerModal({
           )}
 
           {/* 3. Main Narrative Body Paragraphs (Shown on Story, Overview, Hero, Decision CTAs, or Bottom CTA) */}
-          {(isMediaRichStory || isBottomCTA || isTestimonials || isDecisionCTAs || isHero) && (
+          {(isMediaRichStory || isBottomCTA || isDecisionCTAs || isHero) && (
             <div className="adm-form-group">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                 <label className="adm-form-label" style={{ margin: 0 }}>
