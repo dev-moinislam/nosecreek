@@ -85,8 +85,19 @@ export default function Header() {
       } catch {}
     }
     syncContent();
-    fetchFreshServices();
-    fetchFreshConditions();
+
+    // Defer background API freshness sync until after initial page render is complete
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(() => {
+        fetchFreshServices();
+        fetchFreshConditions();
+      });
+    } else {
+      setTimeout(() => {
+        fetchFreshServices();
+        fetchFreshConditions();
+      }, 2000);
+    }
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);

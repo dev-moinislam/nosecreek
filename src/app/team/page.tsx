@@ -12,8 +12,7 @@ export async function generateMetadata() {
   });
 }
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function TeamPage() {
   const team = await getTeamMembers();

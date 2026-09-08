@@ -13,8 +13,7 @@ export async function generateMetadata() {
   });
 }
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const eyebrow = (text: string, color = "#1c9fd8") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>

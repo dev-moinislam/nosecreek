@@ -11,7 +11,7 @@ export default function CallTracking({ scriptUrl }: CallTrackingProps) {
     <Script
       id="call-tracking"
       src={scriptUrl}
-      strategy="afterInteractive"
+      strategy="lazyOnload"
     />
   );
 }

@@ -151,6 +151,12 @@ export default function HomeLiveView({
                 <img
                   src={heroImg}
                   alt={(h as any)?.imageAlt || (homeData.hero as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
+                  width={600}
+                  height={450}
+                  loading="eager"
+                  decoding="async"
+                  // @ts-ignore
+                  fetchPriority="high"
                   style={{ width: "100%", borderRadius: 18, boxShadow: "0 24px 60px rgba(18,60,80,0.18)", objectFit: "cover", aspectRatio: "4/3" }}
                 />
                 <div style={{ position: "absolute", left: 18, bottom: -22, background: "#fff", borderRadius: 14, padding: "14px 18px", boxShadow: "0 14px 34px rgba(18,60,80,0.16)", display: "flex", alignItems: "center", gap: 12 }}>
@@ -258,12 +264,15 @@ export default function HomeLiveView({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={cfg?.image || "/images/clinic/clinic-mobile.jpg"} alt={cfg?.imageAlt || (homeData.aboutClinic as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
+                  loading="lazy" decoding="async"
                   style={{ width: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "3/4", gridRow: "span 2" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/clinic/reception-three.jpg" alt="Nose Creek Physiotherapy Treatment Area Calgary"
+                  loading="lazy" decoding="async"
                   style={{ width: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "4/3" }} />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/clinic/reception-four.jpg" alt="Nose Creek Physiotherapy Reception Desk Calgary"
+                  loading="lazy" decoding="async"
                   style={{ width: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "4/3" }} />
               </div>
               <div>
@@ -308,6 +317,8 @@ export default function HomeLiveView({
                 <img
                   src={image}
                   alt={(d as any)?.imageAlt || (homeData.director as any)?.imageAlt || `${title}, ${role}`}
+                  loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                   style={{ width: "min(300px,80%)", aspectRatio: "1/1", objectFit: "cover", borderRadius: "50%", border: "6px solid var(--primary, #1c9fd8)", margin: "0 auto", boxShadow: "0 20px 50px rgba(0,0,0,0.3)" }}
                 />
@@ -406,6 +417,8 @@ export default function HomeLiveView({
                     key={logo.alt}
                     src={logo.src}
                     alt={logo.alt}
+                    loading="lazy"
+                    decoding="async"
                     style={{
                       height: logo.height || 52,
                       width: "auto",
@@ -587,7 +600,7 @@ export default function HomeLiveView({
                       style={{ display: "flex", flexDirection: "column", background: "#fff", border: "1px solid #e7edf1", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 20px rgba(18,60,80,0.05)", textDecoration: "none" }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={post.featuredImage} alt={post.title} style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover" }} />
+                      <img src={post.featuredImage} alt={post.title} loading="lazy" decoding="async" style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover" }} />
                       <div style={{ padding: 22, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                         {metaText && (
                           <div style={{ fontSize: 12.5, fontWeight: 600, color: "#8a97a1", fontFamily: "'Poppins',sans-serif" }}>
@@ -711,6 +724,8 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
             <img
               src={section.image!}
               alt={section.title}
+              loading="lazy"
+              decoding="async"
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           </div>
@@ -733,6 +748,8 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
               <img
                 src={section.image!}
                 alt={section.title}
+                loading="lazy"
+                decoding="async"
                 style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
               />
             </div>
@@ -794,6 +811,8 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
               <img
                 src={section.image!}
                 alt={section.title}
+                loading="lazy"
+                decoding="async"
                 style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
               />
             </div>

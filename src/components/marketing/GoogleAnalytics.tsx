@@ -22,12 +22,12 @@ export default function GoogleAnalytics({
     <>
       <Script
         id="ga-gtag-src"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         src={`https://www.googletagmanager.com/gtag/js?id=${primaryId}`}
       />
       <Script
         id="ga-gtag-inline"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];

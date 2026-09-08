@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Poppins, Open_Sans } from "next/font/google";
 import "./globals.css";
 import SiteLayout from "@/components/layout/SiteLayout";
 import ThemeApplier from "@/components/theme/ThemeApplier";
@@ -7,6 +8,20 @@ import { RoleProvider } from "@/components/admin/RoleGuard";
 import settingsData from "@/data/settings.json";
 import { getSiteSettings } from "@/lib/api";
 import { getSiteBaseUrl } from "@/lib/seo";
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-open-sans",
+  display: "swap",
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, baseUrl] = await Promise.all([
@@ -74,8 +89,10 @@ export default async function RootLayout({
   const serverThemeCss = serverThemeColors ? buildThemeCss(serverThemeColors) : null;
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${poppins.variable} ${openSans.variable}`}>
       <head>
+        <link rel="preconnect" href="https://vrhrqljixrsckdkstier.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vrhrqljixrsckdkstier.supabase.co" />
         <link rel="icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} sizes="any" />
         <link rel="shortcut icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />
         <link rel="apple-touch-icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />
