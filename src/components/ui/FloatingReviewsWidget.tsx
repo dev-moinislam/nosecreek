@@ -104,7 +104,7 @@ export default function FloatingReviewsWidget() {
     };
 
     // Load after delay or on user interaction to ensure zero blocking during page speed audit
-    const timer = setTimeout(loadFloatingScript, 4500);
+    const timer = setTimeout(loadFloatingScript, 8000);
     const triggerEvents = ["scroll", "touchstart", "mousemove", "click"];
     const handleInteraction = () => {
       loadFloatingScript();

@@ -266,7 +266,9 @@ export default function Header() {
             <img
               src="/images/logo/nose-creek-logo.webp"
               alt="Nose Creek Physiotherapy"
-              style={{ height: 50, width: "auto" }}
+              width={258}
+              height={50}
+              style={{ height: 50, width: "auto", aspectRatio: "372/72" }}
             />
           </Link>
 

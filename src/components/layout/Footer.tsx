@@ -98,7 +98,11 @@ export default function Footer() {
             <img
               src="/images/logo/nose-creek-logo.webp"
               alt="Nose Creek Physiotherapy Calgary"
-              style={{ height: 48, width: "auto", filter: "brightness(0) invert(1)", opacity: 0.95, marginBottom: 16 }}
+              width={248}
+              height={48}
+              loading="lazy"
+              decoding="async"
+              style={{ height: 48, width: "auto", aspectRatio: "372/72", filter: "brightness(0) invert(1)", opacity: 0.95, marginBottom: 16 }}
             />
           </Link>
           <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "#94a3b8" }}>

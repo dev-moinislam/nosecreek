@@ -22,10 +22,10 @@ export default function MarketingScripts() {
       window.addEventListener(ev, handleInteraction, { passive: true, once: true });
     });
 
-    // 2. Or fallback load after 3.8s idle timer so no tracking is ever missed
+    // 2. Or fallback load after 8s idle timer so no tracking is ever missed
     const timer = setTimeout(() => {
       setShouldLoad(true);
-    }, 3800);
+    }, 8000);
 
     return () => {
       clearTimeout(timer);
