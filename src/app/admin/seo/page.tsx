@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { SiteSettings, PageMetaItem } from "@/types/content";
@@ -182,6 +183,23 @@ export default function AdminSeoManagerPage() {
     setCustomPages(updatedPages);
     setEditForm({});
   };
+
+  if (!isAdmin) {
+    return (
+      <div style={{ textAlign: "center", padding: "60px 24px", maxWidth: 520, margin: "40px auto", background: "#fff", borderRadius: 16, border: "1px solid #e2e8f0", boxShadow: "0 10px 25px rgba(0,0,0,0.05)" }}>
+        <div style={{ fontSize: 42, marginBottom: 16 }}>🛡️</div>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1e293b", margin: "0 0 8px 0" }}>
+          Master Admin Restricted
+        </h2>
+        <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.6, margin: "0 0 24px 0" }}>
+          The SEO &amp; Meta Information manager contains critical indexing and ranking controls that can only be managed by a Master Administrator.
+        </p>
+        <Link href="/admin" style={{ display: "inline-block", background: "#0e78a8", color: "#fff", padding: "10px 22px", borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
+          &larr; Return to Dashboard
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto" }}>
