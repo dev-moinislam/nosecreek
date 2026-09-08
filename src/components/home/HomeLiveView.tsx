@@ -5,10 +5,14 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { HomePageData, TeamMember, BlogPost, Service, Condition, Testimonial, ServiceCustomSection } from "@/types/content";
 import defaultHomeData from "@/data/home.json";
-import TeamCarousel from "@/components/ui/TeamCarousel";
 import ConditionTiles from "@/components/ui/ConditionTiles";
 import HomeServicesGrid from "@/components/ui/HomeServicesGrid";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
+
+const TeamCarousel = dynamic(() => import("@/components/ui/TeamCarousel"), {
+  ssr: false,
+  loading: () => <div style={{ minHeight: 280 }} />
+});
 
 const ReviewCarousel = dynamic(() => import("@/components/ui/ReviewCarousel"), {
   ssr: false,
