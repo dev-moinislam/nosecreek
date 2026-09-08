@@ -81,6 +81,62 @@ export async function POST(req: Request) {
         }
       }
 
+      // Backend Supabase sync for conditions data & cleanup
+      if (type === "conditions") {
+        if (isSupabaseConfigured && supabase) {
+          try {
+            if (deletedSlug) {
+              await supabase.from("conditions").delete().eq("slug", deletedSlug);
+              await supabase.from("conditions").delete().eq("id", deletedSlug);
+            }
+            if (Array.isArray(data)) {
+              const currentSlugs = data.map((c: any) => c.slug);
+              // Delete any conditions from Supabase that are not in current data
+              const { data: supaConditions } = await supabase.from("conditions").select("id, slug");
+              if (supaConditions) {
+                const toDelete = supaConditions.filter((c: any) => !currentSlugs.includes(c.slug));
+                for (const d of toDelete) {
+                  await supabase.from("conditions").delete().eq("slug", d.slug);
+                  await supabase.from("conditions").delete().eq("id", d.id);
+                }
+              }
+
+              // Upsert published condition records to Supabase
+              const rows = data.map((c: any, index: number) => ({
+                id: c.id || `cond-${c.slug}`,
+                slug: c.slug,
+                name: c.name,
+                category: c.category || "general",
+                short_description: c.shortDescription || c.short_description || null,
+                description: c.description || "",
+                benefits: c.benefits || [],
+                symptoms: c.symptoms || [],
+                treatment_approach: c.treatmentApproach || c.treatment_approach || [],
+                custom_sections: c.customSections || c.custom_sections || [],
+                faqs: c.faqs || [],
+                hidden_sections: c.hiddenSections || c.hidden_sections || [],
+                section_order: c.sectionOrder || c.section_order || [],
+                related_services: c.relatedServices || c.related_services || [],
+                hero_image: c.heroImage || c.hero_image || null,
+                side_image: c.sideImage || c.side_image || null,
+                cta_text: c.ctaText || c.cta_text || "Book Assessment Online",
+                cta_muted: c.ctaMuted ?? c.cta_muted ?? false,
+                sort_order: typeof c.sort_order === "number" ? c.sort_order : (typeof c.order === "number" ? c.order : index),
+                seo: { ...(c.seo || {}), cardImage: c.cardImage || c.card_image || null, sectionsData: c.sectionsData || {} },
+                is_published: c.is_published !== false,
+                updated_at: new Date().toISOString()
+              }));
+              const { error: upsertErr } = await supabase.from("conditions").upsert(rows, { onConflict: "slug" });
+              if (upsertErr) {
+                console.error("Backend Supabase conditions upsert error:", upsertErr);
+              }
+            }
+          } catch (supaErr) {
+            console.warn("Backend Supabase conditions sync warning:", supaErr);
+          }
+        }
+      }
+
       // Backend Supabase sync for team data
       if (type === "team" && isSupabaseConfigured && supabase && Array.isArray(data)) {
         try {
@@ -138,6 +194,9 @@ export async function POST(req: Request) {
         } else if (type === "conditions") {
           revalidatePath("/conditions");
           revalidatePath("/conditions/[slug]", "page");
+          if (deletedSlug) {
+            revalidatePath(`/conditions/${deletedSlug}`);
+          }
           revalidatePath("/", "layout");
         } else if (type === "locations") {
           revalidatePath("/locations");

@@ -74,6 +74,20 @@ function getFreshServicesData(): Service[] {
   return servicesList;
 }
 
+function getFreshConditionsData(): Condition[] {
+  try {
+    if (typeof window === "undefined") {
+      const fs = require("fs");
+      const path = require("path");
+      const filePath = path.resolve(process.cwd(), "src/data/conditions.json");
+      if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      }
+    }
+  } catch (e) {}
+  return conditionsList;
+}
+
 /**
  * Clinic Services
  */
@@ -359,6 +373,8 @@ export async function getLocationBySlug(slug: string): Promise<Location | undefi
  * Treatable Conditions
  */
 export async function getConditions(): Promise<Condition[]> {
+  const currentList = getFreshConditionsData();
+
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
@@ -366,30 +382,33 @@ export async function getConditions(): Promise<Condition[]> {
         .select("*")
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
-      if (!error && data && data.length > 0) {
-        return data.map((d: any) => ({
-          id: d.id,
-          slug: d.slug,
-          name: d.name,
-          shortDescription: d.short_description || "",
-          description: d.description || "",
-          heroImage: d.hero_image,
-          sideImage: d.side_image,
-          cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
-          ctaText: d.cta_text,
-          ctaMuted: d.cta_muted,
-          benefits: d.benefits || [],
-          symptoms: d.symptoms || [],
-          treatmentApproach: d.treatment_approach || [],
-          customSections: d.custom_sections || [],
-          sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || {},
-          faqs: d.faqs || [],
-          hiddenSections: d.hidden_sections || [],
-          sectionOrder: d.section_order || d.sectionOrder || [],
-          relatedServices: d.related_services || [],
-          category: d.category || "general",
-          seo: d.seo || {}
-        }));
+      if (!error && data) {
+        return data.map((d: any) => {
+          const localItem = currentList.find((c) => c.slug === d.slug);
+          return {
+            id: d.id,
+            slug: d.slug,
+            name: d.name,
+            shortDescription: d.short_description || localItem?.shortDescription || "",
+            description: d.description || localItem?.description || "",
+            heroImage: d.hero_image || localItem?.heroImage,
+            sideImage: d.side_image || localItem?.sideImage,
+            cardImage: d.card_image || d.cardImage || d.seo?.cardImage || localItem?.cardImage || null,
+            ctaText: d.cta_text || localItem?.ctaText,
+            ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
+            benefits: d.benefits || localItem?.benefits || [],
+            symptoms: d.symptoms || localItem?.symptoms || [],
+            treatmentApproach: d.treatment_approach || localItem?.treatmentApproach || [],
+            customSections: d.custom_sections || localItem?.customSections || [],
+            sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || localItem?.sectionsData || {},
+            faqs: d.faqs || localItem?.faqs || [],
+            hiddenSections: d.hidden_sections || localItem?.hiddenSections || [],
+            sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
+            relatedServices: d.related_services || localItem?.relatedServices || [],
+            category: d.category || localItem?.category || "general",
+            seo: d.seo || localItem?.seo || {}
+          };
+        });
       }
     } catch (e) {
       console.warn("Supabase fetch failed for conditions, using local fallback", e);
@@ -399,15 +418,15 @@ export async function getConditions(): Promise<Condition[]> {
   // Client-side fetch from /api/content (useful in incognito or non-admin sessions)
   if (typeof window !== "undefined") {
     try {
-      const res = await fetch("/api/content?type=conditions");
+      const res = await fetch("/api/content?type=conditions", { cache: "no-store" });
       if (res.ok) {
         const list = await res.json();
-        if (Array.isArray(list) && list.length > 0) return list;
+        if (Array.isArray(list)) return list;
       }
     } catch {}
   }
 
-  return conditionsList;
+  return currentList;
 }
 
 export async function getConditionBySlug(slug: string): Promise<Condition | undefined> {
@@ -420,35 +439,45 @@ export async function getConditionBySlug(slug: string): Promise<Condition | unde
         .eq("is_published", true)
         .single();
       if (!error && data) {
+        const localItem = getFreshConditionsData().find((c) => c.slug === slug);
         return {
           id: data.id,
           slug: data.slug,
           name: data.name,
-          shortDescription: data.short_description || "",
-          description: data.description || "",
-          heroImage: data.hero_image,
-          sideImage: data.side_image,
-          cardImage: data.card_image || data.cardImage || data.seo?.cardImage || null,
-          ctaText: data.cta_text,
-          ctaMuted: data.cta_muted,
-          benefits: data.benefits || [],
-          symptoms: data.symptoms || [],
-          treatmentApproach: data.treatment_approach || [],
-          customSections: data.custom_sections || [],
-          sectionsData: data.sections_data || data.seo?.sectionsData || data.sectionsData || {},
-          faqs: data.faqs || [],
-          hiddenSections: data.hidden_sections || [],
-          sectionOrder: data.section_order || data.sectionOrder || [],
-          relatedServices: data.related_services || [],
-          category: data.category || "general",
-          seo: data.seo || {}
+          shortDescription: data.short_description || localItem?.shortDescription || "",
+          description: data.description || localItem?.description || "",
+          heroImage: data.hero_image || localItem?.heroImage,
+          sideImage: data.side_image || localItem?.sideImage,
+          cardImage: data.card_image || data.cardImage || data.seo?.cardImage || localItem?.cardImage || null,
+          ctaText: data.cta_text || localItem?.ctaText,
+          ctaMuted: data.cta_muted ?? localItem?.ctaMuted,
+          benefits: data.benefits || localItem?.benefits || [],
+          symptoms: data.symptoms || localItem?.symptoms || [],
+          treatmentApproach: data.treatment_approach || localItem?.treatmentApproach || [],
+          customSections: data.custom_sections || localItem?.customSections || [],
+          sectionsData: data.sections_data || data.seo?.sectionsData || data.sectionsData || localItem?.sectionsData || {},
+          faqs: data.faqs || localItem?.faqs || [],
+          hiddenSections: data.hidden_sections || localItem?.hiddenSections || [],
+          sectionOrder: data.section_order || data.sectionOrder || localItem?.sectionOrder || [],
+          relatedServices: data.related_services || localItem?.relatedServices || [],
+          category: data.category || localItem?.category || "general",
+          seo: data.seo || localItem?.seo || {}
         };
+      }
+      // If Supabase is configured and query returned 0 rows (item deleted or unpublished), it does not exist
+      if (error && (error.code === "PGRST116" || error.message?.includes("0 rows") || !data)) {
+        return undefined;
       }
     } catch (e) {
       console.warn(`Supabase fetch failed for condition ${slug}, using local fallback`, e);
     }
   }
-  return conditionsList.find((c) => c.slug === slug);
+
+  // Fallback only if Supabase is not configured
+  if (!isSupabaseConfigured) {
+    return getFreshConditionsData().find((c) => c.slug === slug);
+  }
+  return undefined;
 }
 
 /**

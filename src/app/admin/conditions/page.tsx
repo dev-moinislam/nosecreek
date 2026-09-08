@@ -192,16 +192,18 @@ export default function AdminConditionsPage() {
           try {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
-              const map = new Map<string, Condition>();
-              fresh.forEach((c) => map.set(c.slug, c));
-              parsed.forEach((p) => {
-                if (map.has(p.slug)) {
-                  map.set(p.slug, { ...map.get(p.slug)!, ...p });
-                } else {
-                  map.set(p.slug, p);
-                }
-              });
-              data = Array.from(map.values()).map(sanitizeConditionOrder);
+              if (fresh.length > 0) {
+                const map = new Map<string, Condition>();
+                fresh.forEach((c) => map.set(c.slug, c));
+                parsed.forEach((p) => {
+                  if (map.has(p.slug)) {
+                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                  }
+                });
+                data = Array.from(map.values()).map(sanitizeConditionOrder);
+              } else {
+                data = parsed.map(sanitizeConditionOrder);
+              }
             }
           } catch {}
         }
@@ -225,19 +227,8 @@ export default function AdminConditionsPage() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setConditions((current) => {
-                const map = new Map<string, Condition>();
-                current.forEach((c) => map.set(c.slug, c));
-                parsed.forEach((p) => {
-                  if (map.has(p.slug)) {
-                    map.set(p.slug, { ...map.get(p.slug)!, ...p });
-                  } else {
-                    map.set(p.slug, p);
-                  }
-                });
-                return Array.from(map.values());
-              });
+            if (Array.isArray(parsed)) {
+              setConditions(parsed.map(sanitizeConditionOrder));
             }
           } catch {}
         }
@@ -265,10 +256,10 @@ export default function AdminConditionsPage() {
           id: cond.id || `cond-${cond.slug}`,
           slug: cond.slug,
           name: cond.name,
-          category: cond.category,
+          category: cond.category || "general",
           short_description: cond.shortDescription || null,
           description: cond.description || "",
-          overview: cond.description || null,
+          benefits: cond.benefits || [],
           symptoms: cond.symptoms || [],
           treatment_approach: cond.treatmentApproach || [],
           custom_sections: cond.customSections || [],
@@ -278,6 +269,9 @@ export default function AdminConditionsPage() {
           related_services: cond.relatedServices || [],
           hero_image: cond.heroImage || null,
           side_image: cond.sideImage || null,
+          cta_text: cond.ctaText || "Book Assessment Online",
+          cta_muted: cond.ctaMuted ?? false,
+          sort_order: typeof (cond as any).sort_order === "number" ? (cond as any).sort_order : ((cond as any).order || 0),
           seo: { ...(cond.seo || {}), cardImage: cond.cardImage || null, sectionsData: cond.sectionsData || {} },
           is_published: true,
           updated_at: new Date().toISOString()
@@ -326,6 +320,7 @@ export default function AdminConditionsPage() {
       if (isSupabaseConfigured && supabase) {
         try {
           await supabase.from("conditions").delete().eq("slug", slug);
+          await supabase.from("conditions").delete().eq("id", slug);
         } catch (e) {
           console.warn("Supabase delete condition error:", e);
         }
@@ -339,7 +334,7 @@ export default function AdminConditionsPage() {
         await fetch("/api/admin/save-content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "conditions", data: updated })
+          body: JSON.stringify({ type: "conditions", data: updated, deletedSlug: slug })
         });
       } catch {}
 

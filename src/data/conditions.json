@@ -6,6 +6,10 @@
     "shortDescription": "Targeted spinal rehabilitation, manual mobilization, and core stabilization to resolve acute and chronic lower back pain.",
     "description": "Lower back pain is one of the most common musculoskeletal complaints in Calgary. Whether caused by disc herniation, facet joint irritation, ligament sprains, or prolonged postural strain, our physiotherapists use advanced orthopaedic manual therapy and functional core retraining to eliminate pain and restore full spinal mobility.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Dull, persistent ache or sharp pinching in the lumbar spine",
@@ -25,8 +29,18 @@
     "hiddenSections": [],
     "sectionOrder": [
       "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
       "symptoms",
-      "treatment_approach"
+      "treatment_approach",
+      "related_therapies",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "other_links",
+      "bottom_cta"
     ],
     "relatedServices": [
       "physiotherapy",
@@ -37,24 +51,49 @@
     "seo": {
       "title": "Back Pain Treatment Calgary | Nose Creek Physiotherapy",
       "ogTitle": "Back Pain Treatment | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.",
+      "sectionsData": {},
       "ogDescription": "End back pain without pills or surgery with evidence-based physical therapy in Calgary."
-    },
-    "sectionsData": {
-      "testimonials": {
-        "title": "Calgary Patients Relieved from Back Pain",
-        "eyebrow": "Real Patient Stories",
-        "eyebrowColor": "#1c9fd8",
-        "subtitle": "",
-        "content": "how have you been [Back Pain](/conditions/back-pain)",
-        "image": "",
-        "imagePosition": "none",
-        "background": "light",
-        "align": "left",
-        "ctaText": "",
-        "ctaHref": "",
-        "bullets": []
-      }
+    }
+  },
+  {
+    "id": "condition-1788302012251",
+    "slug": "new-condition",
+    "name": "Leg pain",
+    "shortDescription": "Customize the summary paragraph, condition category badge, and card thumbnail that appear inside the card tiles on the Homepage",
+    "description": "",
+    "heroImage": "/images/clinic/reception-three.jpg",
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [],
+    "symptoms": [],
+    "treatmentApproach": [],
+    "customSections": [],
+    "faqs": [],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
+      "symptoms",
+      "treatment_approach",
+      "related_therapies",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "other_links",
+      "bottom_cta"
+    ],
+    "relatedServices": [],
+    "category": "general",
+    "seo": {
+      "cardImage": null,
+      "sectionsData": {}
     }
   },
   {
@@ -64,6 +103,10 @@
     "shortDescription": "Relief from cervical stiffness, pinched nerves, posture fatigue, and radiating shoulder tension.",
     "description": "Neck and shoulder pain often stem from cervical joint restrictions, poor desk ergonomics ('tech neck'), or whiplash. When the cervical spine loses natural mobility, compensatory strain builds up across the upper trapezius and levator scapulae muscles, causing chronic aching and restricted rotation.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Stiffness turning the head or checking blind spots while driving",
@@ -90,7 +133,9 @@
     "seo": {
       "title": "Neck & Shoulder Pain Treatment Calgary | Nose Creek",
       "ogTitle": "Neck & Shoulder Pain Relief | Nose Creek",
+      "cardImage": null,
       "description": "Relieve neck stiffness, tech-neck, and shoulder tension with hands-on physiotherapy and massage in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Restore neck mobility and stop tension headaches with targeted physical therapy."
     }
   },
@@ -101,6 +146,10 @@
     "shortDescription": "Specialized care for knee osteoarthritis, meniscus tears, patellar tendinitis, and ligament strains.",
     "description": "Knee pain can severely limit your ability to walk, take stairs, or enjoy Calgary's outdoor lifestyle. We diagnose the root biomechanical cause — whether it is cartilage wear, patellofemoral tracking dysfunction, or ligament instability — and deliver non-invasive treatments to restore joint function.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Aching or grinding sensation under the kneecap when walking down stairs",
@@ -117,7 +166,21 @@
     "customSections": [],
     "faqs": [],
     "hiddenSections": [],
-    "sectionOrder": [],
+    "sectionOrder": [
+      "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
+      "symptoms",
+      "treatment_approach",
+      "related_therapies",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "other_links",
+      "bottom_cta"
+    ],
     "relatedServices": [
       "physiotherapy",
       "knee-bracing",
@@ -128,7 +191,9 @@
     "seo": {
       "title": "Knee Pain Treatment & Knee Bracing Calgary | Nose Creek",
       "ogTitle": "Knee Pain Rehabilitation | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Evidence-based knee pain rehabilitation, custom knee bracing, and shockwave therapy in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Stop knee pain without injections or surgery. Personalized physical therapy in Calgary."
     }
   },
@@ -139,6 +204,10 @@
     "shortDescription": "Targeted therapies for plantar fasciitis, Achilles tendinopathy, flat feet, and heel spurs.",
     "description": "Your feet bear the weight of your entire body. Chronic foot pain — especially plantar fasciitis and Achilles tendinopathy — occurs when arches lack support or soft tissues undergo repetitive micro-trauma. Our combined shockwave and custom orthotic treatments provide rapid, lasting relief.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Sharp, stabbing heel pain during your very first morning steps",
@@ -165,7 +234,9 @@
     "seo": {
       "title": "Foot Pain & Plantar Fasciitis Calgary | Nose Creek",
       "ogTitle": "Foot & Heel Pain Treatment | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Heal plantar fasciitis, heel spurs, and Achilles tendon pain with shockwave therapy and custom orthotics in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Custom orthotics and acoustic shockwave therapy for lasting foot pain relief."
     }
   },
@@ -176,6 +247,10 @@
     "shortDescription": "Sport-specific physical therapy and rehabilitation to get athletes back in the game safely and fast.",
     "description": "From weekend warriors to competitive athletes, sports injuries require progressive, phase-based rehabilitation. We treat acute ligament sprains, muscle tears, and overuse syndromes with a focus on restoring strength, agility, and neuromuscular control to prevent re-injury.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Sudden popping sensation or swelling in a joint during play",
@@ -202,7 +277,9 @@
     "seo": {
       "title": "Sports Injury Rehabilitation Calgary | Nose Creek",
       "ogTitle": "Sports Injury Clinic | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Sport physiotherapy and athletic rehabilitation in Calgary NW & NE for sprains, tears, and tendonitis.",
+      "sectionsData": {},
       "ogDescription": "Recover faster and return to your sport stronger with certified sport physiotherapy."
     }
   },
@@ -213,6 +290,10 @@
     "shortDescription": "Vestibular therapy and balance retraining to improve stability, confidence, and fall prevention.",
     "description": "Balance problems and dizziness significantly increase fall risk and reduce daily independence. Our vestibular physiotherapists assess inner ear function, vision-proprioception integration, and lower extremity strength to build steady, confident movement.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Feeling unsteady, off-balance, or lightheaded when walking",
@@ -237,7 +318,9 @@
     "seo": {
       "title": "Balance & Fall Prevention Clinic Calgary | Nose Creek",
       "ogTitle": "Balance & Fall Prevention | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Improve your balance, resolve vertigo, and prevent falls with specialized vestibular physiotherapy in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Build steady footing and confidence with specialized balance and vestibular therapy."
     }
   },
@@ -248,6 +331,10 @@
     "shortDescription": "Specialized rehabilitation for rotator cuff tears, shoulder impingement, and frozen shoulder.",
     "description": "The shoulder is the most mobile joint in the human body, making it vulnerable to impingement, rotator cuff strains, labral tears, and adhesive capsulitis (frozen shoulder). Our FCAMPT-certified manual therapists restore joint mechanics and scapular control.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Inability to reach behind your back or lift overhead without pain",
@@ -274,7 +361,9 @@
     "seo": {
       "title": "Shoulder Pain & Rotator Cuff Clinic Calgary | Nose Creek",
       "ogTitle": "Shoulder Pain Rehabilitation | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Expert rotator cuff rehabilitation, frozen shoulder therapy, and impingement treatment in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Restore full overhead reach and pain-free sleep with evidence-based shoulder physiotherapy."
     }
   },
@@ -285,6 +374,10 @@
     "shortDescription": "Evidence-based post-concussion management, visual-vestibular therapy, and safe return-to-activity.",
     "description": "A concussion is a mild traumatic brain injury caused by a direct impact or rapid acceleration-deceleration force. Our evidence-based concussion management protocol addresses cervical spine involvement, vestibular-ocular dysfunction, and autonomic symptom tolerance.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Persistent headaches, brain fog, and fatigue",
@@ -309,7 +402,9 @@
     "seo": {
       "title": "Concussion Management Clinic Calgary | Nose Creek",
       "ogTitle": "Concussion Rehabilitation | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Comprehensive concussion testing, visual-vestibular rehab, and cervical treatment in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Evidence-based post-concussion care to restore mental clarity and safe return to sport."
     }
   },
@@ -320,6 +415,10 @@
     "shortDescription": "Therapy for hip osteoarthritis, labral tears, trochanteric bursitis, and groin tightness.",
     "description": "Hip pain can originate from the joint capsule itself (osteoarthritis or labral tears) or peri-articular structures like the gluteal tendons and bursae. We pinpoint the exact driver of hip discomfort and restore painless walking, stair climbing, and athletic activity.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Deep groin aching after prolonged sitting or walking",
@@ -346,7 +445,9 @@
     "seo": {
       "title": "Hip Pain Treatment Calgary | Nose Creek Physiotherapy",
       "ogTitle": "Hip Pain Rehabilitation | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Relieve hip bursitis, arthritis, and groin pain with specialized physical therapy in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Restore hip mobility and pain-free walking with expert manual physiotherapy."
     }
   },
@@ -357,6 +458,10 @@
     "shortDescription": "Targeted nerve decompression, gentle neural flossing, and herniated disc recovery.",
     "description": "Sciatica occurs when the sciatic nerve is compressed or irritated by a lumbar disc herniation, spinal stenosis, or piriformis muscle spasm. We use gentle neural mobilizations, spinal decompression strategies, and core stability to relieve radiating nerve pain.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Electric, burning, or shooting pain traveling down the buttock into the leg",
@@ -383,7 +488,9 @@
     "seo": {
       "title": "Sciatica & Pinched Nerve Relief Calgary | Nose Creek",
       "ogTitle": "Sciatica Treatment Clinic | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Fast relief from radiating sciatic nerve pain and lumbar disc compression in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Decompress your sciatic nerve and stop radiating leg pain without invasive surgery."
     }
   },
@@ -394,6 +501,10 @@
     "shortDescription": "Advanced treatment for peripheral neuropathy, carpal tunnel, and compressed nerves.",
     "description": "Nerve entrapment syndromes like carpal tunnel, thoracic outlet syndrome, and cubital tunnel cause burning, tingling, and motor weakness. Our targeted nerve mobilization and manual decompression treatments alleviate mechanical pressure and restore healthy neural glide.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Tingling, burning sensations, or numbness in the hands, arms, or feet",
@@ -420,7 +531,9 @@
     "seo": {
       "title": "Nerve Pain & Neuropathy Treatment Calgary | Nose Creek",
       "ogTitle": "Nerve Pain Treatment | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Targeted nerve decompression, neural glide therapy, and pain management in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Resolve carpal tunnel, pinched nerves, and neuropathy with specialized physical therapy."
     }
   },
@@ -431,6 +544,10 @@
     "shortDescription": "Relief from cervicogenic headaches, tension headaches, and posture-induced migraine triggers.",
     "description": "Up to 80% of persistent tension headaches originate from the upper cervical spine (cervicogenic headaches). When upper neck joints and suboccipital muscles are irritated, referred pain radiates upward over the skull into the temples and behind the eyes.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Aching pain starting at the base of the skull spreading forward to the forehead",
@@ -457,7 +574,9 @@
     "seo": {
       "title": "Cervicogenic Headache Treatment Calgary | Nose Creek",
       "ogTitle": "Headache Relief Clinic | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Stop tension and neck headaches with cervical manual therapy and dry needling in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Target the cervical root cause of chronic headaches for lasting relief without daily pills."
     }
   },
@@ -468,6 +587,10 @@
     "shortDescription": "Deep tissue therapies, IMS dry needling, and myofascial release for chronic muscle soreness.",
     "description": "Chronic muscle pain, taut bands, and myofascial trigger points develop from repetitive strain, postural overload, or protective guarding after injury. We combine deep tissue massage, IMS dry needling, and active loading to release contracted fibers.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Deep, constant muscle aching in the back, shoulders, or legs",
@@ -494,7 +617,9 @@
     "seo": {
       "title": "Muscle Pain & Myofascial Relief Calgary | Nose Creek",
       "ogTitle": "Muscle Pain Treatment | Nose Creek Physiotherapy",
+      "cardImage": null,
       "description": "Release chronic muscle knots and soreness with IMS dry needling and massage therapy in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Relieve deep muscle knots and spasms with registered massage therapy and IMS dry needling."
     }
   },
@@ -505,6 +630,10 @@
     "shortDescription": "Non-invasive treatments for arthritis, joint stiffness, bursitis, and cartilage wear.",
     "description": "Whether dealing with osteoarthritis in the knees, hips, or spine, or inflammatory joint stiffness, physical therapy helps lubricate joint surfaces, strengthen surrounding stabilizers, and offload joint pressure.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Stiffness and joint cracking that improves with gentle movement",
@@ -532,7 +661,9 @@
     "seo": {
       "title": "Joint Pain & Arthritis Management Calgary | Nose Creek",
       "ogTitle": "Joint Pain & Arthritis Therapy | Nose Creek",
+      "cardImage": null,
       "description": "Non-surgical joint pain relief, osteoarthritis care, and joint mobilization in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Lubricate joints and restore pain-free movement with customized physiotherapy."
     }
   },
@@ -543,6 +674,10 @@
     "shortDescription": "WCB-approved physiotherapy and active conditioning to return to work safely and comfortably.",
     "description": "Workplace injuries range from repetitive strain and heavy lifting disc herniations to slips and falls on job sites. We provide prompt clinical assessment, WCB claim coordination, and functional work conditioning to get you back on the job safely.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Acute back or shoulder pain following heavy lifting at work",
@@ -568,7 +703,9 @@
     "seo": {
       "title": "WCB Workplace Injury Physiotherapy Calgary | Nose Creek",
       "ogTitle": "Workplace Injury Rehabilitation | Nose Creek",
+      "cardImage": null,
       "description": "WCB-approved physical therapy and occupational rehabilitation in Calgary NW & NE.",
+      "sectionsData": {},
       "ogDescription": "Fast recovery and WCB claim support for workplace injuries in Calgary."
     }
   },
@@ -579,6 +716,10 @@
     "shortDescription": "Direct-billed MVA auto insurance rehabilitation for whiplash, back strains, and trauma recovery.",
     "description": "Motor vehicle collisions (MVA) subject the body to rapid deceleration forces, resulting in whiplash, spinal ligament sprains, concussions, and chest wall contusions. In Alberta, accident claims are direct-billed to your auto insurer without out-of-pocket costs.",
     "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
     "benefits": [],
     "symptoms": [
       "Neck stiffness, whiplash tension, and restricted head turning",
@@ -605,64 +746,10 @@
     "seo": {
       "title": "MVA Whiplash & Car Accident Physiotherapy Calgary",
       "ogTitle": "Motor Vehicle Accident Rehab | Nose Creek",
+      "cardImage": null,
       "description": "Direct-billed auto insurance physiotherapy for whiplash and car accident injuries in Calgary.",
+      "sectionsData": {},
       "ogDescription": "Complete whiplash and auto injury rehabilitation with 100% direct insurance billing in Alberta."
     }
-  },
-  {
-    "id": "chest-rib-pain",
-    "slug": "chest-rib-pain",
-    "name": "Chest & Rib Pain",
-    "shortDescription": "Therapy for costochondritis, rib joint subluxations, and intercostal muscle strains.",
-    "description": "Sharp pain when taking a deep breath, coughing, or twisting is often caused by rib joint dysfunction (costovertebral subluxation), costochondritis, or intercostal muscle strains. Our gentle thoracic mobilizations quickly restore rib mechanics and painless breathing.",
-    "heroImage": null,
-    "benefits": [],
-    "symptoms": [
-      "Sharp, localized pain in the chest wall or upper back when inhaling deeply",
-      "Pinching sensation between the shoulder blades and rib cage",
-      "Tenderness over the cartilage connections along the breastbone (costochondritis)",
-      "Pain with torso twisting, laughing, or coughing"
-    ],
-    "treatmentApproach": [
-      "Thoracic spine and rib cage joint mobility assessment",
-      "Gentle costovertebral joint mobilization and rib realignments",
-      "Intercostal muscle release and thoracic mobility stretches",
-      "Diaphragmatic breathing mechanics and postural training"
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy"
-    ],
-    "category": "Thorax & Ribs",
-    "seo": {
-      "title": "Chest & Rib Pain Treatment Calgary | Nose Creek",
-      "ogTitle": "Chest & Rib Pain Physiotherapy | Nose Creek",
-      "description": "Relieve costochondritis, rib subluxations, and thoracic pain with gentle physiotherapy in Calgary.",
-      "ogDescription": "Restore painless breathing and rib cage alignment with expert physical therapy."
-    }
-  },
-  {
-    "id": "condition-1788302012251",
-    "slug": "new-condition",
-    "name": "Leg pain",
-    "shortDescription": "Customize the summary paragraph, condition category badge, and card thumbnail that appear inside the card tiles on the Homepage",
-    "description": "",
-    "symptoms": [],
-    "treatmentApproach": [],
-    "benefits": [],
-    "customSections": [],
-    "sectionsData": {},
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [
-      "hero"
-    ],
-    "relatedServices": [],
-    "category": "general",
-    "heroImage": "/images/clinic/reception-three.jpg"
   }
 ]

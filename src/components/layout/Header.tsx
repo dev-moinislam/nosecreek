@@ -42,6 +42,18 @@ export default function Header() {
       } catch {}
     }
 
+    async function fetchFreshConditions() {
+      try {
+        const res = await fetch("/api/content?type=conditions", { cache: "no-store" });
+        if (res.ok) {
+          const list = await res.json();
+          if (Array.isArray(list)) {
+            setDynamicConditions(list);
+          }
+        }
+      } catch {}
+    }
+
     function syncContent() {
       try {
         const savedSettings = localStorage.getItem("adm_settings");
@@ -64,14 +76,17 @@ export default function Header() {
         const savedConditions = localStorage.getItem("adm_conditions");
         if (savedConditions) {
           const parsed = JSON.parse(savedConditions);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setDynamicConditions(parsed);
           }
+        } else {
+          fetchFreshConditions();
         }
       } catch {}
     }
     syncContent();
     fetchFreshServices();
+    fetchFreshConditions();
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);

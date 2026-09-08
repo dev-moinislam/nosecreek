@@ -22,12 +22,20 @@ export default function ConditionTiles({ conditions }: ConditionTilesProps) {
         const saved = localStorage.getItem("adm_conditions");
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             setDisplayConditions(parsed);
+            return;
           }
         }
+        fetch("/api/content?type=conditions", { cache: "no-store" })
+          .then((r) => r.json())
+          .then((list) => {
+            if (Array.isArray(list)) setDisplayConditions(list);
+          })
+          .catch(() => {});
       } catch {}
     }
+    sync();
     window.addEventListener("conditionsUpdated", sync);
     window.addEventListener("storage", sync);
     return () => {

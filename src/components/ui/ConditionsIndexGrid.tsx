@@ -24,8 +24,15 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) {
             setConditions(parsed);
+            return;
           }
         }
+        fetch("/api/content?type=conditions", { cache: "no-store" })
+          .then((r) => r.json())
+          .then((list) => {
+            if (Array.isArray(list)) setConditions(list);
+          })
+          .catch(() => {});
       } catch {}
     }
     sync();

@@ -3,6 +3,9 @@ import fs from "fs";
 import path from "path";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -52,6 +55,44 @@ export async function GET(req: Request) {
                 locations: s.locations || existing?.locations || [],
                 testimonials: s.testimonials || existing?.testimonials || [],
                 seo: s.seo || existing?.seo || {}
+              };
+            });
+            return NextResponse.json(list);
+          }
+        } catch {}
+      }
+
+      if (type === "conditions" && isSupabaseConfigured && supabase) {
+        try {
+          const { data: supaConditions } = await supabase
+            .from("conditions")
+            .select("*")
+            .eq("is_published", true)
+            .order("sort_order", { ascending: true });
+          if (supaConditions) {
+            const list = supaConditions.map((c: any) => {
+              const existing = diskData.find((d) => d.slug === c.slug);
+              return {
+                id: c.id,
+                slug: c.slug,
+                name: c.name,
+                shortDescription: c.short_description || existing?.shortDescription || "",
+                description: c.description || existing?.description || "",
+                heroImage: c.hero_image || existing?.heroImage || null,
+                sideImage: c.side_image || existing?.sideImage || null,
+                cardImage: c.card_image || c.cardImage || c.seo?.cardImage || existing?.cardImage || null,
+                ctaText: c.cta_text || existing?.ctaText || "Book Online",
+                ctaMuted: c.cta_muted ?? existing?.ctaMuted ?? false,
+                benefits: c.benefits || existing?.benefits || [],
+                symptoms: c.symptoms || existing?.symptoms || [],
+                treatmentApproach: c.treatment_approach || existing?.treatmentApproach || [],
+                customSections: c.custom_sections || existing?.customSections || [],
+                faqs: c.faqs || existing?.faqs || [],
+                hiddenSections: c.hidden_sections || existing?.hiddenSections || [],
+                sectionOrder: c.section_order || c.sectionOrder || existing?.sectionOrder || [],
+                relatedServices: c.related_services || existing?.relatedServices || [],
+                category: c.category || existing?.category || "general",
+                seo: c.seo || existing?.seo || {}
               };
             });
             return NextResponse.json(list);
