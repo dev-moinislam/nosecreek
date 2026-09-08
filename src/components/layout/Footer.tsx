@@ -27,13 +27,6 @@ export default function Footer() {
           if (Array.isArray(parsed)) {
             setServices(parsed);
           }
-        } else {
-          fetch("/api/content?type=services", { cache: "no-store" })
-            .then((r) => r.json())
-            .then((list) => {
-              if (Array.isArray(list)) setServices(list);
-            })
-            .catch(() => {});
         }
       } catch {}
     }

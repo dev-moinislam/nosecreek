@@ -150,14 +150,17 @@ export default function ReviewCarousel({
       }
     }
 
-    // Defer live reviews check until after initial paint
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      (window as any).requestIdleCallback(() => fetchLiveContent());
-    } else {
-      setTimeout(fetchLiveContent, 2000);
-    }
+    // Defer live reviews check until well after initial page paint and user orientation
+    const liveTimer = setTimeout(() => {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(() => fetchLiveContent());
+      } else {
+        fetchLiveContent();
+      }
+    }, 6000);
 
     return () => {
+      clearTimeout(liveTimer);
       window.removeEventListener("settingsUpdated", syncFromSettings);
       window.removeEventListener("storage", syncFromSettings);
     };

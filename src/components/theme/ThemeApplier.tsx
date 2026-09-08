@@ -116,7 +116,9 @@ export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeCol
             const links = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon'], link[rel='apple-touch-icon'], link[rel='shortcut icon']");
             if (links.length > 0) {
               links.forEach((link) => {
-                link.href = icon;
+                if (link.getAttribute("href") !== icon) {
+                  link.href = icon;
+                }
               });
             } else {
               const link = document.createElement("link");

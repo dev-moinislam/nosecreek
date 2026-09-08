@@ -112,9 +112,13 @@ export default function VisitUsSection({ customEyebrow, customTitle }: VisitUsSe
       }
     }
 
-    syncLoc();
+    const locTimer = setTimeout(() => {
+      syncLoc();
+    }, 6000);
+
     window.addEventListener("locationsUpdated", syncLoc);
     return () => {
+      clearTimeout(locTimer);
       window.removeEventListener("locationsUpdated", syncLoc);
     };
   }, []);

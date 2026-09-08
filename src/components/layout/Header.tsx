@@ -82,7 +82,7 @@ export default function Header() {
     }
     syncContent();
 
-    // Defer background API freshness sync until after initial page render is fully complete (3s delay or idle)
+    // Defer background API freshness sync until after initial page render is fully complete (7s delay or idle)
     const idleTimer = setTimeout(() => {
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
         (window as any).requestIdleCallback(() => {
@@ -93,7 +93,7 @@ export default function Header() {
         fetchFreshServices();
         fetchFreshConditions();
       }
-    }, 3000);
+    }, 7000);
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);
