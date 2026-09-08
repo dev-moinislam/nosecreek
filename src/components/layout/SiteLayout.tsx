@@ -33,7 +33,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         <NavigationProgressBar />
       </React.Suspense>
       <Header />
-      <main id="main-content">{children}</main>
+      <main id="main-content" style={{ minHeight: "100vh" }}>{children}</main>
       <Footer />
       <SchemaMarkup type="MedicalBusiness" data={settingsData} />
       <MarketingScripts />
