@@ -251,6 +251,9 @@ export interface Condition {
   relatedServices?: string[]; // slugs
   testimonials?: any[];
   category?: string;
+  iconType?: string;
+  iconBg?: string;
+  iconColor?: string;
   seo?: SEOData;
 }
 

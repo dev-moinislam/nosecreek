@@ -406,7 +406,7 @@ export async function getConditions(): Promise<Condition[]> {
             heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
             sideImage: d.side_image || localItem?.sideImage,
             sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
-            cardImage: d.card_image || d.cardImage || d.seo?.cardImage || localItem?.cardImage || null,
+            cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
             cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
             ctaText: d.cta_text || localItem?.ctaText,
             ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
@@ -420,6 +420,9 @@ export async function getConditions(): Promise<Condition[]> {
             sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
             relatedServices: d.related_services || localItem?.relatedServices || [],
             category: d.category || localItem?.category || "general",
+            iconType: d.icon_type || d.iconType || localItem?.iconType,
+            iconBg: d.icon_bg || d.iconBg || localItem?.iconBg,
+            iconColor: d.icon_color || d.iconColor || localItem?.iconColor,
             seo: d.seo || localItem?.seo || {}
           };
         });
@@ -464,7 +467,7 @@ export async function getConditionBySlug(slug: string): Promise<Condition | unde
           heroImageAlt: data.hero_image_alt || data.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
           sideImage: data.side_image || localItem?.sideImage,
           sideImageAlt: data.side_image_alt || data.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
-          cardImage: data.card_image || data.cardImage || data.seo?.cardImage || localItem?.cardImage || null,
+          cardImage: data.card_image || data.cardImage || data.seo?.cardImage || null,
           cardImageAlt: data.card_image_alt || data.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
           ctaText: data.cta_text || localItem?.ctaText,
           ctaMuted: data.cta_muted ?? localItem?.ctaMuted,
@@ -478,6 +481,9 @@ export async function getConditionBySlug(slug: string): Promise<Condition | unde
           sectionOrder: data.section_order || data.sectionOrder || localItem?.sectionOrder || [],
           relatedServices: data.related_services || localItem?.relatedServices || [],
           category: data.category || localItem?.category || "general",
+          iconType: data.icon_type || data.iconType || localItem?.iconType,
+          iconBg: data.icon_bg || data.iconBg || localItem?.iconBg,
+          iconColor: data.icon_color || data.iconColor || localItem?.iconColor,
           seo: data.seo || localItem?.seo || {}
         };
       }

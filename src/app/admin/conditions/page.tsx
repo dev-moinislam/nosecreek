@@ -10,6 +10,7 @@ import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomiz
 import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
 import AdminImageUploader from "@/components/admin/AdminImageUploader";
+import ServiceIcon from "@/components/ui/ServiceIcon";
 import {
   SlidersIcon,
   LayoutIcon,
@@ -1720,26 +1721,47 @@ function ConditionEditorModal({
                       />
                     </div>
 
-                    <div className="adm-form-group" style={{ margin: 0 }}>
-                      <label className="adm-form-label">Condition Category Badge</label>
-                      <select
-                        className="adm-input"
-                        value={cond.category || "Spine & Back"}
-                        onChange={(e) => setCond({ ...cond, category: e.target.value })}
-                      >
-                        <option value="Spine & Back">Spine &amp; Back</option>
-                        <option value="Joint & Extremity">Joint &amp; Extremity</option>
-                        <option value="Sports Injury">Sports Injury</option>
-                        <option value="Head & Neck">Head &amp; Neck</option>
-                        <option value="Workplace & MVA">Workplace &amp; MVA</option>
-                        <option value="General Recovery">General Recovery</option>
-                      </select>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div className="adm-form-group" style={{ margin: 0 }}>
+                        <label className="adm-form-label">Condition Icon Style</label>
+                        <select
+                          className="adm-input"
+                          value={cond.iconType || "activity"}
+                          onChange={(e) => setCond({ ...cond, iconType: e.target.value })}
+                        >
+                          <option value="activity">Activity (Movement / General)</option>
+                          <option value="heart-pulse">Heart Pulse (Spine / Core)</option>
+                          <option value="zap">Zap / Lightning (Acute / Nerve)</option>
+                          <option value="shield">Shield (Joint / Bracing / MVA)</option>
+                          <option value="footprints">Footprints (Foot / Lower Extremity)</option>
+                          <option value="user-check">User Check (Pelvic / Posture)</option>
+                          <option value="sparkles">Sparkles (Headache / Wellness)</option>
+                          <option value="needle">Needle (Acupuncture / Dry Needling)</option>
+                          <option value="stethoscope">Stethoscope (Clinical Assessment)</option>
+                        </select>
+                      </div>
+
+                      <div className="adm-form-group" style={{ margin: 0 }}>
+                        <label className="adm-form-label">Condition Category Badge</label>
+                        <select
+                          className="adm-input"
+                          value={cond.category || "Spine & Back"}
+                          onChange={(e) => setCond({ ...cond, category: e.target.value })}
+                        >
+                          <option value="Spine & Back">Spine &amp; Back</option>
+                          <option value="Joint & Extremity">Joint &amp; Extremity</option>
+                          <option value="Sports Injury">Sports Injury</option>
+                          <option value="Head & Neck">Head &amp; Neck</option>
+                          <option value="Workplace & MVA">Workplace &amp; MVA</option>
+                          <option value="General Recovery">General Recovery</option>
+                        </select>
+                      </div>
                     </div>
 
                     <div>
                       <AdminImageUploader
-                        label="Card Thumbnail Image (Optional — leave empty for Badge only)"
-                        value={cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : (cond.heroImage || "")}
+                        label="Card Thumbnail Image (Optional — leave empty for clean Icon style)"
+                        value={cond.cardImage || ""}
                         altValue={cond.cardImageAlt || cond.seo?.cardImageAlt || ""}
                         onAltChange={(alt) =>
                           setCond({
@@ -1763,10 +1785,10 @@ function ConditionEditorModal({
                         }
                         folder="conditions"
                         placeholder="Upload thumbnail or enter image URL..."
-                        aspectRatioNote="Landscape 16:9 or 4:3 (Leave empty for Badge style)"
+                        aspectRatioNote="Landscape 16:9 or 4:3 (Leave empty for Icon style)"
                       />
                       <span style={{ fontSize: 11.5, color: "#64748b", marginTop: 4, display: "block" }}>
-                        Leave blank to show the clean category pill badge, or upload an image to display an image header on the condition card.
+                        Leave blank to show the clean Icon style, or upload an image to display an image thumbnail on the condition card.
                       </span>
                     </div>
                   </div>
@@ -1776,11 +1798,11 @@ function ConditionEditorModal({
                     <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 12 }}>
                       Live Preview on /conditions Directory
                     </div>
-                    {Boolean((cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : cond.heroImage) && (cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : cond.heroImage)?.trim() !== "") ? (
+                    {Boolean(cond.cardImage && cond.cardImage.trim() !== "") ? (
                       <div style={{ background: "#fff", border: "1px solid #e7edf1", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 20px rgba(18,60,80,0.06)", display: "flex", flexDirection: "column" }}>
                         <div style={{ height: 110, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb" }}>
                           <img
-                            src={(cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : cond.heroImage)!}
+                            src={cond.cardImage!}
                             alt={cond.name}
                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                             onError={(e) => {
@@ -1806,8 +1828,13 @@ function ConditionEditorModal({
                       </div>
                     ) : (
                       <div style={{ background: "#fff", border: "1px solid #e7edf1", borderRadius: 16, padding: 20, boxShadow: "0 6px 20px rgba(18,60,80,0.06)", display: "flex", flexDirection: "column" }}>
-                        <div style={{ display: "inline-block", background: "#f2f8fb", color: "#0e78a8", fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", padding: "3px 8px", borderRadius: 6, marginBottom: 10, width: "fit-content" }}>
-                          {cond.category || "General Recovery"}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                          <div style={{ width: 42, height: 42, borderRadius: 10, background: cond.iconBg || "#f2f8fb", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <ServiceIcon type={cond.iconType || "activity"} color={cond.iconColor || "#0e78a8"} size={22} />
+                          </div>
+                          <div style={{ background: "#f2f8fb", color: "#0e78a8", fontSize: 11, fontWeight: 700, textTransform: "uppercase", padding: "3px 8px", borderRadius: 6 }}>
+                            {cond.category || "General Recovery"}
+                          </div>
                         </div>
                         <h4 style={{ fontSize: 17, fontWeight: 700, margin: "0 0 6px 0", color: "#1d2b34" }}>
                           {cond.name || "Condition Name"}

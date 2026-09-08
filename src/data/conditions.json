@@ -63,7 +63,7 @@
     "name": "Leg pain",
     "shortDescription": "Customize the summary paragraph, condition category badge, and card thumbnail that appear inside the card tiles on the Homepage",
     "description": "",
-    "heroImage": "/images/clinic/reception-three.jpg",
+    "heroImage": null,
     "sideImage": null,
     "cardImage": null,
     "ctaText": "Book Assessment Online",
