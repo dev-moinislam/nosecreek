@@ -704,7 +704,18 @@ export default function HomeLiveView({
 
   return (
     <div style={{ width: "100%", overflowX: "hidden" }}>
-      {sectionOrder.map((sectionKey) => renderSectionByKey(sectionKey))}
+      {sectionOrder.map((sectionKey, index) => {
+        const rendered = renderSectionByKey(sectionKey);
+        if (!rendered) return null;
+        if (index > 1) {
+          return (
+            <div key={sectionKey} style={{ contentVisibility: "auto", containIntrinsicSize: "0 600px" }}>
+              {rendered}
+            </div>
+          );
+        }
+        return rendered;
+      })}
     </div>
   );
 }
