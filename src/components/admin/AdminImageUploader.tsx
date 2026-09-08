@@ -32,7 +32,14 @@ export default function AdminImageUploader({
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [showUrlInput, setShowUrlInput] = useState(!value);
+  const [internalAlt, setInternalAlt] = useState(altValue || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (altValue !== undefined) {
+      setInternalAlt(altValue);
+    }
+  }, [altValue]);
 
   const handleFileUpload = async (file: File) => {
     if (!file) return;
@@ -318,35 +325,37 @@ export default function AdminImageUploader({
           </div>
         )}
 
-        {/* SEO Alt Text Input */}
-        {(onAltChange || showAltInput) && Boolean(value) && (
-          <div style={{ marginTop: 6, paddingTop: 8, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <label style={{ fontSize: 11.5, fontWeight: 700, color: "#334155", display: "flex", alignItems: "center", gap: 5 }}>
-                <span>🔍</span> Image Alt Text (SEO)
-              </label>
-              <span style={{ fontSize: 11, color: "#94a3b8" }}>
-                Descriptive text for Google Images &amp; screen readers
-              </span>
-            </div>
-            <input
-              type="text"
-              value={altValue || ""}
-              onChange={(e) => onAltChange?.(e.target.value)}
-              placeholder="e.g. Physiotherapy assessment at Nose Creek clinic Calgary"
-              style={{
-                width: "100%",
-                padding: "6px 10px",
-                borderRadius: 6,
-                border: "1px solid #cbd5e1",
-                fontSize: 12,
-                color: "#1e293b",
-                background: "#f8fafc",
-                outline: "none"
-              }}
-            />
+        {/* SEO Alt Text Input - Always visible at all times */}
+        <div style={{ marginTop: 6, paddingTop: 8, borderTop: "1px dashed #cbd5e1", display: "flex", flexDirection: "column", gap: 5 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <label style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 13 }}>🏷️</span> Image Alt Text <span style={{ fontSize: 11, fontWeight: 600, color: "#0284c7", background: "#e0f2fe", padding: "1px 6px", borderRadius: 4 }}>SEO</span>
+            </label>
+            <span style={{ fontSize: 11, color: "#64748b" }}>
+              Screen readers &amp; Google rank
+            </span>
           </div>
-        )}
+          <input
+            type="text"
+            value={altValue !== undefined ? (altValue || "") : internalAlt}
+            onChange={(e) => {
+              const val = e.target.value;
+              setInternalAlt(val);
+              onAltChange?.(val);
+            }}
+            placeholder="e.g. Physiotherapy assessment at Nose Creek clinic Calgary"
+            style={{
+              width: "100%",
+              padding: "7px 10px",
+              borderRadius: 6,
+              border: "1px solid #cbd5e1",
+              fontSize: 12.5,
+              color: "#0f172a",
+              background: "#ffffff",
+              outline: "none"
+            }}
+          />
+        </div>
       </div>
 
       {uploadError && (

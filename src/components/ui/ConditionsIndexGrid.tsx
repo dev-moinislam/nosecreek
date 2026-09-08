@@ -68,7 +68,7 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
               <div style={{ height: 160, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb", marginBottom: 18 }}>
                 <img
                   src={cardImg!}
-                  alt={condition.name}
+                  alt={condition.cardImageAlt || condition.seo?.cardImageAlt || condition.heroImageAlt || condition.seo?.heroImageAlt || condition.name}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
                 {condition.category && (

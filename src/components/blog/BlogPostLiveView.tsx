@@ -102,7 +102,7 @@ export default function BlogPostLiveView({ initialPost, allPosts }: BlogPostLive
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={post.featuredImage}
-                alt={post.title}
+                alt={post.featuredImageAlt || post.seo?.featuredImageAlt || post.title}
                 referrerPolicy="no-referrer"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />

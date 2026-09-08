@@ -84,7 +84,7 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
                 <div style={{ height: 160, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb", marginBottom: 20 }}>
                   <img
                     src={imageSrc!}
-                    alt={svc.title}
+                    alt={svc.cardImageAlt || svc.seo?.cardImageAlt || svc.heroImageAlt || svc.seo?.heroImageAlt || svc.title}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = "none";

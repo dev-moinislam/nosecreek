@@ -99,7 +99,7 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={member.profileImage}
-                alt={member.name}
+                alt={member.profileImageAlt || member.seo?.profileImageAlt || (member.socialLinks as any)?.profileImageAlt || `${member.name} - ${member.role} at Nose Creek Physiotherapy Calgary`}
                 referrerPolicy="no-referrer"
                 style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
               />

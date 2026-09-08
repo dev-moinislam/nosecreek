@@ -280,8 +280,14 @@ export default function AdminServicesPage() {
             hidden_sections: updatedService.hiddenSections || [],
             section_order: updatedService.sectionOrder || defaultServiceSectionOrder,
             related_services: updatedService.relatedServices || [],
-            related_conditions: updatedService.relatedConditions || [],
-            seo: { ...(updatedService.seo || {}), cardImage: updatedService.cardImage || null, sectionsData: updatedService.sectionsData || {} },
+            seo: {
+              ...(updatedService.seo || {}),
+              cardImage: updatedService.cardImage || null,
+              sectionsData: updatedService.sectionsData || {},
+              heroImageAlt: updatedService.heroImageAlt || updatedService.seo?.heroImageAlt || "",
+              sideImageAlt: updatedService.sideImageAlt || updatedService.seo?.sideImageAlt || "",
+              cardImageAlt: updatedService.cardImageAlt || updatedService.seo?.cardImageAlt || ""
+            },
             is_published: true,
             updated_at: new Date().toISOString()
           };
@@ -1453,6 +1459,24 @@ function ServiceEditorModal({
                   <AdminImageUploader
                     label="Hero Banner Image"
                     value={service.heroImage || ""}
+                    altValue={service.heroImageAlt || service.seo?.heroImageAlt || service.sectionsData?.hero?.imageAlt || ""}
+                    onAltChange={(alt) =>
+                      setService({
+                        ...service,
+                        heroImageAlt: alt,
+                        seo: {
+                          ...(service.seo || {}),
+                          heroImageAlt: alt
+                        },
+                        sectionsData: {
+                          ...(service.sectionsData || {}),
+                          hero: {
+                            ...(service.sectionsData?.hero || {}),
+                            imageAlt: alt
+                          }
+                        }
+                      })
+                    }
                     onChange={(url) =>
                       setService({
                         ...service,
@@ -1663,6 +1687,17 @@ function ServiceEditorModal({
                       <AdminImageUploader
                         label="Card Thumbnail Image (Optional — leave empty for clean Icon style)"
                         value={service.cardImage || ""}
+                        altValue={service.cardImageAlt || service.seo?.cardImageAlt || ""}
+                        onAltChange={(alt) =>
+                          setService({
+                            ...service,
+                            cardImageAlt: alt,
+                            seo: {
+                              ...(service.seo || {}),
+                              cardImageAlt: alt
+                            }
+                          })
+                        }
                         onChange={(url) =>
                           setService({
                             ...service,

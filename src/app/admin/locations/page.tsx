@@ -378,6 +378,19 @@ function LocationEditorModal({
               <AdminImageUploader
                 label="Clinic Facility Photo / Exterior Banner"
                 value={(loc.images && loc.images[0]) || loc.image || ""}
+                altValue={(loc.imagesAlt && loc.imagesAlt[0]) || loc.seo?.imageAlt || ""}
+                onAltChange={(alt) => {
+                  const updatedAlts = loc.imagesAlt && loc.imagesAlt.length > 0 ? [...loc.imagesAlt] : [""];
+                  updatedAlts[0] = alt;
+                  setLoc({
+                    ...loc,
+                    imagesAlt: updatedAlts,
+                    seo: {
+                      ...(loc.seo || {}),
+                      imageAlt: alt
+                    }
+                  });
+                }}
                 onChange={(url) => {
                   const updatedImages = loc.images && loc.images.length > 0 ? [...loc.images] : [""];
                   updatedImages[0] = url;

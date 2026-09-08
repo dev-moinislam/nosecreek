@@ -9,6 +9,7 @@ import LivePreviewPane from "@/components/admin/LivePreviewPane";
 import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
 import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomizerModal";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 import {
   SlidersIcon,
   LayoutIcon,
@@ -699,19 +700,16 @@ export default function AdminHomePage() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <label className="adm-label">Hero Photo URL</label>
-                  <input
-                    type="text"
-                    className="adm-input"
+                  <AdminImageUploader
+                    label="Hero Banner Photo"
                     value={tempData.hero?.image || ""}
-                    onChange={(e) => setTempData({ ...tempData, hero: { ...tempData.hero, image: e.target.value } })}
+                    altValue={(tempData.hero as any)?.imageAlt || ""}
+                    onAltChange={(alt) => setTempData({ ...tempData, hero: { ...tempData.hero, imageAlt: alt } as any })}
+                    onChange={(url) => setTempData({ ...tempData, hero: { ...tempData.hero, image: url } })}
+                    folder="homepage"
+                    placeholder="/images/clinic/reception-three.jpg"
+                    aspectRatioNote="Landscape 16:9 recommended"
                   />
-                  {tempData.hero?.image && (
-                    <div style={{ marginTop: 8 }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={tempData.hero.image} alt="Hero preview" style={{ height: 60, borderRadius: 8, objectFit: "cover" }} />
-                    </div>
-                  )}
                 </div>
                 <div>
                   <label className="adm-label">Google Review Count Badge</label>
@@ -960,16 +958,19 @@ export default function AdminHomePage() {
               </div>
 
               <div>
-                <label className="adm-label">Primary Clinic Photo URL</label>
-                <input
-                  type="text"
-                  className="adm-input"
+                <AdminImageUploader
+                  label="Primary Clinic Photo"
                   value={tempData.aboutClinic?.images?.[0] || ""}
-                  onChange={(e) => {
+                  altValue={(tempData.aboutClinic as any)?.imageAlt || ""}
+                  onAltChange={(alt) => setTempData({ ...tempData, aboutClinic: { ...tempData.aboutClinic!, imageAlt: alt } as any })}
+                  onChange={(url) => {
                     const imgs = [...(tempData.aboutClinic?.images || [])];
-                    imgs[0] = e.target.value;
+                    imgs[0] = url;
                     setTempData({ ...tempData, aboutClinic: { ...tempData.aboutClinic!, images: imgs } });
                   }}
+                  folder="homepage"
+                  placeholder="/images/clinic/clinic-mobile.jpg"
+                  aspectRatioNote="Landscape 16:9 or 4:3 recommended"
                 />
               </div>
             </div>
@@ -1039,19 +1040,16 @@ export default function AdminHomePage() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <label className="adm-label">Director Circular Photo URL</label>
-                  <input
-                    type="text"
-                    className="adm-input"
+                  <AdminImageUploader
+                    label="Director Photo"
                     value={tempData.director?.image || ""}
-                    onChange={(e) => setTempData({ ...tempData, director: { ...tempData.director!, image: e.target.value } })}
+                    altValue={(tempData.director as any)?.imageAlt || ""}
+                    onAltChange={(alt) => setTempData({ ...tempData, director: { ...tempData.director!, imageAlt: alt } as any })}
+                    onChange={(url) => setTempData({ ...tempData, director: { ...tempData.director!, image: url } })}
+                    folder="team"
+                    placeholder="/images/team/blair-schachterle.jpg"
+                    aspectRatioNote="Square or portrait 1:1"
                   />
-                  {tempData.director?.image && (
-                    <div style={{ marginTop: 8 }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={tempData.director.image} alt="Director preview" style={{ width: 50, height: 50, borderRadius: "50%", objectFit: "cover" }} />
-                    </div>
-                  )}
                 </div>
                 <div>
                   <label className="adm-label">Button Destination URL</label>

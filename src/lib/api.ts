@@ -112,8 +112,11 @@ export async function getServices(): Promise<Service[]> {
             shortDescription: d.short_description || localItem?.shortDescription || "",
             description: d.description || localItem?.description || "",
             heroImage: d.hero_image || localItem?.heroImage,
+            heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
             sideImage: d.side_image || localItem?.sideImage,
+            sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
             cardImage: d.card_image || d.cardImage || d.seo?.cardImage || localItem?.cardImage || null,
+            cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
             iconType: d.icon_type || localItem?.iconType,
             iconBg: d.icon_bg || localItem?.iconBg,
             iconColor: d.icon_color || localItem?.iconColor,
@@ -173,8 +176,11 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
           shortDescription: data.short_description || localItem?.shortDescription || "",
           description: data.description || localItem?.description || "",
           heroImage: data.hero_image || localItem?.heroImage,
+          heroImageAlt: data.hero_image_alt || data.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
           sideImage: data.side_image || localItem?.sideImage,
+          sideImageAlt: data.side_image_alt || data.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
           cardImage: data.card_image || data.cardImage || data.seo?.cardImage || localItem?.cardImage || null,
+          cardImageAlt: data.card_image_alt || data.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
           iconType: data.icon_type || localItem?.iconType,
           iconBg: data.icon_bg || localItem?.iconBg,
           iconColor: data.icon_color || localItem?.iconColor,
@@ -253,6 +259,7 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
             shortBio: d.short_bio || "",
             fullBio: d.full_bio || "",
             profileImage: d.profile_image || "/images/team/default.jpg",
+            profileImageAlt: d.profile_image_alt || d.seo?.profileImageAlt || d.social_links?.profileImageAlt || localItem?.profileImageAlt || localItem?.seo?.profileImageAlt || "",
             specialties: d.specialties || localItem?.specialties || [],
             credentials: d.credentials || localItem?.credentials || [],
             education: d.education || localItem?.education || [],
@@ -297,14 +304,17 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         .eq("is_published", true)
         .order("published_at", { ascending: false });
       if (!error && data && data.length > 0) {
-        return data.map((d: any) => ({
-          id: d.id,
+        return data.map((d: any) => {
+          const localItem = blogList.find((b) => b.slug === d.slug);
+          return {
+            id: d.id,
           slug: d.slug,
           title: d.title,
           excerpt: d.excerpt || "",
           content: d.content || "",
           contentBlocks: d.content_blocks || d.contentBlocks || d.seo?.contentBlocks || [],
           featuredImage: d.featured_image || "/images/blog/default.jpg",
+          featuredImageAlt: d.featured_image_alt || d.seo?.featuredImageAlt || localItem?.featuredImageAlt || localItem?.seo?.featuredImageAlt || "",
           author: d.author || "Blair Schachterle",
           category: d.category || "General",
           tags: d.tags || [],
@@ -312,7 +322,8 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
           readingTime: d.reading_time || "4 min",
           relatedPosts: d.related_posts || [],
           seo: d.seo || {}
-        }));
+        };
+      });
       }
     } catch (e) {
       console.warn("Supabase fetch failed for blog posts, using local fallback", e);
@@ -392,8 +403,11 @@ export async function getConditions(): Promise<Condition[]> {
             shortDescription: d.short_description || localItem?.shortDescription || "",
             description: d.description || localItem?.description || "",
             heroImage: d.hero_image || localItem?.heroImage,
+            heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
             sideImage: d.side_image || localItem?.sideImage,
+            sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
             cardImage: d.card_image || d.cardImage || d.seo?.cardImage || localItem?.cardImage || null,
+            cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
             ctaText: d.cta_text || localItem?.ctaText,
             ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
             benefits: d.benefits || localItem?.benefits || [],
@@ -447,8 +461,11 @@ export async function getConditionBySlug(slug: string): Promise<Condition | unde
           shortDescription: data.short_description || localItem?.shortDescription || "",
           description: data.description || localItem?.description || "",
           heroImage: data.hero_image || localItem?.heroImage,
+          heroImageAlt: data.hero_image_alt || data.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
           sideImage: data.side_image || localItem?.sideImage,
+          sideImageAlt: data.side_image_alt || data.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
           cardImage: data.card_image || data.cardImage || data.seo?.cardImage || localItem?.cardImage || null,
+          cardImageAlt: data.card_image_alt || data.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
           ctaText: data.cta_text || localItem?.ctaText,
           ctaMuted: data.cta_muted ?? localItem?.ctaMuted,
           benefits: data.benefits || localItem?.benefits || [],

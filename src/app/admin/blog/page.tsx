@@ -159,7 +159,8 @@ export default function AdminBlogPage() {
             is_published: true,
             seo: {
               ...(postToSave.seo || {}),
-              contentBlocks: postToSave.contentBlocks || []
+              contentBlocks: postToSave.contentBlocks || [],
+              featuredImageAlt: postToSave.featuredImageAlt || postToSave.seo?.featuredImageAlt || ""
             }
           };
 
@@ -911,6 +912,17 @@ function BlogEditModal({
                   <AdminImageUploader
                     label="Featured Image / Article Banner"
                     value={post.featuredImage || ""}
+                    altValue={post.featuredImageAlt || post.seo?.featuredImageAlt || ""}
+                    onAltChange={(alt) =>
+                      setPost({
+                        ...post,
+                        featuredImageAlt: alt,
+                        seo: {
+                          ...(post.seo || {}),
+                          featuredImageAlt: alt
+                        }
+                      })
+                    }
                     onChange={(url) => setPost({ ...post, featuredImage: url })}
                     folder="blog"
                     placeholder="/images/clinic/reception-three.jpg"
@@ -1210,6 +1222,8 @@ function BlogEditModal({
                             <AdminImageUploader
                               label="Section Photo"
                               value={block.image || ""}
+                              altValue={block.imageAlt || ""}
+                              onAltChange={(alt) => handleUpdateBlock(index, { imageAlt: alt })}
                               onChange={(url) => handleUpdateBlock(index, { image: url })}
                               folder="blog"
                               placeholder="/images/clinic/reception-three.jpg"

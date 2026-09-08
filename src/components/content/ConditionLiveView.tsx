@@ -292,7 +292,7 @@ export default function ConditionLiveView({
                   <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 24px 60px rgba(18,60,80,0.18)", aspectRatio: "4/3", background: "#e2e8f0" }}>
                     <img
                       src={cfg?.image || condition.heroImage || "/images/clinic/reception-three.jpg"}
-                      alt={`${condition.name} treatment Calgary`}
+                      alt={cfg?.imageAlt || condition.heroImageAlt || condition.seo?.heroImageAlt || `${condition.name} treatment Calgary`}
                       style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
                   </div>
@@ -372,13 +372,15 @@ export default function ConditionLiveView({
         const hasBottomImg = pos === "bottom" && image;
         const hasNoImg = pos === "none" || !image;
 
+        const overviewAlt = cfg?.imageAlt || condition.sideImageAlt || condition.seo?.sideImageAlt || `${condition.name} Clinical Overview - Nose Creek Physiotherapy Calgary`;
+
         return (
           <section key="clinical_overview" style={{ ...bgStyle, padding: "clamp(56px, 7vw, 96px) 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               
               {hasTopImg && (
                 <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
-                  <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               )}
 
@@ -392,7 +394,7 @@ export default function ConditionLiveView({
               >
                 {hasLeftImg && (
                   <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-                    <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
                 )}
 
@@ -442,14 +444,14 @@ export default function ConditionLiveView({
 
                 {hasRightImg && (
                   <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-                    <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
                 )}
               </div>
 
               {hasBottomImg && (
                 <div style={{ marginTop: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
-                  <img src={image!} alt="Clinical overview" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               )}
             </div>

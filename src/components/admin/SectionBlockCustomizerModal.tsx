@@ -374,6 +374,8 @@ export default function SectionBlockCustomizerModal({
               <AdminImageUploader
                 label="Side Photo & Media"
                 value={formData.image || ""}
+                altValue={formData.imageAlt || ""}
+                onAltChange={(alt) => setFormData({ ...formData, imageAlt: alt })}
                 onChange={(url) => setFormData({ ...formData, image: url })}
                 folder="homepage"
                 placeholder="/images/clinic/reception-one.jpg"

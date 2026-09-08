@@ -272,7 +272,14 @@ export default function AdminConditionsPage() {
           cta_text: cond.ctaText || "Book Assessment Online",
           cta_muted: cond.ctaMuted ?? false,
           sort_order: typeof (cond as any).sort_order === "number" ? (cond as any).sort_order : ((cond as any).order || 0),
-          seo: { ...(cond.seo || {}), cardImage: cond.cardImage || null, sectionsData: cond.sectionsData || {} },
+          seo: {
+            ...(cond.seo || {}),
+            cardImage: cond.cardImage || null,
+            sectionsData: cond.sectionsData || {},
+            heroImageAlt: cond.heroImageAlt || cond.seo?.heroImageAlt || "",
+            sideImageAlt: cond.sideImageAlt || cond.seo?.sideImageAlt || "",
+            cardImageAlt: cond.cardImageAlt || cond.seo?.cardImageAlt || ""
+          },
           is_published: true,
           updated_at: new Date().toISOString()
         };
@@ -1521,6 +1528,24 @@ function ConditionEditorModal({
                   <AdminImageUploader
                     label="Hero Banner Image"
                     value={cond.heroImage || ""}
+                    altValue={cond.heroImageAlt || cond.seo?.heroImageAlt || cond.sectionsData?.hero?.imageAlt || ""}
+                    onAltChange={(alt) =>
+                      setCond({
+                        ...cond,
+                        heroImageAlt: alt,
+                        seo: {
+                          ...(cond.seo || {}),
+                          heroImageAlt: alt
+                        },
+                        sectionsData: {
+                          ...(cond.sectionsData || {}),
+                          hero: {
+                            ...(cond.sectionsData?.hero || {}),
+                            imageAlt: alt
+                          }
+                        }
+                      })
+                    }
                     onChange={(url) =>
                       setCond({
                         ...cond,
@@ -1715,7 +1740,27 @@ function ConditionEditorModal({
                       <AdminImageUploader
                         label="Card Thumbnail Image (Optional — leave empty for Badge only)"
                         value={cond.cardImage !== undefined && cond.cardImage !== null ? cond.cardImage : (cond.heroImage || "")}
-                        onChange={(url) => setCond({ ...cond, cardImage: url })}
+                        altValue={cond.cardImageAlt || cond.seo?.cardImageAlt || ""}
+                        onAltChange={(alt) =>
+                          setCond({
+                            ...cond,
+                            cardImageAlt: alt,
+                            seo: {
+                              ...(cond.seo || {}),
+                              cardImageAlt: alt
+                            }
+                          })
+                        }
+                        onChange={(url) =>
+                          setCond({
+                            ...cond,
+                            cardImage: url,
+                            seo: {
+                              ...(cond.seo || {}),
+                              cardImage: url
+                            }
+                          })
+                        }
                         folder="conditions"
                         placeholder="Upload thumbnail or enter image URL..."
                         aspectRatioNote="Landscape 16:9 or 4:3 (Leave empty for Badge style)"

@@ -228,7 +228,12 @@ export default function AdminTeamPage() {
           booking_url: member.bookingUrl || null,
           social_links: {
             ...(member.socialLinks || {}),
-            bookingCtaText: member.bookingCtaText || null
+            bookingCtaText: member.bookingCtaText || null,
+            profileImageAlt: member.profileImageAlt || member.seo?.profileImageAlt || null
+          },
+          seo: {
+            ...(member.seo || {}),
+            profileImageAlt: member.profileImageAlt || member.seo?.profileImageAlt || ""
           },
           featured: member.featured || false,
           is_director: member.isDirector || false,
@@ -919,6 +924,17 @@ function TeamEditorModal({
               <AdminImageUploader
                 label="Profile Photo (Headshot)"
                 value={member.profileImage || ""}
+                altValue={member.profileImageAlt || member.seo?.profileImageAlt || ""}
+                onAltChange={(alt) =>
+                  setMember({
+                    ...member,
+                    profileImageAlt: alt,
+                    seo: {
+                      ...(member.seo || {}),
+                      profileImageAlt: alt
+                    }
+                  })
+                }
                 onChange={(url) => setMember({ ...member, profileImage: url })}
                 folder="team"
                 placeholder="/images/team/blair-schachterle.jpg"

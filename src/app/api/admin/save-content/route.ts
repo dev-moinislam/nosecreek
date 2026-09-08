@@ -36,9 +36,50 @@ export async function POST(req: Request) {
                   await supabase.from("services").delete().eq("id", d.id);
                 }
               }
+
+              // Upsert published services to Supabase
+              const sRows = data.map((s: any, index: number) => ({
+                id: s.id || `srv-${s.slug}`,
+                slug: s.slug,
+                title: s.title,
+                short_description: s.shortDescription || s.short_description || null,
+                description: s.description || "",
+                hero_image: s.heroImage || s.hero_image || null,
+                side_image: s.sideImage || s.side_image || null,
+                icon_type: s.iconType || s.icon_type || "stethoscope",
+                icon_bg: s.iconBg || s.icon_bg || "#e9f5fb",
+                icon_color: s.iconColor || s.icon_color || "#1c9fd8",
+                cta_text: s.ctaText || s.cta_text || "Book Online",
+                cta_muted: s.ctaMuted ?? s.cta_muted ?? false,
+                benefits: s.benefits || [],
+                symptoms: s.symptoms || [],
+                treatment_approach: s.treatmentApproach || s.treatment_approach || [],
+                custom_sections: s.customSections || s.custom_sections || [],
+                sections_data: s.sectionsData || s.sections_data || {},
+                faqs: s.faqs || [],
+                hidden_sections: s.hiddenSections || s.hidden_sections || [],
+                section_order: s.sectionOrder || s.section_order || [],
+                related_services: s.relatedServices || s.related_services || [],
+                related_conditions: s.relatedConditions || s.related_conditions || [],
+                team_members: s.teamMembers || s.team_members || [],
+                locations: s.locations || s.locations || [],
+                testimonials: s.testimonials || s.testimonials || [],
+                sort_order: typeof s.sort_order === "number" ? s.sort_order : (typeof s.order === "number" ? s.order : index),
+                seo: {
+                  ...(s.seo || {}),
+                  cardImage: s.cardImage || s.card_image || null,
+                  sectionsData: s.sectionsData || {},
+                  heroImageAlt: s.heroImageAlt || s.hero_image_alt || s.seo?.heroImageAlt || "",
+                  sideImageAlt: s.sideImageAlt || s.side_image_alt || s.seo?.sideImageAlt || "",
+                  cardImageAlt: s.cardImageAlt || s.card_image_alt || s.seo?.cardImageAlt || ""
+                },
+                is_published: s.is_published !== false,
+                updated_at: new Date().toISOString()
+              }));
+              await supabase.from("services").upsert(sRows, { onConflict: "slug" });
             }
           } catch (supaErr) {
-            console.warn("Backend Supabase services delete sync warning:", supaErr);
+            console.warn("Backend Supabase services sync warning:", supaErr);
           }
         }
 
@@ -122,7 +163,14 @@ export async function POST(req: Request) {
                 cta_text: c.ctaText || c.cta_text || "Book Assessment Online",
                 cta_muted: c.ctaMuted ?? c.cta_muted ?? false,
                 sort_order: typeof c.sort_order === "number" ? c.sort_order : (typeof c.order === "number" ? c.order : index),
-                seo: { ...(c.seo || {}), cardImage: c.cardImage || c.card_image || null, sectionsData: c.sectionsData || {} },
+                seo: {
+                  ...(c.seo || {}),
+                  cardImage: c.cardImage || c.card_image || null,
+                  sectionsData: c.sectionsData || {},
+                  heroImageAlt: c.heroImageAlt || c.hero_image_alt || c.seo?.heroImageAlt || "",
+                  sideImageAlt: c.sideImageAlt || c.side_image_alt || c.seo?.sideImageAlt || "",
+                  cardImageAlt: c.cardImageAlt || c.card_image_alt || c.seo?.cardImageAlt || ""
+                },
                 is_published: c.is_published !== false,
                 updated_at: new Date().toISOString()
               }));
@@ -162,7 +210,12 @@ export async function POST(req: Request) {
             booking_url: member.bookingUrl || null,
             social_links: {
               ...(member.socialLinks || {}),
-              bookingCtaText: member.bookingCtaText || null
+              bookingCtaText: member.bookingCtaText || null,
+              profileImageAlt: member.profileImageAlt || member.profile_image_alt || member.seo?.profileImageAlt || null
+            },
+            seo: {
+              ...(member.seo || {}),
+              profileImageAlt: member.profileImageAlt || member.profile_image_alt || member.seo?.profileImageAlt || ""
             },
             featured: member.featured || false,
             is_director: member.isDirector || false,

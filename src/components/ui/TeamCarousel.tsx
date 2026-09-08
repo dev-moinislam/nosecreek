@@ -85,7 +85,7 @@ export default function TeamCarousel({ members, customEyebrow, customTitle }: Te
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={m.profileImage}
-                  alt={m.name}
+                  alt={m.profileImageAlt || m.seo?.profileImageAlt || (m.socialLinks as any)?.profileImageAlt || `${m.name} - ${m.role}`}
                   loading="lazy"
                   referrerPolicy="no-referrer"
                   style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", objectPosition: "top", background: "#eef3f6", display: "block" }}

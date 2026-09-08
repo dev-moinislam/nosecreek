@@ -102,8 +102,11 @@ export interface Service {
   shortDescription?: string | null;
   description: string;
   heroImage?: string | null;
+  heroImageAlt?: string;
   sideImage?: string | null;
+  sideImageAlt?: string;
   cardImage?: string | null;
+  cardImageAlt?: string;
   iconType?: string;
   iconBg?: string;
   iconColor?: string;
@@ -135,6 +138,7 @@ export interface TeamMember {
   shortBio?: string;
   fullBio?: string;
   profileImage: string;
+  profileImageAlt?: string;
   specialties?: string[];
   credentials?: string[];
   education?: string[];
@@ -167,6 +171,7 @@ export interface BlogContentBlock {
   subtitle?: string;
   bullets?: string[];
   image?: string | null;
+  imageAlt?: string;
   imagePosition?: "left" | "right" | "top" | "bottom" | "none";
   background?: "white" | "light" | "teal" | "gradient";
   align?: "left" | "center" | "right";
@@ -184,6 +189,7 @@ export interface BlogPost {
   content: string;
   contentBlocks?: BlogContentBlock[];
   featuredImage: string;
+  featuredImageAlt?: string;
   author: string;
   category: string;
   tags?: string[];
@@ -214,6 +220,7 @@ export interface Location {
   testimonials: string[]; // ids
   description: string;
   images: string[];
+  imagesAlt?: string[];
   bookingUrl: string;
   seo: SEOData;
 }
@@ -225,8 +232,11 @@ export interface Condition {
   shortDescription?: string | null;
   description: string;
   heroImage?: string | null;
+  heroImageAlt?: string;
   sideImage?: string | null;
+  sideImageAlt?: string;
   cardImage?: string | null;
+  cardImageAlt?: string;
   ctaText?: string;
   ctaHref?: string;
   ctaMuted?: boolean;
