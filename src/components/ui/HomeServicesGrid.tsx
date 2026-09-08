@@ -20,38 +20,41 @@ export default function HomeServicesGrid({ initialServices }: HomeServicesGridPr
   useEffect(() => {
     let isMounted = true;
 
-    async function syncServices() {
-      try {
-        const fresh = await getServices();
-        let list = Array.isArray(fresh) && fresh.length > 0 ? fresh : (initialServices || (defaultServicesData as Service[]));
-
-        if (typeof window !== "undefined") {
-          const saved = localStorage.getItem("adm_services");
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              if (Array.isArray(parsed)) {
-                list = parsed;
-              }
-            } catch {}
-          }
+    function syncServices(isBackgroundFetch = false) {
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("adm_services");
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && isMounted) {
+              setServices(parsed);
+              return;
+            }
+          } catch {}
         }
+      }
 
-        if (isMounted) {
-          setServices(list);
-        }
-      } catch (err) {
-        console.warn("Failed to sync services in HomeServicesGrid", err);
+      // Only fetch from API if not provided via props or if explicit background sync is needed
+      if (isBackgroundFetch || !initialServices || initialServices.length === 0) {
+        getServices()
+          .then((fresh) => {
+            if (isMounted && Array.isArray(fresh) && fresh.length > 0) {
+              setServices(fresh);
+            }
+          })
+          .catch(() => {});
       }
     }
 
-    syncServices();
-    window.addEventListener("servicesUpdated", syncServices);
-    window.addEventListener("storage", syncServices);
+    syncServices(false);
+
+    const handleUpdate = () => syncServices(true);
+    window.addEventListener("servicesUpdated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
     return () => {
       isMounted = false;
-      window.removeEventListener("servicesUpdated", syncServices);
-      window.removeEventListener("storage", syncServices);
+      window.removeEventListener("servicesUpdated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
     };
   }, [initialServices]);
 

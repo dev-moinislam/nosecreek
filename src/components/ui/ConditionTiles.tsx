@@ -17,7 +17,7 @@ export default function ConditionTiles({ conditions }: ConditionTilesProps) {
   );
 
   useEffect(() => {
-    function sync() {
+    function sync(isBackgroundFetch = false) {
       try {
         const saved = localStorage.getItem("adm_conditions");
         if (saved) {
@@ -27,22 +27,25 @@ export default function ConditionTiles({ conditions }: ConditionTilesProps) {
             return;
           }
         }
-        fetch("/api/content?type=conditions", { cache: "no-store" })
-          .then((r) => r.json())
-          .then((list) => {
-            if (Array.isArray(list)) setDisplayConditions(list);
-          })
-          .catch(() => {});
+        if (isBackgroundFetch || !conditions || conditions.length === 0) {
+          fetch("/api/content?type=conditions", { cache: "no-store" })
+            .then((r) => r.json())
+            .then((list) => {
+              if (Array.isArray(list)) setDisplayConditions(list);
+            })
+            .catch(() => {});
+        }
       } catch {}
     }
-    sync();
-    window.addEventListener("conditionsUpdated", sync);
-    window.addEventListener("storage", sync);
+    sync(false);
+    const handleUpdate = () => sync(true);
+    window.addEventListener("conditionsUpdated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
     return () => {
-      window.removeEventListener("conditionsUpdated", sync);
-      window.removeEventListener("storage", sync);
+      window.removeEventListener("conditionsUpdated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
     };
-  }, []);
+  }, [conditions]);
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 16 }}>
