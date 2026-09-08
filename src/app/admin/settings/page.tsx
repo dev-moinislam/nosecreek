@@ -153,6 +153,14 @@ export default function AdminSettingsPage() {
       // 1. Supabase persistence
       if (isSupabaseConfigured && supabase) {
         try {
+          const { data: cur } = await supabase.from("site_settings").select("marketing").eq("id", "main").single();
+          const mergedMarketing = {
+            ...(cur?.marketing || {}),
+            ...formattedMarketing,
+            auth_credentials: cur?.marketing?.auth_credentials || (settingsData as any)?.marketing?.auth_credentials,
+            theme_colors: cur?.marketing?.theme_colors || (settingsData as any)?.marketing?.theme_colors
+          };
+
           await supabase.from("site_settings").upsert({
             id: "main",
             clinic_name: settings.clinicName,
@@ -167,7 +175,7 @@ export default function AdminSettingsPage() {
               ...(settings.seo || {}),
               favicon: settings.favicon || settings.seo?.favicon
             },
-            marketing: formattedMarketing
+            marketing: mergedMarketing
           });
         } catch (err: any) {
           console.warn("Supabase save error:", err);
@@ -176,10 +184,17 @@ export default function AdminSettingsPage() {
 
       // 2. Disk persistence via API route (updates src/data/settings.json)
       try {
+        const diskMarketing = {
+          ...formattedMarketing,
+          auth_credentials: (settingsData as any)?.marketing?.auth_credentials
+        };
         await fetch("/api/admin/save-content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "settings", data: fullPayload })
+          body: JSON.stringify({
+            type: "settings",
+            data: { ...fullPayload, marketing: diskMarketing }
+          })
         });
       } catch (err) {
         console.warn("Disk save failed", err);

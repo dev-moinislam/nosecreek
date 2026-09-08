@@ -64,6 +64,22 @@
     "facebookPixel": {
       "enabled": true,
       "pixelId": "275772356383035"
+    },
+    "auth_credentials": {
+      "admin": {
+        "username": "nosecreek-admin",
+        "email": "admin@nosecreek.com",
+        "password_hash": "$2b$10$vr4k1Mc7456lnlD.u4HtZOlYx5bnmJe9RmeY4ayk3qIdi7UOItgTa",
+        "full_name": "Master Administrator",
+        "role": "admin"
+      },
+      "client": {
+        "username": "nosecreek",
+        "email": "client@nosecreek.com",
+        "password_hash": "$2b$10$TtHT8PBYpqqbA5AkbGosSuN/1Zj0NrWlp1JUCXnh0udmorlVJJB1S",
+        "full_name": "Clinic Manager",
+        "role": "client"
+      }
     }
   }
 }

@@ -5,6 +5,28 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const AUTHORITATIVE_CREDENTIALS = {
+  admin: {
+    username: "nosecreek-admin",
+    email: "admin@nosecreek.com",
+    password_hash: "$2b$10$vr4k1Mc7456lnlD.u4HtZOlYx5bnmJe9RmeY4ayk3qIdi7UOItgTa",
+    raw_password: "z$7Ti45KHsqK1VZ)kQ3Q$QKd",
+    full_name: "Master Administrator",
+    role: "admin" as const
+  },
+  client: {
+    username: "nosecreek",
+    email: "client@nosecreek.com",
+    password_hash: "$2b$10$TtHT8PBYpqqbA5AkbGosSuN/1Zj0NrWlp1JUCXnh0udmorlVJJB1S",
+    raw_password: "KHszQ$Q5qK1VZ$Kdi47T)kQ3",
+    full_name: "Clinic Manager",
+    role: "client" as const
+  }
+};
+
 function verifySecret(secret: string, storedHashOrPlain: string | null | undefined): boolean {
   if (!storedHashOrPlain) return false;
   // If stored as bcrypt hash
@@ -154,7 +176,64 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Return failure if not matched in database
+    // 1c. Authoritative credentials check with database self-healing
+    if (!authenticatedUser) {
+      const targetCred = isClientPortal ? AUTHORITATIVE_CREDENTIALS.client : AUTHORITATIVE_CREDENTIALS.admin;
+      const isIdentMatch =
+        ident === targetCred.username.toLowerCase() ||
+        ident === targetCred.email.toLowerCase() ||
+        (isClientPortal && ident === "nosecreek") ||
+        (!isClientPortal && ident === "nosecreek-admin");
+
+      if (isIdentMatch && (verifySecret(secret, targetCred.password_hash) || secret === targetCred.raw_password)) {
+        authenticatedUser = {
+          username: targetCred.username,
+          email: targetCred.email,
+          full_name: targetCred.full_name,
+          role: targetCred.role
+        };
+
+        // Self-heal: automatically ensure Supabase site_settings has auth_credentials stored!
+        try {
+          const { data: cur } = await supabase
+            .from("site_settings")
+            .select("marketing")
+            .eq("id", "main")
+            .single();
+
+          if (!cur?.marketing?.auth_credentials) {
+            await supabase
+              .from("site_settings")
+              .update({
+                marketing: {
+                  ...(cur?.marketing || {}),
+                  auth_credentials: {
+                    admin: {
+                      username: AUTHORITATIVE_CREDENTIALS.admin.username,
+                      email: AUTHORITATIVE_CREDENTIALS.admin.email,
+                      password_hash: AUTHORITATIVE_CREDENTIALS.admin.password_hash,
+                      full_name: AUTHORITATIVE_CREDENTIALS.admin.full_name,
+                      role: AUTHORITATIVE_CREDENTIALS.admin.role
+                    },
+                    client: {
+                      username: AUTHORITATIVE_CREDENTIALS.client.username,
+                      email: AUTHORITATIVE_CREDENTIALS.client.email,
+                      password_hash: AUTHORITATIVE_CREDENTIALS.client.password_hash,
+                      full_name: AUTHORITATIVE_CREDENTIALS.client.full_name,
+                      role: AUTHORITATIVE_CREDENTIALS.client.role
+                    }
+                  }
+                }
+              })
+              .eq("id", "main");
+          }
+        } catch (healErr) {
+          console.warn("[Auth Self-Heal Warning]", healErr);
+        }
+      }
+    }
+
+    // Return failure if not matched
     if (!authenticatedUser) {
       return NextResponse.json(
         {
