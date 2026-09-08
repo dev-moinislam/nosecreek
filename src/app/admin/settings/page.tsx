@@ -37,6 +37,7 @@ export default function AdminSettingsPage() {
     };
   });
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   useEffect(() => {
@@ -122,7 +123,8 @@ export default function AdminSettingsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveStatus("Saving...");
+    setIsSaving(true);
+    setSaveStatus(null);
 
     const gtmIdsArray = (marketing.gtm.containerId || "")
       .split(",")
@@ -147,56 +149,62 @@ export default function AdminSettingsPage() {
       marketing: formattedMarketing
     };
 
-    // 1. Supabase persistence
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from("site_settings").upsert({
-          id: "main",
-          clinic_name: settings.clinicName,
-          logo_text: settings.logoText,
-          contact: settings.contact,
-          opening_hours: settings.openingHours,
-          social_links: settings.socialLinks,
-          booking_url: settings.bookingUrl,
-          primary_cta: settings.primaryCTA,
-          footer_content: settings.footerContent,
-          seo: {
-            ...(settings.seo || {}),
-            favicon: settings.favicon || settings.seo?.favicon
-          },
-          marketing: formattedMarketing
-        });
-      } catch (err: any) {
-        console.warn("Supabase save error:", err);
-      }
-    }
-
-    // 2. Disk persistence via API route (updates src/data/settings.json)
     try {
-      await fetch("/api/admin/save-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "settings", data: fullPayload })
-      });
-    } catch (err) {
-      console.warn("Disk save failed", err);
-    }
+      // 1. Supabase persistence
+      if (isSupabaseConfigured && supabase) {
+        try {
+          await supabase.from("site_settings").upsert({
+            id: "main",
+            clinic_name: settings.clinicName,
+            logo_text: settings.logoText,
+            contact: settings.contact,
+            opening_hours: settings.openingHours,
+            social_links: settings.socialLinks,
+            booking_url: settings.bookingUrl,
+            primary_cta: settings.primaryCTA,
+            footer_content: settings.footerContent,
+            seo: {
+              ...(settings.seo || {}),
+              favicon: settings.favicon || settings.seo?.favicon
+            },
+            marketing: formattedMarketing
+          });
+        } catch (err: any) {
+          console.warn("Supabase save error:", err);
+        }
+      }
 
-    // 3. Local storage & real-time broadcast
-    if (typeof window !== "undefined") {
+      // 2. Disk persistence via API route (updates src/data/settings.json)
       try {
-        const curLocal = localStorage.getItem("adm_settings");
-        const parsed = curLocal ? JSON.parse(curLocal) : {};
-        localStorage.setItem(
-          "adm_settings",
-          JSON.stringify({ ...parsed, ...settings, settings, marketing })
-        );
-        window.dispatchEvent(new Event("settingsUpdated"));
-      } catch {}
-    }
+        await fetch("/api/admin/save-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "settings", data: fullPayload })
+        });
+      } catch (err) {
+        console.warn("Disk save failed", err);
+      }
 
-    setSaveStatus("✓ Settings successfully saved to Database, Files, and Live Site!");
-    setTimeout(() => setSaveStatus(null), 4000);
+      // 3. Local storage & real-time broadcast
+      if (typeof window !== "undefined") {
+        try {
+          const curLocal = localStorage.getItem("adm_settings");
+          const parsed = curLocal ? JSON.parse(curLocal) : {};
+          localStorage.setItem(
+            "adm_settings",
+            JSON.stringify({ ...parsed, ...settings, settings, marketing })
+          );
+          window.dispatchEvent(new Event("settingsUpdated"));
+        } catch {}
+      }
+
+      setSaveStatus("✓ Settings successfully saved to Database, Files, and Live Site!");
+      setTimeout(() => setSaveStatus(null), 15000);
+    } catch (err: any) {
+      setSaveStatus("❌ Error saving settings: " + (err?.message || "Unknown error"));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -596,12 +604,154 @@ export default function AdminSettingsPage() {
         </div>
 
         {/* Save Button Bar */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
-          <button type="submit" className="adm-btn adm-btn-success" style={{ padding: "12px 28px", fontSize: 15 }}>
-            💾 Save All Clinic Settings
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 16,
+            marginTop: 24,
+            padding: "16px 24px",
+            background: "#ffffff",
+            border: "1px solid #e2e8f0",
+            borderRadius: 12,
+            boxShadow: "0 2px 10px rgba(0,0,0,0.03)"
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 260 }}>
+            {saveStatus && (
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: saveStatus.includes("✓") ? "#dcfce7" : "#fee2e2",
+                  color: saveStatus.includes("✓") ? "#15803d" : "#b91c1c",
+                  border: saveStatus.includes("✓") ? "1px solid #86efac" : "1px solid #fca5a5",
+                  padding: "10px 18px",
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
+                }}
+              >
+                <span style={{ fontSize: 16 }}>{saveStatus.includes("✓") ? "✅" : "⚠️"}</span>
+                <span>{saveStatus}</span>
+              </div>
+            )}
+            {!saveStatus && isSaving && (
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, color: "var(--primary, #0e78a8)", fontWeight: 600, fontSize: 14 }}>
+                <svg
+                  style={{ animation: "spin 0.8s linear infinite", width: 18, height: 18 }}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.25" />
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+                <span>Synchronizing clinic settings and marketing tags...</span>
+              </div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="adm-btn adm-btn-success"
+            style={{
+              padding: "13px 32px",
+              fontSize: 15,
+              fontWeight: 700,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              cursor: isSaving ? "not-allowed" : "pointer",
+              opacity: isSaving ? 0.85 : 1,
+              transition: "all 0.2s ease",
+              boxShadow: "0 2px 6px rgba(22, 163, 74, 0.25)",
+              background: saveStatus?.includes("✓") ? "#15803d" : undefined
+            }}
+          >
+            {isSaving ? (
+              <>
+                <svg
+                  style={{
+                    animation: "spin 0.8s linear infinite",
+                    width: 18,
+                    height: 18
+                  }}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle cx="12" cy="12" r="10" stroke="#ffffff" strokeWidth="3" strokeOpacity="0.3" />
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+                <span>Saving Settings...</span>
+              </>
+            ) : saveStatus?.includes("✓") ? (
+              <>
+                <span style={{ fontSize: 17 }}>✅</span>
+                <span>Saved Successfully!</span>
+              </>
+            ) : (
+              <>
+                <span style={{ fontSize: 16 }}>💾</span>
+                <span>Save All Clinic Settings</span>
+              </>
+            )}
           </button>
         </div>
       </form>
+
+      {/* Floating Sticky Notification Toast */}
+      {saveStatus && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 32,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 99999,
+            background: saveStatus.includes("✓") ? "#15803d" : "#b91c1c",
+            color: "#ffffff",
+            padding: "14px 26px",
+            borderRadius: 50,
+            boxShadow: "0 12px 35px rgba(0, 0, 0, 0.25)",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            fontSize: 14.5,
+            fontWeight: 600,
+            animation: "slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            maxWidth: "90vw"
+          }}
+        >
+          <span style={{ fontSize: 18 }}>{saveStatus.includes("✓") ? "✅" : "⚠️"}</span>
+          <span>{saveStatus}</span>
+          <button
+            type="button"
+            onClick={() => setSaveStatus(null)}
+            style={{
+              background: "rgba(255,255,255,0.2)",
+              border: "none",
+              color: "#ffffff",
+              cursor: "pointer",
+              fontSize: 13,
+              marginLeft: 6,
+              borderRadius: "50%",
+              width: 22,
+              height: 22,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              lineHeight: 1
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

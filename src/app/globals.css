@@ -74,6 +74,26 @@ details[open] .faqPlus{transform:rotate(45deg)}
   }
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .dropdown-anim {
   animation: slideDownFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

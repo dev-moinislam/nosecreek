@@ -8,89 +8,6 @@
     "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2503.7027581561765!2d-114.09503612349079!3d51.132514538183226!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x53716503c200be6f%3A0xe54d9095bb12be8f!2sNose%20Creek%20Physiotherapy%20-%20Beddington!5e0!3m2!1sen!2sca!4v1700000000000!5m2!1sen!2sca"
   },
   "openingHours": {
-    "monday": "7:00 am — 8:00 pm",
-    "tuesday": "7:00 am — 8:00 pm",
-    "wednesday": "7:00 am — 8:00 pm",
-    "thursday": "7:00 am — 8:00 pm",
-    "friday": "7:00 am — 6:00 pm",
-    "saturday": "8:00 am — 1:00 pm",
-    "sunday": "Closed"
-  },
-  "socialLinks": {
-    "facebook": "https://facebook.com/nosecreekphysio",
-    "instagram": "https://instagram.com/nosecreekphysio",
-    "tiktok": "https://tiktok.com/@nosecreekphysio"
-  },
-  "bookingUrl": "#booking",
-  "primaryCTA": "Book Online",
-  "footerContent": "© 2026 Nose Creek Physiotherapy. All rights reserved. Registered physiotherapy, chiropractic, and massage therapy clinic in Calgary.",
-  "seo": {
-    "title": "Nose Creek Physiotherapy | Calgary North NW & NE",
-    "ogImage": "/images/og-home.jpg",
-    "ogTitle": "Nose Creek Physiotherapy | Calgary NW & NE",
-    "description": "Welcome to Nose Creek Physiotherapy in Calgary. We offer patient-focused physical therapy, chiropractic adjustments, and dry needling since 2001.",
-    "canonicalUrl": "https://nosecreekphysiotherapy.com",
-    "ogDescription": "Move well and feel better with our expert-led, tailored physiotherapy, massage therapy, and chiropractic care in Calgary.",
-    "pages": {
-      "/about": {
-        "title": "About Nose Creek Physiotherapy | Calgary Premier Clinic",
-        "description": "Custom SEO description set from the admin dashboard meta manager.",
-        "ogTitle": "About Nose Creek Physiotherapy Calgary | Our Team & Philosophy",
-        "ogDescription": "Dedicated to restoring motion and active living since 2001. Learn about our multidisciplinary team, FCAMPT manual therapy credentials, and clinic philosophy.",
-        "ogImage": "/images/clinic/clinic-mobile.jpg",
-        "noIndex": false
-      }
-    }
-  },
-  "marketing": {
-    "gtm": {
-      "enabled": true,
-      "containerId": "GTM-M3WLKSQ, GTM-PJ447MK",
-      "containerIds": [
-        "GTM-M3WLKSQ",
-        "GTM-PJ447MK"
-      ]
-    },
-    "callTracking": {
-      "enabled": true,
-      "scriptUrl": "https://cdn.calltrk.com/companies/208038913/2a4e80164caeb8bbc760/12/swap.js"
-    },
-    "theme_colors": {
-      "dark": "#12303d",
-      "accent": "#8cc63f",
-      "bgLight": "#f8fafc",
-      "primary": "#1c9fd8",
-      "secondary": "#6faf1c"
-    },
-    "facebookPixel": {
-      "enabled": true,
-      "pixelId": "275772356383035"
-    },
-    "googleAnalytics": {
-      "enabled": true,
-      "trackingId": "UA-121730452-1"
-    },
-    "auth_credentials": {
-      "admin": {
-        "role": "admin",
-        "email": "admin@nosecreek.com",
-        "username": "nosecreek-admin",
-        "full_name": "Master Administrator",
-        "password_hash": "$2b$10$iYI06kE6lK2l3RF/KMgDhOf/Aeh8GY1hjwIcmQS9nDBLzbs5ctj26"
-      },
-      "client": {
-        "role": "client",
-        "email": "client@nosecreek.com",
-        "username": "nosecreek",
-        "full_name": "Clinic Manager",
-        "password_hash": "$2b$10$1pI9LKG4S6Jkno2FTtk1OO8pG.7LdOx0DDeh1FMPwmVq8pu8LE5om"
-      }
-    }
-  },
-  "id": "main",
-  "clinic_name": "Nose Creek Physiotherapy",
-  "logo_text": "Nose Creek Physiotherapy",
-  "opening_hours": {
     "friday": "7:00 am — 6:00 pm",
     "monday": "7:00 am — 8:00 pm",
     "sunday": "Closed",
@@ -99,14 +16,54 @@
     "thursday": "7:00 am — 8:00 pm",
     "wednesday": "7:00 am — 8:00 pm"
   },
-  "social_links": {
+  "socialLinks": {
     "tiktok": "https://tiktok.com/@nosecreekphysio",
     "facebook": "https://facebook.com/nosecreekphysio",
     "instagram": "https://instagram.com/nosecreekphysio"
   },
-  "booking_url": "#booking",
-  "primary_cta": "Book Online",
-  "footer_content": "© 2026 Nose Creek Physiotherapy. All rights reserved. Registered physiotherapy, chiropractic, and massage therapy clinic in Calgary.",
-  "created_at": "2026-09-01T09:34:30.531124+00:00",
-  "updated_at": "2026-09-07T15:51:48.312247+00:00"
+  "bookingUrl": "#booking",
+  "primaryCTA": "Book Online",
+  "footerContent": "© 2026 Nose Creek Physiotherapy. All rights reserved. Registered physiotherapy, chiropractic, and massage therapy clinic in Calgary.",
+  "seo": {
+    "pages": {
+      "/about": {
+        "title": "About Nose Creek Physiotherapy | Calgary Premier Clinic",
+        "noIndex": false,
+        "ogImage": "/images/clinic/clinic-mobile.jpg",
+        "ogTitle": "About Nose Creek Physiotherapy Calgary | Our Team & Philosophy",
+        "description": "Custom SEO description set from the admin dashboard meta manager.",
+        "ogDescription": "Dedicated to restoring motion and active living since 2001. Learn about our multidisciplinary team, FCAMPT manual therapy credentials, and clinic philosophy."
+      }
+    },
+    "title": "Nose Creek Physiotherapy | Calgary North NW & NE",
+    "favicon": "",
+    "ogImage": "/images/og-home.jpg",
+    "ogTitle": "Nose Creek Physiotherapy | Calgary NW & NE",
+    "description": "Welcome to Nose Creek Physiotherapy in Calgary. We offer patient-focused physical therapy, chiropractic adjustments, and dry needling since 2001.",
+    "canonicalUrl": "https://nosecreekphysiotherapy.com",
+    "ogDescription": "Move well and feel better with our expert-led, tailored physiotherapy, massage therapy, and chiropractic care in Calgary."
+  },
+  "favicon": "",
+  "marketing": {
+    "callTracking": {
+      "enabled": true,
+      "scriptUrl": "https://cdn.calltrk.com/companies/208038913/2a4e80164caeb8bbc760/12/swap.js"
+    },
+    "gtm": {
+      "enabled": true,
+      "containerId": "GTM-M3WLKSQ, GTM-PJ447MK",
+      "containerIds": [
+        "GTM-M3WLKSQ",
+        "GTM-PJ447MK"
+      ]
+    },
+    "googleAnalytics": {
+      "enabled": true,
+      "trackingId": "UA-121730452-1"
+    },
+    "facebookPixel": {
+      "enabled": true,
+      "pixelId": "275772356383035"
+    }
+  }
 }
