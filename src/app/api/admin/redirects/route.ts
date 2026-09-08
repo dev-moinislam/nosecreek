@@ -106,6 +106,26 @@ export async function POST(req: Request) {
   }
 }
 
+export async function PATCH(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const hitId = searchParams.get("hitId");
+    if (!hitId) return NextResponse.json({ error: "Missing hitId" }, { status: 400 });
+
+    const data = readRedirectsData();
+    const rule = data.rules.find((r) => r.id === hitId);
+    if (rule) {
+      rule.hitCount = (rule.hitCount || 0) + 1;
+      rule.lastHitAt = new Date().toISOString();
+      writeRedirectsData(data);
+      return NextResponse.json({ success: true, hitCount: rule.hitCount });
+    }
+    return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || "Failed to update hit count" }, { status: 500 });
+  }
+}
+
 export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);

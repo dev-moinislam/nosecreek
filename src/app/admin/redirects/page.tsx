@@ -45,9 +45,9 @@ export default function AdminRedirectsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Load Data
-  const fetchData = async () => {
+  const fetchData = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await fetch("/api/admin/redirects");
       if (res.ok) {
         const data = await res.json();
@@ -57,12 +57,14 @@ export default function AdminRedirectsPage() {
     } catch (err) {
       console.error("Failed to load redirects data:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(() => fetchData(true), 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const showFeedback = (text: string, type: "success" | "error" = "success") => {
@@ -106,10 +108,19 @@ export default function AdminRedirectsPage() {
   // Save Rule
   const handleSaveRule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fromPath.trim() || !toPath.trim()) {
+    const rawFrom = fromPath.trim();
+    const rawTo = toPath.trim();
+
+    if (!rawFrom || !rawTo) {
       showFeedback("Please enter both the source path and destination URL.", "error");
       return;
     }
+
+    const cleanFrom = rawFrom.startsWith("/") ? rawFrom.toLowerCase() : `/${rawFrom.toLowerCase()}`;
+    const normalizedFrom = cleanFrom.endsWith("/") && cleanFrom.length > 1 ? cleanFrom.slice(0, -1) : cleanFrom;
+    const cleanTo = (rawTo.startsWith("http://") || rawTo.startsWith("https://") || rawTo.startsWith("/"))
+      ? rawTo
+      : `/${rawTo}`;
 
     setSaving(true);
     try {
@@ -119,8 +130,8 @@ export default function AdminRedirectsPage() {
         body: JSON.stringify({
           rule: {
             id: editingRule?.id,
-            fromPath,
-            toPath,
+            fromPath: normalizedFrom,
+            toPath: cleanTo,
             statusCode,
             enabled,
             notes,

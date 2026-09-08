@@ -1,30 +1,73 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import redirectsData from "@/data/redirects.json";
+import staticRedirectsData from "@/data/redirects.json";
 
-export function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+interface CachedRule {
+  id: string;
+  fromPath: string;
+  toPath: string;
+  statusCode: number;
+  enabled: boolean;
+  hitCount?: number;
+}
+
+// In-memory cache for ultra-fast middleware execution
+let cachedRules: CachedRule[] = (staticRedirectsData as any)?.rules || [];
+let lastFetchTime = 0;
+const CACHE_TTL_MS = 1500; // Refresh rules from API every 1.5 seconds
+
+export async function middleware(request: NextRequest) {
+  const { pathname, search, origin } = request.nextUrl;
   const lowerPath = pathname.toLowerCase();
   const normalizedPath = lowerPath.endsWith("/") && lowerPath.length > 1 ? lowerPath.slice(0, -1) : lowerPath;
 
-  const rules = (redirectsData as any)?.rules || [];
+  const now = Date.now();
 
-  for (const rule of rules) {
+  // Dynamically refresh rules from API if TTL expired
+  if (now - lastFetchTime > CACHE_TTL_MS) {
+    try {
+      const res = await fetch(`${origin}/api/admin/redirects`, {
+        cache: "no-store",
+        headers: { "x-internal-middleware": "1" }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.rules)) {
+          cachedRules = data.rules;
+          lastFetchTime = now;
+        }
+      }
+    } catch {
+      // Fall back to currently cached rules or static data
+    }
+  }
+
+  for (const rule of cachedRules) {
     if (!rule.enabled) continue;
+
     const from = (rule.fromPath || "").toLowerCase().trim();
     const normalizedFrom = from.endsWith("/") && from.length > 1 ? from.slice(0, -1) : from;
 
     if (normalizedPath === normalizedFrom) {
       let target = rule.toPath.trim();
+
+      // Preserve query params if not already in target
       if (search && !target.includes("?")) {
         target += search;
       }
 
-      if (target.startsWith("http://") || target.startsWith("https://")) {
-        return NextResponse.redirect(new URL(target), { status: rule.statusCode || 301 });
-      }
+      const statusCode = Number(rule.statusCode) || 301;
+      const destinationUrl = target.startsWith("http://") || target.startsWith("https://")
+        ? new URL(target)
+        : new URL(target, request.url);
 
-      return NextResponse.redirect(new URL(target, request.url), { status: rule.statusCode || 301 });
+      // Async background fire-and-forget to increment hit count
+      fetch(`${origin}/api/admin/redirects?hitId=${encodeURIComponent(rule.id)}`, {
+        method: "PATCH",
+        headers: { "x-internal-middleware": "1" }
+      }).catch(() => {});
+
+      return NextResponse.redirect(destinationUrl, { status: statusCode });
     }
   }
 

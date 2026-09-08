@@ -1,6 +1,17 @@
 {
   "rules": [
     {
+      "id": "rule-1788854112677-ij9m",
+      "fromPath": "/sample-broken-page",
+      "toPath": "/services",
+      "statusCode": 301,
+      "enabled": true,
+      "notes": "",
+      "hitCount": 2,
+      "createdAt": "2026-09-08T07:55:12.677Z",
+      "lastHitAt": "2026-09-08T07:57:49.703Z"
+    },
+    {
       "id": "rule-1788853564273-n5r5",
       "fromPath": "/summer-offer",
       "toPath": "/services",
@@ -31,14 +42,5 @@
       "createdAt": "2026-09-08T00:00:00.000Z"
     }
   ],
-  "notFoundLogs": [
-    {
-      "id": "404-1788853372741-kv0n",
-      "path": "/sample-broken-page",
-      "hitCount": 1,
-      "firstSeenAt": "2026-09-08T07:42:52.741Z",
-      "lastHitAt": "2026-09-08T07:42:52.741Z",
-      "referrer": "https://google.com"
-    }
-  ]
+  "notFoundLogs": []
 }
