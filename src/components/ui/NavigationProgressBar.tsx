@@ -1,27 +1,24 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-export default function NavigationProgressBar() {
+export default function NavigationLoadingIndicator() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isNavigating, setIsNavigating] = useState(false);
-  const [progress, setProgress] = useState(0);
 
-  // Complete and hide bar when page navigation finishes
+  // Complete and hide when page navigation finishes
   useEffect(() => {
     if (isNavigating) {
-      setProgress(100);
       const timer = setTimeout(() => {
         setIsNavigating(false);
-        setProgress(0);
-      }, 350);
+      }, 150);
       return () => clearTimeout(timer);
     }
   }, [pathname, searchParams]);
 
-  // Intercept client link clicks
+  // Intercept internal link clicks to display instant loading spinner
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
       const target = (e.target as HTMLElement).closest("a");
@@ -53,24 +50,15 @@ export default function NavigationProgressBar() {
         return;
       }
 
-      // Start navigation animation
+      // Trigger animated clinical loading badge
       setIsNavigating(true);
-      setProgress(25);
-
-      const t1 = setTimeout(() => setProgress((p) => (p < 60 ? 60 : p)), 180);
-      const t2 = setTimeout(() => setProgress((p) => (p < 85 ? 85 : p)), 400);
 
       // Auto-cancel if navigation fails or takes unusually long (>10s)
       const timeout = setTimeout(() => {
         setIsNavigating(false);
-        setProgress(0);
       }, 10000);
 
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(timeout);
-      };
+      return () => clearTimeout(timeout);
     };
 
     document.addEventListener("click", handleAnchorClick, { capture: true });
@@ -79,73 +67,45 @@ export default function NavigationProgressBar() {
     };
   }, []);
 
-  if (!isNavigating && progress === 0) return null;
+  if (!isNavigating) return null;
 
   return (
-    <>
-      {/* Top Gradient Progress Bar */}
+    <div
+      id="nc-loading-floating-indicator"
+      style={{
+        position: "fixed",
+        bottom: 28,
+        right: 28,
+        zIndex: 999998,
+        pointerEvents: "none",
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        background: "rgba(18, 48, 61, 0.95)",
+        color: "#ffffff",
+        padding: "10px 18px",
+        borderRadius: 999,
+        boxShadow: "0 10px 28px rgba(18, 48, 61, 0.35)",
+        backdropFilter: "blur(8px)",
+        border: "1px solid rgba(255, 255, 255, 0.15)",
+        fontFamily: "'Poppins', sans-serif",
+        fontSize: 13,
+        fontWeight: 600,
+        animation: "slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1)"
+      }}
+    >
       <div
-        id="nc-navigation-progress-container"
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3.5,
-          zIndex: 999999,
-          pointerEvents: "none",
-          overflow: "hidden"
+          width: 18,
+          height: 18,
+          borderRadius: "50%",
+          border: "2.5px solid rgba(255, 255, 255, 0.2)",
+          borderTopColor: "#6faf1c",
+          borderRightColor: "#1c9fd8",
+          animation: "ncSpin 0.75s linear infinite"
         }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${progress}%`,
-            background: "linear-gradient(90deg, #1c9fd8 0%, #6faf1c 50%, #8cc63f 100%)",
-            boxShadow: "0 0 12px rgba(28, 159, 216, 0.7), 0 0 6px rgba(111, 175, 28, 0.6)",
-            transition: progress === 100 ? "width 0.2s ease-out, opacity 0.3s ease-out" : "width 0.35s cubic-bezier(0.1, 0.5, 0.1, 1)",
-            opacity: progress === 100 ? 0.2 : 1
-          }}
-        />
-      </div>
-
-      {/* Floating Corner Indicator Pill for instant interactive feedback */}
-      <div
-        id="nc-loading-floating-indicator"
-        style={{
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          zIndex: 999998,
-          pointerEvents: "none",
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          background: "rgba(18, 48, 61, 0.94)",
-          color: "#ffffff",
-          padding: "9px 16px",
-          borderRadius: 999,
-          boxShadow: "0 8px 24px rgba(18, 48, 61, 0.28)",
-          backdropFilter: "blur(6px)",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
-          fontFamily: "'Poppins', sans-serif",
-          fontSize: 12.5,
-          fontWeight: 600,
-          animation: "slideDownFade 0.25s cubic-bezier(0.16, 1, 0.3, 1)"
-        }}
-      >
-        <div
-          style={{
-            width: 16,
-            height: 16,
-            borderRadius: "50%",
-            border: "2px solid rgba(255, 255, 255, 0.25)",
-            borderTopColor: "#6faf1c",
-            animation: "ncSpin 0.7s linear infinite"
-          }}
-        />
-        <span>Loading page...</span>
-      </div>
-    </>
+      />
+      <span>Loading...</span>
+    </div>
   );
 }
