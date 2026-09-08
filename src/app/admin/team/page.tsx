@@ -410,6 +410,86 @@ export default function AdminTeamPage() {
 }
 
 // =============================================================================
+// ICONS FOR PRACTITIONER EDITOR MODAL (NO EMOJIS - CRISP VECTOR SVGS)
+// =============================================================================
+
+function UserTabIcon({ size = 15, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function CalendarTabIcon({ size = 15, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+      <line x1="16" x2="16" y1="2" y2="6" />
+      <line x1="8" x2="8" y1="2" y2="6" />
+      <line x1="3" x2="21" y1="10" y2="10" />
+    </svg>
+  );
+}
+
+function OverviewTabIcon({ size = 15, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M9 12h6" />
+      <path d="M9 16h6" />
+    </svg>
+  );
+}
+
+function EducationTabIcon({ size = 15, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  );
+}
+
+function ServicesTabIcon({ size = 15, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" />
+      <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" />
+      <circle cx="20" cy="10" r="2" />
+    </svg>
+  );
+}
+
+function InfoTabIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" x2="12" y1="16" y2="12" />
+      <line x1="12" x2="12.01" y1="8" y2="8" />
+    </svg>
+  );
+}
+
+function CheckmarkSvg({ size = 14, color = "#16a34a" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function StarSvg({ size = 14, color = "#0284c7" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke={color} strokeWidth="1">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+
+// =============================================================================
 // ENHANCED TEAM EDITOR MODAL WITH COMPREHENSIVE SINGLE PAGE CONTROLS
 // =============================================================================
 
@@ -527,24 +607,57 @@ function TeamEditorModal({
 
   const firstName = member.name ? member.name.split(" ")[0] : "Practitioner";
 
+  const tabs = [
+    { id: "basic" as const, label: "Basic Info & Bio", icon: UserTabIcon },
+    { id: "booking" as const, label: "Booking & CTA", icon: CalendarTabIcon },
+    { id: "overview" as const, label: "Practitioner Overview", icon: OverviewTabIcon },
+    { id: "education" as const, label: "Education & Certs", icon: EducationTabIcon },
+    {
+      id: "services" as const,
+      label: "Services Offered",
+      icon: ServicesTabIcon,
+      badge: member.services?.length || 0
+    }
+  ];
+
   return (
     <div className="adm-modal-overlay" onClick={onClose}>
       <div
         className="adm-modal wide"
-        style={{ maxWidth: 880, width: "95%", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
+        style={{
+          maxWidth: 900,
+          width: "95%",
+          maxHeight: "92vh",
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: 14,
+          overflow: "hidden"
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div className="adm-modal-header" style={{ borderBottom: "1px solid #e2e8f0", padding: "18px 24px" }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a" }}>
+        {/* Responsive Modal Header */}
+        <div
+          className="adm-modal-header"
+          style={{
+            borderBottom: "1px solid #e2e8f0",
+            padding: "16px 24px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12,
+            background: "#ffffff"
+          }}
+        >
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#0f172a", wordBreak: "break-word" }}>
               Edit Practitioner: {member.name || "New Profile"}
             </h3>
-            <span style={{ fontSize: 12.5, color: "#64748b" }}>
+            <span style={{ fontSize: 12.5, color: "#64748b", display: "inline-block", marginTop: 2 }}>
               Live Route: <strong>/team/{member.slug}</strong>
             </span>
           </div>
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexShrink: 0 }}>
             <button
               type="button"
               onClick={() => onPreview(member.slug)}
@@ -556,55 +669,81 @@ function TeamEditorModal({
             </button>
             <button
               onClick={onClose}
-              style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#94a3b8" }}
+              style={{
+                background: "#f1f5f9",
+                border: "none",
+                fontSize: 16,
+                cursor: "pointer",
+                color: "#64748b",
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.15s ease"
+              }}
+              title="Close"
             >
               ✕
             </button>
           </div>
         </div>
 
-        {/* Modal Navigation Tabs */}
+        {/* Modal Navigation Tabs (Responsive, Clean Pill Design, No Bottom Text Cutoff) */}
         <div
           style={{
             display: "flex",
-            gap: 4,
-            padding: "8px 20px 0",
+            flexWrap: "wrap",
+            gap: 8,
+            padding: "12px 24px",
             background: "#f8fafc",
-            borderBottom: "1px solid #e2e8f0",
-            overflowX: "auto"
+            borderBottom: "1px solid #e2e8f0"
           }}
         >
-          {[
-            { id: "basic", label: "👤 Basic Info & Bio" },
-            { id: "booking", label: "📅 Booking & CTA" },
-            { id: "overview", label: "📋 Practitioner Overview" },
-            { id: "education", label: "🎓 Education & Certs" },
-            {
-              id: "services",
-              label: `🩺 Services Offered (${member.services?.length || 0})`
-            }
-          ].map((tab) => {
+          {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
+            const IconComponent = tab.icon;
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 style={{
-                  padding: "9px 14px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 14px",
                   fontSize: 13,
-                  fontWeight: 700,
-                  border: "none",
+                  fontWeight: 600,
                   cursor: "pointer",
-                  background: isActive ? "#ffffff" : "transparent",
-                  color: isActive ? "var(--primary, #0e78a8)" : "#64748b",
-                  borderRadius: "8px 8px 0 0",
-                  borderBottom: isActive ? "2px solid var(--primary, #0e78a8)" : "2px solid transparent",
-                  transition: "all 0.15s",
+                  borderRadius: 8,
+                  border: isActive ? "1px solid #0e78a8" : "1px solid #cbd5e1",
+                  background: isActive ? "#0e78a8" : "#ffffff",
+                  color: isActive ? "#ffffff" : "#334155",
+                  boxShadow: isActive ? "0 2px 4px rgba(14, 120, 168, 0.2)" : "0 1px 2px rgba(0,0,0,0.03)",
+                  transition: "all 0.15s ease",
+                  lineHeight: 1.4,
                   whiteSpace: "nowrap"
                 }}
               >
-                {tab.label}
+                <IconComponent size={15} color={isActive ? "#ffffff" : "#64748b"} />
+                <span>{tab.label}</span>
+                {tab.badge !== undefined && (
+                  <span
+                    style={{
+                      background: isActive ? "rgba(255, 255, 255, 0.25)" : "#e2e8f0",
+                      color: isActive ? "#ffffff" : "#334155",
+                      padding: "1px 7px",
+                      borderRadius: 999,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      lineHeight: "16px"
+                    }}
+                  >
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -736,10 +875,18 @@ function TeamEditorModal({
                   borderRadius: 12,
                   padding: "14px 18px",
                   fontSize: 13,
-                  color: "#166534"
+                  color: "#166534",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10
                 }}
               >
-                💡 <strong>Single Team Page Booking Controls:</strong> These fields control the prominent green booking CTA buttons in the <strong>Hero Banner</strong>, the <strong>Direct Booking Sidebar Widget</strong>, and the <strong>Bottom CTA Section</strong>.
+                <div style={{ marginTop: 2, flexShrink: 0 }}>
+                  <InfoTabIcon size={16} color="#16a34a" />
+                </div>
+                <div style={{ lineHeight: 1.5 }}>
+                  <strong>Single Team Page Booking Controls:</strong> These fields control the prominent green booking CTA buttons in the <strong>Hero Banner</strong>, the <strong>Direct Booking Sidebar Widget</strong>, and the <strong>Bottom CTA Section</strong>.
+                </div>
               </div>
 
               <div className="adm-form-group">
@@ -807,10 +954,18 @@ function TeamEditorModal({
                   borderRadius: 12,
                   padding: "14px 18px",
                   fontSize: 13,
-                  color: "#0369a1"
+                  color: "#0369a1",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10
                 }}
               >
-                ℹ️ <strong>Practitioner Overview Card:</strong> Appears on the right sidebar of the single team page, highlighting clinical experience, languages spoken, direct phone, and assigned clinic locations.
+                <div style={{ marginTop: 2, flexShrink: 0 }}>
+                  <InfoTabIcon size={16} color="#0284c7" />
+                </div>
+                <div style={{ lineHeight: 1.5 }}>
+                  <strong>Practitioner Overview Card:</strong> Appears on the right sidebar of the single team page, highlighting clinical experience, languages spoken, direct phone, and assigned clinic locations.
+                </div>
               </div>
 
               <div className="adm-form-group">
@@ -870,23 +1025,24 @@ function TeamEditorModal({
                     <span
                       key={idx}
                       style={{
-                        background: "#ecfdf5",
-                        color: "#047857",
-                        border: "1px solid #a7f3d0",
-                        padding: "4px 10px",
+                        background: "#f1f5f9",
+                        color: "#334155",
+                        border: "1px solid #cbd5e1",
+                        padding: "4px 12px",
                         borderRadius: 999,
                         fontSize: 13,
                         fontWeight: 600,
                         display: "inline-flex",
                         alignItems: "center",
-                        gap: 6
+                        gap: 8
                       }}
                     >
-                      <span>🗣️ {lang}</span>
+                      <span>{lang}</span>
                       <button
                         type="button"
                         onClick={() => removeLang(idx)}
-                        style={{ background: "none", border: "none", cursor: "pointer", color: "#059669", fontWeight: 800, padding: 0 }}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", fontWeight: 700, padding: 0, fontSize: 13 }}
+                        title="Remove"
                       >
                         ✕
                       </button>
@@ -946,7 +1102,7 @@ function TeamEditorModal({
                       Academic Background (Degrees &amp; Universities)
                     </h4>
                     <span style={{ fontSize: 12, color: "#64748b" }}>
-                      Renders under &quot;Education &amp; Certifications&quot; with green checkmark ✓ icons.
+                      Renders under &quot;Education &amp; Certifications&quot; with verified credentials.
                     </span>
                   </div>
                 </div>
@@ -983,7 +1139,7 @@ function TeamEditorModal({
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ color: "#16a34a", fontWeight: 800 }}>✓</span>
+                        <CheckmarkSvg size={14} color="#16a34a" />
                         <span>{edu}</span>
                       </div>
                       <button
@@ -1012,7 +1168,7 @@ function TeamEditorModal({
                       Specialized Certifications &amp; Fellowships
                     </h4>
                     <span style={{ fontSize: 12, color: "#64748b" }}>
-                      Renders with blue star ★ icons under the qualifications section.
+                      Renders with specialized certification badges under qualifications.
                     </span>
                   </div>
                 </div>
@@ -1049,7 +1205,7 @@ function TeamEditorModal({
                       }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ color: "#0284c7", fontWeight: 800 }}>★</span>
+                        <StarSvg size={14} color="#0284c7" />
                         <span>{cert}</span>
                       </div>
                       <button
