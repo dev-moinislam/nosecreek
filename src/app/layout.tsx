@@ -93,6 +93,7 @@ export default async function RootLayout({
       <head>
         <link rel="preconnect" href="https://vrhrqljixrsckdkstier.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://vrhrqljixrsckdkstier.supabase.co" />
+        <link rel="preload" as="image" href="/images/clinic/reception-desktop.webp" fetchPriority="high" type="image/webp" />
         <link rel="icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} sizes="any" />
         <link rel="shortcut icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />
         <link rel="apple-touch-icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />

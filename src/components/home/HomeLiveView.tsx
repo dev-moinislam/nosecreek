@@ -148,14 +148,16 @@ export default function HomeLiveView({
               </div>
 
               <div style={{ position: "relative" }}>
-                <Image
-                  src={heroImg || "/images/clinic/reception-desktop.jpg"}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={heroImg ? heroImg.replace(/\.jpg$/, ".webp") : "/images/clinic/reception-desktop.webp"}
                   alt={(h as any)?.imageAlt || (homeData.hero as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
                   width={600}
                   height={450}
-                  priority={true}
-                  quality={80}
-                  sizes="(max-width: 768px) 100vw, 600px"
+                  loading="eager"
+                  decoding="async"
+                  // @ts-ignore
+                  fetchPriority="high"
                   style={{ width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(18,60,80,0.18)", objectFit: "cover", aspectRatio: "4/3" }}
                 />
                 <div style={{ position: "absolute", left: 18, bottom: -22, background: "#fff", borderRadius: 14, padding: "14px 18px", boxShadow: "0 14px 34px rgba(18,60,80,0.16)", display: "flex", alignItems: "center", gap: 12 }}>
