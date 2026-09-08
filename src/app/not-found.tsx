@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Report404Hit from "@/components/analytics/Report404Hit";
 
 export const metadata = {
   title: "Page Not Found | Nose Creek Physiotherapy",
@@ -9,6 +10,7 @@ export const metadata = {
 export default function NotFound() {
   return (
     <div className="section section-offset" style={{ minHeight: "60vh", display: "flex", alignItems: "center" }}>
+      <Report404Hit />
       <div className="container" style={{ textAlign: "center" }}>
         <h1 style={{ fontSize: "5rem", color: "var(--secondary)", fontWeight: "100", marginBottom: "10px" }}>
           404
