@@ -40,7 +40,7 @@ export async function GET(req: Request) {
                 heroImageAlt: s.hero_image_alt || s.seo?.heroImageAlt || existing?.heroImageAlt || existing?.seo?.heroImageAlt || "",
                 sideImage: s.side_image || existing?.sideImage || null,
                 sideImageAlt: s.side_image_alt || s.seo?.sideImageAlt || existing?.sideImageAlt || existing?.seo?.sideImageAlt || "",
-                cardImage: s.card_image || s.cardImage || s.seo?.cardImage || existing?.cardImage || null,
+                cardImage: s.card_image || s.cardImage || s.seo?.cardImage || null,
                 cardImageAlt: s.card_image_alt || s.seo?.cardImageAlt || existing?.cardImageAlt || existing?.seo?.cardImageAlt || "",
                 iconType: s.icon_type || existing?.iconType || "stethoscope",
                 iconBg: s.icon_bg || existing?.iconBg || "#e9f5fb",

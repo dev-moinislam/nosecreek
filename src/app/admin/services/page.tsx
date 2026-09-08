@@ -199,8 +199,8 @@ export default function AdminServicesPage() {
                   parsed.forEach((p) => {
                     if (map.has(p.slug)) {
                       const serverItem = map.get(p.slug)!;
-                      const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : (serverItem.cardImage || "");
-                      const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : (serverItem.heroImage || "");
+                      const cardImage = p.cardImage !== undefined ? (p.cardImage || null) : (serverItem.cardImage || null);
+                      const heroImage = p.heroImage !== undefined ? (p.heroImage || null) : (serverItem.heroImage || null);
                       map.set(p.slug, { ...serverItem, ...p, cardImage, heroImage });
                     }
                   });
