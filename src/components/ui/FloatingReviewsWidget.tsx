@@ -74,6 +74,12 @@ export default function FloatingReviewsWidget() {
 
     const loadFloatingScript = () => {
       if (loaded) return;
+
+      // On small screens (<= 768px), do not load floating review script to prevent obstructing mobile navigation
+      if (typeof window !== "undefined" && window.innerWidth <= 768) {
+        return;
+      }
+
       loaded = true;
 
       // Extract flash ID or use default
@@ -81,11 +87,14 @@ export default function FloatingReviewsWidget() {
       const flashId = flashMatch ? flashMatch[1] : "49021";
 
       // Ensure flash container exists in body
-      let container = document.querySelector(`[data-rw-flash="${flashId}"]`);
+      let container = document.querySelector(`[data-rw-flash="${flashId}"]`) as HTMLElement | null;
       if (!container) {
         container = document.createElement("div");
         container.setAttribute("data-rw-flash", flashId);
+        container.className = "nc-floating-reviews-badge";
         document.body.appendChild(container);
+      } else {
+        container.classList.add("nc-floating-reviews-badge");
       }
 
       // Inject script if not already present
@@ -112,10 +121,12 @@ export default function FloatingReviewsWidget() {
     };
 
     triggerEvents.forEach((ev) => window.addEventListener(ev, handleInteraction, { passive: true, once: true }));
+    window.addEventListener("resize", loadFloatingScript, { passive: true });
 
     return () => {
       clearTimeout(timer);
       triggerEvents.forEach((ev) => window.removeEventListener(ev, handleInteraction));
+      window.removeEventListener("resize", loadFloatingScript);
     };
   }, [enabled, widgetCode]);
 

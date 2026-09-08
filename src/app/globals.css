@@ -220,3 +220,22 @@ details[open] .faqPlus{transform:rotate(45deg)}
   }
 }
 
+/* ─── HIDE FLOATING REVIEWS ON SMALL DEVICES (<= 768px) ─── */
+@media (max-width: 768px) {
+  .nc-floating-reviews-badge,
+  [data-rw-flash],
+  [class*="rw-widget-flash"],
+  [class*="rw-flash"],
+  div[data-rw-flash],
+  iframe[src*="rw-widget-flash"],
+  iframe[src*="revue.us"],
+  iframe[src*="thereviewsplace.com"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    width: 0 !important;
+  }
+}
+
