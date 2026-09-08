@@ -16,6 +16,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
@@ -131,13 +132,13 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
                   target="_blank" rel="noopener noreferrer"
                   style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#6faf1c", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "13px 26px", borderRadius: 9, boxShadow: "0 10px 24px rgba(111,175,28,0.32)", textDecoration: "none" }}
                 >
-                  Book With {member.name.split(" ")[0]}
+                  {member.bookingCtaText || `Book With ${member.name.split(" ")[0]}`}
                 </a>
                 <a
-                  href="tel:+14032958590"
+                  href={`tel:${(member.phone || "403.295.8590").replace(/[^0-9+]/g, "")}`}
                   style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "#fff", color: "#0e78a8", border: "2px solid #cfe6f2", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 15.5, padding: "11px 22px", borderRadius: 9, textDecoration: "none" }}
                 >
-                  Call 403.295.8590
+                  Call {member.phone || "403.295.8590"}
                 </a>
               </div>
 
@@ -303,10 +304,10 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
                       textDecoration: "none"
                     }}
                   >
-                    Book Online Now
+                    {member.bookingCtaText || "Book Online Now"}
                   </a>
                   <a
-                    href="tel:+14032958590"
+                    href={`tel:${(member.phone || "403.295.8590").replace(/[^0-9+]/g, "")}`}
                     style={{
                       display: "block",
                       background: "rgba(255,255,255,0.1)",
@@ -321,7 +322,7 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
                       textDecoration: "none"
                     }}
                   >
-                    Call 403.295.8590
+                    Call {member.phone || "403.295.8590"}
                   </a>
                 </div>
 
@@ -354,15 +355,26 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
                     <div style={{ borderBottom: "1px solid #f0f4f7", paddingBottom: 10 }}>
                       <span style={{ color: "#8a97a1", fontSize: 12, fontWeight: 700, textTransform: "uppercase" }}>Direct Clinic Phone</span>
                       <div style={{ fontWeight: 600, color: "#1d2b34", marginTop: 2 }}>
-                        <a href="tel:+14032958590" style={{ color: "#0e78a8", textDecoration: "none" }}>{member.phone}</a>
+                        <a href={`tel:${member.phone.replace(/[^0-9+]/g, "")}`} style={{ color: "#0e78a8", textDecoration: "none" }}>{member.phone}</a>
                       </div>
                     </div>
                   )}
                   <div>
                     <span style={{ color: "#8a97a1", fontSize: 12, fontWeight: 700, textTransform: "uppercase" }}>Clinic Location</span>
                     <div style={{ fontWeight: 600, color: "#1d2b34", marginTop: 2 }}>
-                      Nose Creek Physiotherapy<br />
-                      <span style={{ fontSize: 13, color: "#5a6570", fontWeight: 400 }}>8220 Centre St NE #153, Calgary, AB</span>
+                      {memberLocations.length > 0 ? (
+                        memberLocations.map((loc, idx) => (
+                          <div key={loc.id || idx} style={{ marginBottom: idx < memberLocations.length - 1 ? 6 : 0 }}>
+                            <div>{loc.name}</div>
+                            {loc.address && <span style={{ fontSize: 13, color: "#5a6570", fontWeight: 400 }}>{loc.address}</span>}
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          Nose Creek Physiotherapy<br />
+                          <span style={{ fontSize: 13, color: "#5a6570", fontWeight: 400 }}>8220 Centre St NE #153, Calgary, AB</span>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -443,13 +455,13 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
               target="_blank" rel="noopener noreferrer"
               style={{ background: "#8cc63f", color: "#12303d", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16, padding: "15px 30px", borderRadius: 10, boxShadow: "0 10px 24px rgba(0,0,0,0.16)", textDecoration: "none" }}
             >
-              Book With {member.name.split(" ")[0]} Online
+              {member.bookingCtaText ? `${member.bookingCtaText} Online` : `Book With ${member.name.split(" ")[0]} Online`}
             </a>
             <a
-              href="tel:+14032958590"
+              href={`tel:${(member.phone || "403.295.8590").replace(/[^0-9+]/g, "")}`}
               style={{ background: "rgba(255,255,255,0.14)", border: "1px solid rgba(255,255,255,0.5)", color: "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 16, padding: "14px 28px", borderRadius: 10, textDecoration: "none" }}
             >
-              Call 403.295.8590
+              Call {member.phone || "403.295.8590"}
             </a>
           </div>
         </div>

@@ -168,10 +168,28 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
   return servicesList.find((s) => s.slug === slug);
 }
 
+function getFreshTeamData(): TeamMember[] {
+  try {
+    if (typeof window === "undefined") {
+      const fs = require("fs");
+      const path = require("path");
+      const filePath = path.resolve(process.cwd(), "src/data/team.json");
+      if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      }
+    }
+  } catch (e) {
+    // fallback
+  }
+  return teamList;
+}
+
 /**
  * Team Members & Practitioners
  */
 export async function getTeamMembers(): Promise<TeamMember[]> {
+  const currentList = getFreshTeamData();
+
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
@@ -180,38 +198,42 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
       if (!error && data && data.length > 0) {
-        return data.map((d: any) => ({
-          id: d.id,
-          slug: d.slug,
-          name: d.name,
-          role: d.role,
-          title: d.title || "",
-          shortBio: d.short_bio || "",
-          fullBio: d.full_bio || "",
-          profileImage: d.profile_image || "/images/team/default.jpg",
-          specialties: d.specialties || [],
-          credentials: d.credentials || [],
-          education: d.education || [],
-          certifications: d.certifications || [],
-          experience: d.experience || "",
-          locations: d.locations || [],
-          services: d.services || [],
-          languages: d.languages || [],
-          email: d.email,
-          phone: d.phone,
-          bookingUrl: d.booking_url,
-          socialLinks: d.social_links || {},
-          featured: d.featured,
-          isDirector: d.is_director,
-          order: d.sort_order,
-          seo: d.seo || {}
-        }));
+        return data.map((d: any) => {
+          const localItem = currentList.find((l) => l.slug === d.slug);
+          return {
+            id: d.id,
+            slug: d.slug,
+            name: d.name,
+            role: d.role,
+            title: d.title || "",
+            shortBio: d.short_bio || "",
+            fullBio: d.full_bio || "",
+            profileImage: d.profile_image || "/images/team/default.jpg",
+            specialties: d.specialties || localItem?.specialties || [],
+            credentials: d.credentials || localItem?.credentials || [],
+            education: d.education || localItem?.education || [],
+            certifications: d.certifications || localItem?.certifications || [],
+            experience: d.experience || localItem?.experience || "",
+            locations: d.locations || localItem?.locations || [],
+            services: d.services || localItem?.services || [],
+            languages: d.languages || localItem?.languages || [],
+            email: d.email || localItem?.email,
+            phone: d.phone || localItem?.phone,
+            bookingUrl: d.booking_url || localItem?.bookingUrl,
+            bookingCtaText: d.social_links?.bookingCtaText || localItem?.bookingCtaText || null,
+            socialLinks: d.social_links || localItem?.socialLinks || {},
+            featured: d.featured ?? localItem?.featured,
+            isDirector: d.is_director ?? localItem?.isDirector,
+            order: d.sort_order ?? localItem?.order,
+            seo: d.seo || localItem?.seo || {}
+          };
+        });
       }
     } catch (e) {
       console.warn("Supabase fetch failed for team members, using local fallback", e);
     }
   }
-  return teamList.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+  return currentList.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 }
 
 export async function getTeamMemberBySlug(slug: string): Promise<TeamMember | undefined> {

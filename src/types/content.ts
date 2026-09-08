@@ -146,6 +146,7 @@ export interface TeamMember {
   email?: string;
   phone?: string;
   bookingUrl?: string;
+  bookingCtaText?: string;
   socialLinks?: SocialLinks;
   featured?: boolean;
   isDirector?: boolean;
