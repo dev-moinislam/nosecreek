@@ -150,7 +150,12 @@ export default function ReviewCarousel({
       }
     }
 
-    fetchLiveContent();
+    // Defer live reviews check until after initial paint
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(() => fetchLiveContent());
+    } else {
+      setTimeout(fetchLiveContent, 2000);
+    }
 
     return () => {
       window.removeEventListener("settingsUpdated", syncFromSettings);
