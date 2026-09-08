@@ -39,8 +39,7 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
                   if (map.has(p.slug)) {
                     const existing = map.get(p.slug)!;
                     const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : existing.cardImage;
-                    const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : existing.heroImage;
-                    map.set(p.slug, { ...existing, ...p, cardImage, heroImage });
+                    map.set(p.slug, { ...existing, ...p, cardImage });
                   } else {
                     map.set(p.slug, p);
                   }
@@ -72,10 +71,8 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
       {services.map((svc) => {
-        const imageSrc = (svc.cardImage && svc.cardImage.trim() !== "")
-          ? svc.cardImage
-          : (svc.heroImage && svc.heroImage.trim() !== "" ? svc.heroImage : null);
-        const hasImage = Boolean(imageSrc && imageSrc.trim() !== "");
+        const imageSrc = (svc.cardImage && svc.cardImage.trim() !== "") ? svc.cardImage : null;
+        const hasImage = Boolean(imageSrc);
         return (
           <Link
             key={svc.id || svc.slug}
