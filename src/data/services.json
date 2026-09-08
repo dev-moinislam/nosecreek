@@ -917,34 +917,5 @@
       "description": "Specialized pelvic health and women's health physiotherapy in Calgary for incontinence, prolapse, and post-partum recovery.",
       "ogDescription": "Strengthen your core and solve bladder leakage with certified pelvic floor physiotherapy in Calgary."
     }
-  },
-  {
-    "id": "service-1788858003025",
-    "slug": "new-service",
-    "title": "New Clinical Service",
-    "shortDescription": "",
-    "description": "",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "iconType": "stethoscope",
-    "iconBg": "#e9f5fb",
-    "iconColor": "#1c9fd8",
-    "ctaText": "Book Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [],
-    "treatmentApproach": [],
-    "customSections": [],
-    "faqs": [],
-    "relatedServices": [],
-    "relatedConditions": [],
-    "teamMembers": [],
-    "locations": [],
-    "testimonials": [],
-    "seo": {
-      "cardImage": null,
-      "sectionsData": {}
-    }
   }
 ]

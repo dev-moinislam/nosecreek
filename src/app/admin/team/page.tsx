@@ -66,13 +66,12 @@ export default function AdminTeamPage() {
           const { data: supaServices } = await supabase
             .from("services")
             .select("*")
+            .eq("is_published", true)
             .order("sort_order", { ascending: true });
-          if (supaServices && supaServices.length > 0) {
-            const map = new Map<string, Service>();
-            combined.forEach((s) => map.set(s.slug, s));
-            supaServices.forEach((d: any) => {
-              const existing = map.get(d.slug);
-              map.set(d.slug, {
+          if (supaServices) {
+            combined = supaServices.map((d: any) => {
+              const existing = combined.find((s) => s.slug === d.slug);
+              return {
                 id: d.id,
                 slug: d.slug,
                 title: d.title,
@@ -100,16 +99,13 @@ export default function AdminTeamPage() {
                 locations: d.locations || existing?.locations || [],
                 testimonials: d.testimonials || existing?.testimonials || [],
                 seo: d.seo || existing?.seo || {}
-              });
+              };
             });
-            combined = Array.from(map.values());
           }
         } catch {}
       }
 
-      if (combined.length > 0) {
-        setAllServices(combined);
-      }
+      setAllServices(combined);
     } catch {}
 
     // 3. Fetch fresh locations
@@ -202,7 +198,12 @@ export default function AdminTeamPage() {
     };
   }, []);
 
-  const handleSave = async (member: TeamMember) => {
+  const handleSave = async (memberInput: TeamMember) => {
+    // Strip out any services that no longer exist
+    const validServiceSlugs = new Set(allServices.map((s) => s.slug).concat(allServices.map((s) => s.id)));
+    const cleanedServices = (memberInput.services || []).filter((s) => validServiceSlugs.has(s));
+    const member: TeamMember = { ...memberInput, services: cleanedServices };
+
     if (isSupabaseConfigured && supabase) {
       try {
         const { error } = await supabase.from("team_members").upsert({

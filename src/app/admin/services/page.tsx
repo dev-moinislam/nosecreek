@@ -192,24 +192,25 @@ export default function AdminServicesPage() {
             try {
               const parsed = JSON.parse(saved);
               if (Array.isArray(parsed) && parsed.length > 0) {
-                // Merge authoritative fresh services with any existing local edits
-                const map = new Map<string, Service>();
-                fresh.forEach((f) => map.set(f.slug, f));
-                parsed.forEach((p) => {
-                  if (map.has(p.slug)) {
-                    const serverItem = map.get(p.slug)!;
-                    const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : (serverItem.cardImage || "");
-                    const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : (serverItem.heroImage || "");
-                    map.set(p.slug, { ...serverItem, ...p, cardImage, heroImage });
-                  } else {
-                    map.set(p.slug, p);
-                  }
-                });
-                list = Array.from(map.values()).map(sanitizeServiceOrder);
+                // If fresh is available from Supabase, only keep items in fresh and overlay draft edits
+                if (fresh.length > 0) {
+                  const map = new Map<string, Service>();
+                  fresh.forEach((f) => map.set(f.slug, f));
+                  parsed.forEach((p) => {
+                    if (map.has(p.slug)) {
+                      const serverItem = map.get(p.slug)!;
+                      const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : (serverItem.cardImage || "");
+                      const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : (serverItem.heroImage || "");
+                      map.set(p.slug, { ...serverItem, ...p, cardImage, heroImage });
+                    }
+                  });
+                  list = Array.from(map.values()).map(sanitizeServiceOrder);
+                } else {
+                  list = parsed.map(sanitizeServiceOrder);
+                }
               }
             } catch {}
           }
-          // Immediately update localStorage with complete list to fix stale 7-item caches
           localStorage.setItem("adm_services", JSON.stringify(list));
           window.dispatchEvent(new Event("servicesUpdated"));
         }
@@ -228,22 +229,8 @@ export default function AdminServicesPage() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              setServices((current) => {
-                const map = new Map<string, Service>();
-                current.forEach((c) => map.set(c.slug, c));
-                parsed.forEach((p) => {
-                  if (map.has(p.slug)) {
-                    const currentItem = map.get(p.slug)!;
-                    const cardImage = (p.cardImage && p.cardImage.trim() !== "") ? p.cardImage : (currentItem.cardImage || "");
-                    const heroImage = (p.heroImage && p.heroImage.trim() !== "") ? p.heroImage : (currentItem.heroImage || "");
-                    map.set(p.slug, { ...currentItem, ...p, cardImage, heroImage });
-                  } else {
-                    map.set(p.slug, p);
-                  }
-                });
-                return Array.from(map.values());
-              });
+            if (Array.isArray(parsed)) {
+              setServices(parsed.map(sanitizeServiceOrder));
             }
           } catch {}
         }
@@ -363,7 +350,7 @@ export default function AdminServicesPage() {
         await fetch("/api/admin/save-content", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "services", data: remaining })
+          body: JSON.stringify({ type: "services", data: remaining, deletedSlug: slug })
         });
       } catch {}
 

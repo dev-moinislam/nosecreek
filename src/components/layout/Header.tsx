@@ -30,6 +30,18 @@ export default function Header() {
 
   // Dynamic sync of backend services, conditions, and site settings
   useEffect(() => {
+    async function fetchFreshServices() {
+      try {
+        const res = await fetch("/api/content?type=services", { cache: "no-store" });
+        if (res.ok) {
+          const list = await res.json();
+          if (Array.isArray(list)) {
+            setDynamicServices(list);
+          }
+        }
+      } catch {}
+    }
+
     function syncContent() {
       try {
         const savedSettings = localStorage.getItem("adm_settings");
@@ -43,38 +55,23 @@ export default function Header() {
         const savedServices = localStorage.getItem("adm_services");
         if (savedServices) {
           const parsed = JSON.parse(savedServices);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map<string, Service>();
-            (defaultServicesData as Service[]).forEach((s) => map.set(s.slug, s));
-            parsed.forEach((p) => {
-              if (map.has(p.slug)) {
-                map.set(p.slug, { ...map.get(p.slug)!, ...p });
-              } else {
-                map.set(p.slug, p);
-              }
-            });
-            setDynamicServices(Array.from(map.values()));
+          if (Array.isArray(parsed)) {
+            setDynamicServices(parsed);
           }
+        } else {
+          fetchFreshServices();
         }
         const savedConditions = localStorage.getItem("adm_conditions");
         if (savedConditions) {
           const parsed = JSON.parse(savedConditions);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map<string, Condition>();
-            (defaultConditionsData as Condition[]).forEach((c) => map.set(c.slug, c));
-            parsed.forEach((p) => {
-              if (map.has(p.slug)) {
-                map.set(p.slug, { ...map.get(p.slug)!, ...p });
-              } else {
-                map.set(p.slug, p);
-              }
-            });
-            setDynamicConditions(Array.from(map.values()));
+            setDynamicConditions(parsed);
           }
         }
       } catch {}
     }
     syncContent();
+    fetchFreshServices();
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);

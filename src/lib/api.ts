@@ -87,13 +87,11 @@ export async function getServices(): Promise<Service[]> {
         .select("*")
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
-      if (!error && data && data.length > 0) {
-        const map = new Map<string, Service>();
-        currentList.forEach((s) => map.set(s.slug, s));
-
-        data.forEach((d: any) => {
-          const localItem = map.get(d.slug);
-          map.set(d.slug, {
+      if (!error && data) {
+        // Authoritative mapping from Supabase database rows only
+        return data.map((d: any) => {
+          const localItem = currentList.find((s) => s.slug === d.slug);
+          return {
             id: d.id,
             slug: d.slug,
             title: d.title,
@@ -121,10 +119,8 @@ export async function getServices(): Promise<Service[]> {
             locations: d.locations || localItem?.locations || [],
             testimonials: d.testimonials || localItem?.testimonials || [],
             seo: d.seo || localItem?.seo || {}
-          });
+          };
         });
-
-        return Array.from(map.values());
       }
     } catch (e) {
       console.warn("Supabase fetch failed for services, using local fallback", e);
@@ -137,7 +133,7 @@ export async function getServices(): Promise<Service[]> {
       const res = await fetch("/api/content?type=services", { cache: "no-store" });
       if (res.ok) {
         const list = await res.json();
-        if (Array.isArray(list) && list.length > 0) return list;
+        if (Array.isArray(list)) return list;
       }
     } catch {}
   }
@@ -155,40 +151,51 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
         .eq("is_published", true)
         .single();
       if (!error && data) {
+        const localItem = getFreshServicesData().find((s) => s.slug === slug);
         return {
           id: data.id,
           slug: data.slug,
           title: data.title,
-          shortDescription: data.short_description || "",
-          description: data.description || "",
-          heroImage: data.hero_image,
-          sideImage: data.side_image,
-          iconType: data.icon_type,
-          iconBg: data.icon_bg,
-          iconColor: data.icon_color,
-          ctaText: data.cta_text,
-          ctaMuted: data.cta_muted,
-          benefits: data.benefits || [],
-          symptoms: data.symptoms || [],
-          treatmentApproach: data.treatment_approach || [],
-          customSections: data.custom_sections || [],
-          sectionsData: data.sections_data || data.seo?.sectionsData || data.sectionsData || {},
-          faqs: data.faqs || [],
-          hiddenSections: data.hidden_sections || [],
-          sectionOrder: data.section_order || data.sectionOrder || [],
-          relatedServices: data.related_services || [],
-          relatedConditions: data.related_conditions || [],
-          teamMembers: data.team_members || [],
-          locations: data.locations || [],
-          testimonials: data.testimonials || [],
-          seo: data.seo || {}
+          shortDescription: data.short_description || localItem?.shortDescription || "",
+          description: data.description || localItem?.description || "",
+          heroImage: data.hero_image || localItem?.heroImage,
+          sideImage: data.side_image || localItem?.sideImage,
+          cardImage: data.card_image || data.cardImage || data.seo?.cardImage || localItem?.cardImage || null,
+          iconType: data.icon_type || localItem?.iconType,
+          iconBg: data.icon_bg || localItem?.iconBg,
+          iconColor: data.icon_color || localItem?.iconColor,
+          ctaText: data.cta_text || localItem?.ctaText,
+          ctaMuted: data.cta_muted ?? localItem?.ctaMuted,
+          benefits: data.benefits || localItem?.benefits || [],
+          symptoms: data.symptoms || localItem?.symptoms || [],
+          treatmentApproach: data.treatment_approach || localItem?.treatmentApproach || [],
+          customSections: data.custom_sections || localItem?.customSections || [],
+          sectionsData: data.sections_data || data.seo?.sectionsData || data.sectionsData || localItem?.sectionsData || {},
+          faqs: data.faqs || localItem?.faqs || [],
+          hiddenSections: data.hidden_sections || localItem?.hiddenSections || [],
+          sectionOrder: data.section_order || data.sectionOrder || localItem?.sectionOrder || [],
+          relatedServices: data.related_services || localItem?.relatedServices || [],
+          relatedConditions: data.related_conditions || localItem?.relatedConditions || [],
+          teamMembers: data.team_members || localItem?.teamMembers || [],
+          locations: data.locations || localItem?.locations || [],
+          testimonials: data.testimonials || localItem?.testimonials || [],
+          seo: data.seo || localItem?.seo || {}
         };
+      }
+      // If Supabase is configured and query returned 0 rows (item deleted or unpublished), it does not exist
+      if (error && (error.code === "PGRST116" || error.message?.includes("0 rows") || !data)) {
+        return undefined;
       }
     } catch (e) {
       console.warn(`Supabase fetch failed for service ${slug}, using local fallback`, e);
     }
   }
-  return servicesList.find((s) => s.slug === slug);
+
+  // Fallback only if Supabase is not configured
+  if (!isSupabaseConfigured) {
+    return getFreshServicesData().find((s) => s.slug === slug);
+  }
+  return undefined;
 }
 
 function getFreshTeamData(): TeamMember[] {

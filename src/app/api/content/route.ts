@@ -22,13 +22,12 @@ export async function GET(req: Request) {
           const { data: supaServices } = await supabase
             .from("services")
             .select("*")
+            .eq("is_published", true)
             .order("sort_order", { ascending: true });
-          if (supaServices && supaServices.length > 0) {
-            const map = new Map<string, any>();
-            diskData.forEach((d) => map.set(d.slug, d));
-            supaServices.forEach((s: any) => {
-              const existing = map.get(s.slug);
-              map.set(s.slug, {
+          if (supaServices) {
+            const list = supaServices.map((s: any) => {
+              const existing = diskData.find((d) => d.slug === s.slug);
+              return {
                 id: s.id,
                 slug: s.slug,
                 title: s.title,
@@ -53,9 +52,9 @@ export async function GET(req: Request) {
                 locations: s.locations || existing?.locations || [],
                 testimonials: s.testimonials || existing?.testimonials || [],
                 seo: s.seo || existing?.seo || {}
-              });
+              };
             });
-            return NextResponse.json(Array.from(map.values()));
+            return NextResponse.json(list);
           }
         } catch {}
       }

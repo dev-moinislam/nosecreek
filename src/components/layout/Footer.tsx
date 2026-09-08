@@ -24,18 +24,16 @@ export default function Footer() {
         const saved = localStorage.getItem("adm_services");
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const map = new Map<string, Service>();
-            (defaultServicesData as Service[]).forEach((s) => map.set(s.slug, s));
-            parsed.forEach((p) => {
-              if (map.has(p.slug)) {
-                map.set(p.slug, { ...map.get(p.slug)!, ...p });
-              } else {
-                map.set(p.slug, p);
-              }
-            });
-            setServices(Array.from(map.values()));
+          if (Array.isArray(parsed)) {
+            setServices(parsed);
           }
+        } else {
+          fetch("/api/content?type=services", { cache: "no-store" })
+            .then((r) => r.json())
+            .then((list) => {
+              if (Array.isArray(list)) setServices(list);
+            })
+            .catch(() => {});
         }
       } catch {}
     }
