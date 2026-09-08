@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
 import settingsData from "@/data/settings.json";
 import CallTracking from "./CallTracking";
 import GoogleTagManager from "./GoogleTagManager";
@@ -5,6 +8,33 @@ import GoogleAnalytics from "./GoogleAnalytics";
 import FacebookPixel from "./FacebookPixel";
 
 export default function MarketingScripts() {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    // 1. Load immediately upon first user interaction (scroll, touch, click, mousemove)
+    const triggerEvents = ["scroll", "touchstart", "mousemove", "keydown", "click"];
+    const handleInteraction = () => {
+      setShouldLoad(true);
+      triggerEvents.forEach((ev) => window.removeEventListener(ev, handleInteraction));
+    };
+
+    triggerEvents.forEach((ev) => {
+      window.addEventListener(ev, handleInteraction, { passive: true, once: true });
+    });
+
+    // 2. Or fallback load after 3.8s idle timer so no tracking is ever missed
+    const timer = setTimeout(() => {
+      setShouldLoad(true);
+    }, 3800);
+
+    return () => {
+      clearTimeout(timer);
+      triggerEvents.forEach((ev) => window.removeEventListener(ev, handleInteraction));
+    };
+  }, []);
+
+  if (!shouldLoad) return null;
+
   const marketing = (settingsData as any).marketing || {};
 
   // GTM Container IDs (supports both GTM-M3WLKSQ and GTM-PJ447MK)

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { HomePageData, TeamMember, BlogPost, Service, Condition, Testimonial, ServiceCustomSection } from "@/types/content";
 import defaultHomeData from "@/data/home.json";
 import TeamCarousel from "@/components/ui/TeamCarousel";
@@ -147,17 +148,15 @@ export default function HomeLiveView({
               </div>
 
               <div style={{ position: "relative" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={heroImg}
+                <Image
+                  src={heroImg || "/images/clinic/reception-desktop.jpg"}
                   alt={(h as any)?.imageAlt || (homeData.hero as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
                   width={600}
                   height={450}
-                  loading="eager"
-                  decoding="async"
-                  // @ts-ignore
-                  fetchPriority="high"
-                  style={{ width: "100%", borderRadius: 18, boxShadow: "0 24px 60px rgba(18,60,80,0.18)", objectFit: "cover", aspectRatio: "4/3" }}
+                  priority={true}
+                  quality={80}
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  style={{ width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(18,60,80,0.18)", objectFit: "cover", aspectRatio: "4/3" }}
                 />
                 <div style={{ position: "absolute", left: 18, bottom: -22, background: "#fff", borderRadius: 14, padding: "14px 18px", boxShadow: "0 14px 34px rgba(18,60,80,0.16)", display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 800, fontSize: 30, color: "#1d2b34", lineHeight: 1 }}>
