@@ -72,9 +72,12 @@ export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeCol
     // 1. Instant local render
     loadAndApplyTheme();
 
-    // 2. Background sync from Supabase if connected
+    let dbTimer: any = null;
+    let favTimer: any = null;
+
+    // 2. Background sync from Supabase deferred until browser is completely idle
     if (isSupabaseConfigured && supabase) {
-      (async () => {
+      const syncDbTheme = async () => {
         try {
           const { data, error } = await supabase
             .from("site_settings")
@@ -94,7 +97,13 @@ export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeCol
         } catch {
           // ignore error
         }
-      })();
+      };
+
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(() => syncDbTheme(), { timeout: 4000 });
+      } else {
+        dbTimer = setTimeout(syncDbTheme, 4000);
+      }
     }
 
     function loadAndApplyFavicon() {
@@ -119,13 +128,20 @@ export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeCol
         }
       } catch {}
     }
-    loadAndApplyFavicon();
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(() => loadAndApplyFavicon(), { timeout: 3000 });
+    } else {
+      favTimer = setTimeout(loadAndApplyFavicon, 3000);
+    }
 
     // 3. React instantly to real-time events across windows & modals
     window.addEventListener("storage", loadAndApplyTheme);
     window.addEventListener("themeChanged", loadAndApplyTheme);
     window.addEventListener("settingsUpdated", loadAndApplyFavicon);
     return () => {
+      if (dbTimer) clearTimeout(dbTimer);
+      if (favTimer) clearTimeout(favTimer);
       window.removeEventListener("storage", loadAndApplyTheme);
       window.removeEventListener("themeChanged", loadAndApplyTheme);
       window.removeEventListener("settingsUpdated", loadAndApplyFavicon);
