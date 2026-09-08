@@ -59,6 +59,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} sizes="any" />
+        <link rel="apple-touch-icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />
         {serverThemeCss && (
           <style
             id="nc-ssr-theme-style"

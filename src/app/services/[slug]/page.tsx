@@ -24,6 +24,8 @@ export async function generateStaticParams() {
   }));
 }
 
+import { resolvePageMetadata } from "@/lib/seo";
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const service = await getServiceBySlug(slug);
@@ -34,15 +36,15 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return {
+  return resolvePageMetadata(`/services/${slug}`, {
     title: `${service.seo?.title || service.title} in Calgary | Nose Creek Physiotherapy`,
-    description: service.seo?.description || service.shortDescription,
+    description: service.seo?.description || service.shortDescription || undefined,
     openGraph: {
       title: service.seo?.ogTitle || `${service.title} | Nose Creek Physiotherapy Calgary`,
-      description: service.seo?.ogDescription || service.shortDescription,
-      images: service.heroImage ? [{ url: service.heroImage }] : undefined
+      description: service.seo?.ogDescription || service.shortDescription || undefined,
+      images: (service.cardImage || service.heroImage) ? [{ url: String(service.cardImage || service.heroImage) }] : undefined
     }
-  };
+  });
 }
 
 export default async function ServiceDetailPage({ params }: PageProps) {

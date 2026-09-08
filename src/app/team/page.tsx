@@ -3,10 +3,14 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { getTeamMembers } from "@/lib/api";
 
-export const metadata = {
-  title: "Meet Our Team | Nose Creek Physiotherapy Calgary",
-  description: "Get to know the highly qualified physiotherapists, chiropractors, and massage therapists at Nose Creek Physiotherapy in Calgary."
-};
+import { resolvePageMetadata } from "@/lib/seo";
+
+export async function generateMetadata() {
+  return resolvePageMetadata("/team", {
+    title: "Meet Our Team | Nose Creek Physiotherapy Calgary",
+    description: "Get to know the highly qualified physiotherapists, chiropractors, and massage therapists at Nose Creek Physiotherapy in Calgary."
+  });
+}
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";

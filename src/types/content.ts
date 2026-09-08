@@ -1,3 +1,14 @@
+export interface PageMetaItem {
+  title?: string;
+  description?: string;
+  canonicalUrl?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  keywords?: string;
+  noIndex?: boolean;
+}
+
 export interface SEOData {
   title?: string;
   description?: string;
@@ -8,6 +19,8 @@ export interface SEOData {
   noIndex?: boolean;
   cardImage?: string | null;
   sectionsData?: any;
+  favicon?: string;
+  pages?: Record<string, PageMetaItem>;
   [key: string]: any;
 }
 
@@ -53,6 +66,7 @@ export interface SiteSettings {
   primaryCTA: string;
   footerContent: string;
   seo: SEOData;
+  favicon?: string;
   themeColors?: Record<string, string>;
   theme_colors?: Record<string, string>;
 }

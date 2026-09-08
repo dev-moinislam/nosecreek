@@ -3,14 +3,18 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
 import { getTestimonials } from "@/lib/api";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Patient Reviews & Testimonials | Nose Creek Physiotherapy Calgary",
-  description:
-    "Read real 5-star reviews from over 545 Calgary patients. See how our physiotherapists and chiropractors helped them overcome chronic back, neck, and joint pain."
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/reviews", {
+    title: "Patient Reviews & Testimonials | Nose Creek Physiotherapy Calgary",
+    description:
+      "Read real 5-star reviews from over 545 Calgary patients. See how our physiotherapists and chiropractors helped them overcome chronic back, neck, and joint pain."
+  });
+}
 
-export const dynamic = "force-static";
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export default async function ReviewsPage() {
   const testimonials = await getTestimonials();

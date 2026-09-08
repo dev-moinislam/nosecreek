@@ -3,11 +3,14 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ConditionsIndexGrid from "@/components/ui/ConditionsIndexGrid";
 import { getConditions } from "@/lib/api";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Conditions We Treat | Nose Creek Physiotherapy Calgary",
-  description: "Explore the wide range of musculoskeletal, spinal, and sports injury conditions treated at Nose Creek Physiotherapy in Calgary NW & NE."
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/conditions", {
+    title: "Conditions We Treat | Nose Creek Physiotherapy Calgary",
+    description: "Explore the wide range of musculoskeletal, spinal, and sports injury conditions treated at Nose Creek Physiotherapy in Calgary NW & NE."
+  });
+}
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";

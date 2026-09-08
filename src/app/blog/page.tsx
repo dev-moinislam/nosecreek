@@ -4,11 +4,14 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { getBlogPosts } from "@/lib/api";
 
 import BlogIndexGrid from "@/components/ui/BlogIndexGrid";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Health & Wellness Blog | Nose Creek Physiotherapy Calgary",
-  description: "Read the latest physiotherapy tips, injury recovery advice, exercises, and health guides from our Calgary practitioners."
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/blog", {
+    title: "Health & Wellness Blog | Nose Creek Physiotherapy Calgary",
+    description: "Read the latest physiotherapy tips, injury recovery advice, exercises, and health guides from our Calgary practitioners."
+  });
+}
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";

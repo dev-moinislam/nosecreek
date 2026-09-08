@@ -23,6 +23,8 @@ export async function generateStaticParams() {
   }));
 }
 
+import { resolvePageMetadata } from "@/lib/seo";
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const condition = await getConditionBySlug(slug);
@@ -33,15 +35,15 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return {
+  return resolvePageMetadata(`/conditions/${slug}`, {
     title: `${condition.seo?.title || condition.name} Treatment in Calgary | Nose Creek Physiotherapy`,
-    description: condition.seo?.description || condition.shortDescription || condition.description,
+    description: condition.seo?.description || condition.shortDescription || condition.description || undefined,
     openGraph: {
       title: condition.seo?.ogTitle || `${condition.name} Treatment | Nose Creek Physiotherapy Calgary`,
-      description: condition.seo?.ogDescription || condition.description,
-      images: condition.heroImage ? [{ url: condition.heroImage }] : undefined
+      description: condition.seo?.ogDescription || condition.description || undefined,
+      images: condition.heroImage ? [{ url: String(condition.heroImage) }] : undefined
     }
-  };
+  });
 }
 
 export default async function ConditionDetailPage({ params }: PageProps) {

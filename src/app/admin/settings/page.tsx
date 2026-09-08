@@ -5,6 +5,7 @@ import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { SiteSettings } from "@/types/content";
 import settingsData from "@/data/settings.json";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 
 export default function AdminSettingsPage() {
   const { role, isAdmin, canEditMarketingScripts } = useRole();
@@ -58,7 +59,8 @@ export default function AdminSettingsPage() {
               bookingUrl: data.booking_url || settingsData.bookingUrl,
               primaryCTA: data.primary_cta || settingsData.primaryCTA,
               footerContent: data.footer_content || settingsData.footerContent,
-              seo: data.seo || settingsData.seo
+              seo: data.seo || settingsData.seo,
+              favicon: data.seo?.favicon || (data as any).favicon || (settingsData as any).favicon
             });
             if (data.marketing) {
               const m = data.marketing;
@@ -137,6 +139,11 @@ export default function AdminSettingsPage() {
 
     const fullPayload = {
       ...settings,
+      favicon: settings.favicon || settings.seo?.favicon,
+      seo: {
+        ...(settings.seo || {}),
+        favicon: settings.favicon || settings.seo?.favicon
+      },
       marketing: formattedMarketing
     };
 
@@ -153,7 +160,10 @@ export default function AdminSettingsPage() {
           booking_url: settings.bookingUrl,
           primary_cta: settings.primaryCTA,
           footer_content: settings.footerContent,
-          seo: settings.seo,
+          seo: {
+            ...(settings.seo || {}),
+            favicon: settings.favicon || settings.seo?.favicon
+          },
           marketing: formattedMarketing
         });
       } catch (err: any) {
@@ -218,7 +228,81 @@ export default function AdminSettingsPage() {
       )}
 
       <form onSubmit={handleSave}>
-        {/* 1. Clinic General Settings */}
+        {/* 1. Branding & Favicon */}
+        <div className="adm-card" style={{ padding: 24, marginBottom: 24 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e2e8f0", paddingBottom: 12, marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>
+              🎨 Branding &amp; Website Favicon
+            </h3>
+            <a
+              href="/admin/seo"
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: "var(--primary, #0e78a8)",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4
+              }}
+            >
+              <span>🌐</span> Manage All Page Meta Titles &amp; Descriptions &rarr;
+            </a>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <div>
+              <AdminImageUploader
+                label="Website Favicon (Browser Tab Icon)"
+                value={settings.favicon || settings.seo?.favicon || ""}
+                onChange={(url) => {
+                  setSettings({
+                    ...settings,
+                    favicon: url,
+                    seo: {
+                      ...(settings.seo || {}),
+                      favicon: url
+                    }
+                  });
+                }}
+                folder="branding"
+                placeholder="Upload .ico, .png, or .svg favicon..."
+                aspectRatioNote="Square 1:1 (.png, .ico, .svg)"
+              />
+              <span style={{ fontSize: 11.5, color: "#64748b", marginTop: 4, display: "block" }}>
+                Displays on browser tabs, bookmarks, and mobile home screen shortcuts across the entire website.
+              </span>
+            </div>
+
+            {/* Live Browser Tab Preview */}
+            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 10 }}>
+                Live Browser Tab Preview
+              </div>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#ffffff", padding: "8px 16px", borderRadius: "8px 8px 0 0", border: "1px solid #cbd5e1", borderBottom: "none", boxShadow: "0 -2px 6px rgba(0,0,0,0.03)", maxWidth: 300 }}>
+                {settings.favicon || settings.seo?.favicon ? (
+                  <img
+                    src={settings.favicon || settings.seo?.favicon}
+                    alt="Favicon preview"
+                    style={{ width: 16, height: 16, objectFit: "contain", borderRadius: 2 }}
+                    onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+                  />
+                ) : (
+                  <div style={{ width: 16, height: 16, borderRadius: 2, background: "var(--primary, #0e78a8)", color: "#fff", fontSize: 9, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    NC
+                  </div>
+                )}
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#1e293b", maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {settings.clinicName || "Nose Creek Physiotherapy"}
+                </span>
+                <span style={{ fontSize: 10, color: "#94a3b8", marginLeft: "auto" }}>✕</span>
+              </div>
+              <div style={{ height: 6, background: "#ffffff", borderLeft: "1px solid #cbd5e1", borderRight: "1px solid #cbd5e1", borderBottom: "1px solid #cbd5e1", borderRadius: "0 0 4px 4px", maxWidth: 300 }} />
+            </div>
+          </div>
+        </div>
+
+        {/* 2. Clinic General Settings */}
         <div className="adm-card" style={{ padding: 24, marginBottom: 24 }}>
           <h3 style={{ margin: "0 0 16px 0", fontSize: 16, fontWeight: 700, borderBottom: "1px solid #e2e8f0", paddingBottom: 12 }}>
             🏥 Clinic Information

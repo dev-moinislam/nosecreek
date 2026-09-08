@@ -3,11 +3,17 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
 import { getTestimonials } from "@/lib/api";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "About Us | Nose Creek Physiotherapy Calgary",
-  description: "We help people aged 30+ in Calgary restore mobility, strength, and balance with less dependence on medication. Founded by Blair Schachterle."
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/about", {
+    title: "About Us | Nose Creek Physiotherapy Calgary",
+    description: "We help people aged 30+ in Calgary restore mobility, strength, and balance with less dependence on medication. Founded by Blair Schachterle."
+  });
+}
+
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 const eyebrow = (text: string, color = "#1c9fd8") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>

@@ -17,6 +17,8 @@ export async function generateStaticParams() {
   }));
 }
 
+import { resolvePageMetadata } from "@/lib/seo";
+
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
@@ -27,7 +29,7 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return {
+  return resolvePageMetadata(`/blog/${slug}`, {
     title: `${post.seo?.title || post.title} | Nose Creek Physiotherapy`,
     description: post.seo?.description || post.excerpt,
     openGraph: {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps) {
       description: post.seo?.ogDescription || post.excerpt,
       images: [{ url: post.seo?.ogImage || post.featuredImage }]
     }
-  };
+  });
 }
 
 export default async function BlogPostDetailPage({ params }: PageProps) {

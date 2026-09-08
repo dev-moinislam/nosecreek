@@ -3,10 +3,17 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { getLocations } from "@/lib/api";
 
-export const metadata = {
-  title: "Our Clinic Locations | Calgary Physiotherapy & Rehabilitation",
-  description: "Find Nose Creek Physiotherapy Clinic in Calgary. View maps, driving directions, phone numbers, opening hours, and practitioners."
-};
+import { resolvePageMetadata } from "@/lib/seo";
+
+export async function generateMetadata() {
+  return resolvePageMetadata("/locations", {
+    title: "Our Clinic Locations | Calgary Physiotherapy & Rehabilitation",
+    description: "Find Nose Creek Physiotherapy Clinic in Calgary. View maps, driving directions, phone numbers, opening hours, and practitioners."
+  });
+}
+
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export default async function LocationsPage() {
   const locations = await getLocations();

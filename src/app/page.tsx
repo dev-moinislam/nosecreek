@@ -8,12 +8,15 @@ import {
   getHomeContent
 } from "@/lib/api";
 import HomeLiveView from "@/components/home/HomeLiveView";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Nose Creek Physiotherapy Calgary | Physiotherapy, Massage & Movement",
-  description:
-    "Physiotherapy in Calgary North (Beddington). Since 2001, restoring mobility, strength & balance naturally. Direct insurance billing, open evenings & Saturdays."
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/", {
+    title: "Nose Creek Physiotherapy Calgary | Physiotherapy, Massage & Movement",
+    description:
+      "Physiotherapy in Calgary North (Beddington). Since 2001, restoring mobility, strength & balance naturally. Direct insurance billing, open evenings & Saturdays."
+  });
+}
 
 export const revalidate = 0;
 

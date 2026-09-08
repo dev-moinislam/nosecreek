@@ -4,11 +4,14 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import ServicesIndexGrid from "@/components/ui/ServicesIndexGrid";
 import { getServices } from "@/lib/api";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Clinical Services | Nose Creek Physiotherapy Calgary",
-  description: "Explore our full range of clinical services in Calgary North including physiotherapy, massage therapy, shockwave therapy, custom orthotics, and knee bracing."
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/services", {
+    title: "Clinical Services | Nose Creek Physiotherapy Calgary",
+    description: "Explore our full range of clinical services in Calgary North including physiotherapy, massage therapy, shockwave therapy, custom orthotics, and knee bracing."
+  });
+}
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";

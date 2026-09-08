@@ -11,6 +11,9 @@ interface AdminImageUploaderProps {
   placeholder?: string;
   aspectRatioNote?: string;
   style?: React.CSSProperties;
+  altValue?: string;
+  onAltChange?: (alt: string) => void;
+  showAltInput?: boolean;
 }
 
 export default function AdminImageUploader({
@@ -21,6 +24,9 @@ export default function AdminImageUploader({
   placeholder = "Upload image or enter URL...",
   aspectRatioNote,
   style,
+  altValue,
+  onAltChange,
+  showAltInput,
 }: AdminImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -307,6 +313,36 @@ export default function AdminImageUploader({
                 color: "#1e293b",
                 background: "#ffffff",
                 outline: "none",
+              }}
+            />
+          </div>
+        )}
+
+        {/* SEO Alt Text Input */}
+        {(onAltChange || showAltInput) && Boolean(value) && (
+          <div style={{ marginTop: 6, paddingTop: 8, borderTop: "1px dashed #e2e8f0", display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <label style={{ fontSize: 11.5, fontWeight: 700, color: "#334155", display: "flex", alignItems: "center", gap: 5 }}>
+                <span>🔍</span> Image Alt Text (SEO)
+              </label>
+              <span style={{ fontSize: 11, color: "#94a3b8" }}>
+                Descriptive text for Google Images &amp; screen readers
+              </span>
+            </div>
+            <input
+              type="text"
+              value={altValue || ""}
+              onChange={(e) => onAltChange?.(e.target.value)}
+              placeholder="e.g. Physiotherapy assessment at Nose Creek clinic Calgary"
+              style={{
+                width: "100%",
+                padding: "6px 10px",
+                borderRadius: 6,
+                border: "1px solid #cbd5e1",
+                fontSize: 12,
+                color: "#1e293b",
+                background: "#f8fafc",
+                outline: "none"
               }}
             />
           </div>

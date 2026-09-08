@@ -97,12 +97,29 @@ export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeCol
       })();
     }
 
+    function loadAndApplyFavicon() {
+      try {
+        const saved = localStorage.getItem("adm_settings");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          const icon = parsed.favicon || parsed.seo?.favicon || parsed.settings?.favicon || parsed.settings?.seo?.favicon;
+          if (icon) {
+            let link = document.querySelector("link[rel*='icon']") as HTMLLinkElement | null;
+            if (link) link.href = icon;
+          }
+        }
+      } catch {}
+    }
+    loadAndApplyFavicon();
+
     // 3. React instantly to real-time events across windows & modals
     window.addEventListener("storage", loadAndApplyTheme);
     window.addEventListener("themeChanged", loadAndApplyTheme);
+    window.addEventListener("settingsUpdated", loadAndApplyFavicon);
     return () => {
       window.removeEventListener("storage", loadAndApplyTheme);
       window.removeEventListener("themeChanged", loadAndApplyTheme);
+      window.removeEventListener("settingsUpdated", loadAndApplyFavicon);
     };
   }, [initialTheme]);
 

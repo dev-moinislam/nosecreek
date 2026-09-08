@@ -4,16 +4,22 @@ import ContactInquiryForm from "@/components/forms/ContactInquiryForm";
 import VisitUsSection from "@/components/content/VisitUsSection";
 import SchemaMarkup from "@/components/seo/SchemaMarkup";
 import settingsData from "@/data/settings.json";
+import { resolvePageMetadata } from "@/lib/seo";
 
-export const metadata = {
-  title: "Contact Nose Creek Physiotherapy | Calgary NE & NW Clinic",
-  description: "Get in touch with Nose Creek Physiotherapy in Calgary. Phone: 403.295.8590. Located at 8220 Centre St NE #153. Direct insurance billing and free parking.",
-  openGraph: {
-    title: "Contact Nose Creek Physiotherapy | Calgary Physio Clinic",
-    description: "Send an inquiry, book treatment, or call our Calgary North clinic at 403.295.8590.",
-    url: "https://www.nosecreekphysiotherapy.com/contact/"
-  }
-};
+export async function generateMetadata() {
+  return resolvePageMetadata("/contact", {
+    title: "Contact Nose Creek Physiotherapy | Calgary NE & NW Clinic",
+    description: "Get in touch with Nose Creek Physiotherapy in Calgary. Phone: 403.295.8590. Located at 8220 Centre St NE #153. Direct insurance billing and free parking.",
+    openGraph: {
+      title: "Contact Nose Creek Physiotherapy | Calgary Physio Clinic",
+      description: "Send an inquiry, book treatment, or call our Calgary North clinic at 403.295.8590.",
+      url: "https://www.nosecreekphysiotherapy.com/contact/"
+    }
+  });
+}
+
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export default function ContactPage() {
   return (
