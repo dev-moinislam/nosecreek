@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import SchemaMarkup from "@/components/seo/SchemaMarkup";
 import MarketingScripts from "@/components/marketing/MarketingScripts";
 import FloatingReviewsWidget from "@/components/ui/FloatingReviewsWidget";
+import NavigationProgressBar from "@/components/ui/NavigationProgressBar";
 import settingsData from "@/data/settings.json";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   // Standard public website layout with Header and Footer
   return (
     <>
+      <React.Suspense fallback={null}>
+        <NavigationProgressBar />
+      </React.Suspense>
       <Header />
       <main id="main-content">{children}</main>
       <Footer />
