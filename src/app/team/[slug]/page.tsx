@@ -10,6 +10,7 @@ import {
   getServices,
   getLocations
 } from "@/lib/api";
+import { resolvePageMetadata } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return {
+  return resolvePageMetadata(`/team/${slug}`, {
     title: `${member.name} | ${member.role} | Nose Creek Physiotherapy Calgary`,
     description: member.seo?.description || member.shortBio || member.fullBio,
     openGraph: {
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: PageProps) {
       description: member.seo?.ogDescription || member.shortBio,
       images: [{ url: member.profileImage }]
     }
-  };
+  });
 }
 
 const eyebrow = (text: string, color = "#1c9fd8") => (

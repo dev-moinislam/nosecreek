@@ -8,6 +8,7 @@ import {
   getServices,
   getTeamMembers
 } from "@/lib/api";
+import { resolvePageMetadata } from "@/lib/seo";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -33,14 +34,14 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return {
-    title: location.seo.title || `${location.name} | Calgary Clinic`,
-    description: location.seo.description,
+  return resolvePageMetadata(`/locations/${slug}`, {
+    title: location.seo?.title || `${location.name} | Calgary Clinic`,
+    description: location.seo?.description || location.description,
     openGraph: {
-      title: location.seo.ogTitle || location.name,
-      description: location.seo.ogDescription || location.description
+      title: location.seo?.ogTitle || location.name,
+      description: location.seo?.ogDescription || location.description
     }
-  };
+  });
 }
 
 export default async function LocationDetailPage({ params }: PageProps) {

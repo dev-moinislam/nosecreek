@@ -6,9 +6,13 @@ import { buildThemeCss, ThemeColors } from "@/lib/theme";
 import { RoleProvider } from "@/components/admin/RoleGuard";
 import settingsData from "@/data/settings.json";
 import { getSiteSettings } from "@/lib/api";
+import { getSiteBaseUrl } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings();
+  const [settings, baseUrl] = await Promise.all([
+    getSiteSettings(),
+    getSiteBaseUrl()
+  ]);
   const faviconUrl = settings.favicon || settings.seo?.favicon || "/favicon.ico";
 
   return {
@@ -17,10 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.clinicName || settingsData.clinicName}`
     },
     description: settings.seo?.description || settingsData.seo.description,
-    metadataBase: new URL(settings.seo?.canonicalUrl || settingsData.seo.canonicalUrl),
-    alternates: {
-      canonical: "/"
-    },
+    metadataBase: new URL(baseUrl),
     icons: {
       icon: [
         { url: faviconUrl, sizes: "any" },

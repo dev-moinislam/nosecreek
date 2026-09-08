@@ -86,6 +86,7 @@ export default function AdminSeoManagerPage() {
     setEditForm({
       title: existing.title || route.defaultTitle,
       description: existing.description || route.defaultDescription,
+      canonicalUrl: existing.canonicalUrl || "",
       ogTitle: existing.ogTitle || existing.title || route.defaultTitle,
       ogDescription: existing.ogDescription || existing.description || route.defaultDescription,
       ogImage: existing.ogImage || route.defaultOgImage || settings.seo?.ogImage || "/images/og-home.jpg",
@@ -107,6 +108,7 @@ export default function AdminSeoManagerPage() {
         ...editForm,
         title: editForm.title?.trim() || undefined,
         description: editForm.description?.trim() || undefined,
+        canonicalUrl: editForm.canonicalUrl?.trim() || undefined,
         ogTitle: editForm.ogTitle?.trim() || undefined,
         ogDescription: editForm.ogDescription?.trim() || undefined,
         ogImage: editForm.ogImage?.trim() || undefined,
@@ -302,18 +304,20 @@ export default function AdminSeoManagerPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
-                  <th style={{ padding: "12px 18px", width: "25%" }}>Page &amp; Route</th>
-                  <th style={{ padding: "12px 18px", width: "35%" }}>Meta Title (Google Tab)</th>
-                  <th style={{ padding: "12px 18px", width: "25%" }}>Meta Description</th>
-                  <th style={{ padding: "12px 18px", width: "15%", textAlign: "right" }}>Actions</th>
+                  <th style={{ padding: "12px 18px", width: "22%" }}>Page &amp; Route</th>
+                  <th style={{ padding: "12px 18px", width: "28%" }}>Meta Title (Google Tab)</th>
+                  <th style={{ padding: "12px 18px", width: "22%" }}>Meta Description</th>
+                  <th style={{ padding: "12px 18px", width: "18%" }}>Canonical URL</th>
+                  <th style={{ padding: "12px 18px", width: "10%", textAlign: "right" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRoutes.map((route, idx) => {
                   const custom = customPages[route.path];
-                  const hasCustom = Boolean(custom?.title || custom?.description);
+                  const hasCustom = Boolean(custom?.title || custom?.description || custom?.canonicalUrl);
                   const activeTitle = custom?.title || route.defaultTitle;
                   const activeDesc = custom?.description || route.defaultDescription;
+                  const hasCustomCanonical = Boolean(custom?.canonicalUrl);
 
                   return (
                     <tr
@@ -375,6 +379,29 @@ export default function AdminSeoManagerPage() {
                         <div style={{ fontSize: 11, color: activeDesc.length > 160 ? "#d97706" : "#64748b", marginTop: 4 }}>
                           Length: {activeDesc.length} chars (Recommended: 150-160)
                         </div>
+                      </td>
+
+                      {/* Canonical URL */}
+                      <td style={{ padding: "14px 18px", verticalAlign: "top" }}>
+                        {hasCustomCanonical ? (
+                          <div>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a", padding: "3px 8px", borderRadius: 6, fontSize: 11, fontWeight: 700 }}>
+                              <span>🎯 Target:</span> {custom.canonicalUrl}
+                            </span>
+                            <div style={{ fontSize: 10.5, color: "#b45309", marginTop: 4, fontWeight: 600 }}>
+                              Points authority to target page
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0", padding: "3px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
+                              <span>✨ Self-Canonical</span>
+                            </span>
+                            <div style={{ fontSize: 10.5, color: "#64748b", marginTop: 4 }}>
+                              Dynamic: current domain + {route.path}
+                            </div>
+                          </div>
+                        )}
                       </td>
 
                       {/* Actions */}
@@ -511,6 +538,90 @@ export default function AdminSeoManagerPage() {
                 />
               </div>
 
+              {/* Canonical URL & Duplicate Content Control */}
+              <div style={{ background: "#f8fafc", padding: 16, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <label className="adm-form-label" style={{ margin: 0, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>🔗</span> Canonical URL (Self or Point to Another Page)
+                  </label>
+                  {editForm.canonicalUrl ? (
+                    <span style={{ fontSize: 11, background: "#fef3c7", color: "#92400e", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      Custom Target Set
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 11, background: "#f0fdf4", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      Self-Canonical (Dynamic)
+                    </span>
+                  )}
+                </div>
+
+                <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 12px 0", lineHeight: 1.4 }}>
+                  By default, this page is <strong>Self-Canonical</strong> (automatically resolves to its own live URL on whatever domain is loaded, including Vercel or your production domain). To make this page point authority to another primary page or external URL, select or type below:
+                </p>
+
+                {/* Quick Selector from existing site pages */}
+                <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+                  <select
+                    className="adm-input"
+                    style={{ fontSize: 12.5, flex: 1, minWidth: 200 }}
+                    value={routes.some((r) => r.path === editForm.canonicalUrl) ? editForm.canonicalUrl : ""}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditForm({ ...editForm, canonicalUrl: val });
+                    }}
+                  >
+                    <option value="">-- Quick Select Target from Existing Pages --</option>
+                    {routes
+                      .filter((r) => r.path !== editingPath)
+                      .map((r) => (
+                        <option key={r.path} value={r.path}>
+                          {r.path} — ({r.name})
+                        </option>
+                      ))}
+                  </select>
+                  {editForm.canonicalUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setEditForm({ ...editForm, canonicalUrl: "" })}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: 8,
+                        border: "1px solid #cbd5e1",
+                        background: "#ffffff",
+                        color: "#dc2626",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      ✕ Reset to Self-Canonical
+                    </button>
+                  )}
+                </div>
+
+                {/* Direct Custom Input */}
+                <input
+                  type="text"
+                  className="adm-input"
+                  value={editForm.canonicalUrl || ""}
+                  onChange={(e) => setEditForm({ ...editForm, canonicalUrl: e.target.value })}
+                  placeholder={`Leave empty for default self-canonical (${editingPath})`}
+                  style={{ fontSize: 12.5 }}
+                />
+                <span style={{ fontSize: 11, color: "#64748b", marginTop: 6, display: "block" }}>
+                  {editForm.canonicalUrl ? (
+                    <span style={{ color: "#d97706", fontWeight: 600 }}>
+                      ⚠️ Search engines will treat <strong>{editForm.canonicalUrl}</strong> as the master authoritative source for this page.
+                    </span>
+                  ) : (
+                    <span style={{ color: "#15803d", fontWeight: 600 }}>
+                      ✓ Currently Self-Canonical: Search engines will index this exact page URL directly.
+                    </span>
+                  )}
+                </span>
+              </div>
+
               {/* Keywords */}
               <div className="adm-form-group" style={{ margin: 0 }}>
                 <label className="adm-form-label" style={{ fontWeight: 700 }}>
@@ -550,7 +661,10 @@ export default function AdminSeoManagerPage() {
                 </div>
                 <div style={{ fontFamily: "arial, sans-serif" }}>
                   <div style={{ fontSize: 12, color: "#202124", display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ color: "#5f6368" }}>https://nosecreekphysiotherapy.com{editingPath}</span>
+                    <span style={{ color: "#5f6368" }}>
+                      {(typeof window !== "undefined" ? window.location.origin : "https://nosecreek.vercel.app")}
+                      {editForm.canonicalUrl ? editForm.canonicalUrl : editingPath}
+                    </span>
                   </div>
                   <div style={{ fontSize: 18, color: "#1a0dab", textDecoration: "none", cursor: "pointer", marginTop: 3, fontWeight: 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {editForm.title || "Page Title — Nose Creek Physiotherapy"}

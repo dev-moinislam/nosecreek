@@ -179,14 +179,52 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
 }
 
 /**
+ * Dynamically resolves the base URL of the active deployment.
+ * Supports Vercel preview/production domains, custom domains, and localhost.
+ */
+export async function getSiteBaseUrl(): Promise<string> {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+
+  try {
+    const { headers } = await import("next/headers");
+    const headersList = await headers();
+    const host = headersList.get("x-forwarded-host") || headersList.get("host");
+    if (host) {
+      const proto = headersList.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+      return `${proto}://${host}`;
+    }
+  } catch {
+    // headers() might throw during static generation or if not in request context
+  }
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return "https://nosecreekphysiotherapy.com";
+}
+
+/**
  * Resolves page metadata, prioritizing custom metadata saved in site settings
+ * and dynamically generating self-canonical URLs unless explicitly overridden.
  */
 export async function resolvePageMetadata(
   pathname: string,
   fallback: Metadata = {}
 ): Promise<Metadata> {
   try {
-    const settings = await getSiteSettings();
+    const [settings, baseUrl] = await Promise.all([
+      getSiteSettings(),
+      getSiteBaseUrl()
+    ]);
     const customPages = settings.seo?.pages || {};
     const custom = customPages[pathname];
 
@@ -214,16 +252,38 @@ export async function resolvePageMetadata(
       ? custom.ogImage.trim()
       : (fallback.openGraph?.images as any)?.[0]?.url || settings.seo?.ogImage || "/images/og-home.jpg";
 
+    // Dynamic Self-Canonical or Custom Target Resolution
+    let canonicalUrl: string;
+    if (custom?.canonicalUrl && custom.canonicalUrl.trim() !== "") {
+      const trimmedCanonical = custom.canonicalUrl.trim();
+      if (trimmedCanonical.startsWith("http://") || trimmedCanonical.startsWith("https://")) {
+        canonicalUrl = trimmedCanonical;
+      } else {
+        const cleanPath = trimmedCanonical.startsWith("/") ? trimmedCanonical : `/${trimmedCanonical}`;
+        canonicalUrl = `${baseUrl}${cleanPath}`;
+      }
+    } else {
+      // Default: Dynamic Self-Canonical matching current page URL
+      const cleanPath = pathname === "/" ? "" : (pathname.startsWith("/") ? pathname : `/${pathname}`);
+      canonicalUrl = `${baseUrl}${cleanPath}`;
+    }
+
     return {
       ...fallback,
+      metadataBase: new URL(baseUrl),
       title,
       description,
+      alternates: {
+        ...(fallback.alternates || {}),
+        canonical: canonicalUrl,
+      },
       openGraph: {
         ...(fallback.openGraph || {}),
         title: ogTitle,
         description: ogDescription,
         images: [{ url: ogImage }],
         siteName: settings.clinicName,
+        url: canonicalUrl,
       },
       twitter: {
         ...(fallback.twitter || {}),
