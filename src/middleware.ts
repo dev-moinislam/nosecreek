@@ -14,7 +14,7 @@ interface CachedRule {
 // In-memory cache for ultra-fast middleware execution
 let cachedRules: CachedRule[] = (staticRedirectsData as any)?.rules || [];
 let lastFetchTime = 0;
-const CACHE_TTL_MS = 1500; // Refresh rules from API every 1.5 seconds
+const CACHE_TTL_MS = 60000; // Refresh rules from API every 60 seconds
 
 export async function middleware(request: NextRequest) {
   const { pathname, search, origin } = request.nextUrl;

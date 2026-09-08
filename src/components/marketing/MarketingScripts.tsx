@@ -11,8 +11,8 @@ export default function MarketingScripts() {
   const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
-    // 1. Load immediately upon first user interaction (scroll, touch, click, mousemove)
-    const triggerEvents = ["scroll", "touchstart", "mousemove", "keydown", "click"];
+    // 1. Load immediately upon real user interaction (scroll, touch, pointerdown, keydown)
+    const triggerEvents = ["scroll", "touchstart", "pointerdown", "keydown"];
     const handleInteraction = () => {
       setShouldLoad(true);
       triggerEvents.forEach((ev) => window.removeEventListener(ev, handleInteraction));
@@ -22,10 +22,10 @@ export default function MarketingScripts() {
       window.addEventListener(ev, handleInteraction, { passive: true, once: true });
     });
 
-    // 2. Or fallback load after 8s idle timer so no tracking is ever missed
+    // 2. Or fallback load after 10s idle timer so no tracking is ever missed
     const timer = setTimeout(() => {
       setShouldLoad(true);
-    }, 8000);
+    }, 10000);
 
     return () => {
       clearTimeout(timer);

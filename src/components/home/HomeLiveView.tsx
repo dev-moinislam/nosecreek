@@ -11,12 +11,12 @@ import HomeServicesGrid from "@/components/ui/HomeServicesGrid";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
 
 const ReviewCarousel = dynamic(() => import("@/components/ui/ReviewCarousel"), {
-  ssr: true,
+  ssr: false,
   loading: () => <div style={{ minHeight: 320 }} />
 });
 
 const VisitUsSection = dynamic(() => import("@/components/content/VisitUsSection"), {
-  ssr: true,
+  ssr: false,
   loading: () => <div style={{ minHeight: 340 }} />
 });
 

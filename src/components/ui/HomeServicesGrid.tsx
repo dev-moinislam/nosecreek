@@ -86,6 +86,8 @@ export default function HomeServicesGrid({ initialServices }: HomeServicesGridPr
                   <img
                     src={imageSrc!}
                     alt={svc.cardImageAlt || svc.seo?.cardImageAlt || svc.heroImageAlt || svc.seo?.heroImageAlt || svc.title}
+                    loading="lazy"
+                    decoding="async"
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = "none";

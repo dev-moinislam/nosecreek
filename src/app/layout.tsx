@@ -9,9 +9,11 @@ import settingsData from "@/data/settings.json";
 import { getSiteSettings } from "@/lib/api";
 import { getSiteBaseUrl } from "@/lib/seo";
 
+export const revalidate = 60;
+
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["700"],
   variable: "--font-poppins",
   display: "swap",
   preload: true,
@@ -97,7 +99,7 @@ export default async function RootLayout({
       <head>
         <link rel="preconnect" href="https://vrhrqljixrsckdkstier.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://vrhrqljixrsckdkstier.supabase.co" />
-        <link rel="preload" as="image" href="/images/clinic/reception-desktop.webp" fetchPriority="high" type="image/webp" />
+        <link rel="preload" as="image" href="/images/clinic/reception-desktop.webp" media="(min-width: 768px)" fetchPriority="high" type="image/webp" />
         <link rel="icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} sizes="any" />
         <link rel="shortcut icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />
         <link rel="apple-touch-icon" href={settings.favicon || settings.seo?.favicon || "/favicon.ico"} />

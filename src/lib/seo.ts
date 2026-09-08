@@ -187,18 +187,6 @@ export async function getSiteBaseUrl(): Promise<string> {
     return window.location.origin;
   }
 
-  try {
-    const { headers } = await import("next/headers");
-    const headersList = await headers();
-    const host = headersList.get("x-forwarded-host") || headersList.get("host");
-    if (host) {
-      const proto = headersList.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
-      return `${proto}://${host}`;
-    }
-  } catch {
-    // headers() might throw during static generation or if not in request context
-  }
-
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return process.env.NEXT_PUBLIC_SITE_URL;
   }
