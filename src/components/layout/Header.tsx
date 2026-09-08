@@ -70,8 +70,6 @@ export default function Header() {
           if (Array.isArray(parsed)) {
             setDynamicServices(parsed);
           }
-        } else {
-          fetchFreshServices();
         }
         const savedConditions = localStorage.getItem("adm_conditions");
         if (savedConditions) {
@@ -79,31 +77,30 @@ export default function Header() {
           if (Array.isArray(parsed)) {
             setDynamicConditions(parsed);
           }
-        } else {
-          fetchFreshConditions();
         }
       } catch {}
     }
     syncContent();
 
-    // Defer background API freshness sync until after initial page render is complete
-    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-      (window as any).requestIdleCallback(() => {
+    // Defer background API freshness sync until after initial page render is fully complete (3s delay or idle)
+    const idleTimer = setTimeout(() => {
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        (window as any).requestIdleCallback(() => {
+          fetchFreshServices();
+          fetchFreshConditions();
+        });
+      } else {
         fetchFreshServices();
         fetchFreshConditions();
-      });
-    } else {
-      setTimeout(() => {
-        fetchFreshServices();
-        fetchFreshConditions();
-      }, 2000);
-    }
+      }
+    }, 3000);
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);
     window.addEventListener("conditionsUpdated", syncContent);
     window.addEventListener("storage", syncContent);
     return () => {
+      clearTimeout(idleTimer);
       window.removeEventListener("settingsUpdated", syncContent);
       window.removeEventListener("servicesUpdated", syncContent);
       window.removeEventListener("conditionsUpdated", syncContent);

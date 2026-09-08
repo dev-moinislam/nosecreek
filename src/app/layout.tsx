@@ -15,7 +15,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["700"],
   variable: "--font-poppins",
-  display: "swap",
+  display: "optional",
   preload: true,
   fallback: ["system-ui", "sans-serif"],
 });
@@ -24,7 +24,7 @@ const openSans = Open_Sans({
   subsets: ["latin"],
   weight: ["400", "600"],
   variable: "--font-open-sans",
-  display: "swap",
+  display: "optional",
   preload: true,
   fallback: ["system-ui", "sans-serif"],
 });
