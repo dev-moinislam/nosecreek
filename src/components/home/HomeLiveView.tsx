@@ -120,16 +120,16 @@ export default function HomeLiveView({
                   {eyebrowText}
                 </div>
 
-                <h1 style={{ fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.1 }}>
-                  <span style={{ display: "block", fontSize: "clamp(20px,2.4vw,28px)", color: "#1d2b34", marginBottom: 6 }}>
+                <h1 style={{ fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.15 }}>
+                  <span style={{ display: "block", fontSize: "clamp(22px,2.6vw,30px)", color: "#1d2b34", marginBottom: 8 }}>
                     {titleLine1}
                   </span>
-                  <span style={{ display: "block", fontSize: "clamp(30px,4.2vw,50px)", color: "#1c9fd8", lineHeight: 1.08 }}>
+                  <span style={{ display: "block", fontSize: "clamp(32px,4.6vw,52px)", color: "#1c9fd8", lineHeight: 1.1 }}>
                     {titleLine2}
                   </span>
                 </h1>
 
-                <p style={{ marginTop: 20, fontSize: "clamp(16px,1.5vw,19px)", lineHeight: 1.6, color: "#48535c", maxWidth: 560 }}>
+                <p style={{ marginTop: 20, fontSize: "clamp(15.5px,1.4vw,18.5px)", lineHeight: 1.55, color: "#48535c", maxWidth: 560 }}>
                   {desc}
                 </p>
 
