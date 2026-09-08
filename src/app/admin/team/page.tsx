@@ -32,6 +32,98 @@ export default function AdminTeamPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ slug: string; name: string } | null>(null);
 
+  // Dynamic services & locations list (synced live with /admin/services and Supabase)
+  const [allServices, setAllServices] = useState<Service[]>(servicesData as Service[]);
+  const [allLocations, setAllLocations] = useState<Location[]>(locationsData as Location[]);
+
+  const fetchServicesAndLocations = async () => {
+    // 1. Instant sync from local storage cache if available
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("adm_services");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAllServices(parsed);
+          }
+        } catch {}
+      }
+    }
+
+    // 2. Fetch fresh services from API and Supabase
+    try {
+      let combined: Service[] = [];
+      const res = await fetch("/api/content?type=services", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          combined = data;
+        }
+      }
+
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data: supaServices } = await supabase
+            .from("services")
+            .select("*")
+            .order("sort_order", { ascending: true });
+          if (supaServices && supaServices.length > 0) {
+            const map = new Map<string, Service>();
+            combined.forEach((s) => map.set(s.slug, s));
+            supaServices.forEach((d: any) => {
+              const existing = map.get(d.slug);
+              map.set(d.slug, {
+                id: d.id,
+                slug: d.slug,
+                title: d.title,
+                shortDescription: d.short_description || existing?.shortDescription || "",
+                description: d.description || existing?.description || "",
+                heroImage: d.hero_image || existing?.heroImage || null,
+                sideImage: d.side_image || existing?.sideImage || null,
+                cardImage: d.card_image || d.cardImage || d.seo?.cardImage || existing?.cardImage || null,
+                iconType: d.icon_type || existing?.iconType || "stethoscope",
+                iconBg: d.icon_bg || existing?.iconBg || "#e9f5fb",
+                iconColor: d.icon_color || existing?.iconColor || "#1c9fd8",
+                ctaText: d.cta_text || existing?.ctaText || "Book Online",
+                ctaMuted: d.cta_muted ?? existing?.ctaMuted ?? false,
+                benefits: d.benefits || existing?.benefits || [],
+                symptoms: d.symptoms || existing?.symptoms || [],
+                treatmentApproach: d.treatment_approach || existing?.treatmentApproach || [],
+                customSections: d.custom_sections || existing?.customSections || [],
+                sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || existing?.sectionsData || {},
+                faqs: d.faqs || existing?.faqs || [],
+                hiddenSections: d.hidden_sections || existing?.hiddenSections || [],
+                sectionOrder: d.section_order || d.sectionOrder || existing?.sectionOrder || [],
+                relatedServices: d.related_services || existing?.relatedServices || [],
+                relatedConditions: d.related_conditions || existing?.relatedConditions || [],
+                teamMembers: d.team_members || existing?.teamMembers || [],
+                locations: d.locations || existing?.locations || [],
+                testimonials: d.testimonials || existing?.testimonials || [],
+                seo: d.seo || existing?.seo || {}
+              });
+            });
+            combined = Array.from(map.values());
+          }
+        } catch {}
+      }
+
+      if (combined.length > 0) {
+        setAllServices(combined);
+      }
+    } catch {}
+
+    // 3. Fetch fresh locations
+    try {
+      const locRes = await fetch("/api/content?type=locations", { cache: "no-store" });
+      if (locRes.ok) {
+        const locData = await locRes.json();
+        if (Array.isArray(locData) && locData.length > 0) {
+          setAllLocations(locData);
+        }
+      }
+    } catch {}
+  };
+
   const fetchTeam = async () => {
     setLoading(true);
     // 1. First attempt to read live from local content API (always fresh from disk)
@@ -97,6 +189,17 @@ export default function AdminTeamPage() {
 
   useEffect(() => {
     fetchTeam();
+    fetchServicesAndLocations();
+
+    const handleSync = () => {
+      fetchServicesAndLocations();
+    };
+    window.addEventListener("servicesUpdated", handleSync);
+    window.addEventListener("storage", handleSync);
+    return () => {
+      window.removeEventListener("servicesUpdated", handleSync);
+      window.removeEventListener("storage", handleSync);
+    };
   }, []);
 
   const handleSave = async (member: TeamMember) => {
@@ -222,7 +325,8 @@ export default function AdminTeamPage() {
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button
             type="button"
-            onClick={() =>
+            onClick={() => {
+              fetchServicesAndLocations();
               setEditingMember({
                 id: `team-${Date.now()}`,
                 slug: `practitioner-${Date.now()}`,
@@ -245,8 +349,8 @@ export default function AdminTeamPage() {
                 phone: "403-295-8590",
                 email: "",
                 order: team.length + 1
-              })
-            }
+              });
+            }}
             className="adm-btn adm-btn-primary"
             style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
           >
@@ -361,7 +465,10 @@ export default function AdminTeamPage() {
                         <span>Preview</span>
                       </button>
                       <button
-                        onClick={() => setEditingMember(JSON.parse(JSON.stringify(member)))}
+                        onClick={() => {
+                          fetchServicesAndLocations();
+                          setEditingMember(JSON.parse(JSON.stringify(member)));
+                        }}
                         className="adm-btn adm-btn-primary adm-btn-sm"
                         style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 4 }}
                       >
@@ -391,8 +498,8 @@ export default function AdminTeamPage() {
         <TeamEditorModal
           member={editingMember}
           canEditSlugs={canEditSlugs}
-          allServices={servicesData as Service[]}
-          allLocations={locationsData as Location[]}
+          allServices={allServices}
+          allLocations={allLocations}
           onClose={() => setEditingMember(null)}
           onSave={handleSave}
           onPreview={(slug) => setPreviewUrl(`/team/${slug}`)}

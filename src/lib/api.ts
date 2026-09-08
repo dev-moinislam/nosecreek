@@ -60,11 +60,26 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   }
   return siteSettingsObj;
 }
+function getFreshServicesData(): Service[] {
+  try {
+    if (typeof window === "undefined") {
+      const fs = require("fs");
+      const path = require("path");
+      const filePath = path.resolve(process.cwd(), "src/data/services.json");
+      if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      }
+    }
+  } catch (e) {}
+  return servicesList;
+}
 
 /**
  * Clinic Services
  */
 export async function getServices(): Promise<Service[]> {
+  const currentList = getFreshServicesData();
+
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
@@ -73,35 +88,43 @@ export async function getServices(): Promise<Service[]> {
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
       if (!error && data && data.length > 0) {
-        return data.map((d: any) => ({
-          id: d.id,
-          slug: d.slug,
-          title: d.title,
-          shortDescription: d.short_description || "",
-          description: d.description || "",
-          heroImage: d.hero_image,
-          sideImage: d.side_image,
-          cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
-          iconType: d.icon_type,
-          iconBg: d.icon_bg,
-          iconColor: d.icon_color,
-          ctaText: d.cta_text,
-          ctaMuted: d.cta_muted,
-          benefits: d.benefits || [],
-          symptoms: d.symptoms || [],
-          treatmentApproach: d.treatment_approach || [],
-          customSections: d.custom_sections || [],
-          sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || {},
-          faqs: d.faqs || [],
-          hiddenSections: d.hidden_sections || [],
-          sectionOrder: d.section_order || d.sectionOrder || [],
-          relatedServices: d.related_services || [],
-          relatedConditions: d.related_conditions || [],
-          teamMembers: d.team_members || [],
-          locations: d.locations || [],
-          testimonials: d.testimonials || [],
-          seo: d.seo || {}
-        }));
+        const map = new Map<string, Service>();
+        currentList.forEach((s) => map.set(s.slug, s));
+
+        data.forEach((d: any) => {
+          const localItem = map.get(d.slug);
+          map.set(d.slug, {
+            id: d.id,
+            slug: d.slug,
+            title: d.title,
+            shortDescription: d.short_description || localItem?.shortDescription || "",
+            description: d.description || localItem?.description || "",
+            heroImage: d.hero_image || localItem?.heroImage,
+            sideImage: d.side_image || localItem?.sideImage,
+            cardImage: d.card_image || d.cardImage || d.seo?.cardImage || localItem?.cardImage || null,
+            iconType: d.icon_type || localItem?.iconType,
+            iconBg: d.icon_bg || localItem?.iconBg,
+            iconColor: d.icon_color || localItem?.iconColor,
+            ctaText: d.cta_text || localItem?.ctaText,
+            ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
+            benefits: d.benefits || localItem?.benefits || [],
+            symptoms: d.symptoms || localItem?.symptoms || [],
+            treatmentApproach: d.treatment_approach || localItem?.treatmentApproach || [],
+            customSections: d.custom_sections || localItem?.customSections || [],
+            sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || localItem?.sectionsData || {},
+            faqs: d.faqs || localItem?.faqs || [],
+            hiddenSections: d.hidden_sections || localItem?.hiddenSections || [],
+            sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
+            relatedServices: d.related_services || localItem?.relatedServices || [],
+            relatedConditions: d.related_conditions || localItem?.relatedConditions || [],
+            teamMembers: d.team_members || localItem?.teamMembers || [],
+            locations: d.locations || localItem?.locations || [],
+            testimonials: d.testimonials || localItem?.testimonials || [],
+            seo: d.seo || localItem?.seo || {}
+          });
+        });
+
+        return Array.from(map.values());
       }
     } catch (e) {
       console.warn("Supabase fetch failed for services, using local fallback", e);
@@ -111,7 +134,7 @@ export async function getServices(): Promise<Service[]> {
   // Client-side fetch from /api/content (useful in incognito or non-admin sessions)
   if (typeof window !== "undefined") {
     try {
-      const res = await fetch("/api/content?type=services");
+      const res = await fetch("/api/content?type=services", { cache: "no-store" });
       if (res.ok) {
         const list = await res.json();
         if (Array.isArray(list) && list.length > 0) return list;
@@ -119,7 +142,7 @@ export async function getServices(): Promise<Service[]> {
     } catch {}
   }
 
-  return servicesList;
+  return currentList;
 }
 
 export async function getServiceBySlug(slug: string): Promise<Service | undefined> {
