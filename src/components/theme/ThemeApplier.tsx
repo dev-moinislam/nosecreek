@@ -104,8 +104,17 @@ export default function ThemeApplier({ initialTheme }: { initialTheme?: ThemeCol
           const parsed = JSON.parse(saved);
           const icon = parsed.favicon || parsed.seo?.favicon || parsed.settings?.favicon || parsed.settings?.seo?.favicon;
           if (icon) {
-            let link = document.querySelector("link[rel*='icon']") as HTMLLinkElement | null;
-            if (link) link.href = icon;
+            const links = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon'], link[rel='apple-touch-icon'], link[rel='shortcut icon']");
+            if (links.length > 0) {
+              links.forEach((link) => {
+                link.href = icon;
+              });
+            } else {
+              const link = document.createElement("link");
+              link.rel = "icon";
+              link.href = icon;
+              document.head.appendChild(link);
+            }
           }
         }
       } catch {}
