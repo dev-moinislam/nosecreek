@@ -308,7 +308,7 @@ export default function AdminSeoManagerPage() {
                   <th style={{ padding: "12px 18px", width: "28%" }}>Meta Title (Google Tab)</th>
                   <th style={{ padding: "12px 18px", width: "22%" }}>Meta Description</th>
                   <th style={{ padding: "12px 18px", width: "18%" }}>Canonical URL</th>
-                  <th style={{ padding: "12px 18px", width: "10%", textAlign: "right" }}>Actions</th>
+                  <th style={{ padding: "12px 18px", width: "8%", textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -405,7 +405,7 @@ export default function AdminSeoManagerPage() {
                       </td>
 
                       {/* Actions */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "top", textAlign: "right" }}>
+                      <td style={{ padding: "14px 18px", verticalAlign: "top", textAlign: "right", whiteSpace: "nowrap" }}>
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(route)}
@@ -418,10 +418,15 @@ export default function AdminSeoManagerPage() {
                             fontWeight: 700,
                             fontSize: 12.5,
                             cursor: "pointer",
-                            boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                            whiteSpace: "nowrap",
+                            boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 5
                           }}
                         >
-                          ✏️ Edit Meta
+                          <span>✏️</span>
+                          <span>Edit</span>
                         </button>
                       </td>
                     </tr>
