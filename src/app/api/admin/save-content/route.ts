@@ -40,8 +40,10 @@ export async function POST(req: Request) {
             email: member.email || null,
             phone: member.phone || null,
             booking_url: member.bookingUrl || null,
-            booking_cta_text: member.bookingCtaText || null,
-            social_links: member.socialLinks || {},
+            social_links: {
+              ...(member.socialLinks || {}),
+              bookingCtaText: member.bookingCtaText || null
+            },
             featured: member.featured || false,
             is_director: member.isDirector || false,
             sort_order: member.order || 99,

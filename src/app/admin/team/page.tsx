@@ -168,7 +168,7 @@ export default function AdminTeamPage() {
               email: d.email,
               phone: d.phone,
               bookingUrl: d.booking_url,
-              bookingCtaText: d.booking_cta_text || d.bookingCtaText || "",
+              bookingCtaText: d.social_links?.bookingCtaText || d.booking_cta_text || d.bookingCtaText || "",
               socialLinks: d.social_links || {},
               featured: d.featured,
               isDirector: d.is_director,
@@ -225,8 +225,10 @@ export default function AdminTeamPage() {
           email: member.email || null,
           phone: member.phone || null,
           booking_url: member.bookingUrl || null,
-          booking_cta_text: member.bookingCtaText || null,
-          social_links: member.socialLinks || {},
+          social_links: {
+            ...(member.socialLinks || {}),
+            bookingCtaText: member.bookingCtaText || null
+          },
           featured: member.featured || false,
           is_director: member.isDirector || false,
           sort_order: member.order || 99,
@@ -673,14 +675,14 @@ function TeamEditorModal({
   };
 
   // Toggle Service
-  const toggleService = (serviceSlugOrId: string) => {
+  const toggleService = (service: Service) => {
     const current = member.services || [];
-    const isSelected = current.includes(serviceSlugOrId);
+    const isSelected = current.includes(service.slug) || (service.id && current.includes(service.id));
     let updated: string[];
     if (isSelected) {
-      updated = current.filter((s) => s !== serviceSlugOrId);
+      updated = current.filter((s) => s !== service.slug && s !== service.id);
     } else {
-      updated = [...current, serviceSlugOrId];
+      updated = [...current, service.slug];
     }
     setMember((p) => ({ ...p, services: updated }));
   };
@@ -1464,8 +1466,12 @@ function TeamEditorModal({
                   const isChecked = (member.services || []).includes(service.slug) || (member.services || []).includes(service.id);
                   return (
                     <div
-                      key={service.id || service.slug}
-                      onClick={() => toggleService(service.slug || service.id)}
+                      key={service.slug || service.id}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).tagName !== "INPUT") {
+                          toggleService(service);
+                        }
+                      }}
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
@@ -1482,7 +1488,7 @@ function TeamEditorModal({
                       <input
                         type="checkbox"
                         checked={isChecked}
-                        onChange={() => {}} // handled by parent div onClick
+                        onChange={() => toggleService(service)}
                         style={{ marginTop: 4, width: 16, height: 16, cursor: "pointer" }}
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>
