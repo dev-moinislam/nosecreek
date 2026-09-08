@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Testimonial } from "@/types/content";
@@ -306,6 +307,23 @@ export default function AdminReviewsPage() {
       r.author.toLowerCase().includes(search.toLowerCase()) ||
       r.text.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (!isAdmin) {
+    return (
+      <div style={{ maxWidth: 600, margin: "60px auto", textAlign: "center", padding: "40px 24px", background: "#ffffff", borderRadius: 16, border: "1px solid #e2e8f0", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+        <div style={{ fontSize: 42, marginBottom: 16 }}>🛡️</div>
+        <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1e293b", margin: "0 0 8px 0" }}>
+          Master Admin Restricted
+        </h2>
+        <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.6, margin: "0 0 24px 0" }}>
+          Google Reviews and widget integration settings can only be managed by a Master Administrator.
+        </p>
+        <Link href="/admin" style={{ display: "inline-block", background: "#0e78a8", color: "#fff", padding: "10px 22px", borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
+          &larr; Return to Dashboard
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="adm-page" style={{ padding: "28px 32px", maxWidth: 1300, margin: "0 auto" }}>

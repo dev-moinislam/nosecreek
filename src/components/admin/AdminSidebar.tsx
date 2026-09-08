@@ -65,7 +65,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { label: "Services", href: "/admin/services", icon: <ServiceIconSvg size={17} />, adminOnly: false },
     { label: "Conditions", href: "/admin/conditions", icon: <ConditionIconSvg size={17} />, adminOnly: false },
     { label: "Blog & Articles", href: "/admin/blog", icon: <BlogIconSvg size={17} />, adminOnly: false },
-    { label: "Google Reviews", href: "/admin/reviews", icon: <StarIcon size={17} />, adminOnly: false },
+    { label: "Google Reviews", href: "/admin/reviews", icon: <StarIcon size={17} />, adminOnly: true },
     { label: "Team Members", href: "/admin/team", icon: <TeamIcon size={17} />, adminOnly: false },
     { label: "Locations", href: "/admin/locations", icon: <LocationIconSvg size={17} />, adminOnly: false },
     { label: "SEO & Meta Info", href: "/admin/seo", icon: <GlobeIcon size={17} />, adminOnly: true },
