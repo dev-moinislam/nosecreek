@@ -2,15 +2,23 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { HomePageData, TeamMember, BlogPost, Service, Condition, Testimonial, ServiceCustomSection } from "@/types/content";
 import defaultHomeData from "@/data/home.json";
 import TeamCarousel from "@/components/ui/TeamCarousel";
-import ReviewCarousel from "@/components/ui/ReviewCarousel";
 import ConditionTiles from "@/components/ui/ConditionTiles";
 import HomeServicesGrid from "@/components/ui/HomeServicesGrid";
-import VisitUsSection from "@/components/content/VisitUsSection";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
+
+const ReviewCarousel = dynamic(() => import("@/components/ui/ReviewCarousel"), {
+  ssr: true,
+  loading: () => <div style={{ minHeight: 320 }} />
+});
+
+const VisitUsSection = dynamic(() => import("@/components/content/VisitUsSection"), {
+  ssr: true,
+  loading: () => <div style={{ minHeight: 340 }} />
+});
 
 interface HomeLiveViewProps {
   initialHomeData: HomePageData;
