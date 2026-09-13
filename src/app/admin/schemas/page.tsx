@@ -8,7 +8,7 @@ import settingsData from "@/data/settings.json";
 
 const DEFAULT_BUSINESS_SCHEMA_TEMPLATE = JSON.stringify({
   "@context": "https://schema.org",
-  "@type": ["LocalBusiness", "MedicalBusiness", "Physiotherapy"],
+  "@type": "LocalBusiness",
   "@id": "https://www.nosecreekphysiotherapy.com/#LocalBusiness",
   "name": "Nose Creek Physiotherapy",
   "alternateName": "Nose Creek Physical Therapy",
@@ -168,7 +168,7 @@ export default function AdminSchemasPage() {
               setCustomSchemas(schemas);
               loaded = true;
             }
-          } catch {}
+          } catch { }
         }
       }
 
@@ -263,7 +263,7 @@ export default function AdminSchemasPage() {
           try {
             const parsed = JSON.parse(local);
             Object.assign(baseData, parsed.settings || {}, parsed);
-          } catch {}
+          } catch { }
         }
       }
       baseData.customSchemas = customSchemas;
@@ -639,7 +639,7 @@ export default function AdminSchemasPage() {
                           const formatted = JSON.stringify(parsed, null, 2);
                           handleUpdateSchema(schema.id, { schemaJson: formatted });
                           handleValidateSchemaJson(schema.id, formatted);
-                        } catch {}
+                        } catch { }
                       }}
                       className="adm-btn adm-btn-secondary"
                       style={{ fontSize: 12, padding: "4px 10px" }}

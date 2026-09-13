@@ -1,7 +1,7 @@
 import React from "react";
 
 interface SchemaMarkupProps {
-  type: "MedicalBusiness" | "Person" | "Article" | "BreadcrumbList" | "FAQPage";
+  type: "MedicalBusiness" | "Person" | "Article" | "FAQPage";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
 }
@@ -13,7 +13,7 @@ export default function SchemaMarkup({ type, data }: SchemaMarkupProps) {
   switch (type) {
     case "MedicalBusiness":
       const localBusiness = {
-        "@type": ["LocalBusiness", "MedicalBusiness", "Physiotherapy"],
+        "@type": "LocalBusiness",
         "@id": "https://www.nosecreekphysiotherapy.com/#LocalBusiness",
         "name": data.clinicName || data.name || "Nose Creek Physiotherapy",
         "alternateName": "Nose Creek Physical Therapy",
@@ -147,20 +147,6 @@ export default function SchemaMarkup({ type, data }: SchemaMarkupProps) {
           "@type": "WebPage",
           "@id": `https://www.nosecreekphysiotherapy.com/blog/${data.slug}`
         }
-      };
-      break;
-
-    case "BreadcrumbList":
-      schema = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        "itemListElement": data.map((item: any, index: number) => ({
-          "@type": "ListItem",
-          "position": index + 1,
-          "name": item.name || item.label,
-          "item": item.url || item.href
-        }))
       };
       break;
 

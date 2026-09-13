@@ -18,25 +18,8 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
     ...items
   ];
 
-  // Generate BreadcrumbList structured data for search engines
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": fullItems.map((item, idx) => ({
-      "@type": "ListItem",
-      "position": idx + 1,
-      "name": item.label,
-      "item": item.href ? `https://nosecreekphysiotherapy.com${item.href}` : undefined
-    }))
-  };
-
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <nav className={styles.nav} aria-label="Breadcrumb">
+    <nav className={styles.nav} aria-label="Breadcrumb">
         <ol className={styles.list}>
           {fullItems.map((item, index) => {
             const isLast = index === fullItems.length - 1;
@@ -62,6 +45,5 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
           })}
         </ol>
       </nav>
-    </>
   );
 }
