@@ -86,7 +86,11 @@
     "enabled": true,
     "receiverEmail": "info@nosecreekphysiotherapy.com",
     "subjectPrefix": "[New Website Lead]",
-    "provider": "resend",
+    "provider": "smtp",
+    "smtpHost": "smtp.gmail.com",
+    "smtpPort": 465,
+    "smtpUser": "",
+    "smtpPass": "",
     "senderName": "Nose Creek Website Forms"
   },
   "customSchemas": [

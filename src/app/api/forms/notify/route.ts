@@ -1,12 +1,16 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import nodemailer from "nodemailer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+
+export const runtime = "nodejs";
 
 interface NotificationSettings {
   enabled: boolean;
   receiverEmail: string;
   senderName?: string;
+  senderEmail?: string;
   subjectPrefix?: string;
   provider?: "resend" | "smtp" | "webhook";
   resendApiKey?: string;
@@ -23,7 +27,7 @@ async function getNotificationSettings(): Promise<NotificationSettings | null> {
     try {
       const { data } = await supabase
         .from("site_settings")
-        .select("marketing, clinic_name")
+        .select("marketing")
         .eq("id", "main")
         .single();
       if (data?.marketing?.notifications) {
@@ -43,6 +47,9 @@ async function getNotificationSettings(): Promise<NotificationSettings | null> {
       if (parsed.notifications) {
         return parsed.notifications;
       }
+      if (parsed.marketing?.notifications) {
+        return parsed.marketing.notifications;
+      }
     }
   } catch (err) {
     console.warn("Could not read settings.json for notifications:", err);
@@ -51,29 +58,106 @@ async function getNotificationSettings(): Promise<NotificationSettings | null> {
   return null;
 }
 
+/**
+ * Returns human-readable label, badge color, and icon for any form type
+ */
+function getFormBadge(formType: string = "") {
+  const normalized = (formType || "").toLowerCase().trim();
+
+  if (normalized.includes("appointment") || normalized === "booking") {
+    return {
+      title: "Appointment Booking Request",
+      tag: "APPOINTMENT BOOKING",
+      color: "#0e78a8",
+      icon: "📅"
+    };
+  }
+  if (normalized.includes("contact") || normalized === "inquiry") {
+    return {
+      title: "Contact Page Inquiry",
+      tag: "CONTACT INQUIRY",
+      color: "#059669",
+      icon: "✉️"
+    };
+  }
+  if (normalized.includes("workshop_registration") || normalized === "workshop") {
+    return {
+      title: "Workshop Registration",
+      tag: "WORKSHOP SIGN-UP",
+      color: "#7c3aed",
+      icon: "🎓"
+    };
+  }
+  if (normalized.includes("replay")) {
+    return {
+      title: "Workshop Replay Request",
+      tag: "WORKSHOP REPLAY",
+      color: "#d97706",
+      icon: "▶️"
+    };
+  }
+  if (normalized.includes("test")) {
+    return {
+      title: "Verification Test Email",
+      tag: "SYSTEM TEST",
+      color: "#2563eb",
+      icon: "🧪"
+    };
+  }
+
+  // Generic / Future custom forms fallback
+  const pretty = formType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return {
+    title: `${pretty || "Website Form"} Submission`,
+    tag: formType.toUpperCase().replace(/_/g, " ") || "FORM SUBMISSION",
+    color: "#0e78a8",
+    icon: "📝"
+  };
+}
+
 function buildEmailHtml(lead: any, isTest = false): string {
   const brandTeal = "#0e78a8";
   const bgLight = "#f8fafc";
   const borderCol = "#e2e8f0";
 
+  const formInfo = getFormBadge(lead.form_type || lead.formType || "Inquiry");
+  const dateStr = new Date().toLocaleString("en-US", {
+    dateStyle: "full",
+    timeStyle: "short",
+    timeZone: "America/Edmonton"
+  });
+
+  const submittedPage = lead.metadata?.page || lead.metadata?.requested_service || lead.page || null;
+
   if (isTest) {
     return `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid ${borderCol}; border-radius: 12px; overflow: hidden;">
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid ${borderCol}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
         <div style="background: ${brandTeal}; padding: 24px; text-align: center; color: #ffffff;">
-          <h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px;">Nose Creek Physiotherapy</h1>
+          <h1 style="margin: 0; font-size: 20px; font-weight: 700;">Nose Creek Physiotherapy</h1>
           <p style="margin: 6px 0 0 0; font-size: 13px; opacity: 0.9;">Form Notification Email System Test</p>
         </div>
+
         <div style="padding: 28px;">
-          <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 14px; margin-bottom: 20px; color: #065f46; font-size: 14px;">
-            <strong>✓ Test Email Successful!</strong> Your client notification receiver email is properly connected to the website.
+          <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin-bottom: 20px; color: #065f46;">
+            <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">✓ Email Connection Verified!</div>
+            <div style="font-size: 13.5px; line-height: 1.5;">
+              Your email forwarding is active. Form submissions from the website will be dispatched to this inbox.
+            </div>
           </div>
-          <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
-            Whenever a patient or visitor submits any form on the Nose Creek Physiotherapy website (Contact, Booking, Workshops, or future custom forms), complete submission details will be dispatched immediately to this email address.
-          </p>
+
+          <div style="background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px; margin-bottom: 20px;">
+            <div style="font-size: 11px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px;">IDENTIFYING FORMS</div>
+            <div style="font-size: 13px; color: #0369a1; margin-top: 4px; line-height: 1.5;">
+              Every email will clearly specify which form was used (e.g. <strong>[Appointment Booking Request]</strong> or <strong>[Contact Page Inquiry]</strong>) right in the subject line and in the email header.
+            </div>
+          </div>
+
           <div style="background: ${bgLight}; border-radius: 8px; padding: 14px; border: 1px solid ${borderCol}; font-size: 13px; color: #64748b;">
-            <strong>Test Timestamp:</strong> ${new Date().toLocaleString("en-US", { timeZoneName: "short" })}
+            <div><strong>Recipient:</strong> ${lead.receiverEmail}</div>
+            <div style="margin-top: 4px;"><strong>Test Timestamp:</strong> ${dateStr}</div>
           </div>
         </div>
+
         <div style="background: #f1f5f9; padding: 16px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid ${borderCol};">
           Nose Creek Physiotherapy &bull; Automated Website Notification System
         </div>
@@ -82,23 +166,42 @@ function buildEmailHtml(lead: any, isTest = false): string {
   }
 
   const name = lead.name || `${lead.first_name || ""} ${lead.last_name || ""}`.trim() || "Website Visitor";
-  const formType = (lead.form_type || "General Inquiry").toUpperCase().replace(/_/g, " ");
-  const page = lead.metadata?.page || "Website Form";
-  const dateStr = new Date().toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 
   return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid ${borderCol}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid ${borderCol}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+      
+      <!-- Top Clinic Banner -->
       <div style="background: ${brandTeal}; padding: 22px 26px; color: #ffffff;">
-        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.85; font-weight: 700;">New Form Submission</div>
-        <h1 style="margin: 4px 0 0 0; font-size: 20px; font-weight: 700;">${name}</h1>
-        <div style="margin-top: 6px; font-size: 13px; opacity: 0.9;">Form: <span style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-weight: 600;">${formType}</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.9; font-weight: 700;">Nose Creek Physiotherapy</span>
+          <span style="background: rgba(255,255,255,0.2); padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">NEW PATIENT LEAD</span>
+        </div>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800;">${name}</h1>
       </div>
 
       <div style="padding: 26px;">
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+        
+        <!-- PROMINENT FORM TYPE HIGHLIGHT BANNER (Requested by User) -->
+        <div style="background: #f0f9ff; border: 2px solid ${brandTeal}; border-radius: 10px; padding: 14px 18px; margin-bottom: 22px;">
+          <div style="font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #0284c7;">
+            SUBMITTED FORM TYPE
+          </div>
+          <div style="font-size: 19px; font-weight: 800; color: #0c4a6e; margin-top: 4px; display: flex; align-items: center; gap: 8px;">
+            <span>${formInfo.icon}</span>
+            <span>${formInfo.title}</span>
+          </div>
+          ${submittedPage ? `
+            <div style="font-size: 12.5px; color: #64748b; margin-top: 6px; border-top: 1px dashed #cbd5e1; padding-top: 6px;">
+              Submitted from: <span style="font-family: monospace; color: #0369a1; font-weight: 600;">${submittedPage}</span>
+            </div>
+          ` : ""}
+        </div>
+
+        <!-- Details Table -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 22px;">
           <tbody>
             <tr style="border-bottom: 1px solid #f1f5f9;">
-              <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b; width: 140px;">Full Name</td>
+              <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b; width: 140px;">Patient Name</td>
               <td style="padding: 10px 0; font-size: 14px; font-weight: 700; color: #0f172a;">${name}</td>
             </tr>
             <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -110,7 +213,7 @@ function buildEmailHtml(lead: any, isTest = false): string {
             <tr style="border-bottom: 1px solid #f1f5f9;">
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Phone Number</td>
               <td style="padding: 10px 0; font-size: 14px; color: #0f172a;">
-                ${lead.phone ? `<a href="tel:${lead.phone}" style="color: #0f172a; text-decoration: none; font-weight: 600;">${lead.phone}</a>` : "Not provided"}
+                ${lead.phone ? `<a href="tel:${lead.phone}" style="color: #0f172a; text-decoration: none; font-weight: 700;">${lead.phone}</a>` : "Not provided"}
               </td>
             </tr>
             ${lead.service_interest ? `
@@ -118,10 +221,11 @@ function buildEmailHtml(lead: any, isTest = false): string {
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Service / Interest</td>
               <td style="padding: 10px 0; font-size: 14px; color: #0f172a; font-weight: 600;">${lead.service_interest}</td>
             </tr>` : ""}
+            ${lead.preferredLocation ? `
             <tr style="border-bottom: 1px solid #f1f5f9;">
-              <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Submitted Page</td>
-              <td style="padding: 10px 0; font-size: 13px; color: #64748b;">${page}</td>
-            </tr>
+              <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Preferred Location</td>
+              <td style="padding: 10px 0; font-size: 14px; color: #0f172a; font-weight: 600;">${lead.preferredLocation}</td>
+            </tr>` : ""}
             <tr>
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Date & Time</td>
               <td style="padding: 10px 0; font-size: 13px; color: #64748b;">${dateStr}</td>
@@ -129,29 +233,31 @@ function buildEmailHtml(lead: any, isTest = false): string {
           </tbody>
         </table>
 
+        <!-- Message Box -->
         ${lead.message ? `
-          <div style="background: ${bgLight}; border: 1px solid ${borderCol}; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-            <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 6px;">Patient / Client Message:</div>
+          <div style="background: ${bgLight}; border: 1px solid ${borderCol}; border-radius: 8px; padding: 16px; margin-bottom: 22px;">
+            <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #64748b; margin-bottom: 6px; letter-spacing: 0.5px;">Inquiry / Patient Note:</div>
             <div style="font-size: 14px; color: #1e293b; line-height: 1.6; white-space: pre-wrap;">${lead.message}</div>
           </div>
         ` : ""}
 
+        <!-- Quick Action Buttons -->
         <div style="text-align: center; margin-top: 24px;">
           ${lead.email ? `
-            <a href="mailto:${lead.email}?subject=Re: Your inquiry with Nose Creek Physiotherapy" style="display: inline-block; background: ${brandTeal}; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-right: 8px;">
-              Reply by Email &rarr;
+            <a href="mailto:${lead.email}?subject=Re: Your ${formInfo.title} - Nose Creek Physiotherapy" style="display: inline-block; background: ${brandTeal}; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; margin-right: 8px;">
+              ✉️ Reply by Email &rarr;
             </a>
           ` : ""}
           ${lead.phone ? `
             <a href="tel:${lead.phone}" style="display: inline-block; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px;">
-              Call Patient &rarr;
+              📞 Call Patient &rarr;
             </a>
           ` : ""}
         </div>
       </div>
 
       <div style="background: #f8fafc; padding: 16px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid ${borderCol};">
-        This notification was sent automatically by Nose Creek Physiotherapy website to <strong style="color: #64748b;">${lead.receiverEmail || "configured client receiver email"}</strong>.
+        Dispatched automatically to client receiver inbox: <strong style="color: #64748b;">${lead.receiverEmail || "configured client receiver email"}</strong>
       </div>
     </div>
   `;
@@ -160,9 +266,10 @@ function buildEmailHtml(lead: any, isTest = false): string {
 export async function POST(req: Request) {
   try {
     const payload = await req.json();
-    const { isTest, receiverEmailOverride, ...leadData } = payload;
+    const { isTest, receiverEmailOverride, tempSettings, ...leadData } = payload;
 
-    const notifSettings = await getNotificationSettings();
+    // Use in-memory tempSettings if provided (e.g. during live test in admin dashboard), or load saved settings
+    const notifSettings = tempSettings || (await getNotificationSettings());
 
     const isEnabled = isTest ? true : (notifSettings?.enabled ?? true);
     const receiverEmail = receiverEmailOverride || notifSettings?.receiverEmail;
@@ -177,10 +284,9 @@ export async function POST(req: Request) {
 
     if (!receiverEmail) {
       return NextResponse.json({
-        success: true,
-        skipped: true,
-        message: "No receiver email configured yet in settings."
-      });
+        success: false,
+        error: "No client receiver email is configured. Please enter a receiver email in Admin > Email Notifications."
+      }, { status: 400 });
     }
 
     const recipients = receiverEmail
@@ -190,28 +296,94 @@ export async function POST(req: Request) {
 
     if (recipients.length === 0) {
       return NextResponse.json({
-        error: "Invalid receiver email address configured."
+        success: false,
+        error: "Invalid receiver email address configured. Please provide a valid email."
       }, { status: 400 });
     }
 
+    const formInfo = getFormBadge(leadData.form_type || leadData.formType || (isTest ? "test" : "inquiry"));
     const prefix = notifSettings?.subjectPrefix || "[New Website Lead]";
+
+    // Crystal-clear subject line stating WHICH form was submitted
     const subject = isTest
-      ? `${prefix} Test Notification Email`
-      : `${prefix} ${leadData.name ? `${leadData.name} - ` : ""}${leadData.form_type || "Form"}`;
+      ? `${prefix} [${formInfo.title}] Email Verification Test`
+      : `${prefix} [${formInfo.title}] ${leadData.name ? `${leadData.name} - ` : ""}Nose Creek Physiotherapy`;
 
     const htmlContent = buildEmailHtml({ ...leadData, receiverEmail: recipients.join(", ") }, Boolean(isTest));
 
-    // Determine Provider & API Key
-    const resendApiKey =
-      notifSettings?.resendApiKey ||
-      process.env.RESEND_API_KEY ||
-      process.env.NEXT_PUBLIC_RESEND_API_KEY;
+    const provider = notifSettings?.provider || "smtp";
+    let deliveryStatus: any = { dispatched: false, provider };
 
-    let deliveryStatus: any = { dispatched: false, provider: "none" };
+    // 1. SMTP Provider (Nodemailer) - Supports Gmail App Passwords, cPanel Webmail, SendGrid, etc.
+    if (provider === "smtp" || (notifSettings?.smtpHost && notifSettings?.smtpUser && notifSettings?.smtpPass)) {
+      if (!notifSettings.smtpHost || !notifSettings.smtpUser || !notifSettings.smtpPass) {
+        return NextResponse.json({
+          success: false,
+          error: "SMTP is selected but SMTP Host, Username, or Password is missing. Please enter your SMTP details or switch to Resend API."
+        }, { status: 400 });
+      }
 
-    // 1. Try Resend if configured
-    if (resendApiKey) {
       try {
+        const port = Number(notifSettings.smtpPort) || 465;
+        const isSecure = port === 465;
+
+        const transporter = nodemailer.createTransport({
+          host: notifSettings.smtpHost,
+          port,
+          secure: isSecure,
+          auth: {
+            user: notifSettings.smtpUser,
+            pass: notifSettings.smtpPass
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+        });
+
+        const senderDisplayName = notifSettings.senderName || "Nose Creek Website Forms";
+        const senderAddress = notifSettings.senderEmail || notifSettings.smtpUser;
+
+        const info = await transporter.sendMail({
+          from: `"${senderDisplayName}" <${senderAddress}>`,
+          to: recipients,
+          replyTo: leadData.email || senderAddress,
+          subject,
+          html: htmlContent
+        });
+
+        deliveryStatus = {
+          dispatched: true,
+          provider: "smtp",
+          messageId: info.messageId
+        };
+      } catch (smtpErr: any) {
+        console.error("SMTP delivery failed:", smtpErr);
+        return NextResponse.json({
+          success: false,
+          error: `SMTP Error: ${smtpErr.message || "Failed to authenticate or send via SMTP"}. Please verify your SMTP Host, Port, and Password/App Password.`
+        }, { status: 500 });
+      }
+    }
+
+    // 2. Resend API Provider
+    else if (provider === "resend") {
+      const resendApiKey =
+        notifSettings?.resendApiKey ||
+        process.env.RESEND_API_KEY ||
+        process.env.NEXT_PUBLIC_RESEND_API_KEY;
+
+      if (!resendApiKey) {
+        return NextResponse.json({
+          success: false,
+          error: "Resend is selected but no Resend API Key is provided. Enter your API key in Admin > Email Notifications or switch to SMTP."
+        }, { status: 400 });
+      }
+
+      try {
+        const sender = notifSettings?.senderEmail
+          ? `${notifSettings.senderName || "Nose Creek Forms"} <${notifSettings.senderEmail}>`
+          : `${notifSettings?.senderName || "Nose Creek Forms"} <onboarding@resend.dev>`;
+
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -219,60 +391,80 @@ export async function POST(req: Request) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            from: notifSettings?.senderName
-              ? `${notifSettings.senderName} <onboarding@resend.dev>`
-              : "Nose Creek Physiotherapy <onboarding@resend.dev>",
+            from: sender,
             to: recipients,
+            reply_to: leadData.email || undefined,
             subject,
             html: htmlContent
           })
         });
 
         const resData = await res.json();
-        if (res.ok) {
+        if (res.ok && resData.id) {
           deliveryStatus = { dispatched: true, provider: "resend", id: resData.id };
         } else {
-          console.warn("Resend API delivery response error:", resData);
-          deliveryStatus = { dispatched: false, provider: "resend", error: resData.message || "Resend error" };
+          console.error("Resend API response error:", resData);
+          return NextResponse.json({
+            success: false,
+            error: `Resend API Error: ${resData.message || resData.error || "Failed to send email via Resend"}. (Note: If using unverified onboarding@resend.dev, Resend only allows sending to the email registered on your Resend account).`
+          }, { status: 500 });
         }
       } catch (sendErr: any) {
-        console.warn("Resend dispatch failed:", sendErr);
-        deliveryStatus = { dispatched: false, provider: "resend", error: sendErr.message };
+        console.error("Resend dispatch exception:", sendErr);
+        return NextResponse.json({
+          success: false,
+          error: `Resend Connection Error: ${sendErr.message || "Failed to reach Resend API"}`
+        }, { status: 500 });
       }
     }
 
-    // 2. Webhook relay if configured
-    if (!deliveryStatus.dispatched && notifSettings?.webhookUrl) {
+    // 3. Webhook Provider
+    else if (provider === "webhook") {
+      if (!notifSettings?.webhookUrl) {
+        return NextResponse.json({
+          success: false,
+          error: "Webhook Relay is selected but no Webhook URL was provided."
+        }, { status: 400 });
+      }
+
       try {
-        await fetch(notifSettings.webhookUrl, {
+        const whRes = await fetch(notifSettings.webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             recipients,
             subject,
+            formType: formInfo.title,
             lead: leadData,
             html: htmlContent
           })
         });
-        deliveryStatus = { dispatched: true, provider: "webhook" };
-      } catch (whErr: any) {
-        console.warn("Webhook dispatch failed:", whErr);
-      }
-    }
 
-    // In local development or before Resend API key is provided, log for immediate transparency
-    if (!deliveryStatus.dispatched) {
-      console.log(`[Form Notification Dispatch] To: ${recipients.join(", ")} | Subject: ${subject}`);
-      deliveryStatus = {
-        dispatched: true,
-        provider: "logged",
-        note: `Notification recorded for ${recipients.join(", ")}. To enable direct live email inbox delivery, add your Resend API Key in Settings.`
-      };
+        if (whRes.ok) {
+          deliveryStatus = { dispatched: true, provider: "webhook" };
+        } else {
+          return NextResponse.json({
+            success: false,
+            error: `Webhook returned HTTP ${whRes.status}: ${whRes.statusText}`
+          }, { status: 500 });
+        }
+      } catch (whErr: any) {
+        return NextResponse.json({
+          success: false,
+          error: `Webhook dispatch failed: ${whErr.message}`
+        }, { status: 500 });
+      }
+    } else {
+      return NextResponse.json({
+        success: false,
+        error: "No email delivery provider configured. Please configure SMTP or Resend API in Admin > Email Notifications."
+      }, { status: 400 });
     }
 
     return NextResponse.json({
       success: true,
       recipients,
+      formType: formInfo.title,
       status: deliveryStatus
     });
   } catch (err: any) {

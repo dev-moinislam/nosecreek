@@ -60,6 +60,7 @@ export interface EmailNotificationSettings {
   enabled: boolean;
   receiverEmail: string;
   senderName?: string;
+  senderEmail?: string;
   subjectPrefix?: string;
   provider?: "resend" | "smtp" | "webhook";
   resendApiKey?: string;
