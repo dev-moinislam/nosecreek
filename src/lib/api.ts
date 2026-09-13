@@ -29,36 +29,56 @@ const conditionsList = conditionsData as Condition[];
 const testimonialsList = testimonialsData as Testimonial[];
 const defaultHomeObj = defaultHomeData as HomePageData;
 
+function getFreshSettingsData(): SiteSettings {
+  try {
+    if (typeof window === "undefined") {
+      const fs = require("fs");
+      const path = require("path");
+      const filePath = path.resolve(process.cwd(), "src/data/settings.json");
+      if (fs.existsSync(filePath)) {
+        return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+      }
+    }
+  } catch (e) {}
+  return siteSettingsObj;
+}
+
 /**
- * Site-wide settings (Clinic info, business hours, default SEO)
+ * Site-wide settings (Clinic info, business hours, default SEO, schemas)
  */
 export async function getSiteSettings(): Promise<SiteSettings> {
+  const currentSettings = getFreshSettingsData();
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
         .from("site_settings")
         .select("*")
         .eq("id", "main")
-        .single();
+        .maybeSingle();
       if (!error && data) {
         return {
-          clinicName: data.clinic_name || siteSettingsObj.clinicName,
-          logoText: data.logo_text || siteSettingsObj.logoText,
-          contact: data.contact || siteSettingsObj.contact,
-          openingHours: data.opening_hours || siteSettingsObj.openingHours,
-          socialLinks: data.social_links || siteSettingsObj.socialLinks,
-          bookingUrl: data.booking_url || siteSettingsObj.bookingUrl,
-          primaryCTA: data.primary_cta || siteSettingsObj.primaryCTA,
-          footerContent: data.footer_content || siteSettingsObj.footerContent,
-          seo: data.seo || siteSettingsObj.seo,
-          ...(data.marketing ? { marketing: data.marketing } : {})
+          clinicName: data.clinic_name || currentSettings.clinicName,
+          logoText: data.logo_text || currentSettings.logoText,
+          contact: data.contact || currentSettings.contact,
+          openingHours: data.opening_hours || currentSettings.openingHours,
+          socialLinks: data.social_links || currentSettings.socialLinks,
+          bookingUrl: data.booking_url || currentSettings.bookingUrl,
+          primaryCTA: data.primary_cta || currentSettings.primaryCTA,
+          footerContent: data.footer_content || currentSettings.footerContent,
+          seo: data.seo || currentSettings.seo,
+          favicon: data.seo?.favicon || (data as any).favicon || currentSettings.favicon,
+          ...(data.marketing ? { marketing: data.marketing } : {}),
+          notifications: data.marketing?.notifications || (data as any).notifications || currentSettings.notifications,
+          customSchemas: (data.marketing?.customSchemas && Array.isArray(data.marketing.customSchemas))
+            ? data.marketing.customSchemas
+            : (Array.isArray((data as any).customSchemas) ? (data as any).customSchemas : (currentSettings.customSchemas || []))
         };
       }
     } catch (e) {
       console.warn("Supabase fetch failed for settings, using local fallback", e);
     }
   }
-  return siteSettingsObj;
+  return currentSettings;
 }
 function getFreshServicesData(): Service[] {
   try {

@@ -11,32 +11,38 @@ function matchesTargetScope(
   targetPages: string[] = [],
   currentPath: string
 ): boolean {
-  const normPath = currentPath.toLowerCase();
-
   if (scope === "site_wide") {
     return true;
   }
 
+  // Normalize path: clean off query string, trailing slashes (except root '/')
+  const cleanPath = (currentPath.split("?")[0].split("#")[0].toLowerCase().trim() || "/").replace(/\/+$/, "") || "/";
+
   if (scope === "homepage") {
-    return normPath === "/" || normPath === "";
+    return cleanPath === "/" || cleanPath === "";
   }
 
   if (scope === "specific") {
     if (!targetPages || targetPages.length === 0) {
       return false;
     }
-    return targetPages.some((target) => {
-      const normTarget = target.toLowerCase().trim();
-      if (!normTarget) return false;
-      if (normTarget === normPath) return true;
+    return targetPages.some((rawTarget) => {
+      let normTarget = (rawTarget.toLowerCase().trim() || "/").replace(/\/+$/, "") || "/";
+      if (!normTarget.startsWith("/")) normTarget = "/" + normTarget;
+
+      // Exact match
+      if (normTarget === cleanPath) return true;
+
+      // Wildcard match, e.g. /services/* or /services*
       if (normTarget.endsWith("/*")) {
         const prefix = normTarget.slice(0, -2);
-        return normPath.startsWith(prefix);
+        return cleanPath === prefix || cleanPath.startsWith(prefix + "/");
       }
       if (normTarget.endsWith("*")) {
         const prefix = normTarget.slice(0, -1);
-        return normPath.startsWith(prefix);
+        return cleanPath === prefix || cleanPath.startsWith(prefix + "/");
       }
+
       return false;
     });
   }
@@ -44,49 +50,73 @@ function matchesTargetScope(
   return false;
 }
 
+interface CustomSchemasInjectorProps {
+  initialSchemas?: CustomSchemaItem[];
+}
+
 /**
  * CustomSchemasInjector:
  * Injects multiple business and custom schemas dynamically into the live website
  * according to each schema's configured target scope (Site-wide, Homepage, or Specific Pages).
  */
-export default function CustomSchemasInjector() {
+export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasInjectorProps = {}) {
   const pathname = usePathname() || "/";
 
-  // Initial schemas from static settings data
-  const initialSchemas: CustomSchemaItem[] = (settingsData as any).customSchemas || [];
-  const [schemas, setSchemas] = useState<CustomSchemaItem[]>(initialSchemas);
+  // Initial schemas from SSR prop or static settings data
+  const [schemas, setSchemas] = useState<CustomSchemaItem[]>(() => {
+    if (initialSchemas && Array.isArray(initialSchemas) && initialSchemas.length > 0) {
+      return initialSchemas;
+    }
+    return (settingsData as any).customSchemas || [];
+  });
+
+  // Keep state in sync if initialSchemas changes from server
+  useEffect(() => {
+    if (initialSchemas && Array.isArray(initialSchemas) && initialSchemas.length > 0) {
+      setSchemas(initialSchemas);
+    }
+  }, [initialSchemas]);
 
   useEffect(() => {
-    function loadLiveSchemas() {
+    async function loadLiveSchemas() {
       // 1. Try local storage sync from admin
       try {
         const local = localStorage.getItem("adm_settings");
         if (local) {
           const parsed = JSON.parse(local);
-          const custom = parsed.customSchemas || parsed.settings?.customSchemas;
-          if (Array.isArray(custom)) {
+          const custom = parsed.customSchemas || parsed.marketing?.customSchemas || parsed.settings?.customSchemas;
+          if (Array.isArray(custom) && custom.length > 0) {
             setSchemas(custom);
             return;
           }
         }
       } catch {}
 
-      // 2. Try Supabase
-      if (isSupabaseConfigured && supabase) {
-        (async () => {
-          try {
-            const { data } = await supabase
-              .from("site_settings")
-              .select("marketing")
-              .eq("id", "main")
-              .single();
-            if (data?.marketing?.customSchemas && Array.isArray(data.marketing.customSchemas)) {
-              setSchemas(data.marketing.customSchemas);
-            }
-          } catch {
-            // ignore
+      // 2. Fetch canonical settings from /api/content?type=settings
+      try {
+        const res = await fetch("/api/content?type=settings");
+        if (res.ok) {
+          const data = await res.json();
+          const custom = data.customSchemas || data.marketing?.customSchemas;
+          if (Array.isArray(custom) && custom.length > 0) {
+            setSchemas(custom);
+            return;
           }
-        })();
+        }
+      } catch {}
+
+      // 3. Fallback direct to Supabase
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data } = await supabase
+            .from("site_settings")
+            .select("marketing")
+            .eq("id", "main")
+            .maybeSingle();
+          if (data?.marketing?.customSchemas && Array.isArray(data.marketing.customSchemas)) {
+            setSchemas(data.marketing.customSchemas);
+          }
+        } catch {}
       }
     }
 
@@ -114,7 +144,7 @@ export default function CustomSchemasInjector() {
         try {
           jsonPayload = typeof item.schemaJson === "string" ? JSON.parse(item.schemaJson) : item.schemaJson;
         } catch (e) {
-          // If JSON parse fails, render as raw string or skip broken JSON
+          // If JSON parse fails, skip broken JSON
           console.warn(`[CustomSchemasInjector] Invalid JSON in schema "${item.title}":`, e);
           return null;
         }

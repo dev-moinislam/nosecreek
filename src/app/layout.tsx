@@ -113,7 +113,7 @@ export default async function RootLayout({
       <body>
         <ThemeApplier initialTheme={serverThemeColors} />
         <RoleProvider>
-          <SiteLayout>{children}</SiteLayout>
+          <SiteLayout initialSchemas={settings.customSchemas || []}>{children}</SiteLayout>
         </RoleProvider>
       </body>
     </html>

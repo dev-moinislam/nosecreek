@@ -13,6 +13,51 @@ export async function GET(req: Request) {
 
     if (type) {
       const filePath = path.resolve(process.cwd(), `src/data/${type}.json`);
+
+      // Special handling for settings (an Object, not an Array)
+      if (type === "settings") {
+        let settingsResult: any = null;
+        if (fs.existsSync(filePath)) {
+          try {
+            settingsResult = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+          } catch {}
+        }
+        if (isSupabaseConfigured && supabase) {
+          try {
+            const { data: supaSettings } = await supabase
+              .from("site_settings")
+              .select("*")
+              .eq("id", "main")
+              .maybeSingle();
+
+            if (supaSettings) {
+              settingsResult = {
+                ...(settingsResult || {}),
+                clinicName: supaSettings.clinic_name || settingsResult?.clinicName,
+                logoText: supaSettings.logo_text || settingsResult?.logoText,
+                contact: supaSettings.contact || settingsResult?.contact,
+                openingHours: supaSettings.opening_hours || settingsResult?.openingHours,
+                socialLinks: supaSettings.social_links || settingsResult?.socialLinks,
+                bookingUrl: supaSettings.booking_url || settingsResult?.bookingUrl,
+                primaryCTA: supaSettings.primary_cta || settingsResult?.primaryCTA,
+                footerContent: supaSettings.footer_content || settingsResult?.footerContent,
+                seo: supaSettings.seo || settingsResult?.seo,
+                favicon: supaSettings.seo?.favicon || supaSettings.favicon || settingsResult?.favicon,
+                marketing: supaSettings.marketing || settingsResult?.marketing,
+                customSchemas: supaSettings.marketing?.customSchemas || supaSettings.customSchemas || settingsResult?.customSchemas || [],
+                notifications: supaSettings.marketing?.notifications || supaSettings.notifications || settingsResult?.notifications
+              };
+            }
+          } catch (e) {
+            console.warn("Supabase fetch failed for settings in /api/content:", e);
+          }
+        }
+        if (settingsResult && typeof settingsResult === "object") {
+          return NextResponse.json(settingsResult);
+        }
+        return NextResponse.json({ error: "File settings.json not found" }, { status: 404 });
+      }
+
       let diskData: any[] = [];
       if (fs.existsSync(filePath)) {
         try {

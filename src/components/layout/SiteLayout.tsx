@@ -9,7 +9,14 @@ import MarketingScripts from "@/components/marketing/MarketingScripts";
 import FloatingReviewsWidget from "@/components/ui/FloatingReviewsWidget";
 import NavigationProgressBar from "@/components/ui/NavigationProgressBar";
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+import { CustomSchemaItem } from "@/types/content";
+
+interface SiteLayoutProps {
+  children: React.ReactNode;
+  initialSchemas?: CustomSchemaItem[];
+}
+
+export default function SiteLayout({ children, initialSchemas }: SiteLayoutProps) {
   const pathname = usePathname();
   
   // Exclude all Admin, Portal, and Login routes (/admin, /client-login, /admin-login)
@@ -34,7 +41,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Header />
       <main id="main-content" style={{ minHeight: "100vh" }}>{children}</main>
       <Footer />
-      <CustomSchemasInjector />
+      <CustomSchemasInjector initialSchemas={initialSchemas} />
       <MarketingScripts />
       <FloatingReviewsWidget />
     </>

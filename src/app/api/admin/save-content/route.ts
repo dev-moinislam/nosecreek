@@ -229,6 +229,50 @@ export async function POST(req: Request) {
         }
       }
 
+      // Backend Supabase sync for settings (including customSchemas & notifications)
+      if (type === "settings" && isSupabaseConfigured && supabase) {
+        try {
+          const { data: curRow } = await supabase
+            .from("site_settings")
+            .select("*")
+            .eq("id", "main")
+            .maybeSingle();
+
+          const existingMarketing = curRow?.marketing || {};
+          const incomingMarketing = data.marketing || {};
+          const customSchemas = data.customSchemas || incomingMarketing.customSchemas || existingMarketing.customSchemas || [];
+          const notifications = data.notifications || incomingMarketing.notifications || existingMarketing.notifications;
+
+          const mergedMarketing = {
+            ...existingMarketing,
+            ...incomingMarketing,
+            customSchemas,
+            notifications,
+            auth_credentials: incomingMarketing.auth_credentials || existingMarketing.auth_credentials,
+            theme_colors: incomingMarketing.theme_colors || existingMarketing.theme_colors
+          };
+
+          const upsertPayload: any = {
+            id: "main",
+            clinic_name: data.clinicName || curRow?.clinic_name || "Nose Creek Physiotherapy",
+            logo_text: data.logoText || curRow?.logo_text || "Nose Creek Physiotherapy",
+            contact: data.contact || curRow?.contact || {},
+            opening_hours: data.openingHours || curRow?.opening_hours || {},
+            social_links: data.socialLinks || curRow?.social_links || {},
+            booking_url: data.bookingUrl || curRow?.booking_url || "#booking",
+            primary_cta: data.primaryCTA || curRow?.primary_cta || "Book Online",
+            footer_content: data.footerContent || curRow?.footer_content || "",
+            seo: data.seo || curRow?.seo || {},
+            marketing: mergedMarketing,
+            updated_at: new Date().toISOString()
+          };
+
+          await supabase.from("site_settings").upsert(upsertPayload, { onConflict: "id" });
+        } catch (sErr) {
+          console.warn("Backend Supabase settings sync warning:", sErr);
+        }
+      }
+
       // Instant cache purge across all affected routes
       try {
         if (type === "team") {
@@ -255,6 +299,12 @@ export async function POST(req: Request) {
           revalidatePath("/locations");
           revalidatePath("/locations/[slug]", "page");
           revalidatePath("/", "layout");
+        } else if (type === "settings") {
+          revalidatePath("/", "layout");
+          revalidatePath("/");
+          revalidatePath("/about");
+          revalidatePath("/contact");
+          revalidatePath("/services");
         } else {
           revalidatePath("/", "layout");
         }

@@ -51,6 +51,43 @@ const DEFAULT_ORGANIZATION_SCHEMA_TEMPLATE = JSON.stringify({
   }
 }, null, 2);
 
+const DEFAULT_FAQ_SCHEMA_TEMPLATE = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do I need a doctor's referral for physiotherapy in Alberta?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No referral is needed. In Alberta, you can visit a licensed physiotherapist directly. Some private extended health insurance policies may require one for claim reimbursement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Nose Creek Physiotherapy offer direct insurance billing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, we direct bill most extended health benefit providers including Alberta Blue Cross, Sun Life, Canada Life, and Manulife."
+      }
+    }
+  ]
+}, null, 2);
+
+const DEFAULT_SERVICE_SCHEMA_TEMPLATE = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "MedicalProcedure",
+  "name": "Physiotherapy Rehabilitation Treatment",
+  "procedureType": "NoninvasiveProcedure",
+  "description": "Comprehensive physical therapy assessment, hands-on joint manipulation, dry needling, and therapeutic exercise prescription.",
+  "howPerformed": "Administered by licensed FCAMPT physiotherapists in private treatment rooms and active gym facility.",
+  "provider": {
+    "@type": "MedicalBusiness",
+    "name": "Nose Creek Physiotherapy",
+    "url": "https://www.nosecreekphysiotherapy.com"
+  }
+}, null, 2);
+
 const COMMON_PAGES = [
   { label: "Homepage (/)", value: "/" },
   { label: "About Us (/about)", value: "/about" },
@@ -86,27 +123,51 @@ export default function AdminSchemasPage() {
   });
 
   const [jsonValidationErrors, setJsonValidationErrors] = useState<Record<string, string | null>>({});
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadSchemas() {
-      if (isSupabaseConfigured && supabase) {
+      let loaded = false;
+
+      // 1. Fetch from canonical settings endpoint
+      try {
+        const res = await fetch("/api/content?type=settings");
+        if (res.ok) {
+          const data = await res.json();
+          const schemas = data.customSchemas || data.marketing?.customSchemas;
+          if (Array.isArray(schemas) && schemas.length > 0) {
+            setCustomSchemas(schemas);
+            loaded = true;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch schemas from /api/content:", err);
+      }
+
+      // 2. If not loaded, try Supabase directly
+      if (!loaded && isSupabaseConfigured && supabase) {
         try {
           const { data } = await supabase
             .from("site_settings")
             .select("*")
-            .single();
+            .eq("id", "main")
+            .maybeSingle();
 
           if (data) {
             const m = data.marketing || {};
             const schemas = m.customSchemas || data.customSchemas;
             if (Array.isArray(schemas) && schemas.length > 0) {
               setCustomSchemas(schemas);
+              loaded = true;
             }
           }
-        } catch {
-          // ignore
+        } catch (sErr) {
+          console.warn("Supabase load error:", sErr);
         }
-      } else if (typeof window !== "undefined") {
+      }
+
+      // 3. If still not loaded, check localStorage
+      if (!loaded && typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
         if (local) {
           try {
@@ -114,12 +175,12 @@ export default function AdminSchemasPage() {
             const schemas = parsed.customSchemas || (parsed.marketing && parsed.marketing.customSchemas);
             if (Array.isArray(schemas) && schemas.length > 0) {
               setCustomSchemas(schemas);
+              loaded = true;
             }
-          } catch {
-            // ignore
-          }
+          } catch {}
         }
       }
+
       setLoading(false);
     }
     loadSchemas();
@@ -193,7 +254,7 @@ export default function AdminSchemasPage() {
     setSaveStatus(null);
 
     try {
-      // 1. Save to localStorage for instant local preview
+      // 1. Save to localStorage for instant preview
       if (typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
         let parsed = local ? JSON.parse(local) : {};
@@ -203,7 +264,7 @@ export default function AdminSchemasPage() {
         localStorage.setItem("adm_settings", JSON.stringify(parsed));
       }
 
-      // 2. Persist to Disk via API
+      // 2. Persist to Disk via API & sync to Supabase server-side
       const baseData = { ...(settingsData as any) };
       if (typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
@@ -218,7 +279,7 @@ export default function AdminSchemasPage() {
       if (!baseData.marketing) baseData.marketing = {};
       baseData.marketing.customSchemas = customSchemas;
 
-      await fetch("/api/admin/save-content", {
+      const saveRes = await fetch("/api/admin/save-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -227,10 +288,15 @@ export default function AdminSchemasPage() {
         })
       });
 
-      // 3. Persist to Supabase if configured
+      if (!saveRes.ok) {
+        const errJson = await saveRes.json().catch(() => ({}));
+        throw new Error(errJson.error || "Failed to persist schemas to server");
+      }
+
+      // 3. Also update Supabase client-side if permitted
       if (isSupabaseConfigured && supabase) {
         try {
-          const { data: cur } = await supabase.from("site_settings").select("marketing").eq("id", "main").single();
+          const { data: cur } = await supabase.from("site_settings").select("marketing").eq("id", "main").maybeSingle();
           const updatedMarketing = {
             ...(cur?.marketing || {}),
             customSchemas
@@ -238,16 +304,21 @@ export default function AdminSchemasPage() {
           await supabase
             .from("site_settings")
             .update({ marketing: updatedMarketing })
-            .match({ id: "main" });
+            .eq("id", "main");
         } catch (sErr) {
-          console.warn("Supabase update error:", sErr);
+          console.warn("Client Supabase sync warning (handled by backend API):", sErr);
         }
+      }
+
+      // 4. Real-time broadcast event to update live schemas instantly
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("settingsUpdated"));
       }
 
       setSaveStatus("✓ Schema configurations saved and activated on live site!");
       setTimeout(() => setSaveStatus(null), 4000);
     } catch (err: any) {
-      setSaveStatus(`⚠️ Saved locally (Database notice: ${err.message})`);
+      setSaveStatus(`⚠️ Save notice: ${err.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -278,9 +349,28 @@ export default function AdminSchemasPage() {
             <p style={{ margin: "6px 0 0 0", fontSize: 14, color: "#64748b" }}>
               Manage multiple structured data schemas (LocalBusiness, MedicalBusiness, MedicalOrganization) with precise page targeting.
             </p>
+            <div style={{ display: "flex", gap: 12, marginTop: 10, flexWrap: "wrap" }}>
+              <a
+                href="https://search.google.com/test/rich-results?url=https%3A%2F%2Fwww.nosecreekphysiotherapy.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 12.5, fontWeight: 600, color: "#0284c7", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}
+              >
+                🔍 Test with Google Rich Results ↗
+              </a>
+              <span style={{ color: "#cbd5e1" }}>•</span>
+              <a
+                href="https://validator.schema.org/#url=https%3A%2F%2Fwww.nosecreekphysiotherapy.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 12.5, fontWeight: 600, color: "#0284c7", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}
+              >
+                🧪 Schema.org Validator ↗
+              </a>
+            </div>
           </div>
 
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <button
               type="button"
               onClick={handleAddSchema}
@@ -515,7 +605,7 @@ export default function AdminSchemasPage() {
                       className="adm-btn adm-btn-secondary"
                       style={{ fontSize: 12, padding: "4px 10px" }}
                     >
-                      Load Business Template
+                      Business Template
                     </button>
                     <button
                       type="button"
@@ -526,7 +616,29 @@ export default function AdminSchemasPage() {
                       className="adm-btn adm-btn-secondary"
                       style={{ fontSize: 12, padding: "4px 10px" }}
                     >
-                      Load Organization Template
+                      Organization Template
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleUpdateSchema(schema.id, { schemaJson: DEFAULT_FAQ_SCHEMA_TEMPLATE });
+                        handleValidateSchemaJson(schema.id, DEFAULT_FAQ_SCHEMA_TEMPLATE);
+                      }}
+                      className="adm-btn adm-btn-secondary"
+                      style={{ fontSize: 12, padding: "4px 10px" }}
+                    >
+                      FAQ Template
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleUpdateSchema(schema.id, { schemaJson: DEFAULT_SERVICE_SCHEMA_TEMPLATE });
+                        handleValidateSchemaJson(schema.id, DEFAULT_SERVICE_SCHEMA_TEMPLATE);
+                      }}
+                      className="adm-btn adm-btn-secondary"
+                      style={{ fontSize: 12, padding: "4px 10px" }}
+                    >
+                      Service Template
                     </button>
                     <button
                       type="button"
@@ -542,6 +654,20 @@ export default function AdminSchemasPage() {
                       style={{ fontSize: 12, padding: "4px 10px" }}
                     >
                       Format JSON
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof navigator !== "undefined" && navigator.clipboard) {
+                          navigator.clipboard.writeText(schema.schemaJson);
+                          setCopiedId(schema.id);
+                          setTimeout(() => setCopiedId(null), 2000);
+                        }
+                      }}
+                      className="adm-btn adm-btn-secondary"
+                      style={{ fontSize: 12, padding: "4px 10px", color: copiedId === schema.id ? "#16a34a" : undefined }}
+                    >
+                      {copiedId === schema.id ? "✓ Copied!" : "📋 Copy JSON"}
                     </button>
                   </div>
                 </div>
