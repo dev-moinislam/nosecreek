@@ -5,7 +5,8 @@ import {
   getServices,
   getConditions,
   getTestimonials,
-  getHomeContent
+  getHomeContent,
+  getSiteSettings
 } from "@/lib/api";
 import HomeLiveView from "@/components/home/HomeLiveView";
 import { resolvePageMetadata } from "@/lib/seo";
@@ -21,14 +22,19 @@ export async function generateMetadata() {
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [homeData, allTeam, blogPosts, services, conditions, testimonials] = await Promise.all([
+  const [homeData, allTeam, blogPosts, services, conditions, testimonials, settings] = await Promise.all([
     getHomeContent(),
     getTeamMembers(),
     getBlogPosts(),
     getServices(),
     getConditions(),
-    getTestimonials()
+    getTestimonials(),
+    getSiteSettings()
   ]);
+
+  const homepageSchemas = Array.isArray(settings.customSchemas)
+    ? settings.customSchemas.filter((s) => s.enabled && s.scope === "homepage" && s.schemaJson)
+    : [];
 
   // Project only the fields strictly needed by the Homepage to keep initial HTML/RSC payload minimal
   const homepageServices = services.map((s) => ({
@@ -87,13 +93,30 @@ export default async function HomePage() {
   })) as typeof testimonials;
 
   return (
-    <HomeLiveView
-      initialHomeData={homeData}
-      allTeam={homepageTeam}
-      blogPosts={homepageBlogPosts}
-      services={homepageServices}
-      conditions={homepageConditions}
-      testimonials={homepageTestimonials}
-    />
+    <>
+      {homepageSchemas.map((s) => {
+        try {
+          const parsed = typeof s.schemaJson === "string" ? JSON.parse(s.schemaJson) : s.schemaJson;
+          return (
+            <script
+              key={`ssr-home-schema-${s.id || s.title}`}
+              id={`schema-${s.id || s.title}`}
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(parsed) }}
+            />
+          );
+        } catch {
+          return null;
+        }
+      })}
+      <HomeLiveView
+        initialHomeData={homeData}
+        allTeam={homepageTeam}
+        blogPosts={homepageBlogPosts}
+        services={homepageServices}
+        conditions={homepageConditions}
+        testimonials={homepageTestimonials}
+      />
+    </>
   );
 }

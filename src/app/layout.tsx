@@ -109,6 +109,25 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: serverThemeCss }}
           />
         )}
+        {/* Active Site-Wide Structured Data Schemas (JSON-LD) for Search Engines */}
+        {Array.isArray(settings.customSchemas) &&
+          settings.customSchemas
+            .filter((s) => s.enabled && s.scope === "site_wide" && s.schemaJson)
+            .map((s) => {
+              try {
+                const parsed = typeof s.schemaJson === "string" ? JSON.parse(s.schemaJson) : s.schemaJson;
+                return (
+                  <script
+                    key={`ssr-site-schema-${s.id || s.title}`}
+                    id={`schema-${s.id || s.title}`}
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(parsed) }}
+                  />
+                );
+              } catch {
+                return null;
+              }
+            })}
       </head>
       <body>
         <ThemeApplier initialTheme={serverThemeColors} />

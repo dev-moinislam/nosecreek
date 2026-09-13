@@ -405,6 +405,48 @@ export default function AdminSchemasPage() {
         </div>
       )}
 
+      {/* Educational info callout explaining how Schema works */}
+      <div
+        style={{
+          marginBottom: 24,
+          padding: "16px 20px",
+          borderRadius: 12,
+          background: "#f0f9ff",
+          border: "1px solid #bae6fd",
+          display: "flex",
+          gap: 14,
+          alignItems: "flex-start"
+        }}
+      >
+        <span style={{ fontSize: 24, lineHeight: 1 }}>💡</span>
+        <div style={{ fontSize: 13.5, color: "#0369a1", lineHeight: 1.6 }}>
+          <strong style={{ color: "#0c4a6e", display: "block", marginBottom: 2 }}>
+            Schema (Structured Data) কীভাবে কাজ করে এবং কেন ওয়েবসাইটে সরাসরি দেখা যায় না?
+          </strong>
+          <span>
+            Schema (JSON-LD) কোনো দৃশ্যমান বাটন বা কার্ড নয়। এটি একটি <strong>ইনভিজিবল মেটাডেটা কোড</strong> যা ওয়েবসাইটের HTML <code>&lt;head&gt;</code> ট্যাগে ইনজেক্ট হয়, যাতে <strong>Google Search ও Bing</strong> আপনার ক্লিনিকের নাম, রিভিউ রেটিং (4.9 ⭐), খোলার সময় ও লোকেশন গুগল সার্চের রেজাল্টে দেখাতে পারে।
+          </span>
+          <div style={{ marginTop: 8, display: "flex", gap: 14, flexWrap: "wrap", fontWeight: 600 }}>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#0284c7", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              🌐 হোমপেজ ভিউ করুন (Ctrl + U দিয়ে সোর্স কোড দেখতে পারবেন) ↗
+            </a>
+            <a
+              href="https://search.google.com/test/rich-results?url=https%3A%2F%2Fwww.nosecreekphysiotherapy.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#0284c7", textDecoration: "underline", display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              🧪 গুগল রিচ রেজাল্টস টেস্টে চেক করুন ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Main Schemas List */}
       {customSchemas.length === 0 ? (
         <div style={{ padding: "48px 24px", textAlign: "center", background: "#ffffff", borderRadius: 16, border: "1px dashed #cbd5e1" }}>

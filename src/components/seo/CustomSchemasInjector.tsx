@@ -61,6 +61,7 @@ interface CustomSchemasInjectorProps {
  */
 export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasInjectorProps = {}) {
   const pathname = usePathname() || "/";
+  const [mounted, setMounted] = useState(false);
 
   // Initial schemas from SSR prop or static settings data
   const [schemas, setSchemas] = useState<CustomSchemaItem[]>(() => {
@@ -69,6 +70,10 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
     }
     return (settingsData as any).customSchemas || [];
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Keep state in sync if initialSchemas changes from server
   useEffect(() => {
@@ -79,13 +84,13 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
 
   useEffect(() => {
     async function loadLiveSchemas() {
-      // 1. Try local storage sync from admin
+      // 1. Try local storage sync from admin if populated
       try {
         const local = localStorage.getItem("adm_settings");
         if (local) {
           const parsed = JSON.parse(local);
           const custom = parsed.customSchemas !== undefined ? parsed.customSchemas : (parsed.marketing?.customSchemas || parsed.settings?.customSchemas);
-          if (Array.isArray(custom)) {
+          if (Array.isArray(custom) && custom.length > 0) {
             setSchemas(custom);
             return;
           }
@@ -130,7 +135,19 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
   // Filter schemas that are enabled and apply to current pathname
   const applicableSchemas = schemas.filter((s) => {
     if (!s.enabled || !s.schemaJson) return false;
-    return matchesTargetScope(s.scope, s.targetPages, pathname);
+    if (!matchesTargetScope(s.scope, s.targetPages, pathname)) return false;
+
+    // During SSR, site_wide is rendered by RootLayout in <head>, and homepage is rendered by page.tsx.
+    // So only render specific route schemas during SSR to avoid duplicate SSR tags.
+    if (!mounted) {
+      return s.scope === "specific";
+    }
+
+    // On client: if already in DOM from SSR, don't duplicate
+    const existing = document.getElementById(`schema-${s.id || s.title}`);
+    if (existing) return false;
+
+    return true;
   });
 
   if (applicableSchemas.length === 0) {
@@ -152,6 +169,7 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
         return (
           <script
             key={item.id || item.title}
+            id={`schema-${item.id || item.title}`}
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonPayload) }}
           />
