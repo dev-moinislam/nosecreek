@@ -4,11 +4,10 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import SchemaMarkup from "@/components/seo/SchemaMarkup";
+import CustomSchemasInjector from "@/components/seo/CustomSchemasInjector";
 import MarketingScripts from "@/components/marketing/MarketingScripts";
 import FloatingReviewsWidget from "@/components/ui/FloatingReviewsWidget";
 import NavigationProgressBar from "@/components/ui/NavigationProgressBar";
-import settingsData from "@/data/settings.json";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -35,7 +34,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Header />
       <main id="main-content" style={{ minHeight: "100vh" }}>{children}</main>
       <Footer />
-      <SchemaMarkup type="MedicalBusiness" data={settingsData} />
+      <CustomSchemasInjector />
       <MarketingScripts />
       <FloatingReviewsWidget />
     </>

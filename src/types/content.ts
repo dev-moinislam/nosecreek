@@ -56,6 +56,29 @@ export interface ClinicContact {
   mapEmbedUrl?: string;
 }
 
+export interface EmailNotificationSettings {
+  enabled: boolean;
+  receiverEmail: string;
+  senderName?: string;
+  subjectPrefix?: string;
+  provider?: "resend" | "smtp" | "webhook";
+  resendApiKey?: string;
+  smtpHost?: string;
+  smtpPort?: number;
+  smtpUser?: string;
+  smtpPass?: string;
+  webhookUrl?: string;
+}
+
+export interface CustomSchemaItem {
+  id: string;
+  title: string;
+  enabled: boolean;
+  scope: "site_wide" | "homepage" | "specific";
+  targetPages: string[];
+  schemaJson: string;
+}
+
 export interface SiteSettings {
   clinicName: string;
   logoText: string;
@@ -69,6 +92,8 @@ export interface SiteSettings {
   favicon?: string;
   themeColors?: Record<string, string>;
   theme_colors?: Record<string, string>;
+  notifications?: EmailNotificationSettings;
+  customSchemas?: CustomSchemaItem[];
 }
 
 export interface SectionBlockConfig {

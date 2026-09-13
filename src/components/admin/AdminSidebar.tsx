@@ -58,10 +58,18 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const allNavItems = [
+  interface NavItem {
+    label: string;
+    href: string;
+    icon: React.ReactNode;
+    badge?: number;
+    adminOnly: boolean;
+  }
+
+  const allNavItems: NavItem[] = [
     { label: "Overview", href: "/admin", icon: <DashboardIcon size={17} />, adminOnly: false },
     { label: "Homepage", href: "/admin/home", icon: <GlobeIcon size={17} />, adminOnly: false },
-    { label: "Leads & Inbox", href: "/admin/leads", icon: <InboxIcon size={17} />, badge: newLeadsCount, adminOnly: false },
+    // Leads box hidden per client request: form submissions are dispatched directly to client receiver email
     { label: "Services", href: "/admin/services", icon: <ServiceIconSvg size={17} />, adminOnly: false },
     { label: "Conditions", href: "/admin/conditions", icon: <ConditionIconSvg size={17} />, adminOnly: false },
     { label: "Blog & Articles", href: "/admin/blog", icon: <BlogIconSvg size={17} />, adminOnly: false },

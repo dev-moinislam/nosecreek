@@ -81,5 +81,22 @@
         "role": "client"
       }
     }
-  }
+  },
+  "notifications": {
+    "enabled": true,
+    "receiverEmail": "info@nosecreekphysiotherapy.com",
+    "subjectPrefix": "[New Website Lead]",
+    "provider": "resend",
+    "senderName": "Nose Creek Website Forms"
+  },
+  "customSchemas": [
+    {
+      "id": "schema-business-main",
+      "title": "Main Clinic Business Schema (MedicalBusiness)",
+      "enabled": true,
+      "scope": "site_wide",
+      "targetPages": [],
+      "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": [\"LocalBusiness\", \"MedicalBusiness\", \"Physiotherapy\"],\n  \"@id\": \"https://www.nosecreekphysiotherapy.com/#LocalBusiness\",\n  \"name\": \"Nose Creek Physiotherapy\",\n  \"alternateName\": \"Nose Creek Physical Therapy\",\n  \"image\": \"https://www.nosecreekphysiotherapy.com/images/clinic/reception-desktop.jpg\",\n  \"logo\": \"https://www.nosecreekphysiotherapy.com/images/logo/nose-creek-logo.webp\",\n  \"url\": \"https://www.nosecreekphysiotherapy.com\",\n  \"telephone\": \"403-295-8590\",\n  \"email\": \"info@nosecreekphysiotherapy.com\",\n  \"priceRange\": \"$$\",\n  \"currenciesAccepted\": \"CAD\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"8220 Centre St NE #153\",\n    \"addressLocality\": \"Calgary\",\n    \"addressRegion\": \"AB\",\n    \"postalCode\": \"T3K 1J7\",\n    \"addressCountry\": \"CA\"\n  },\n  \"aggregateRating\": {\n    \"@type\": \"AggregateRating\",\n    \"ratingValue\": \"4.9\",\n    \"reviewCount\": \"545\",\n    \"bestRating\": \"5\",\n    \"worstRating\": \"1\"\n  }\n}"
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import SchemaMarkup from "@/components/seo/SchemaMarkup";
+import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
 import ServiceLiveView from "@/components/content/ServiceLiveView";
 import {
   getServiceBySlug,
@@ -64,14 +64,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
-      <SchemaMarkup
-        type="MedicalBusiness"
-        data={{
-          name: service.title,
-          description: service.shortDescription,
-          url: `https://nosecreekphysiotherapy.com/services/${service.slug}`
-        }}
-      />
+      <DynamicFAQSchema faqs={service.faqs} />
 
       {/* Real-time Reactive Live View */}
       <ServiceLiveView

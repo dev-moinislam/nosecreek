@@ -1,6 +1,6 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import SchemaMarkup from "@/components/seo/SchemaMarkup";
+import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
 import ConditionLiveView from "@/components/content/ConditionLiveView";
 import {
   getConditionBySlug,
@@ -64,14 +64,7 @@ export default async function ConditionDetailPage({ params }: PageProps) {
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
-      <SchemaMarkup
-        type="MedicalBusiness"
-        data={{
-          name: condition.name,
-          description: condition.description,
-          url: `https://nosecreekphysiotherapy.com/conditions/${condition.slug}`
-        }}
-      />
+      <DynamicFAQSchema faqs={condition.faqs} />
 
       {/* Real-time Reactive Live View */}
       <ConditionLiveView

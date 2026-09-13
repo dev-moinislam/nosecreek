@@ -11,6 +11,7 @@ import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import VisitUsSection from "./VisitUsSection";
 import CustomStorySection from "./CustomStorySection";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
+import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
 
 const eyebrowEl = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
@@ -770,6 +771,7 @@ export default function ConditionLiveView({
 
   return (
     <div>
+      <DynamicFAQSchema faqs={condition.faqs} />
       {order.map((sectionKey) => renderSection(sectionKey))}
     </div>
   );

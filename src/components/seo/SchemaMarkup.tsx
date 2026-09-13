@@ -23,7 +23,7 @@ export default function SchemaMarkup({ type, data }: SchemaMarkupProps) {
         "telephone": data.contact?.phone || data.telephone || "403-295-8590",
         "faxNumber": "403-295-8598",
         "email": data.contact?.email || data.email || "info@nosecreekphysiotherapy.com",
-        "description": "Nose Creek Physiotherapy in Calgary provides expert physiotherapy, massage therapy, acupuncture, shockwave therapy, custom orthotics, and knee bracing.",
+        "description": data.description || "Nose Creek Physiotherapy in Calgary provides expert physiotherapy, massage therapy, acupuncture, shockwave therapy, custom orthotics, and knee bracing.",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "8220 Centre St NE #153",
@@ -95,42 +95,9 @@ export default function SchemaMarkup({ type, data }: SchemaMarkupProps) {
         }
       };
 
-      const defaultFaqs = [
-        {
-          "@type": "Question",
-          "name": "What other services do you provide?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Our team provides massage therapy, shockwave therapy, online physiotherapy (tele-health), rehabilitation, foot care and custom orthotics, acute injury management, injury recovery programs and expert advice on pain — all delivered by experienced therapists."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What type of common conditions can physiotherapy services treat?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Physiotherapy can help with a wide range of issues including back and neck pain, knee pain, shoulder and joint problems, sports injuries, motor-vehicle injuries, chronic pain, vertigo and balance issues, frozen shoulder, TMJ/jaw dysfunction, soft-tissue and connective-tissue problems, spinal stenosis, pelvic health concerns and limited range of motion."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is physiotherapy covered by my insurance policy?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Physiotherapy and many of our other services are covered by extended health insurance plans, and we offer direct billing where available. No doctor referral is needed to start."
-          }
-        }
-      ];
-
-      const faqPage = {
-        "@type": "FAQPage",
-        "@id": "https://www.nosecreekphysiotherapy.com/#faq",
-        "mainEntity": defaultFaqs
-      };
-
       schema = {
         "@context": "https://schema.org",
-        "@graph": [localBusiness, product, faqPage]
+        "@graph": [localBusiness, product]
       };
       break;
 
@@ -198,11 +165,24 @@ export default function SchemaMarkup({ type, data }: SchemaMarkupProps) {
       break;
 
     case "FAQPage":
+      if (!Array.isArray(data) || data.length === 0) {
+        return null;
+      }
+      const validFaqs = data
+        .map((faq: any) => ({
+          question: (faq.question || faq.q || "").trim(),
+          answer: (faq.answer || faq.a || "").trim()
+        }))
+        .filter((faq) => faq.question && faq.answer);
+
+      if (validFaqs.length === 0) {
+        return null;
+      }
+
       schema = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        "mainEntity": data.map((faq: any) => ({
+        "mainEntity": validFaqs.map((faq) => ({
           "@type": "Question",
           "name": faq.question,
           "acceptedAnswer": {

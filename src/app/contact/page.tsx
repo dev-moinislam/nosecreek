@@ -2,8 +2,6 @@ import React from "react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContactInquiryForm from "@/components/forms/ContactInquiryForm";
 import VisitUsSection from "@/components/content/VisitUsSection";
-import SchemaMarkup from "@/components/seo/SchemaMarkup";
-import settingsData from "@/data/settings.json";
 import { resolvePageMetadata } from "@/lib/seo";
 
 export async function generateMetadata() {
@@ -131,8 +129,6 @@ export default function ContactPage() {
 
         </div>
       </section>
-
-      <SchemaMarkup type="MedicalBusiness" data={settingsData} />
     </div>
   );
 }

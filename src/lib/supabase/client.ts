@@ -24,6 +24,17 @@ export const supabase: SupabaseClient = isSupabaseConfigured
  * Submit a lead or form inquiry to Supabase
  */
 export async function submitLead(lead: Omit<Lead, "id" | "created_at" | "updated_at">): Promise<{ success: boolean; data?: any; error?: string }> {
+  // 1. Trigger automated email notification to client's configured receiver email
+  try {
+    fetch("/api/forms/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(lead)
+    }).catch((err) => console.warn("Form email notification trigger error:", err));
+  } catch (notifErr) {
+    console.warn("Background notification dispatch failed:", notifErr);
+  }
+
   if (!isSupabaseConfigured || !supabase) {
     // If Supabase is not yet configured, save locally in browser storage for demo & inspection
     try {

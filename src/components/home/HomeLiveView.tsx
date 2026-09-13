@@ -8,6 +8,7 @@ import defaultHomeData from "@/data/home.json";
 import ConditionTiles from "@/components/ui/ConditionTiles";
 import HomeServicesGrid from "@/components/ui/HomeServicesGrid";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
+import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
 
 const TeamCarousel = dynamic(() => import("@/components/ui/TeamCarousel"), {
   ssr: false,
@@ -667,7 +668,45 @@ export default function HomeLiveView({
         return <VisitUsSection key="location_map" />;
       }
 
-      // ── 18. FINAL CALL TO ACTION (Configurable) ──
+      // ── 18. FAQS ACCORDION ──
+      case "faqs": {
+        const faqsList = homeData.faqs || defaultHomeData.faqs || [];
+        if (!faqsList || faqsList.length === 0) return null;
+        const title = cfg?.title || "Frequently Asked Questions";
+        const subtitle = cfg?.subtitle || "Everything you need to know before your first appointment with our Calgary clinic.";
+
+        return (
+          <section key="faqs" style={{ padding: "clamp(56px,7vw,90px) 0", background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+            <div style={{ maxWidth: 840, margin: "0 auto", padding: "0 24px" }}>
+              <div style={{ textAlign: "center", marginBottom: 38 }}>
+                {eyebrow(cfg?.eyebrow || "FAQ", cfg?.eyebrowColor || "#1c9fd8")}
+                <h2 style={{ fontSize: "clamp(26px,3.6vw,40px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
+                  {title}
+                </h2>
+                <p style={{ marginTop: 12, fontSize: 16, color: "#5a6570", lineHeight: 1.6 }}>
+                  {subtitle}
+                </p>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {faqsList.map((faq: any, i: number) => (
+                  <details key={i} style={{ background: "#fff", border: "1px solid #e2ebf0", borderRadius: 14, padding: "4px 22px" }}>
+                    <summary style={{ cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, padding: "18px 0", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 17, color: "#1d2b34" }}>
+                      {faq.question || faq.q}
+                      <span style={{ color: "#1c9fd8", fontSize: 24, transition: "transform .2s", flex: "0 0 auto" }}>+</span>
+                    </summary>
+                    <p style={{ padding: "0 0 20px", fontSize: 15, lineHeight: 1.7, color: "#5a6570", margin: 0 }}>
+                      {faq.answer || faq.a}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      // ── 19. FINAL CALL TO ACTION (Configurable) ──
       case "final_cta": {
         const fc = homeData.finalCta;
         const title = cfg?.title || fc?.title || "Ready to move faster and feel better?";
@@ -708,6 +747,7 @@ export default function HomeLiveView({
 
   return (
     <div style={{ width: "100%", overflowX: "hidden" }}>
+      <DynamicFAQSchema faqs={homeData.faqs} />
       {sectionOrder.map((sectionKey, index) => {
         const rendered = renderSectionByKey(sectionKey);
         if (!rendered) return null;
