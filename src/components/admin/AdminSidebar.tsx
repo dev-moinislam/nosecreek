@@ -19,7 +19,9 @@ import {
   GlobeIcon,
   ExternalLinkIcon,
   XIcon,
-  RedirectIcon
+  RedirectIcon,
+  MailIcon,
+  SchemaIcon
 } from "./AdminIcons";
 
 interface AdminSidebarProps {
@@ -78,6 +80,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { label: "Locations", href: "/admin/locations", icon: <LocationIconSvg size={17} />, adminOnly: false },
     { label: "SEO & Meta Info", href: "/admin/seo", icon: <GlobeIcon size={17} />, adminOnly: true },
     { label: "Redirects & 404s", href: "/admin/redirects", icon: <RedirectIcon size={17} />, adminOnly: true },
+    { label: "Email Notifications", href: "/admin/email-setup", icon: <MailIcon size={17} />, adminOnly: true },
+    { label: "Schema Manager", href: "/admin/schemas", icon: <SchemaIcon size={17} />, adminOnly: true },
     { label: "Settings & Marketing", href: "/admin/settings", icon: <SettingsIcon size={17} />, adminOnly: true },
   ];
 
