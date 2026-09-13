@@ -109,17 +109,8 @@ export default function AdminSchemasPage() {
 
   const [customSchemas, setCustomSchemas] = useState<CustomSchemaItem[]>(() => {
     const s = (settingsData as any).customSchemas;
-    if (Array.isArray(s) && s.length > 0) return s;
-    return [
-      {
-        id: "schema-business-main",
-        title: "Main Clinic Business Schema (MedicalBusiness)",
-        enabled: true,
-        scope: "site_wide",
-        targetPages: [],
-        schemaJson: DEFAULT_BUSINESS_SCHEMA_TEMPLATE
-      }
-    ];
+    if (Array.isArray(s)) return s;
+    return [];
   });
 
   const [jsonValidationErrors, setJsonValidationErrors] = useState<Record<string, string | null>>({});
@@ -134,8 +125,8 @@ export default function AdminSchemasPage() {
         const res = await fetch("/api/content?type=settings");
         if (res.ok) {
           const data = await res.json();
-          const schemas = data.customSchemas || data.marketing?.customSchemas;
-          if (Array.isArray(schemas) && schemas.length > 0) {
+          const schemas = data.customSchemas !== undefined ? data.customSchemas : data.marketing?.customSchemas;
+          if (Array.isArray(schemas)) {
             setCustomSchemas(schemas);
             loaded = true;
           }
@@ -155,8 +146,8 @@ export default function AdminSchemasPage() {
 
           if (data) {
             const m = data.marketing || {};
-            const schemas = m.customSchemas || data.customSchemas;
-            if (Array.isArray(schemas) && schemas.length > 0) {
+            const schemas = m.customSchemas !== undefined ? m.customSchemas : data.customSchemas;
+            if (Array.isArray(schemas)) {
               setCustomSchemas(schemas);
               loaded = true;
             }
@@ -172,8 +163,8 @@ export default function AdminSchemasPage() {
         if (local) {
           try {
             const parsed = JSON.parse(local);
-            const schemas = parsed.customSchemas || (parsed.marketing && parsed.marketing.customSchemas);
-            if (Array.isArray(schemas) && schemas.length > 0) {
+            const schemas = parsed.customSchemas !== undefined ? parsed.customSchemas : (parsed.marketing && parsed.marketing.customSchemas);
+            if (Array.isArray(schemas)) {
               setCustomSchemas(schemas);
               loaded = true;
             }

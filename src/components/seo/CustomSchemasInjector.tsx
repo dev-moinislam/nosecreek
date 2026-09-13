@@ -64,7 +64,7 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
 
   // Initial schemas from SSR prop or static settings data
   const [schemas, setSchemas] = useState<CustomSchemaItem[]>(() => {
-    if (initialSchemas && Array.isArray(initialSchemas) && initialSchemas.length > 0) {
+    if (initialSchemas && Array.isArray(initialSchemas)) {
       return initialSchemas;
     }
     return (settingsData as any).customSchemas || [];
@@ -72,7 +72,7 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
 
   // Keep state in sync if initialSchemas changes from server
   useEffect(() => {
-    if (initialSchemas && Array.isArray(initialSchemas) && initialSchemas.length > 0) {
+    if (initialSchemas && Array.isArray(initialSchemas)) {
       setSchemas(initialSchemas);
     }
   }, [initialSchemas]);
@@ -84,8 +84,8 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
         const local = localStorage.getItem("adm_settings");
         if (local) {
           const parsed = JSON.parse(local);
-          const custom = parsed.customSchemas || parsed.marketing?.customSchemas || parsed.settings?.customSchemas;
-          if (Array.isArray(custom) && custom.length > 0) {
+          const custom = parsed.customSchemas !== undefined ? parsed.customSchemas : (parsed.marketing?.customSchemas || parsed.settings?.customSchemas);
+          if (Array.isArray(custom)) {
             setSchemas(custom);
             return;
           }
@@ -97,8 +97,8 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
         const res = await fetch("/api/content?type=settings");
         if (res.ok) {
           const data = await res.json();
-          const custom = data.customSchemas || data.marketing?.customSchemas;
-          if (Array.isArray(custom) && custom.length > 0) {
+          const custom = data.customSchemas !== undefined ? data.customSchemas : data.marketing?.customSchemas;
+          if (Array.isArray(custom)) {
             setSchemas(custom);
             return;
           }
