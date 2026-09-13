@@ -56,6 +56,13 @@ export interface ClinicContact {
   mapEmbedUrl?: string;
 }
 
+export interface AutoReplySettings {
+  enabled: boolean;
+  subject?: string;
+  headline?: string;
+  customMessage?: string;
+}
+
 export interface EmailNotificationSettings {
   enabled: boolean;
   receiverEmail: string;
@@ -69,6 +76,7 @@ export interface EmailNotificationSettings {
   smtpUser?: string;
   smtpPass?: string;
   webhookUrl?: string;
+  autoReply?: AutoReplySettings;
 }
 
 export interface CustomSchemaItem {

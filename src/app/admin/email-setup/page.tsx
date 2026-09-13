@@ -27,7 +27,12 @@ export default function AdminEmailSetupPage() {
       smtpPort: n.smtpPort || 465,
       smtpUser: n.smtpUser || "",
       smtpPass: n.smtpPass || "",
-      webhookUrl: n.webhookUrl || ""
+      webhookUrl: n.webhookUrl || "",
+      autoReply: n.autoReply || {
+        enabled: true,
+        subject: "Thank you for contacting Nose Creek Physiotherapy - We've received your request",
+        customMessage: "Thank you for reaching out to Nose Creek Physiotherapy! We have received your request and our clinical care team will contact you shortly to confirm your details or appointment."
+      }
     };
   });
 
@@ -637,11 +642,83 @@ export default function AdminEmailSetupPage() {
           )}
         </div>
 
+        {/* 3. Automatic Confirmation Email to Patient (Auto-Reply) */}
+        <div style={{ background: "#f8fafc", padding: 22, borderRadius: 12, border: "1px solid #e2e8f0", marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e2e8f0", paddingBottom: 12, marginBottom: 16 }}>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
+                3. 🤖 Automatic Confirmation Email to Patient (Auto-Reply)
+              </div>
+              <p style={{ margin: "2px 0 0 0", fontSize: 12.5, color: "#64748b" }}>
+                When a patient submits any form, automatically send a branded &quot;Thank You&quot; confirmation email to their personal email address.
+              </p>
+            </div>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={notifications.autoReply?.enabled ?? true}
+                onChange={(e) => setNotifications({
+                  ...notifications,
+                  autoReply: {
+                    ...(notifications.autoReply || { subject: "", customMessage: "" }),
+                    enabled: e.target.checked
+                  }
+                })}
+                style={{ width: 16, height: 16 }}
+              />
+              <span style={{ fontSize: 13, fontWeight: 700, color: (notifications.autoReply?.enabled ?? true) ? "#16a34a" : "#64748b" }}>
+                {(notifications.autoReply?.enabled ?? true) ? "Auto-Reply Active" : "Disabled"}
+              </span>
+            </label>
+          </div>
+
+          {(notifications.autoReply?.enabled ?? true) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div className="adm-form-group" style={{ margin: 0 }}>
+                <label className="adm-form-label">Confirmation Email Subject (Sent to Patient)</label>
+                <input
+                  type="text"
+                  className="adm-input"
+                  placeholder="Thank you for contacting Nose Creek Physiotherapy - We've received your request"
+                  value={notifications.autoReply?.subject || ""}
+                  onChange={(e) => setNotifications({
+                    ...notifications,
+                    autoReply: {
+                      ...(notifications.autoReply || { enabled: true, customMessage: "" }),
+                      subject: e.target.value
+                    }
+                  })}
+                />
+              </div>
+
+              <div className="adm-form-group" style={{ margin: 0 }}>
+                <label className="adm-form-label">Custom Reassurance Message in Email Body</label>
+                <textarea
+                  className="adm-input"
+                  rows={3}
+                  placeholder="Thank you for reaching out to Nose Creek Physiotherapy! We have received your request and our clinical care team will contact you shortly to confirm your details or appointment."
+                  value={notifications.autoReply?.customMessage || ""}
+                  onChange={(e) => setNotifications({
+                    ...notifications,
+                    autoReply: {
+                      ...(notifications.autoReply || { enabled: true, subject: "" }),
+                      customMessage: e.target.value
+                    }
+                  })}
+                />
+                <span style={{ fontSize: 11.5, color: "#64748b", marginTop: 4, display: "block" }}>
+                  The email will also automatically attach the patient&apos;s submitted request details, clinic phone number (403-295-8590), address, and operating hours.
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Live Test Email Section */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, paddingTop: 14, borderTop: "1px solid #f1f5f9" }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
-              3. Send Verification Test Email
+              4. Send Verification Test Email
             </div>
             <p style={{ margin: "2px 0 0 0", fontSize: 12.5, color: "#64748b" }}>
               Dispatches an instant live email right now using your settings to confirm delivery.
