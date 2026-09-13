@@ -1,6 +1,5 @@
 import React from "react";
 import { notFound } from "next/navigation";
-import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
 import ConditionLiveView from "@/components/content/ConditionLiveView";
 import {
   getConditionBySlug,
@@ -64,8 +63,6 @@ export default async function ConditionDetailPage({ params }: PageProps) {
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
-      <DynamicFAQSchema faqs={condition.faqs} />
-
       {/* Real-time Reactive Live View */}
       <ConditionLiveView
         initialCondition={condition}
