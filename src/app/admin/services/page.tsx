@@ -965,7 +965,6 @@ function ServiceEditorModal({
         if (updatedCfg.image) syncUpdates.sideImage = updatedCfg.image;
       }
       if (customizingBlockKey === "hero") {
-        if (updatedCfg.content) syncUpdates.shortDescription = updatedCfg.content;
         if (updatedCfg.image) syncUpdates.heroImage = updatedCfg.image;
       }
 
@@ -1425,15 +1424,14 @@ function ServiceEditorModal({
                 </div>
 
                 <div className="adm-form-group" style={{ margin: 0 }}>
-                  <label className="adm-form-label">Hero Short Summary (Hook featured on top banner &amp; search cards)</label>
+                  <label className="adm-form-label">Hero Short Summary (Hook featured on top banner)</label>
                   <textarea
                     className="adm-textarea"
                     style={{ minHeight: 80 }}
-                    value={service.shortDescription || ""}
+                    value={service.sectionsData?.hero?.content !== undefined ? service.sectionsData.hero.content : (service.shortDescription || "")}
                     onChange={(e) =>
                       setService({
                         ...service,
-                        shortDescription: e.target.value,
                         sectionsData: {
                           ...(service.sectionsData || {}),
                           hero: {
@@ -1445,6 +1443,9 @@ function ServiceEditorModal({
                     }
                     placeholder="Enter a compelling clinical summary for the top hero banner..."
                   />
+                  <span style={{ fontSize: 12, color: "#64748b", marginTop: 4, display: "block" }}>
+                    This hook appears exclusively on the service page top hero banner. It will NOT overwrite your directory card summary.
+                  </span>
                 </div>
               </div>
 

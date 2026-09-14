@@ -965,7 +965,6 @@ function ConditionEditorModal({
         if (updatedCfg.image) syncUpdates.sideImage = updatedCfg.image;
       }
       if (customizingBlockKey === "hero") {
-        if (updatedCfg.content) syncUpdates.shortDescription = updatedCfg.content;
         if (updatedCfg.image) syncUpdates.heroImage = updatedCfg.image;
       }
 
@@ -1495,15 +1494,14 @@ function ConditionEditorModal({
                 </div>
 
                 <div className="adm-form-group" style={{ margin: 0 }}>
-                  <label className="adm-form-label">Hero Short Summary (Hook featured on top hero banner &amp; preview cards)</label>
+                  <label className="adm-form-label">Hero Short Summary (Hook featured on top hero banner)</label>
                   <textarea
                     className="adm-textarea"
                     style={{ minHeight: 80 }}
-                    value={cond.shortDescription || ""}
+                    value={cond.sectionsData?.hero?.content !== undefined ? cond.sectionsData.hero.content : (cond.shortDescription || "")}
                     onChange={(e) =>
                       setCond({
                         ...cond,
-                        shortDescription: e.target.value,
                         sectionsData: {
                           ...(cond.sectionsData || {}),
                           hero: {
@@ -1515,6 +1513,9 @@ function ConditionEditorModal({
                     }
                     placeholder="Enter a compelling clinical summary for the top hero banner..."
                   />
+                  <span style={{ fontSize: 12, color: "#64748b", marginTop: 4, display: "block" }}>
+                    This hook appears exclusively on the condition page top hero banner. It will NOT overwrite your directory card summary.
+                  </span>
                 </div>
               </div>
 
