@@ -63,10 +63,16 @@ export default function Header() {
       try {
         const savedSettings = localStorage.getItem("adm_settings");
         if (savedSettings) {
-          const parsed = JSON.parse(savedSettings);
-          const s = parsed.settings || parsed;
-          if (s && (s.contact || s.clinicName || s.primaryCTA || s.bookingUrl || s.navigation)) {
-            setSiteSettings((prev) => ({ ...prev, ...s }));
+          // If cached settings still contain stale #hash links or outdated flat condition links in navigation, refresh from clean defaults
+          if (savedSettings.includes('"/about#') || savedSettings.includes('"/conditions/sciatica"')) {
+            localStorage.removeItem("adm_settings");
+            setSiteSettings(defaultSettingsData as SiteSettings);
+          } else {
+            const parsed = JSON.parse(savedSettings);
+            const s = parsed.settings || parsed;
+            if (s && (s.contact || s.clinicName || s.primaryCTA || s.bookingUrl || s.navigation)) {
+              setSiteSettings((prev) => ({ ...prev, ...s }));
+            }
           }
         }
         const savedServices = localStorage.getItem("adm_services");

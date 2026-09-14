@@ -5,22 +5,28 @@ import {
   getServiceBySlug,
   getTeamMembers,
   getConditions,
-  getServices
+  getServices,
+  getSubServices
 } from "@/lib/api";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }
 
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 export const revalidate = 0;
 
 export async function generateStaticParams() {
   const { getServices } = await import("@/lib/api");
   const services = await getServices();
-  return services.map((s) => ({
-    slug: s.slug,
-  }));
+  return services.flatMap((s) => {
+    const list = [{ slug: [s.slug] }];
+    if (s.parentSlug) {
+      list.push({ slug: [s.parentSlug, s.slug] });
+    }
+    return list;
+  });
 }
 
 import { resolvePageMetadata } from "@/lib/seo";
@@ -35,7 +41,9 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return resolvePageMetadata(`/services/${slug}`, {
+  const pathUrl = `/services/${Array.isArray(slug) ? slug.join("/") : slug}`;
+
+  return resolvePageMetadata(pathUrl, {
     title: `${service.seo?.title || service.title} in Calgary | Nose Creek Physiotherapy`,
     description: service.seo?.description || service.shortDescription || undefined,
     openGraph: {
@@ -55,20 +63,27 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   }
 
   // Cross-reference data
-  const [allTeam, allConditions, allServices] = await Promise.all([
+  const [allTeam, allConditions, allServices, subServices] = await Promise.all([
     getTeamMembers(),
     getConditions(),
-    getServices()
+    getServices(),
+    getSubServices(service.slug)
   ]);
+
+  const parentService = service.parentSlug
+    ? allServices.find((s) => s.slug === service.parentSlug)
+    : undefined;
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
-      {/* Real-time Reactive Live View */}
-      <ServiceLiveView
-        initialService={service}
-        allTeam={allTeam}
-        allConditions={allConditions}
+      {/* Real-time Reactive Live View with Sub-Service Support */}
+      <ServiceLiveView 
+        initialService={service} 
+        allTeam={allTeam} 
+        allConditions={allConditions} 
         allServices={allServices}
+        subServices={subServices}
+        parentService={parentService}
       />
     </div>
   );

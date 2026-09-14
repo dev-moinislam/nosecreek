@@ -156,6 +156,7 @@ export async function getServices(): Promise<Service[]> {
             teamMembers: d.team_members || localItem?.teamMembers || [],
             locations: d.locations || localItem?.locations || [],
             testimonials: d.testimonials || localItem?.testimonials || [],
+            parentSlug: d.parent_slug || localItem?.parentSlug || undefined,
             seo: d.seo || localItem?.seo || {}
           };
         });
@@ -179,20 +180,35 @@ export async function getServices(): Promise<Service[]> {
   return currentList;
 }
 
-export async function getServiceBySlug(slug: string): Promise<Service | undefined> {
+export async function getServiceBySlug(slugInput: string | string[]): Promise<Service | undefined> {
+  const fullSlug = Array.isArray(slugInput) ? slugInput.join("/") : slugInput;
+  const leafSlug = Array.isArray(slugInput) ? slugInput[slugInput.length - 1] : slugInput;
+
   if (isSupabaseConfigured && supabase) {
     try {
-      const { data, error } = await supabase
+      let query = await supabase
         .from("services")
         .select("*")
-        .eq("slug", slug)
+        .eq("slug", fullSlug)
         .eq("is_published", true)
-        .single();
+        .maybeSingle();
+
+      if (!query.data && fullSlug !== leafSlug) {
+        query = await supabase
+          .from("services")
+          .select("*")
+          .eq("slug", leafSlug)
+          .eq("is_published", true)
+          .maybeSingle();
+      }
+
+      const { data, error } = query;
       if (!error && data) {
-        const localItem = getFreshServicesData().find((s) => s.slug === slug);
+        const localItem = getFreshServicesData().find((s) => s.slug === data.slug || s.slug === leafSlug || s.slug === fullSlug);
         return {
           id: data.id,
           slug: data.slug,
+          parentSlug: data.parent_slug || localItem?.parentSlug || undefined,
           title: data.title,
           shortDescription: data.short_description || localItem?.shortDescription || "",
           description: data.description || localItem?.description || "",
@@ -223,20 +239,19 @@ export async function getServiceBySlug(slug: string): Promise<Service | undefine
           seo: data.seo || localItem?.seo || {}
         };
       }
-      // If Supabase is configured and query returned 0 rows (item deleted or unpublished), it does not exist
-      if (error && (error.code === "PGRST116" || error.message?.includes("0 rows") || !data)) {
-        return undefined;
-      }
     } catch (e) {
-      console.warn(`Supabase fetch failed for service ${slug}, using local fallback`, e);
+      console.warn(`Supabase fetch failed for service ${fullSlug}, using local fallback`, e);
     }
   }
 
-  // Fallback only if Supabase is not configured
-  if (!isSupabaseConfigured) {
-    return getFreshServicesData().find((s) => s.slug === slug);
-  }
-  return undefined;
+  // Fallback to local services
+  const freshList = getFreshServicesData();
+  return freshList.find((s) => s.slug === fullSlug || s.slug === leafSlug);
+}
+
+export async function getSubServices(parentSlug: string): Promise<Service[]> {
+  const all = await getServices();
+  return all.filter((s) => s.parentSlug === parentSlug);
 }
 
 function getFreshTeamData(): TeamMember[] {
@@ -441,6 +456,7 @@ export async function getConditions(): Promise<Condition[]> {
             sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
             relatedServices: d.related_services || localItem?.relatedServices || [],
             category: d.category || localItem?.category || "general",
+            parentSlug: d.parent_slug || localItem?.parentSlug || undefined,
             iconType: d.icon_type || d.iconType || localItem?.iconType,
             iconBg: d.icon_bg || d.iconBg || localItem?.iconBg,
             iconColor: d.icon_color || d.iconColor || localItem?.iconColor,
@@ -467,20 +483,35 @@ export async function getConditions(): Promise<Condition[]> {
   return currentList;
 }
 
-export async function getConditionBySlug(slug: string): Promise<Condition | undefined> {
+export async function getConditionBySlug(slugInput: string | string[]): Promise<Condition | undefined> {
+  const fullSlug = Array.isArray(slugInput) ? slugInput.join("/") : slugInput;
+  const leafSlug = Array.isArray(slugInput) ? slugInput[slugInput.length - 1] : slugInput;
+
   if (isSupabaseConfigured && supabase) {
     try {
-      const { data, error } = await supabase
+      let query = await supabase
         .from("conditions")
         .select("*")
-        .eq("slug", slug)
+        .eq("slug", fullSlug)
         .eq("is_published", true)
-        .single();
+        .maybeSingle();
+
+      if (!query.data && fullSlug !== leafSlug) {
+        query = await supabase
+          .from("conditions")
+          .select("*")
+          .eq("slug", leafSlug)
+          .eq("is_published", true)
+          .maybeSingle();
+      }
+
+      const { data, error } = query;
       if (!error && data) {
-        const localItem = getFreshConditionsData().find((c) => c.slug === slug);
+        const localItem = getFreshConditionsData().find((c) => c.slug === data.slug || c.slug === leafSlug || c.slug === fullSlug);
         return {
           id: data.id,
           slug: data.slug,
+          parentSlug: data.parent_slug || localItem?.parentSlug || undefined,
           name: data.name,
           shortDescription: data.short_description || localItem?.shortDescription || "",
           description: data.description || localItem?.description || "",
@@ -508,20 +539,19 @@ export async function getConditionBySlug(slug: string): Promise<Condition | unde
           seo: data.seo || localItem?.seo || {}
         };
       }
-      // If Supabase is configured and query returned 0 rows (item deleted or unpublished), it does not exist
-      if (error && (error.code === "PGRST116" || error.message?.includes("0 rows") || !data)) {
-        return undefined;
-      }
     } catch (e) {
-      console.warn(`Supabase fetch failed for condition ${slug}, using local fallback`, e);
+      console.warn(`Supabase fetch failed for condition ${fullSlug}, using local fallback`, e);
     }
   }
 
-  // Fallback only if Supabase is not configured
-  if (!isSupabaseConfigured) {
-    return getFreshConditionsData().find((c) => c.slug === slug);
-  }
-  return undefined;
+  // Fallback to local conditions
+  const freshList = getFreshConditionsData();
+  return freshList.find((c) => c.slug === fullSlug || c.slug === leafSlug);
+}
+
+export async function getSubConditions(parentSlug: string): Promise<Condition[]> {
+  const all = await getConditions();
+  return all.filter((c) => c.parentSlug === parentSlug);
 }
 
 /**

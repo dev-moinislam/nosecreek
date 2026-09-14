@@ -60,6 +60,7 @@
   {
     "id": "lower-back-pain",
     "slug": "lower-back-pain",
+    "parentSlug": "back-pain",
     "name": "Lower Back Pain",
     "shortDescription": "Targeted spinal rehabilitation, lumbar facet decompression, and deep core retraining for acute and chronic lumbar spine pain.",
     "description": "Lower back pain affects nearly 80% of adults at some point in their lives. Whether caused by lumbar disc herniation, facet joint irritation, ligament sprain, or postural muscle imbalance, our registered Calgary physiotherapists use advanced orthopaedic manual therapy and functional core stabilization to stop pain and prevent recurrences.",
@@ -121,6 +122,7 @@
   {
     "id": "si-joint-dysfunction",
     "slug": "si-joint-dysfunction",
+    "parentSlug": "back-pain",
     "name": "SI Joint Dysfunction",
     "shortDescription": "Targeted pelvic alignment, sacroiliac joint stabilization, and manual therapy for sharp buttock and hip pain.",
     "description": "Sacroiliac (SI) joint dysfunction occurs when the joint connecting your sacrum and pelvic bone becomes hypermobile, locked, or inflamed. It often mimics sciatica or disc herniation with sharp, localized pain in one buttock. Our physical therapists realign the pelvis and restore joint stability.",
@@ -322,6 +324,7 @@
   {
     "id": "foot-pain",
     "slug": "foot-pain",
+    "parentSlug": "knee-pain",
     "name": "Foot Pain",
     "shortDescription": "Targeted therapies for plantar fasciitis, Achilles tendinopathy, flat feet, and heel spurs.",
     "description": "Your feet bear the weight of your entire body. Chronic foot pain — especially plantar fasciitis and Achilles tendinopathy — occurs when arches lack support or soft tissues undergo repetitive micro-trauma. Our combined shockwave and custom orthotic treatments provide rapid, lasting relief.",
@@ -408,6 +411,7 @@
   {
     "id": "balance-falls",
     "slug": "balance-falls",
+    "parentSlug": "sports-injury",
     "name": "Balance & Falls",
     "shortDescription": "Vestibular therapy and balance retraining to improve stability, confidence, and fall prevention.",
     "description": "Balance problems and dizziness significantly increase fall risk and reduce daily independence. Our vestibular physiotherapists assess inner ear function, vision-proprioception integration, and lower extremity strength to build steady, confident movement.",
@@ -449,6 +453,7 @@
   {
     "id": "shoulder-conditions",
     "slug": "shoulder-conditions",
+    "parentSlug": "neck-shoulder-pain",
     "name": "Shoulder Conditions",
     "shortDescription": "Specialized rehabilitation for rotator cuff tears, shoulder impingement, and frozen shoulder.",
     "description": "The shoulder is the most mobile joint in the human body, making it vulnerable to impingement, rotator cuff strains, labral tears, and adhesive capsulitis (frozen shoulder). Our FCAMPT-certified manual therapists restore joint mechanics and scapular control.",
@@ -492,6 +497,7 @@
   {
     "id": "concussion",
     "slug": "concussion",
+    "parentSlug": "sports-injury",
     "name": "Concussion",
     "shortDescription": "Evidence-based post-concussion management, visual-vestibular therapy, and safe return-to-activity.",
     "description": "A concussion is a mild traumatic brain injury caused by a direct impact or rapid acceleration-deceleration force. Our evidence-based concussion management protocol addresses cervical spine involvement, vestibular-ocular dysfunction, and autonomic symptom tolerance.",
@@ -533,6 +539,7 @@
   {
     "id": "hip-pain",
     "slug": "hip-pain",
+    "parentSlug": "knee-pain",
     "name": "Hip Pain",
     "shortDescription": "Therapy for hip osteoarthritis, labral tears, trochanteric bursitis, and groin tightness.",
     "description": "Hip pain can originate from the joint capsule itself (osteoarthritis or labral tears) or peri-articular structures like the gluteal tendons and bursae. We pinpoint the exact driver of hip discomfort and restore painless walking, stair climbing, and athletic activity.",
@@ -576,6 +583,7 @@
   {
     "id": "sciatica",
     "slug": "sciatica",
+    "parentSlug": "back-pain",
     "name": "Sciatica",
     "shortDescription": "Targeted nerve decompression, gentle neural flossing, and herniated disc recovery.",
     "description": "Sciatica occurs when the sciatic nerve is compressed or irritated by a lumbar disc herniation, spinal stenosis, or piriformis muscle spasm. We use gentle neural mobilizations, spinal decompression strategies, and core stability to relieve radiating nerve pain.",
@@ -619,6 +627,7 @@
   {
     "id": "nerve-pain",
     "slug": "nerve-pain",
+    "parentSlug": "neck-shoulder-pain",
     "name": "Nerve Pain",
     "shortDescription": "Advanced treatment for peripheral neuropathy, carpal tunnel, and compressed nerves.",
     "description": "Nerve entrapment syndromes like carpal tunnel, thoracic outlet syndrome, and cubital tunnel cause burning, tingling, and motor weakness. Our targeted nerve mobilization and manual decompression treatments alleviate mechanical pressure and restore healthy neural glide.",
@@ -662,6 +671,7 @@
   {
     "id": "headaches",
     "slug": "headaches",
+    "parentSlug": "neck-shoulder-pain",
     "name": "Headaches",
     "shortDescription": "Relief from cervicogenic headaches, tension headaches, and posture-induced migraine triggers.",
     "description": "Up to 80% of persistent tension headaches originate from the upper cervical spine (cervicogenic headaches). When upper neck joints and suboccipital muscles are irritated, referred pain radiates upward over the skull into the temples and behind the eyes.",
@@ -705,6 +715,7 @@
   {
     "id": "muscle-pain",
     "slug": "muscle-pain",
+    "parentSlug": "sports-injury",
     "name": "Muscle Pain",
     "shortDescription": "Deep tissue therapies, IMS dry needling, and myofascial release for chronic muscle soreness.",
     "description": "Chronic muscle pain, taut bands, and myofascial trigger points develop from repetitive strain, postural overload, or protective guarding after injury. We combine deep tissue massage, IMS dry needling, and active loading to release contracted fibers.",
@@ -748,6 +759,7 @@
   {
     "id": "joint-pain",
     "slug": "joint-pain",
+    "parentSlug": "knee-pain",
     "name": "Joint Pain",
     "shortDescription": "Non-invasive treatments for arthritis, joint stiffness, bursitis, and cartilage wear.",
     "description": "Whether dealing with osteoarthritis in the knees, hips, or spine, or inflammatory joint stiffness, physical therapy helps lubricate joint surfaces, strengthen surrounding stabilizers, and offload joint pressure.",
@@ -792,6 +804,7 @@
   {
     "id": "workplace-injuries",
     "slug": "workplace-injuries",
+    "parentSlug": "motor-vehicle-accidents",
     "name": "Workplace Injuries",
     "shortDescription": "WCB-approved physiotherapy and active conditioning to return to work safely and comfortably.",
     "description": "Workplace injuries range from repetitive strain and heavy lifting disc herniations to slips and falls on job sites. We provide prompt clinical assessment, WCB claim coordination, and functional work conditioning to get you back on the job safely.",

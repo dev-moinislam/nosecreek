@@ -167,6 +167,7 @@ export interface ServiceCustomSection extends SectionBlockConfig {
 export interface Service {
   id: string;
   slug: string;
+  parentSlug?: string;
   title: string;
   shortDescription?: string | null;
   description: string;
@@ -297,6 +298,7 @@ export interface Location {
 export interface Condition {
   id: string;
   slug: string;
+  parentSlug?: string;
   name: string;
   shortDescription?: string | null;
   description: string;

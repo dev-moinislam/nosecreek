@@ -67,12 +67,16 @@ export default function ServiceLiveView({
   initialService,
   allTeam,
   allConditions,
-  allServices = []
+  allServices = [],
+  subServices = [],
+  parentService
 }: {
   initialService: Service;
   allTeam: TeamMember[];
   allConditions: Condition[];
   allServices?: Service[];
+  subServices?: Service[];
+  parentService?: Service;
 }) {
   const [service, setService] = useState<Service>(initialService);
 
@@ -207,15 +211,35 @@ export default function ServiceLiveView({
                 items={[
                   { label: "Home", href: "/" },
                   { label: "Services", href: "/services" },
+                  ...(parentService ? [{ label: parentService.title, href: `/services/${parentService.slug}` }] : []),
                   { label: service.title }
                 ]}
               />
+
+              {parentService && (
+                <div style={{ marginTop: 14 }}>
+                  <Link
+                    href={`/services/${parentService.slug}`}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: "var(--primary, #0e78a8)",
+                      textDecoration: "none"
+                    }}
+                  >
+                    &larr; Back to {parentService.title} Overview
+                  </Link>
+                </div>
+              )}
 
               <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(32px, 4vw, 56px)", alignItems: "center" }}>
                 <div>
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--nc-bg-blue, #e6f4ea)", color: "var(--secondary-hover, #5c9515)", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "7px 14px", borderRadius: 999, marginBottom: 20 }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--secondary, #6faf1c)", display: "inline-block" }} />
-                    {cfg?.eyebrow || "Evidence-Based Clinical Care · Calgary North"}
+                    {cfg?.eyebrow || (parentService ? `Specialized Program · ${parentService.title}` : "Evidence-Based Clinical Care · Calgary North")}
                   </div>
 
                   <h1 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(30px, 4.2vw, 48px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.12, marginBottom: 18 }}>
@@ -607,62 +631,128 @@ export default function ServiceLiveView({
           (service.relatedConditions || []).includes(c.slug)
         );
         const targetConditions = matchingConditions.length > 0 ? matchingConditions : (allConditions || []).slice(0, 6);
-        if (targetConditions.length === 0) return null;
 
         return (
-          <section key="related_conditions" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
-            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-              <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 44px" }}>
-                {eyebrowEl(cfg?.eyebrow || "Targeted Clinical Conditions", cfg?.eyebrowColor || "#1c9fd8")}
-                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
-                  {cfg?.title || `Conditions Commonly Treated With ${service.title}`}
-                </h2>
-                <p style={{ marginTop: 12, fontSize: 16, color: "#5a6570", lineHeight: 1.6 }}>
-                  Our registered therapists in Calgary North develop customized rehabilitation protocols for these specific complaints:
-                </p>
-              </div>
+          <React.Fragment key="related_conditions_group">
+            {/* Sub-Services Showcase Section (if service has specialized programs) */}
+            {subServices && subServices.length > 0 && (
+              <section style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#ffffff", borderTop: "1px solid #e2e8f0" }}>
+                <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+                  <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 44px" }}>
+                    {eyebrowEl("Specialized Programs", "#1c9fd8")}
+                    <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
+                      Specialized Clinical Programs under {service.title}
+                    </h2>
+                    <p style={{ marginTop: 14, fontSize: 16, color: "#5a6570", lineHeight: 1.6 }}>
+                      Explore dedicated clinical tracks and specialized modalities available within our {service.title} department.
+                    </p>
+                  </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
-                {targetConditions.map((cond) => (
-                  <Link key={cond.slug} href={`/conditions/${cond.slug}`} style={{ textDecoration: "none", display: "block" }}>
-                    <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 14, padding: "22px 20px", height: "100%", display: "flex", flexDirection: "column", boxShadow: "0 2px 8px rgba(18,60,80,0.04)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block" }} />
-                        <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#6faf1c", letterSpacing: "0.5px" }}>Condition Care</span>
-                      </div>
-                      <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, fontWeight: 700, color: "#1d2b34", margin: "0 0 8px" }}>
-                        {cond.name}
-                      </h3>
-                      <p style={{ fontSize: 13.5, color: "#64748b", lineHeight: 1.6, flexGrow: 1, margin: "0 0 14px" }}>
-                        {cond.shortDescription || `Targeted evidence-based care for ${cond.name} in Calgary.`}
-                      </p>
-                      <span style={{ color: "#0284c7", fontWeight: 700, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4 }}>
-                        Read Recovery Protocol &rarr;
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 24 }}>
+                    {subServices.map((sub) => {
+                      const nestedUrl = `/services/${service.slug}/${sub.slug}`;
+                      return (
+                        <Link
+                          key={sub.slug}
+                          href={nestedUrl}
+                          style={{
+                            textDecoration: "none",
+                            display: "flex",
+                            flexDirection: "column",
+                            background: "#f8fafc",
+                            border: "1.5px solid #e2ebf0",
+                            borderRadius: 16,
+                            padding: "28px 26px",
+                            boxShadow: "0 4px 14px rgba(18,60,80,0.04)"
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--primary, #0e78a8)", background: "#e0f2fe", padding: "4px 10px", borderRadius: 999 }}>
+                              Service Track
+                            </span>
+                            <span style={{ color: "var(--primary, #0e78a8)", fontWeight: 700, fontSize: 18 }}>&rarr;</span>
+                          </div>
 
-              <div style={{ textAlign: "center", marginTop: 32 }}>
-                <Link
-                  href="/conditions"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: "#0e78a8",
-                    textDecoration: "underline",
-                    textUnderlineOffset: 4
-                  }}
-                >
-                  Browse Complete Directory of Conditions We Treat &rarr;
-                </Link>
-              </div>
-            </div>
-          </section>
+                          <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 21, fontWeight: 700, color: "#1d2b34", marginBottom: 10 }}>
+                            {sub.title}
+                          </h3>
+
+                          <p style={{ fontSize: 14.5, lineHeight: 1.65, color: "#5a6570", flexGrow: 1, margin: 0 }}>
+                            {sub.shortDescription || sub.description || "Comprehensive clinical therapy, assessment, and individualized treatment."}
+                          </p>
+
+                          <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid #e2ebf0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--secondary, #6faf1c)" }}>
+                              View Specialized Program &rarr;
+                            </span>
+                            <span style={{ fontSize: 12.5, color: "#94a3b8", fontWeight: 600 }}>
+                              Calgary Clinic
+                            </span>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {targetConditions.length > 0 && (
+              <section style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+                <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+                  <div style={{ textAlign: "center", maxWidth: 700, margin: "0 auto 44px" }}>
+                    {eyebrowEl(cfg?.eyebrow || "Targeted Clinical Conditions", cfg?.eyebrowColor || "#1c9fd8")}
+                    <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.5vw, 40px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
+                      {cfg?.title || `Conditions Commonly Treated With ${service.title}`}
+                    </h2>
+                    <p style={{ marginTop: 12, fontSize: 16, color: "#5a6570", lineHeight: 1.6 }}>
+                      Our registered therapists in Calgary North develop customized rehabilitation protocols for these specific complaints:
+                    </p>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+                    {targetConditions.map((cond) => (
+                      <Link key={cond.slug} href={`/conditions/${cond.slug}`} style={{ textDecoration: "none", display: "block" }}>
+                        <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 14, padding: "22px 20px", height: "100%", display: "flex", flexDirection: "column", boxShadow: "0 2px 8px rgba(18,60,80,0.04)" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#6faf1c", display: "inline-block" }} />
+                            <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: "#6faf1c", letterSpacing: "0.5px" }}>Condition Care</span>
+                          </div>
+                          <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, fontWeight: 700, color: "#1d2b34", margin: "0 0 8px" }}>
+                            {cond.name}
+                          </h3>
+                          <p style={{ fontSize: 13.5, color: "#64748b", lineHeight: 1.6, flexGrow: 1, margin: "0 0 14px" }}>
+                            {cond.shortDescription || `Targeted evidence-based care for ${cond.name} in Calgary.`}
+                          </p>
+                          <span style={{ color: "#0284c7", fontWeight: 700, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                            Read Recovery Protocol &rarr;
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div style={{ textAlign: "center", marginTop: 32 }}>
+                    <Link
+                      href="/conditions"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: "#0e78a8",
+                        textDecoration: "underline",
+                        textUnderlineOffset: 4
+                      }}
+                    >
+                      Browse Complete Directory of Conditions We Treat &rarr;
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            )}
+          </React.Fragment>
         );
       }
 

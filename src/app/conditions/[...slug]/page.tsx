@@ -4,12 +4,13 @@ import ConditionLiveView from "@/components/content/ConditionLiveView";
 import {
   getConditionBySlug,
   getConditions,
+  getSubConditions,
   getServices,
   getTeamMembers
 } from "@/lib/api";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -18,9 +19,13 @@ export const revalidate = 0;
 
 export async function generateStaticParams() {
   const conditions = await getConditions();
-  return conditions.map((c) => ({
-    slug: c.slug,
-  }));
+  return conditions.flatMap((c) => {
+    const list = [{ slug: [c.slug] }];
+    if (c.parentSlug) {
+      list.push({ slug: [c.parentSlug, c.slug] });
+    }
+    return list;
+  });
 }
 
 import { resolvePageMetadata } from "@/lib/seo";
@@ -35,7 +40,9 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return resolvePageMetadata(`/conditions/${slug}`, {
+  const pathUrl = `/conditions/${Array.isArray(slug) ? slug.join("/") : slug}`;
+
+  return resolvePageMetadata(pathUrl, {
     title: `${condition.seo?.title || condition.name} Treatment in Calgary | Nose Creek Physiotherapy`,
     description: condition.seo?.description || condition.shortDescription || condition.description || undefined,
     openGraph: {
@@ -55,20 +62,28 @@ export default async function ConditionDetailPage({ params }: PageProps) {
   }
 
   // Cross-reference data
-  const [allServices, allConditions, allTeam] = await Promise.all([
+  const [allServices, allConditions, allTeam, subConditions] = await Promise.all([
     getServices(),
     getConditions(),
-    getTeamMembers()
+    getTeamMembers(),
+    getSubConditions(condition.slug)
   ]);
+
+  // Find parent condition if this is a sub-condition
+  const parentCondition = condition.parentSlug
+    ? allConditions.find((c) => c.slug === condition.parentSlug)
+    : undefined;
 
   return (
     <div style={{ width: "100%", overflowX: "hidden", backgroundColor: "#fff" }}>
-      {/* Real-time Reactive Live View */}
+      {/* Real-time Reactive Live View with Hierarchical Sub-Condition Support */}
       <ConditionLiveView
         initialCondition={condition}
         allServices={allServices}
         allConditions={allConditions}
         allTeam={allTeam}
+        subConditions={subConditions}
+        parentCondition={parentCondition}
       />
     </div>
   );
