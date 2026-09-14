@@ -71,6 +71,18 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const allNavItems: NavItem[] = [
     { label: "Overview", href: "/admin", icon: <DashboardIcon size={17} />, adminOnly: false },
     { label: "Homepage", href: "/admin/home", icon: <GlobeIcon size={17} />, adminOnly: false },
+    {
+      label: "Header & Footer",
+      href: "/admin/navigation",
+      icon: (
+        <svg width={17} height={17} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="3" y1="17" x2="21" y2="17" />
+        </svg>
+      ),
+      adminOnly: true
+    },
     // Leads box hidden per client request: form submissions are dispatched directly to client receiver email
     { label: "Services", href: "/admin/services", icon: <ServiceIconSvg size={17} />, adminOnly: false },
     { label: "Conditions", href: "/admin/conditions", icon: <ConditionIconSvg size={17} />, adminOnly: false },

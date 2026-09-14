@@ -45,7 +45,8 @@ export async function GET(req: Request) {
                 favicon: supaSettings.seo?.favicon || supaSettings.favicon || settingsResult?.favicon,
                 marketing: supaSettings.marketing || settingsResult?.marketing,
                 customSchemas: supaSettings.marketing?.customSchemas || supaSettings.customSchemas || settingsResult?.customSchemas || [],
-                notifications: supaSettings.marketing?.notifications || supaSettings.notifications || settingsResult?.notifications
+                notifications: supaSettings.marketing?.notifications || supaSettings.notifications || settingsResult?.notifications,
+                navigation: supaSettings.marketing?.navigation || supaSettings.navigation || settingsResult?.navigation
               };
             }
           } catch (e) {

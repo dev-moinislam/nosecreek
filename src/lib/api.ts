@@ -71,7 +71,8 @@ export async function getSiteSettings(): Promise<SiteSettings> {
           notifications: data.marketing?.notifications || (data as any).notifications || currentSettings.notifications,
           customSchemas: (data.marketing?.customSchemas && Array.isArray(data.marketing.customSchemas))
             ? data.marketing.customSchemas
-            : (Array.isArray((data as any).customSchemas) ? (data as any).customSchemas : (currentSettings.customSchemas || []))
+            : (Array.isArray((data as any).customSchemas) ? (data as any).customSchemas : (currentSettings.customSchemas || [])),
+          navigation: data.marketing?.navigation || (data as any).navigation || currentSettings.navigation
         };
       }
     } catch (e) {

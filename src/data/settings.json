@@ -102,5 +102,136 @@
       "targetPages": [],
       "schemaJson": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"LocalBusiness\",\n  \"@id\": \"https://www.nosecreekphysiotherapy.com/#LocalBusiness\",\n  \"name\": \"Nose Creek Physiotherapy\",\n  \"alternateName\": \"Nose Creek Physical Therapy\",\n  \"image\": \"https://www.nosecreekphysiotherapy.com/images/clinic/reception-desktop.jpg\",\n  \"logo\": \"https://www.nosecreekphysiotherapy.com/images/logo/nose-creek-logo.webp\",\n  \"url\": \"https://www.nosecreekphysiotherapy.com\",\n  \"telephone\": \"403-295-8590\",\n  \"email\": \"info@nosecreekphysiotherapy.com\",\n  \"priceRange\": \"$$\",\n  \"currenciesAccepted\": \"CAD\",\n  \"address\": {\n    \"@type\": \"PostalAddress\",\n    \"streetAddress\": \"8220 Centre St NE #153\",\n    \"addressLocality\": \"Calgary\",\n    \"addressRegion\": \"AB\",\n    \"postalCode\": \"T3K 1J7\",\n    \"addressCountry\": \"CA\"\n  },\n  \"aggregateRating\": {\n    \"@type\": \"AggregateRating\",\n    \"ratingValue\": \"4.9\",\n    \"reviewCount\": \"545\",\n    \"bestRating\": \"5\",\n    \"worstRating\": \"1\"\n  }\n}"
     }
-  ]
+  ],
+  "navigation": {
+    "header": {
+      "topBarEnabled": true,
+      "phone": "403-295-8590",
+      "ctaButtonText": "Book Online",
+      "ctaButtonUrl": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+      "menu": [
+        {
+          "id": "nav-services",
+          "label": "Services",
+          "href": "/services",
+          "enabled": true,
+          "children": [
+            { "id": "srv-physio", "label": "Physiotherapy", "href": "/services/physiotherapy", "enabled": true },
+            { "id": "srv-massage", "label": "Massage Therapy", "href": "/services/massage-therapy", "enabled": true },
+            { "id": "srv-acupuncture", "label": "Acupuncture & Dry Needling", "href": "/services/acupuncture", "enabled": true },
+            { "id": "srv-orthotics", "label": "Custom Orthotics", "href": "/services/custom-orthotics", "enabled": true },
+            { "id": "srv-bracing", "label": "Knee Bracing", "href": "/services/knee-bracing", "enabled": true },
+            { "id": "srv-shockwave", "label": "Shockwave Therapy", "href": "/services/shockwave-therapy", "enabled": true },
+            { "id": "srv-all", "label": "View All Services →", "href": "/services", "enabled": true, "badge": "Directory" }
+          ]
+        },
+        {
+          "id": "nav-conditions",
+          "label": "What We Treat",
+          "href": "/conditions",
+          "enabled": true,
+          "children": [
+            {
+              "id": "cnd-back-pain",
+              "label": "Back Pain & Sciatica",
+              "href": "/conditions/back-pain",
+              "enabled": true,
+              "children": [
+                { "id": "cnd-back-lower", "label": "Lower Back Pain", "href": "/conditions/back-pain#lower-back", "enabled": true },
+                { "id": "cnd-back-sciatica", "label": "Sciatica Nerve Relief", "href": "/conditions/back-pain#sciatica", "enabled": true },
+                { "id": "cnd-back-si-joint", "label": "SI Joint Dysfunction", "href": "/conditions/back-pain#si-joint", "enabled": true }
+              ]
+            },
+            {
+              "id": "cnd-neck-pain",
+              "label": "Neck Pain & Whiplash",
+              "href": "/conditions/neck-shoulder-pain",
+              "enabled": true,
+              "children": [
+                { "id": "cnd-neck-whiplash", "label": "Whiplash Rehabilitation", "href": "/conditions/neck-shoulder-pain#whiplash", "enabled": true },
+                { "id": "cnd-neck-headache", "label": "Cervicogenic Headaches", "href": "/conditions/neck-shoulder-pain#headache", "enabled": true }
+              ]
+            },
+            { "id": "cnd-shoulder", "label": "Shoulder Pain & Rotator Cuff", "href": "/conditions/shoulder-pain", "enabled": true },
+            { "id": "cnd-knee-hip", "label": "Knee & Hip Pain", "href": "/conditions/knee-hip-pain", "enabled": true },
+            { "id": "cnd-sports", "label": "Sports Injuries & Sprains", "href": "/conditions/sports-injuries", "enabled": true },
+            { "id": "cnd-mva", "label": "Motor Vehicle Accidents (MVA)", "href": "/conditions/motor-vehicle-accident", "enabled": true, "badge": "Insurance Direct" },
+            { "id": "cnd-all", "label": "Browse All Conditions →", "href": "/conditions", "enabled": true, "badge": "Overview" }
+          ]
+        },
+        {
+          "id": "nav-about",
+          "label": "About Us",
+          "href": "/about",
+          "enabled": true,
+          "children": [
+            { "id": "abt-clinic", "label": "Our Clinic Philosophy", "href": "/about", "enabled": true },
+            { "id": "abt-team", "label": "Meet the Team", "href": "/team", "enabled": true },
+            { "id": "abt-locations", "label": "Locations & Hours", "href": "/locations", "enabled": true },
+            { "id": "abt-workshops", "label": "Workshops & Events", "href": "/workshops", "enabled": true },
+            { "id": "abt-blog", "label": "Clinical Health Blog", "href": "/blog", "enabled": true }
+          ]
+        },
+        { "id": "nav-reviews", "label": "Google Reviews", "href": "/reviews", "enabled": true, "badge": "4.9 ★" },
+        { "id": "nav-team", "label": "Our Team", "href": "/team", "enabled": true },
+        { "id": "nav-contact", "label": "Contact", "href": "/contact", "enabled": true }
+      ]
+    },
+    "footer": {
+      "columns": [
+        {
+          "id": "ft-col-services",
+          "title": "Clinical Services",
+          "links": [
+            { "label": "Physiotherapy Rehabilitation", "href": "/services/physiotherapy" },
+            { "label": "Massage Therapy", "href": "/services/massage-therapy" },
+            { "label": "Acupuncture & Dry Needling", "href": "/services/acupuncture" },
+            { "label": "Custom Orthotics", "href": "/services/custom-orthotics" },
+            { "label": "Knee Bracing & Support", "href": "/services/knee-bracing" },
+            { "label": "Shockwave Therapy", "href": "/services/shockwave-therapy" }
+          ]
+        },
+        {
+          "id": "ft-col-conditions",
+          "title": "What We Treat",
+          "links": [
+            { "label": "Back Pain & Sciatica", "href": "/conditions/back-pain" },
+            { "label": "Neck Pain & Whiplash", "href": "/conditions/neck-shoulder-pain" },
+            { "label": "Shoulder Pain & Rotator Cuff", "href": "/conditions/shoulder-pain" },
+            { "label": "Knee & Hip Pain", "href": "/conditions/knee-hip-pain" },
+            { "label": "Sports Injuries", "href": "/conditions/sports-injuries" },
+            { "label": "MVA & Auto Claims", "href": "/conditions/motor-vehicle-accident" }
+          ]
+        },
+        {
+          "id": "ft-col-clinic",
+          "title": "Clinic & Patients",
+          "links": [
+            { "label": "About Our Clinic", "href": "/about" },
+            { "label": "Meet the Clinical Team", "href": "/team" },
+            { "label": "545+ Google Reviews", "href": "/reviews" },
+            { "label": "Beddington Location & Hours", "href": "/locations" },
+            { "label": "Patient Education Blog", "href": "/blog" },
+            { "label": "Patient Portal Login", "href": "/client-login" }
+          ]
+        },
+        {
+          "id": "ft-col-booking",
+          "title": "Booking & Hours",
+          "links": [
+            { "label": "Book Appointment Online", "href": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington" },
+            { "label": "Direct Insurance Billing", "href": "/about" },
+            { "label": "Free Discovery Session", "href": "/contact" },
+            { "label": "Call 403-295-8590", "href": "tel:4032958590" },
+            { "label": "Contact Us", "href": "/contact" }
+          ]
+        }
+      ],
+      "contactPhone": "403-295-8590",
+      "contactEmail": "info@nosecreekphysiotherapy.com",
+      "contactAddress": "#22, 8120 Beddington Blvd NW, Calgary, AB T3K 2A8",
+      "copyrightText": "© 2026 Nose Creek Physiotherapy. All rights reserved. Registered physiotherapy, chiropractic, and massage therapy clinic in Calgary.",
+      "disclaimerText": "The information provided on this website is for educational purposes only and should not be substituted for professional medical advice, diagnosis, or treatment."
+    }
+  }
 }

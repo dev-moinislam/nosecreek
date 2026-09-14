@@ -270,11 +270,18 @@ export async function POST(req: Request) {
               ? incomingMarketing.notifications
               : existingMarketing.notifications);
 
+        const navigation = data.navigation !== undefined
+          ? data.navigation
+          : (incomingMarketing.navigation !== undefined
+              ? incomingMarketing.navigation
+              : existingMarketing.navigation);
+
         const mergedMarketing = {
           ...existingMarketing,
           ...incomingMarketing,
           customSchemas,
           notifications,
+          navigation,
           auth_credentials: incomingMarketing.auth_credentials || existingMarketing.auth_credentials,
           theme_colors: incomingMarketing.theme_colors || existingMarketing.theme_colors
         };

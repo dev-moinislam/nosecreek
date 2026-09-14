@@ -141,6 +141,42 @@ details[open] .faqPlus{transform:rotate(45deg)}
   transform: rotate(180deg);
 }
 
+/* ─── MULTI-LEVEL DESKTOP FLYOUT STYLES ─── */
+.nav-level2-item {
+  position: relative;
+}
+
+.nav-level2-item.has-children::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -10px;
+  width: 14px;
+  height: 100%;
+}
+
+.nav-level3-flyout {
+  display: none;
+  position: absolute;
+  top: -4px;
+  left: calc(100% + 4px);
+  min-width: 230px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 16px 44px rgba(18, 60, 80, 0.16);
+  border: 1px solid #e7edf1;
+  padding: 8px 6px;
+  z-index: 130;
+  animation: slideDownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.nav-level2-item:hover > .nav-level3-flyout,
+.nav-level2-item:focus-within > .nav-level3-flyout {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 /* ─── RESPONSIVE NAVIGATION STYLES ─── */
 @media (max-width: 992px) {
   .desktop-nav {

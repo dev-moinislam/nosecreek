@@ -4,20 +4,31 @@ import Link from "next/link";
 import defaultServicesData from "@/data/services.json";
 import defaultSettingsData from "@/data/settings.json";
 import { Service, SiteSettings } from "@/types/content";
-import { getServices } from "@/lib/api";
 
 export default function Footer() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettingsData as SiteSettings);
   const [services, setServices] = useState<Service[]>(defaultServicesData as Service[]);
 
   useEffect(() => {
+    async function fetchFreshSettings() {
+      try {
+        const res = await fetch("/api/content?type=settings", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && (data.clinicName || data.navigation || data.contact)) {
+            setSiteSettings((prev) => ({ ...prev, ...data }));
+          }
+        }
+      } catch {}
+    }
+
     function sync() {
       try {
         const savedSettings = localStorage.getItem("adm_settings");
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings);
           const s = parsed.settings || parsed;
-          if (s && (s.contact || s.clinicName || s.bookingUrl || s.socialLinks || s.footerContent)) {
+          if (s && (s.contact || s.clinicName || s.bookingUrl || s.socialLinks || s.footerContent || s.navigation)) {
             setSiteSettings((prev) => ({ ...prev, ...s }));
           }
         }
@@ -32,17 +43,23 @@ export default function Footer() {
     }
     sync();
 
+    // Idle background fetch
+    const timer = setTimeout(() => {
+      fetchFreshSettings();
+    }, 6000);
+
     window.addEventListener("settingsUpdated", sync);
     window.addEventListener("servicesUpdated", sync);
     window.addEventListener("storage", sync);
     return () => {
+      clearTimeout(timer);
       window.removeEventListener("settingsUpdated", sync);
       window.removeEventListener("servicesUpdated", sync);
       window.removeEventListener("storage", sync);
     };
   }, []);
 
-  const clinicLinks = [
+  const fallbackClinicLinks = [
     { label: "About Us",          href: "/about" },
     { label: "Meet the Team",     href: "/team" },
     { label: "Patient Reviews",   href: "/reviews" },
@@ -51,24 +68,24 @@ export default function Footer() {
     { label: "Clinical Blog",     href: "/blog" },
   ];
 
-  const conditionLinks = [
-    { label: "Back Pain & Sciatica",      href: "/conditions/back-pain-relief" },
-    { label: "Neck Pain & Whiplash",      href: "/conditions/neck-pain-relief" },
+  const fallbackConditionLinks = [
+    { label: "Back Pain & Sciatica",      href: "/conditions/back-pain" },
+    { label: "Neck Pain & Whiplash",      href: "/conditions/neck-shoulder-pain" },
     { label: "Shoulder Pain & Impingement",href: "/conditions/shoulder-pain" },
     { label: "Knee & Hip Pain",           href: "/conditions/knee-hip-pain" },
     { label: "Sports Injuries & Sprains", href: "/conditions/sports-injuries" },
     { label: "Motor Vehicle Accidents",   href: "/conditions/motor-vehicle-accident" },
   ];
 
-  const getStartedLinks = [
+  const fallbackGetStartedLinks = [
     {
       label: "Book Assessment Online",
       href: siteSettings.bookingUrl || "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
       highlight: true,
       external: true
     },
-    { label: "Free Discovery Session", href: "/contact?consult=discovery", highlight: false },
-    { label: "Free Phone Consultation",href: "/contact?consult=phone", highlight: false },
+    { label: "Free Discovery Session", href: "/contact", highlight: false },
+    { label: "Free Phone Consultation",href: "/contact", highlight: false },
     { label: "Clinic Contact & Map",   href: "/contact", highlight: false },
     { label: "Patient Reviews (5-Star)",href: "/reviews", highlight: false },
   ];
@@ -76,10 +93,12 @@ export default function Footer() {
   const colStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: 9, fontSize: 13.5 };
   const headStyle: React.CSSProperties = { fontFamily: "'Poppins',sans-serif", fontWeight: 700, color: "#fff", fontSize: 14, marginBottom: 14 };
 
-  const phoneText = siteSettings.contact?.phone || "403.295.8590";
-  const addressLines = siteSettings.contact?.address
-    ? siteSettings.contact.address.split("\n")
-    : ["#22, 8120 Beddington Blvd NW", "Calgary, AB T3K 2A8, Canada"];
+  const navFooter = siteSettings.navigation?.footer;
+  const phoneText = navFooter?.contactPhone || siteSettings.contact?.phone || "403.295.8590";
+  const addressText = navFooter?.contactAddress || siteSettings.contact?.address || "#22, 8120 Beddington Blvd NW\nCalgary, AB T3K 2A8, Canada";
+  const addressLines = addressText.includes("\n") ? addressText.split("\n") : [addressText];
+
+  const customColumns = navFooter?.columns && navFooter.columns.length > 0 ? navFooter.columns : null;
 
   return (
     <footer style={{ background: "var(--dark, #0d2530)", color: "#a9c1cd", paddingTop: "clamp(44px,5vw,64px)" }}>
@@ -117,76 +136,6 @@ export default function Footer() {
               View Interactive Map &rarr;
             </Link>
           </div>
-        </div>
-
-        {/* Column 2: Clinical Services */}
-        <div>
-          <div style={headStyle}>Clinical Services</div>
-          <div style={colStyle}>
-            {services.slice(0, 6).map((s) => (
-              <Link key={s.slug || s.id} href={`/services/${s.slug}`} style={{ color: "#a9c1cd", textDecoration: "none", transition: "color 0.15s" }}>
-                {s.title}
-              </Link>
-            ))}
-            <Link href="/services" style={{ color: "var(--accent, #8cc63f)", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
-              View All Services &rarr;
-            </Link>
-          </div>
-        </div>
-
-        {/* Column 3: What We Treat (Conditions) */}
-        <div>
-          <div style={headStyle}>What We Treat</div>
-          <div style={colStyle}>
-            {conditionLinks.map((c) => (
-              <Link key={c.href} href={c.href} style={{ color: "#a9c1cd", textDecoration: "none" }}>
-                {c.label}
-              </Link>
-            ))}
-            <Link href="/conditions" style={{ color: "var(--accent, #8cc63f)", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
-              View All Conditions &rarr;
-            </Link>
-          </div>
-        </div>
-
-        {/* Column 4: Clinic Info */}
-        <div>
-          <div style={headStyle}>Clinic</div>
-          <div style={colStyle}>
-            {clinicLinks.map((l) => (
-              <Link key={l.label} href={l.href} style={{ color: "#a9c1cd", textDecoration: "none" }}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Column 5: Appointments & Consultations */}
-        <div>
-          <div style={headStyle}>Get Started</div>
-          <div style={colStyle}>
-            {getStartedLinks.map((l) => (
-              l.external ? (
-                <a
-                  key={l.label}
-                  href={l.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: l.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
-                >
-                  {l.label}
-                </a>
-              ) : (
-                <Link
-                  key={l.label}
-                  href={l.href}
-                  style={{ color: l.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
-                >
-                  {l.label}
-                </Link>
-              )
-            ))}
-          </div>
           <div style={{ display: "flex", gap: 14, marginTop: 18 }}>
             <a
               href={siteSettings.socialLinks?.facebook || "https://www.facebook.com/nosecreekphysio"}
@@ -220,18 +169,147 @@ export default function Footer() {
             )}
           </div>
         </div>
+
+        {/* Dynamic or Fallback Columns */}
+        {customColumns ? (
+          customColumns.map((col) => (
+            <div key={col.id || col.title}>
+              <div style={headStyle}>{col.title}</div>
+              <div style={colStyle}>
+                {col.links.map((link, idx) => {
+                  const isExternal = link.external || link.href.startsWith("http") || link.href.startsWith("tel:");
+                  if (isExternal) {
+                    return (
+                      <a
+                        key={idx}
+                        href={link.href}
+                        target={link.href.startsWith("tel:") ? undefined : "_blank"}
+                        rel="noopener noreferrer"
+                        style={{
+                          color: link.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd",
+                          fontWeight: link.highlight ? 700 : 400,
+                          textDecoration: "none",
+                          transition: "color 0.15s",
+                        }}
+                      >
+                        {link.label}
+                      </a>
+                    );
+                  }
+                  return (
+                    <Link
+                      key={idx}
+                      href={link.href}
+                      style={{
+                        color: link.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd",
+                        fontWeight: link.highlight ? 700 : 400,
+                        textDecoration: "none",
+                        transition: "color 0.15s",
+                      }}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        ) : (
+          <>
+            {/* Fallback Column 2: Clinical Services */}
+            <div>
+              <div style={headStyle}>Clinical Services</div>
+              <div style={colStyle}>
+                {services.slice(0, 6).map((s) => (
+                  <Link key={s.slug || s.id} href={`/services/${s.slug}`} style={{ color: "#a9c1cd", textDecoration: "none", transition: "color 0.15s" }}>
+                    {s.title}
+                  </Link>
+                ))}
+                <Link href="/services" style={{ color: "var(--accent, #8cc63f)", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
+                  View All Services &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Fallback Column 3: What We Treat (Conditions) */}
+            <div>
+              <div style={headStyle}>What We Treat</div>
+              <div style={colStyle}>
+                {fallbackConditionLinks.map((c) => (
+                  <Link key={c.href} href={c.href} style={{ color: "#a9c1cd", textDecoration: "none" }}>
+                    {c.label}
+                  </Link>
+                ))}
+                <Link href="/conditions" style={{ color: "var(--accent, #8cc63f)", fontWeight: 700, textDecoration: "none", fontSize: 13, marginTop: 4 }}>
+                  View All Conditions &rarr;
+                </Link>
+              </div>
+            </div>
+
+            {/* Fallback Column 4: Clinic Info */}
+            <div>
+              <div style={headStyle}>Clinic</div>
+              <div style={colStyle}>
+                {fallbackClinicLinks.map((l) => (
+                  <Link key={l.label} href={l.href} style={{ color: "#a9c1cd", textDecoration: "none" }}>
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Fallback Column 5: Appointments & Consultations */}
+            <div>
+              <div style={headStyle}>Get Started</div>
+              <div style={colStyle}>
+                {fallbackGetStartedLinks.map((l) => (
+                  l.external ? (
+                    <a
+                      key={l.label}
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: l.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
+                    >
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link
+                      key={l.label}
+                      href={l.href}
+                      style={{ color: l.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd", fontWeight: l.highlight ? 700 : 400, textDecoration: "none" }}
+                    >
+                      {l.label}
+                    </Link>
+                  )
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      <div style={{ borderTop: "1px solid #1c3a47", marginTop: 44 }}>
+      {/* Disclaimer Notice if present */}
+      {navFooter?.disclaimerText && (
+        <div style={{ maxWidth: 1200, margin: "24px auto 0", padding: "0 24px" }}>
+          <p style={{ fontSize: 12, color: "#64748b", lineHeight: 1.6, borderTop: "1px solid #162f3c", paddingTop: 16 }}>
+            {navFooter.disclaimerText}
+          </p>
+        </div>
+      )}
+
+      {/* Bottom Bar */}
+      <div style={{ borderTop: "1px solid #1c3a47", marginTop: navFooter?.disclaimerText ? 16 : 44 }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 24px", display: "flex", flexWrap: "wrap", gap: "10px 24px", justifyContent: "space-between", fontSize: 13, color: "#7b95a2" }}>
           <span>
-            {siteSettings.footerContent || `© 2001–${new Date().getFullYear()} ${siteSettings.clinicName || "Nose Creek Physiotherapy"}. All rights reserved. Calgary, Alberta.`}
+            {navFooter?.copyrightText || siteSettings.footerContent || `© 2001–${new Date().getFullYear()} ${siteSettings.clinicName || "Nose Creek Physiotherapy"}. All rights reserved. Calgary, Alberta.`}
           </span>
           <div style={{ display: "flex", gap: 20 }}>
             <Link href="/" style={{ color: "#7b95a2", textDecoration: "none" }}>Home</Link>
             <Link href="/services" style={{ color: "#7b95a2", textDecoration: "none" }}>Services</Link>
             <Link href="/conditions" style={{ color: "#7b95a2", textDecoration: "none" }}>Conditions</Link>
             <Link href="/contact" style={{ color: "#7b95a2", textDecoration: "none" }}>Contact</Link>
+            <Link href="/client-login" style={{ color: "#7b95a2", textDecoration: "none" }}>Portal</Link>
           </div>
         </div>
       </div>

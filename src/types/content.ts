@@ -88,6 +88,40 @@ export interface CustomSchemaItem {
   schemaJson: string;
 }
 
+export interface NavMenuItem {
+  id: string;
+  label: string;
+  href: string;
+  target?: "_self" | "_blank";
+  badge?: string;
+  enabled?: boolean;
+  children?: NavMenuItem[];
+}
+
+export interface FooterColumnItem {
+  id: string;
+  title: string;
+  links: { label: string; href: string; target?: string; external?: boolean; highlight?: boolean }[];
+}
+
+export interface HeaderFooterNavigation {
+  header?: {
+    topBarEnabled?: boolean;
+    phone?: string;
+    ctaButtonText?: string;
+    ctaButtonUrl?: string;
+    menu?: NavMenuItem[];
+  };
+  footer?: {
+    columns?: FooterColumnItem[];
+    contactPhone?: string;
+    contactEmail?: string;
+    contactAddress?: string;
+    copyrightText?: string;
+    disclaimerText?: string;
+  };
+}
+
 export interface SiteSettings {
   clinicName: string;
   logoText: string;
@@ -103,6 +137,7 @@ export interface SiteSettings {
   theme_colors?: Record<string, string>;
   notifications?: EmailNotificationSettings;
   customSchemas?: CustomSchemaItem[];
+  navigation?: HeaderFooterNavigation;
 }
 
 export interface SectionBlockConfig {
