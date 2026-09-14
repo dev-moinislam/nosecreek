@@ -168,7 +168,7 @@ const sectionDefinitions: Record<string, { title: string; desc: string; category
 };
 
 export default function AdminServicesPage() {
-  const { role, isAdmin, canDelete, canEditSlugs } = useRole();
+  const { role, isAdmin, isClient, canDelete, canEditSlugs } = useRole();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -400,7 +400,7 @@ export default function AdminServicesPage() {
           </p>
         </div>
 
-        {isAdmin && (
+        {(isAdmin || isClient) && (
           <button
             onClick={() =>
               setEditingService({

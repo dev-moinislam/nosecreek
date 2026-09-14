@@ -173,7 +173,7 @@ const conditionSectionDefs: Record<string, { title: string; desc: string; catego
 };
 
 export default function AdminConditionsPage() {
-  const { role, isAdmin, canDelete, canEditSlugs } = useRole();
+  const { role, isAdmin, isClient, canDelete, canEditSlugs } = useRole();
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingCondition, setEditingCondition] = useState<Condition | null>(null);
@@ -394,7 +394,7 @@ export default function AdminConditionsPage() {
           </p>
         </div>
 
-        {isAdmin && (
+        {(isAdmin || isClient) && (
           <button
             onClick={() =>
               setEditingCondition({

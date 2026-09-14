@@ -58,6 +58,128 @@
     }
   },
   {
+    "id": "lower-back-pain",
+    "slug": "lower-back-pain",
+    "name": "Lower Back Pain",
+    "shortDescription": "Targeted spinal rehabilitation, lumbar facet decompression, and deep core retraining for acute and chronic lumbar spine pain.",
+    "description": "Lower back pain affects nearly 80% of adults at some point in their lives. Whether caused by lumbar disc herniation, facet joint irritation, ligament sprain, or postural muscle imbalance, our registered Calgary physiotherapists use advanced orthopaedic manual therapy and functional core stabilization to stop pain and prevent recurrences.",
+    "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Rapid reduction of acute lumbar spasms and stiffness",
+      "Restores painless bending, lifting, and prolonged sitting",
+      "Identifies the root mechanical cause to prevent future flare-ups"
+    ],
+    "symptoms": [
+      "Dull or throbbing ache across the lumbar spine and beltline",
+      "Morning stiffness that takes 30+ minutes to loosen up",
+      "Sharp pinching pain when bending forward, coughing, or standing up",
+      "Muscle spasms across the lower back and gluteal region"
+    ],
+    "treatmentApproach": [
+      "CAMPT-certified joint mobilizations and spinal manual therapy",
+      "Gunn IMS / Dry Needling to release chronic deep paraspinal muscle spasms",
+      "Custom core stabilization exercises (McKenzie and Stuart McGill protocols)",
+      "Ergonomic computer and sitting posture modifications"
+    ],
+    "customSections": [],
+    "faqs": [],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
+      "symptoms",
+      "treatment_approach",
+      "related_therapies",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "other_links",
+      "bottom_cta"
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture"
+    ],
+    "category": "Spine & Core",
+    "seo": {
+      "title": "Lower Back Pain Treatment Calgary | Nose Creek Physiotherapy",
+      "ogTitle": "Lower Back Pain Relief | Nose Creek Physiotherapy",
+      "cardImage": null,
+      "description": "Evidence-based lower back pain therapy, IMS dry needling, and spinal rehabilitation in Calgary NW & NE.",
+      "sectionsData": {},
+      "ogDescription": "End lower back pain without pills or surgery with evidence-based physical therapy in Calgary."
+    }
+  },
+  {
+    "id": "si-joint-dysfunction",
+    "slug": "si-joint-dysfunction",
+    "name": "SI Joint Dysfunction",
+    "shortDescription": "Targeted pelvic alignment, sacroiliac joint stabilization, and manual therapy for sharp buttock and hip pain.",
+    "description": "Sacroiliac (SI) joint dysfunction occurs when the joint connecting your sacrum and pelvic bone becomes hypermobile, locked, or inflamed. It often mimics sciatica or disc herniation with sharp, localized pain in one buttock. Our physical therapists realign the pelvis and restore joint stability.",
+    "heroImage": null,
+    "sideImage": null,
+    "cardImage": null,
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Restores anatomical pelvic and sacroiliac joint alignment",
+      "Stabilizes the pelvic girdle with targeted muscular retraining",
+      "Relieves sharp buttock and groin pain when walking or rolling over"
+    ],
+    "symptoms": [
+      "Sharp, stabbing pain in one buttock or the back of the hip",
+      "Discomfort when bearing weight on one leg or climbing stairs",
+      "Pain when rolling over in bed or getting out of a car",
+      "Aching that radiates into the groin or back of the upper thigh"
+    ],
+    "treatmentApproach": [
+      "Sacroiliac joint alignment and manual pelvic correction",
+      "Gluteus medius and deep pelvic stabilizer muscle strengthening",
+      "Sacroiliac belt bracing recommendations for acute instability",
+      "Gentle soft tissue release and dry needling of piriformis and gluteal muscles"
+    ],
+    "customSections": [],
+    "faqs": [],
+    "hiddenSections": [],
+    "sectionOrder": [
+      "hero",
+      "at_a_glance",
+      "clinical_overview",
+      "custom_sections",
+      "symptoms",
+      "treatment_approach",
+      "related_therapies",
+      "team_carousel",
+      "faqs",
+      "location_map",
+      "decision_ctas",
+      "other_links",
+      "bottom_cta"
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture"
+    ],
+    "category": "Spine & Pelvis",
+    "seo": {
+      "title": "SI Joint Dysfunction Treatment Calgary | Nose Creek Physiotherapy",
+      "ogTitle": "SI Joint & Pelvic Pain Relief | Nose Creek Physiotherapy",
+      "cardImage": null,
+      "description": "Relieve sacroiliac pelvic pain and buttock stiffness with specialized physical therapy in Calgary.",
+      "sectionsData": {},
+      "ogDescription": "Expert pelvic alignment and sacroiliac joint physical therapy in Calgary."
+    }
+  },
+  {
     "id": "condition-1788302012251",
     "slug": "new-condition",
     "name": "Leg pain",

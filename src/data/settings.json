@@ -137,25 +137,55 @@
               "href": "/conditions/back-pain",
               "enabled": true,
               "children": [
-                { "id": "cnd-back-lower", "label": "Lower Back Pain", "href": "/conditions/back-pain#lower-back", "enabled": true },
-                { "id": "cnd-back-sciatica", "label": "Sciatica Nerve Relief", "href": "/conditions/back-pain#sciatica", "enabled": true },
-                { "id": "cnd-back-si-joint", "label": "SI Joint Dysfunction", "href": "/conditions/back-pain#si-joint", "enabled": true }
+                { "id": "cnd-back-sciatica", "label": "Sciatica Nerve Relief", "href": "/conditions/sciatica", "enabled": true },
+                { "id": "cnd-back-lower", "label": "Lower Back Pain", "href": "/conditions/lower-back-pain", "enabled": true },
+                { "id": "cnd-back-si-joint", "label": "SI Joint Dysfunction", "href": "/conditions/si-joint-dysfunction", "enabled": true }
               ]
             },
             {
               "id": "cnd-neck-pain",
-              "label": "Neck Pain & Whiplash",
+              "label": "Neck & Shoulder Pain",
               "href": "/conditions/neck-shoulder-pain",
               "enabled": true,
               "children": [
-                { "id": "cnd-neck-whiplash", "label": "Whiplash Rehabilitation", "href": "/conditions/neck-shoulder-pain#whiplash", "enabled": true },
-                { "id": "cnd-neck-headache", "label": "Cervicogenic Headaches", "href": "/conditions/neck-shoulder-pain#headache", "enabled": true }
+                { "id": "cnd-neck-headache", "label": "Cervicogenic Headaches", "href": "/conditions/headaches", "enabled": true },
+                { "id": "cnd-neck-shoulder", "label": "Shoulder Impingement & Rotator Cuff", "href": "/conditions/shoulder-conditions", "enabled": true },
+                { "id": "cnd-neck-nerve", "label": "Pinched Nerve & Neuropathy", "href": "/conditions/nerve-pain", "enabled": true }
               ]
             },
-            { "id": "cnd-shoulder", "label": "Shoulder Pain & Rotator Cuff", "href": "/conditions/shoulder-pain", "enabled": true },
-            { "id": "cnd-knee-hip", "label": "Knee & Hip Pain", "href": "/conditions/knee-hip-pain", "enabled": true },
-            { "id": "cnd-sports", "label": "Sports Injuries & Sprains", "href": "/conditions/sports-injuries", "enabled": true },
-            { "id": "cnd-mva", "label": "Motor Vehicle Accidents (MVA)", "href": "/conditions/motor-vehicle-accident", "enabled": true, "badge": "Insurance Direct" },
+            {
+              "id": "cnd-knee-hip",
+              "label": "Knee & Hip Pain",
+              "href": "/conditions/knee-pain",
+              "enabled": true,
+              "children": [
+                { "id": "cnd-sub-hip", "label": "Hip Bursitis & Groin Pain", "href": "/conditions/hip-pain", "enabled": true },
+                { "id": "cnd-sub-joint", "label": "Joint Pain & Arthritis", "href": "/conditions/joint-pain", "enabled": true },
+                { "id": "cnd-sub-foot", "label": "Foot & Plantar Fasciitis", "href": "/conditions/foot-pain", "enabled": true }
+              ]
+            },
+            {
+              "id": "cnd-sports",
+              "label": "Sports Injuries & Recovery",
+              "href": "/conditions/sports-injury",
+              "enabled": true,
+              "children": [
+                { "id": "cnd-sub-muscle", "label": "Muscle Strains & Deep Knots", "href": "/conditions/muscle-pain", "enabled": true },
+                { "id": "cnd-sub-concussion", "label": "Concussion Rehabilitation", "href": "/conditions/concussion", "enabled": true },
+                { "id": "cnd-sub-balance", "label": "Balance & Fall Prevention", "href": "/conditions/balance-falls", "enabled": true }
+              ]
+            },
+            {
+              "id": "cnd-mva",
+              "label": "Motor Vehicle Accidents (MVA)",
+              "href": "/conditions/motor-vehicle-accidents",
+              "enabled": true,
+              "badge": "Direct Billing",
+              "children": [
+                { "id": "cnd-mva-whiplash", "label": "Whiplash Trauma Recovery", "href": "/conditions/motor-vehicle-accidents", "enabled": true },
+                { "id": "cnd-mva-workplace", "label": "Workplace Injuries (WCB)", "href": "/conditions/workplace-injuries", "enabled": true }
+              ]
+            },
             { "id": "cnd-all", "label": "Browse All Conditions →", "href": "/conditions", "enabled": true, "badge": "Overview" }
           ]
         },
