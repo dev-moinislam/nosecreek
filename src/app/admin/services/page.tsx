@@ -280,6 +280,7 @@ export default function AdminServicesPage() {
             hidden_sections: updatedService.hiddenSections || [],
             section_order: updatedService.sectionOrder || defaultServiceSectionOrder,
             related_services: updatedService.relatedServices || [],
+            parent_slug: updatedService.parentSlug || null,
             seo: {
               ...(updatedService.seo || {}),
               cardImage: updatedService.cardImage || null,
@@ -482,62 +483,143 @@ export default function AdminServicesPage() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((service) => (
-                  <tr key={service.slug}>
-                    <td>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{service.title}</div>
-                      <div style={{ fontSize: 12, color: "#64748b", maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {service.shortDescription || "Clinical treatment"}
-                      </div>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a", whiteSpace: "nowrap" }}>
-                        /services/{service.slug}
-                      </code>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                          {service.customSections?.length || 0} Sections
-                        </span>
-                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                          {service.faqs?.length || 0} FAQs
-                        </span>
-                      </div>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      <span style={{ fontSize: 12.5, color: "#475569", whiteSpace: "nowrap" }}>
-                        {service.benefits?.length || 0} highlights
-                      </span>
-                    </td>
-                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <button
-                        onClick={() => setPreviewUrl(`/services/${service.slug}`)}
-                        className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
+                (() => {
+                  const rootServices = filtered.filter((s) => !s.parentSlug);
+                  const subServicesList = filtered.filter((s) => Boolean(s.parentSlug));
+                  const orphanedSubs = subServicesList.filter(
+                    (sub) => !rootServices.some((root) => root.slug === sub.parentSlug)
+                  );
+
+                  const renderServiceRow = (service: Service, isSubPage = false, parentService?: Service) => {
+                    const fullSlugPath = service.parentSlug ? `/services/${service.parentSlug}/${service.slug}` : `/services/${service.slug}`;
+                    const childCount = services.filter((s) => s.parentSlug === service.slug).length;
+
+                    return (
+                      <tr 
+                        key={service.slug}
+                        style={{
+                          background: isSubPage ? "#f8fafc" : "#ffffff",
+                          borderLeft: isSubPage ? "3px solid var(--adm-primary)" : "none"
+                        }}
                       >
-                        <EyeIcon size={14} />
-                        <span>Preview</span>
-                      </button>
-                      <button
-                        onClick={() => setEditingService(JSON.parse(JSON.stringify(service)))}
-                        className="adm-btn adm-btn-primary adm-btn-sm"
-                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
-                      >
-                        <EditIcon size={14} />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget({ slug: service.slug, title: service.title })}
-                        className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
-                        title="Delete Service"
-                      >
-                        <TrashIcon size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2, paddingLeft: isSubPage ? 22 : 0 }}>
+                            {isSubPage ? (
+                              <span style={{ color: "var(--adm-primary)", fontWeight: 700, fontSize: 13, userSelect: "none" }}>
+                                ↳
+                              </span>
+                            ) : null}
+                            <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{service.title}</div>
+                            {isSubPage ? (
+                              <span style={{ fontSize: 10.5, fontWeight: 700, background: "#e0f2fe", color: "#0284c7", padding: "1px 7px", borderRadius: 4, whiteSpace: "nowrap" }}>
+                                Sub-page of {parentService?.title || service.parentSlug}
+                              </span>
+                            ) : null}
+                            {!isSubPage && childCount > 0 && (
+                              <span style={{ fontSize: 10.5, fontWeight: 700, background: "#ecfdf5", color: "#059669", padding: "2px 6px", borderRadius: 4, whiteSpace: "nowrap" }}>
+                                {childCount} Sub-{childCount === 1 ? "Program" : "Programs"}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: "#64748b", maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", paddingLeft: isSubPage ? 36 : 0 }}>
+                            {service.shortDescription || "Clinical treatment"}
+                          </div>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <code style={{ fontSize: 12, background: isSubPage ? "#f0f9ff" : "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: isSubPage ? "#0369a1" : "#0f172a", whiteSpace: "nowrap" }}>
+                            {fullSlugPath}
+                          </code>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
+                            <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                              {service.customSections?.length || 0} Sections
+                            </span>
+                            <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                              {service.faqs?.length || 0} FAQs
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <span style={{ fontSize: 12.5, color: "#475569", whiteSpace: "nowrap" }}>
+                            {service.benefits?.length || 0} highlights
+                          </span>
+                        </td>
+                        <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                          {!isSubPage && (isAdmin || isClient) && (
+                            <button
+                              onClick={() =>
+                                setEditingService({
+                                  id: `service-${Date.now()}`,
+                                  slug: `new-${service.slug}-track`,
+                                  title: `New ${service.title} Program`,
+                                  parentSlug: service.slug,
+                                  shortDescription: "",
+                                  description: "",
+                                  benefits: [],
+                                  symptoms: [],
+                                  treatmentApproach: [],
+                                  customSections: [],
+                                  sectionsData: {},
+                                  faqs: [],
+                                  hiddenSections: [],
+                                  sectionOrder: defaultServiceSectionOrder,
+                                  relatedServices: [...(service.relatedServices || [])],
+                                  relatedConditions: [...(service.relatedConditions || [])]
+                                })
+                              }
+                              className="adm-btn adm-btn-secondary adm-btn-sm"
+                              style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 4, background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0" }}
+                              title={`Create a sub-page program under ${service.title}`}
+                            >
+                              <PlusIcon size={13} />
+                              <span>Sub-page</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setPreviewUrl(fullSlugPath)}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                            style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
+                          >
+                            <EyeIcon size={14} />
+                            <span>Preview</span>
+                          </button>
+                          <button
+                            onClick={() => setEditingService(JSON.parse(JSON.stringify(service)))}
+                            className="adm-btn adm-btn-primary adm-btn-sm"
+                            style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
+                          >
+                            <EditIcon size={14} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget({ slug: service.slug, title: service.title })}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                            style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
+                            title="Delete Service"
+                          >
+                            <TrashIcon size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  };
+
+                  return (
+                    <React.Fragment>
+                      {rootServices.map((parent) => {
+                        const directChildren = services.filter((s) => s.parentSlug === parent.slug);
+                        return (
+                          <React.Fragment key={parent.slug}>
+                            {renderServiceRow(parent, false)}
+                            {directChildren.map((child) => renderServiceRow(child, true, parent))}
+                          </React.Fragment>
+                        );
+                      })}
+                      {orphanedSubs.map((orphan) => renderServiceRow(orphan, true))}
+                    </React.Fragment>
+                  );
+                })()
               )}
             </tbody>
           </table>
@@ -548,6 +630,7 @@ export default function AdminServicesPage() {
       {editingService && (
         <ServiceEditorModal
           service={editingService}
+          allServices={services}
           isAdmin={isAdmin}
           canEditSlugs={canEditSlugs}
           onClose={() => setEditingService(null)}
@@ -574,6 +657,7 @@ export default function AdminServicesPage() {
 // Sub-component: Service Editor Modal with Section Reordering & Universal Block Customizer
 function ServiceEditorModal({
   service: initialService,
+  allServices = [],
   isAdmin,
   canEditSlugs,
   onClose,
@@ -582,6 +666,7 @@ function ServiceEditorModal({
   onPreview
 }: {
   service: Service;
+  allServices?: Service[];
   isAdmin: boolean;
   canEditSlugs: boolean;
   onClose: () => void;
@@ -1367,6 +1452,35 @@ function ServiceEditorModal({
                       onChange={(e) => setService({ ...service, slug: e.target.value })}
                       required
                     />
+                  </div>
+                </div>
+
+                {/* Parent Service Selector (for nested hierarchy) */}
+                <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #f1f5f9" }}>
+                  <div className="adm-form-group" style={{ margin: 0 }}>
+                    <label className="adm-form-label" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span>Parent Clinical Service (Hierarchy &amp; Nested URL)</span>
+                      <span style={{ fontSize: 11, color: "var(--adm-primary)", fontWeight: 600 }}>
+                        {service.parentSlug ? `Live URL: /services/${service.parentSlug}/${service.slug}` : `Live URL: /services/${service.slug}`}
+                      </span>
+                    </label>
+                    <select
+                      className="adm-input"
+                      value={service.parentSlug || ""}
+                      onChange={(e) => setService({ ...service, parentSlug: e.target.value || undefined })}
+                    >
+                      <option value="">None (Top-Level Main Service)</option>
+                      {allServices
+                        .filter((s) => s.slug !== service.slug && !s.parentSlug)
+                        .map((s) => (
+                          <option key={s.slug} value={s.slug}>
+                            {s.title} (/services/{s.slug})
+                          </option>
+                        ))}
+                    </select>
+                    <span style={{ fontSize: 12, color: "#64748b", marginTop: 4, display: "block" }}>
+                      Setting a parent groups this service as a specialized sub-page/track under that service and displays it in the parent service&apos;s programs showcase.
+                    </span>
                   </div>
                 </div>
               </div>

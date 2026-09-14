@@ -273,6 +273,7 @@ export default function AdminConditionsPage() {
           cta_text: cond.ctaText || "Book Assessment Online",
           cta_muted: cond.ctaMuted ?? false,
           sort_order: typeof (cond as any).sort_order === "number" ? (cond as any).sort_order : ((cond as any).order || 0),
+          parent_slug: cond.parentSlug || null,
           seo: {
             ...(cond.seo || {}),
             cardImage: cond.cardImage || null,
@@ -476,67 +477,152 @@ export default function AdminConditionsPage() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((cond) => (
-                  <tr key={cond.slug}>
-                    <td>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
-                        <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>{cond.name}</div>
-                        <span style={{ fontSize: 11, fontWeight: 700, textTransform: "capitalize", background: "#f1f5f9", color: "#475569", padding: "2px 7px", borderRadius: 4, whiteSpace: "nowrap" }}>
-                          {cond.category || "General"}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 12, color: "#64748b", maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {cond.shortDescription || cond.description?.slice(0, 70)}
-                      </div>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      <code style={{ fontSize: 12, background: "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: "#0f172a", whiteSpace: "nowrap" }}>
-                        /conditions/{cond.slug}
-                      </code>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                          {cond.customSections?.length || 0} Sections
-                        </span>
-                        <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
-                          {cond.faqs?.length || 0} FAQs
-                        </span>
-                      </div>
-                    </td>
-                    <td style={{ whiteSpace: "nowrap" }}>
-                      <span style={{ fontSize: 12.5, color: "#475569", whiteSpace: "nowrap" }}>
-                        {cond.symptoms?.length || 0} symptom points
-                      </span>
-                    </td>
-                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                      <button
-                        onClick={() => setPreviewUrl(`/conditions/${cond.slug}`)}
-                        className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
+                (() => {
+                  // Organize into parent conditions and sub-conditions
+                  const rootConditions = filtered.filter((c) => !c.parentSlug);
+                  const subConditionsList = filtered.filter((c) => Boolean(c.parentSlug));
+                  
+                  // In case of active search query where parent is filtered out but child matches
+                  const orphanedSubs = subConditionsList.filter(
+                    (sub) => !rootConditions.some((root) => root.slug === sub.parentSlug)
+                  );
+
+                  const renderConditionRow = (cond: Condition, isSubPage = false, parentCondition?: Condition) => {
+                    const fullSlugPath = cond.parentSlug ? `/conditions/${cond.parentSlug}/${cond.slug}` : `/conditions/${cond.slug}`;
+                    const childCount = conditions.filter((c) => c.parentSlug === cond.slug).length;
+
+                    return (
+                      <tr 
+                        key={cond.slug} 
+                        style={{ 
+                          background: isSubPage ? "#f8fafc" : "#ffffff",
+                          borderLeft: isSubPage ? "3px solid var(--adm-primary)" : "none" 
+                        }}
                       >
-                        <EyeIcon size={14} />
-                        <span>Preview</span>
-                      </button>
-                      <button
-                        onClick={() => setEditingCondition(JSON.parse(JSON.stringify(cond)))}
-                        className="adm-btn adm-btn-primary adm-btn-sm"
-                        style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
-                      >
-                        <EditIcon size={14} />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget({ slug: cond.slug, title: cond.name })}
-                        className="adm-btn adm-btn-secondary adm-btn-sm"
-                        style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
-                        title="Delete Condition"
-                      >
-                        <TrashIcon size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                        <td>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2, paddingLeft: isSubPage ? 22 : 0 }}>
+                            {isSubPage ? (
+                              <span style={{ color: "var(--adm-primary)", fontWeight: 700, fontSize: 13, userSelect: "none" }}>
+                                ↳
+                              </span>
+                            ) : null}
+                            <div style={{ fontWeight: 700, fontSize: 14, color: "#0f172a" }}>
+                              {cond.name}
+                            </div>
+                            {isSubPage ? (
+                              <span style={{ fontSize: 10.5, fontWeight: 700, background: "#e0f2fe", color: "#0284c7", padding: "1px 7px", borderRadius: 4, whiteSpace: "nowrap" }}>
+                                Sub-page of {parentCondition?.name || cond.parentSlug}
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: 11, fontWeight: 700, textTransform: "capitalize", background: "#f1f5f9", color: "#475569", padding: "2px 7px", borderRadius: 4, whiteSpace: "nowrap" }}>
+                                {cond.category || "General"}
+                              </span>
+                            )}
+                            {!isSubPage && childCount > 0 && (
+                              <span style={{ fontSize: 10.5, fontWeight: 700, background: "#ecfdf5", color: "#059669", padding: "2px 6px", borderRadius: 4, whiteSpace: "nowrap" }}>
+                                {childCount} Sub-{childCount === 1 ? "Page" : "Pages"}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: "#64748b", maxWidth: 280, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", paddingLeft: isSubPage ? 36 : 0 }}>
+                            {cond.shortDescription || cond.description?.slice(0, 70)}
+                          </div>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <code style={{ fontSize: 12, background: isSubPage ? "#f0f9ff" : "#f1f5f9", padding: "3px 7px", borderRadius: 6, color: isSubPage ? "#0369a1" : "#0f172a", whiteSpace: "nowrap" }}>
+                            {fullSlugPath}
+                          </code>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
+                            <span style={{ fontSize: 11.5, fontWeight: 600, color: "#0369a1", background: "#e0f2fe", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                              {cond.customSections?.length || 0} Sections
+                            </span>
+                            <span style={{ fontSize: 11.5, fontWeight: 600, color: "#15803d", background: "#dcfce7", padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap" }}>
+                              {cond.faqs?.length || 0} FAQs
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          <span style={{ fontSize: 12.5, color: "#475569", whiteSpace: "nowrap" }}>
+                            {cond.symptoms?.length || 0} symptom points
+                          </span>
+                        </td>
+                        <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                          {!isSubPage && (isAdmin || isClient) && (
+                            <button
+                              onClick={() =>
+                                setEditingCondition({
+                                  id: `condition-${Date.now()}`,
+                                  slug: `new-${cond.slug}-sub`,
+                                  name: `New ${cond.name} Sub-Condition`,
+                                  parentSlug: cond.slug,
+                                  shortDescription: "",
+                                  description: "",
+                                  symptoms: [],
+                                  treatmentApproach: [],
+                                  benefits: [],
+                                  customSections: [],
+                                  sectionsData: {},
+                                  faqs: [],
+                                  hiddenSections: [],
+                                  sectionOrder: defaultConditionSectionOrder,
+                                  relatedServices: [...(cond.relatedServices || [])],
+                                  category: cond.category || "general"
+                                })
+                              }
+                              className="adm-btn adm-btn-secondary adm-btn-sm"
+                              style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 4, background: "#f0fdf4", color: "#166534", border: "1px solid #bbf7d0" }}
+                              title={`Create a sub-page under ${cond.name}`}
+                            >
+                              <PlusIcon size={13} />
+                              <span>Sub-page</span>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setPreviewUrl(fullSlugPath)}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                            style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
+                          >
+                            <EyeIcon size={14} />
+                            <span>Preview</span>
+                          </button>
+                          <button
+                            onClick={() => setEditingCondition(JSON.parse(JSON.stringify(cond)))}
+                            className="adm-btn adm-btn-primary adm-btn-sm"
+                            style={{ marginRight: 6, display: "inline-flex", alignItems: "center", gap: 5 }}
+                          >
+                            <EditIcon size={14} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget({ slug: cond.slug, title: cond.name })}
+                            className="adm-btn adm-btn-secondary adm-btn-sm"
+                            style={{ color: "#dc2626", display: "inline-flex", alignItems: "center", padding: "6px 8px" }}
+                            title="Delete Condition"
+                          >
+                            <TrashIcon size={14} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  };
+
+                  return (
+                    <React.Fragment>
+                      {rootConditions.map((parent) => {
+                        const directChildren = conditions.filter((c) => c.parentSlug === parent.slug);
+                        return (
+                          <React.Fragment key={parent.slug}>
+                            {renderConditionRow(parent, false)}
+                            {directChildren.map((child) => renderConditionRow(child, true, parent))}
+                          </React.Fragment>
+                        );
+                      })}
+                      {orphanedSubs.map((orphan) => renderConditionRow(orphan, true))}
+                    </React.Fragment>
+                  );
+                })()
               )}
             </tbody>
           </table>
@@ -547,6 +633,7 @@ export default function AdminConditionsPage() {
       {editingCondition && (
         <ConditionEditorModal
           condition={editingCondition}
+          allConditions={conditions}
           isAdmin={isAdmin}
           canEditSlugs={canEditSlugs}
           onClose={() => setEditingCondition(null)}
@@ -573,6 +660,7 @@ export default function AdminConditionsPage() {
 // Sub-component: Condition Editor Modal with Reordering & Universal Block Customizer
 function ConditionEditorModal({
   condition: initialCondition,
+  allConditions = [],
   isAdmin,
   canEditSlugs,
   onClose,
@@ -581,6 +669,7 @@ function ConditionEditorModal({
   onPreview
 }: {
   condition: Condition;
+  allConditions?: Condition[];
   isAdmin: boolean;
   canEditSlugs: boolean;
   onClose: () => void;
@@ -1437,6 +1526,35 @@ function ConditionEditorModal({
                       onChange={(e) => setCond({ ...cond, slug: e.target.value })}
                       required
                     />
+                  </div>
+                </div>
+
+                {/* Parent Condition Selector (for nested hierarchy) */}
+                <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid #f1f5f9" }}>
+                  <div className="adm-form-group" style={{ margin: 0 }}>
+                    <label className="adm-form-label" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                      <span>Parent Condition (Hierarchy &amp; Nested URL)</span>
+                      <span style={{ fontSize: 11, color: "var(--adm-primary)", fontWeight: 600 }}>
+                        {cond.parentSlug ? `Live URL: /conditions/${cond.parentSlug}/${cond.slug}` : `Live URL: /conditions/${cond.slug}`}
+                      </span>
+                    </label>
+                    <select
+                      className="adm-input"
+                      value={cond.parentSlug || ""}
+                      onChange={(e) => setCond({ ...cond, parentSlug: e.target.value || undefined })}
+                    >
+                      <option value="">None (Top-Level Main Condition)</option>
+                      {allConditions
+                        .filter((c) => c.slug !== cond.slug && !c.parentSlug)
+                        .map((c) => (
+                          <option key={c.slug} value={c.slug}>
+                            {c.name} (/conditions/{c.slug})
+                          </option>
+                        ))}
+                    </select>
+                    <span style={{ fontSize: 12, color: "#64748b", marginTop: 4, display: "block" }}>
+                      Setting a parent groups this condition as a specialized sub-page under that parent and displays it inside the parent condition&apos;s treatment roadmap.
+                    </span>
                   </div>
                 </div>
               </div>

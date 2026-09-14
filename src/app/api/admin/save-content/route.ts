@@ -72,6 +72,7 @@ export async function POST(req: Request) {
               locations: s.locations || s.locations || [],
               testimonials: s.testimonials || s.testimonials || [],
               sort_order: typeof s.sort_order === "number" ? s.sort_order : (typeof s.order === "number" ? s.order : index),
+              parent_slug: s.parentSlug || s.parent_slug || null,
               seo: {
                 ...(s.seo || {}),
                 cardImage: s.cardImage || s.card_image || null,
@@ -178,6 +179,7 @@ export async function POST(req: Request) {
               testimonials: c.testimonials || [],
               category: c.category || "general",
               sort_order: typeof c.sort_order === "number" ? c.sort_order : (typeof c.order === "number" ? c.order : index),
+              parent_slug: c.parentSlug || c.parent_slug || null,
               seo: {
                 ...(c.seo || {}),
                 cardImage: c.cardImage || c.card_image || null,
