@@ -257,6 +257,167 @@ export default function AdminNavigationPage() {
     setSaveStatus(null);
 
     try {
+      // 0. Auto-instantiate pages for any new /conditions/* or /services/* nested menu items
+      const collectItems = (items: NavMenuItem[]): NavMenuItem[] => {
+        let res: NavMenuItem[] = [];
+        for (const item of items) {
+          res.push(item);
+          if (item.children && item.children.length > 0) {
+            res = res.concat(collectItems(item.children));
+          }
+        }
+        return res;
+      };
+
+      const allNavItems = collectItems(navData.header?.menu || []);
+      const newConditionsToAdd: Condition[] = [];
+      const newServicesToAdd: Service[] = [];
+
+      allNavItems.forEach((item) => {
+        if (!item.href || typeof item.href !== "string") return;
+        const cleanHref = item.href.trim().split("?")[0].split("#")[0];
+
+        // Match /conditions/...
+        if (cleanHref.startsWith("/conditions/")) {
+          const parts = cleanHref.replace("/conditions/", "").split("/").filter(Boolean);
+          if (parts.length > 0) {
+            const slug = parts[parts.length - 1];
+            const parentSlug = parts.length > 1 ? parts[0] : undefined;
+
+            const existing = conditionsList.find((c) => c.slug === slug);
+            if (!existing && !newConditionsToAdd.some((c) => c.slug === slug)) {
+              newConditionsToAdd.push({
+                id: `cond-${slug}`,
+                slug,
+                name: item.label || slug,
+                parentSlug,
+                category: parentSlug ? "specialized" : "general",
+                shortDescription: `Targeted clinical rehabilitation and evidence-based treatment for ${(item.label || slug).toLowerCase()} in Calgary.`,
+                description: `Comprehensive diagnostic assessment, manual therapy, and active rehabilitation plans tailored for ${(item.label || slug).toLowerCase()} at Nose Creek Physiotherapy.`,
+                heroImage: "/images/conditions/back-hero.webp",
+                cardImage: "/images/conditions/back-hero.webp",
+                benefits: [
+                  "Rapid symptom relief and reduced inflammation",
+                  "Targeted manual therapy and joint mobilization",
+                  "Customized home exercise and recurrence prevention program"
+                ],
+                symptoms: [
+                  "Persistent ache, stiffness, or localized discomfort",
+                  "Reduced mobility during routine work or physical recreation",
+                  "Radiating nerve sensations or muscular tension"
+                ],
+                treatmentApproach: [
+                  "In-depth physical assessment and root-cause movement analysis",
+                  "Hands-on joint mobilization, soft tissue release, and dry needling",
+                  "Personalized progressive strengthening and ergonomic retraining"
+                ],
+                faqs: [
+                  {
+                    question: `What should I expect during my assessment for ${(item.label || slug).toLowerCase()}?`,
+                    answer: "Your physiotherapist will conduct a comprehensive biomechanical evaluation, identify root causes, begin initial therapy, and establish a clear customized recovery roadmap."
+                  }
+                ],
+                ctaText: "Book Assessment Online",
+                ctaMuted: false,
+                sectionOrder: ["hero", "clinical_overview", "symptoms", "treatment_approach", "faqs", "bottom_cta"],
+                seo: {
+                  title: `${item.label || slug} Treatment Calgary | Nose Creek Physiotherapy`,
+                  description: `Specialized physiotherapy, manual therapy, and rehabilitation for ${(item.label || slug).toLowerCase()} at Nose Creek Physiotherapy in Calgary NW & NE.`,
+                  heroImageAlt: `${item.label || slug} treatment at Nose Creek Physiotherapy`,
+                  cardImageAlt: `${item.label || slug} rehabilitation clinic Calgary`
+                }
+              });
+            }
+          }
+        }
+
+        // Match /services/...
+        if (cleanHref.startsWith("/services/")) {
+          const parts = cleanHref.replace("/services/", "").split("/").filter(Boolean);
+          if (parts.length > 0) {
+            const slug = parts[parts.length - 1];
+            const parentSlug = parts.length > 1 ? parts[0] : undefined;
+
+            const existing = servicesList.find((s) => s.slug === slug);
+            if (!existing && !newServicesToAdd.some((s) => s.slug === slug)) {
+              newServicesToAdd.push({
+                id: `srv-${slug}`,
+                slug,
+                title: item.label || slug,
+                parentSlug,
+                shortDescription: `Professional ${(item.label || slug).toLowerCase()} services delivered by registered clinicians in Calgary.`,
+                description: `Specialized ${(item.label || slug).toLowerCase()} treatments designed to restore mobility, accelerate healing, and optimize physical performance.`,
+                heroImage: "/images/services/physio-hero.webp",
+                cardImage: "/images/services/physio-hero.webp",
+                iconType: "stethoscope",
+                iconBg: "#e9f5fb",
+                iconColor: "#1c9fd8",
+                benefits: [
+                  "Accelerated tissue healing and restored functional movement",
+                  "One-on-one treatment sessions with experienced clinicians",
+                  "Direct billing to major health insurance providers"
+                ],
+                symptoms: [
+                  "Acute pain following sports injury or daily strain",
+                  "Chronic muscle stiffness and limited range of motion",
+                  "Post-operative weakness or balance difficulties"
+                ],
+                treatmentApproach: [
+                  "Comprehensive diagnostic evaluation",
+                  "Targeted manual therapy and therapeutic modalities",
+                  "Supervised functional exercise and rehabilitation"
+                ],
+                faqs: [
+                  {
+                    question: `Do I need a doctor's referral for ${(item.label || slug).toLowerCase()}?`,
+                    answer: "In Alberta, you do not need a physician referral to see a registered physiotherapist, although some private insurance plans may request one for reimbursement."
+                  }
+                ],
+                ctaText: "Book Online",
+                ctaMuted: false,
+                sectionOrder: ["hero", "clinical_overview", "symptoms", "treatment_approach", "faqs", "bottom_cta"],
+                seo: {
+                  title: `${item.label || slug} Calgary North | Nose Creek Physiotherapy`,
+                  description: `Comprehensive ${(item.label || slug).toLowerCase()} treatments at Nose Creek Physiotherapy Beddington. Direct billing available.`,
+                  heroImageAlt: `${item.label || slug} at Nose Creek Physiotherapy`,
+                  cardImageAlt: `${item.label || slug} Calgary North clinic`
+                }
+              });
+            }
+          }
+        }
+      });
+
+      // If new conditions auto-created, save them
+      if (newConditionsToAdd.length > 0) {
+        const updatedConds = [...conditionsList, ...newConditionsToAdd];
+        setConditionsList(updatedConds);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("adm_conditions", JSON.stringify(updatedConds));
+          window.dispatchEvent(new Event("conditionsUpdated"));
+        }
+        await fetch("/api/admin/save-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "conditions", data: updatedConds })
+        }).catch(() => {});
+      }
+
+      // If new services auto-created, save them
+      if (newServicesToAdd.length > 0) {
+        const updatedSrvs = [...servicesList, ...newServicesToAdd];
+        setServicesList(updatedSrvs);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("adm_services", JSON.stringify(updatedSrvs));
+          window.dispatchEvent(new Event("servicesUpdated"));
+        }
+        await fetch("/api/admin/save-content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "services", data: updatedSrvs })
+        }).catch(() => {});
+      }
+
       // 1. LocalStorage preview sync
       if (typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
@@ -316,8 +477,13 @@ export default function AdminNavigationPage() {
         window.dispatchEvent(new Event("settingsUpdated"));
       }
 
-      setSaveStatus("✓ Header & Footer Navigation saved and live across website!");
-      setTimeout(() => setSaveStatus(null), 4000);
+      const addedCount = newConditionsToAdd.length + newServicesToAdd.length;
+      if (addedCount > 0) {
+        setSaveStatus(`✓ Saved! Auto-created ${newConditionsToAdd.length} Condition(s) and ${newServicesToAdd.length} Service(s) as editable pages in admin!`);
+      } else {
+        setSaveStatus("✓ Header & Footer Navigation saved and live across website!");
+      }
+      setTimeout(() => setSaveStatus(null), 5000);
     } catch (err: any) {
       alert(`Save failed: ${err.message}`);
     } finally {
@@ -1158,9 +1324,12 @@ export default function AdminNavigationPage() {
                     item: { ...editingItem.item, href: e.target.value }
                   })
                 }
-                placeholder="e.g. /conditions/back-pain or https://..."
+                placeholder="e.g. /conditions/back-pain or /services/physiotherapy/sports-rehab"
                 required
               />
+              <div style={{ fontSize: 12, color: "#0369a1", marginTop: 6, background: "#f0f9ff", border: "1px solid #bae6fd", padding: "6px 10px", borderRadius: 6, lineHeight: 1.4 }}>
+                💡 <strong>Auto-Page Creation:</strong> If this URL points to a new service or condition sub-page (e.g. <code>/services/...</code> or <code>/conditions/...</code>), saving will automatically create an independent, fully editable clinical page for it in the Services or Conditions manager!
+              </div>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>

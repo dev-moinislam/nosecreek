@@ -114,26 +114,48 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
 
     // 1. Services
     services.forEach((s) => {
+      const canonicalPath = s.parentSlug ? `/services/${s.parentSlug}/${s.slug}` : `/services/${s.slug}`;
       routes.push({
-        path: `/services/${s.slug}`,
-        name: `${s.title} (Service)`,
+        path: canonicalPath,
+        name: s.parentSlug ? `${s.title} (Sub-Service)` : `${s.title} (Service)`,
         category: "Clinical Services",
         defaultTitle: s.seo?.title || `${s.title} Calgary North | Nose Creek Physiotherapy`,
         defaultDescription: s.seo?.description || s.shortDescription || `Expert ${s.title.toLowerCase()} care at Nose Creek Physiotherapy in Calgary.`,
         defaultOgImage: s.cardImage || s.heroImage || undefined
       });
+      if (s.parentSlug) {
+        routes.push({
+          path: `/services/${s.slug}`,
+          name: `${s.title} (Service Direct Link)`,
+          category: "Clinical Services",
+          defaultTitle: s.seo?.title || `${s.title} Calgary North | Nose Creek Physiotherapy`,
+          defaultDescription: s.seo?.description || s.shortDescription || `Expert ${s.title.toLowerCase()} care at Nose Creek Physiotherapy in Calgary.`,
+          defaultOgImage: s.cardImage || s.heroImage || undefined
+        });
+      }
     });
 
     // 2. Conditions
     conditions.forEach((c) => {
+      const canonicalPath = c.parentSlug ? `/conditions/${c.parentSlug}/${c.slug}` : `/conditions/${c.slug}`;
       routes.push({
-        path: `/conditions/${c.slug}`,
-        name: `${c.name} (Condition)`,
+        path: canonicalPath,
+        name: c.parentSlug ? `${c.name} (Sub-Condition)` : `${c.name} (Condition)`,
         category: "Conditions We Treat",
         defaultTitle: c.seo?.title || `${c.name} Treatment Calgary | Nose Creek Physiotherapy`,
         defaultDescription: c.seo?.description || c.shortDescription || `Targeted evidence-based rehabilitation for ${c.name.toLowerCase()} in Calgary.`,
         defaultOgImage: c.cardImage || c.heroImage || undefined
       });
+      if (c.parentSlug) {
+        routes.push({
+          path: `/conditions/${c.slug}`,
+          name: `${c.name} (Condition Direct Link)`,
+          category: "Conditions We Treat",
+          defaultTitle: c.seo?.title || `${c.name} Treatment Calgary | Nose Creek Physiotherapy`,
+          defaultDescription: c.seo?.description || c.shortDescription || `Targeted evidence-based rehabilitation for ${c.name.toLowerCase()} in Calgary.`,
+          defaultOgImage: c.cardImage || c.heroImage || undefined
+        });
+      }
     });
 
     // 3. Blog Posts
@@ -171,6 +193,31 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
         defaultOgImage: l.images && l.images.length > 0 ? l.images[0] : undefined
       });
     });
+
+    // 6. Navigation Custom Pages Discovery
+    const siteSettings = await getSiteSettings().catch(() => null);
+    if (siteSettings?.navigation?.header?.menu) {
+      const scanNav = (items: any[]) => {
+        items.forEach((item: any) => {
+          if (item.href && item.href.startsWith("/") && !item.href.includes("#")) {
+            const cleanPath = item.href.split("?")[0];
+            if (!routes.some((r) => r.path === cleanPath)) {
+              routes.push({
+                path: cleanPath,
+                name: `${item.label} (Custom Page)`,
+                category: "Core Pages",
+                defaultTitle: `${item.label} | Nose Creek Physiotherapy Calgary`,
+                defaultDescription: `Learn more about ${item.label.toLowerCase()} at Nose Creek Physiotherapy in Calgary.`
+              });
+            }
+          }
+          if (item.children && Array.isArray(item.children)) {
+            scanNav(item.children);
+          }
+        });
+      };
+      scanNav(siteSettings.navigation.header.menu);
+    }
   } catch (err) {
     console.warn("Error discovering dynamic site routes:", err);
   }

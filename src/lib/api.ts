@@ -123,8 +123,8 @@ export async function getServices(): Promise<Service[]> {
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
       if (!error && data) {
-        // Authoritative mapping from Supabase database rows only
-        return data.map((d: any) => {
+        // Authoritative mapping from Supabase database rows + local disk items
+        const list = data.map((d: any) => {
           const localItem = currentList.find((s) => s.slug === d.slug);
           return {
             id: d.id,
@@ -160,6 +160,9 @@ export async function getServices(): Promise<Service[]> {
             seo: d.seo || localItem?.seo || {}
           };
         });
+        const supaSlugs = new Set(data.map((d: any) => d.slug));
+        const missingLocal = currentList.filter((s) => !supaSlugs.has(s.slug));
+        return [...list, ...missingLocal];
       }
     } catch (e) {
       console.warn("Supabase fetch failed for services, using local fallback", e);
@@ -430,7 +433,7 @@ export async function getConditions(): Promise<Condition[]> {
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
       if (!error && data) {
-        return data.map((d: any) => {
+        const list = data.map((d: any) => {
           const localItem = currentList.find((c) => c.slug === d.slug);
           return {
             id: d.id,
@@ -463,6 +466,9 @@ export async function getConditions(): Promise<Condition[]> {
             seo: d.seo || localItem?.seo || {}
           };
         });
+        const supaSlugs = new Set(data.map((d: any) => d.slug));
+        const missingLocal = currentList.filter((c) => !supaSlugs.has(c.slug));
+        return [...list, ...missingLocal];
       }
     } catch (e) {
       console.warn("Supabase fetch failed for conditions, using local fallback", e);

@@ -324,10 +324,94 @@ export default function AdminServicesPage() {
         // ignore
       }
 
+      // 4. Cross-Sync into Navigation Header Menu
+      try {
+        const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
+        let currentSettings = savedSettingsRaw ? JSON.parse(savedSettingsRaw) : null;
+        if (!currentSettings) {
+          const sRes = await fetch("/api/content?type=settings");
+          if (sRes.ok) currentSettings = await sRes.json();
+        }
+
+        if (currentSettings?.navigation?.header?.menu) {
+          const menu = [...currentSettings.navigation.header.menu];
+          const srvMenu = menu.find((m: any) => m.id === "nav-services" || m.href === "/services");
+          if (srvMenu) {
+            srvMenu.children = srvMenu.children ? [...srvMenu.children] : [];
+            const childHref = updatedService.parentSlug
+              ? `/services/${updatedService.parentSlug}/${updatedService.slug}`
+              : `/services/${updatedService.slug}`;
+            const targetId = `srv-${updatedService.slug}`;
+
+            if (updatedService.parentSlug) {
+              // Nested sub-service: find parent service in menu
+              const parentItem = srvMenu.children.find((s: any) => 
+                s.id === `srv-${updatedService.parentSlug}` || s.href === `/services/${updatedService.parentSlug}` || s.href.endsWith(`/${updatedService.parentSlug}`)
+              );
+              if (parentItem) {
+                parentItem.children = parentItem.children ? [...parentItem.children] : [];
+                const existIdx = parentItem.children.findIndex((sub: any) => sub.id === targetId || sub.href.endsWith(`/${updatedService.slug}`));
+                if (existIdx >= 0) {
+                  parentItem.children[existIdx] = { ...parentItem.children[existIdx], label: updatedService.title, href: childHref };
+                } else {
+                  parentItem.children.push({ id: targetId, label: updatedService.title, href: childHref, enabled: true });
+                }
+              }
+            } else {
+              // Top-level service
+              const existIdx = srvMenu.children.findIndex((s: any) => s.id === targetId || s.href === childHref || s.href.endsWith(`/${updatedService.slug}`));
+              if (existIdx >= 0) {
+                srvMenu.children[existIdx] = { ...srvMenu.children[existIdx], label: updatedService.title, href: childHref };
+              } else {
+                srvMenu.children.push({ id: targetId, label: updatedService.title, href: childHref, enabled: true });
+              }
+            }
+
+            currentSettings.navigation.header.menu = menu;
+            if (typeof window !== "undefined") {
+              localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+              window.dispatchEvent(new Event("settingsUpdated"));
+            }
+            fetch("/api/admin/save-content", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: "settings", data: currentSettings })
+            }).catch(() => {});
+          }
+        }
+      } catch (syncErr) {
+        console.warn("Navigation cross-sync warning:", syncErr);
+      }
+
+      // 5. Auto-register 301 Redirect if URL changed
+      if (editingService && (editingService.slug !== updatedService.slug || editingService.parentSlug !== updatedService.parentSlug)) {
+        const oldPath = editingService.parentSlug
+          ? `/services/${editingService.parentSlug}/${editingService.slug}`
+          : `/services/${editingService.slug}`;
+        const newPath = updatedService.parentSlug
+          ? `/services/${updatedService.parentSlug}/${updatedService.slug}`
+          : `/services/${updatedService.slug}`;
+        if (oldPath !== newPath) {
+          fetch("/api/admin/redirects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              rule: {
+                fromPath: oldPath,
+                toPath: newPath,
+                statusCode: 301,
+                enabled: true,
+                notes: `Auto-redirect from Service Manager update: ${editingService.title}`
+              }
+            })
+          }).catch(() => {});
+        }
+      }
+
       // Update local state
       setServices(allUpdated);
       setEditingService(null);
-      setToastMessage(`✓ Service "${updatedService.title}" saved successfully!`);
+      setToastMessage(`✓ Service "${updatedService.title}" saved & synchronized across website!`);
     } catch (err: any) {
       console.error("Failed to save service", err);
       alert("⚠️ Error saving service: " + (err.message || JSON.stringify(err)));

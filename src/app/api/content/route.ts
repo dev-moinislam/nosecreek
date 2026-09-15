@@ -31,6 +31,13 @@ export async function GET(req: Request) {
               .maybeSingle();
 
             if (supaSettings) {
+              const supaNav = supaSettings.marketing?.navigation || supaSettings.navigation;
+              const diskNav = settingsResult?.navigation;
+              const supaMenuLen = supaNav?.header?.menu?.length || 0;
+              const diskMenuLen = diskNav?.header?.menu?.length || 0;
+              // Prefer whichever navigation is richer / has more items, preventing stale empty Supabase states from wiping disk
+              const effectiveNav = (diskMenuLen >= supaMenuLen && diskMenuLen > 0) ? diskNav : (supaNav || diskNav);
+
               settingsResult = {
                 ...(settingsResult || {}),
                 clinicName: supaSettings.clinic_name || settingsResult?.clinicName,
@@ -46,7 +53,7 @@ export async function GET(req: Request) {
                 marketing: supaSettings.marketing || settingsResult?.marketing,
                 customSchemas: supaSettings.marketing?.customSchemas || supaSettings.customSchemas || settingsResult?.customSchemas || [],
                 notifications: supaSettings.marketing?.notifications || supaSettings.notifications || settingsResult?.notifications,
-                navigation: supaSettings.marketing?.navigation || supaSettings.navigation || settingsResult?.navigation
+                navigation: effectiveNav
               };
             }
           } catch (e) {
@@ -103,10 +110,14 @@ export async function GET(req: Request) {
                 teamMembers: s.team_members || existing?.teamMembers || [],
                 locations: s.locations || existing?.locations || [],
                 testimonials: s.testimonials || existing?.testimonials || [],
+                parentSlug: s.parent_slug || s.parentSlug || existing?.parentSlug || undefined,
                 seo: s.seo || existing?.seo || {}
               };
             });
-            return NextResponse.json(list);
+            // Combine with any disk items not in Supabase
+            const supaSlugs = new Set(supaServices.map((s: any) => s.slug));
+            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug));
+            return NextResponse.json([...list, ...missingFromSupa]);
           }
         } catch {}
       }
@@ -146,10 +157,14 @@ export async function GET(req: Request) {
                 sectionOrder: c.section_order || c.sectionOrder || existing?.sectionOrder || [],
                 relatedServices: c.related_services || existing?.relatedServices || [],
                 category: c.category || existing?.category || "general",
+                parentSlug: c.parent_slug || c.parentSlug || existing?.parentSlug || undefined,
                 seo: c.seo || existing?.seo || {}
               };
             });
-            return NextResponse.json(list);
+            // Combine with any disk items not in Supabase
+            const supaSlugs = new Set(supaConditions.map((c: any) => c.slug));
+            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug));
+            return NextResponse.json([...list, ...missingFromSupa]);
           }
         } catch {}
       }

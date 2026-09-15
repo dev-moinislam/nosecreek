@@ -318,6 +318,7 @@ export async function POST(req: Request) {
       } else if (type === "services") {
         revalidatePath("/services");
         revalidatePath("/services/[slug]", "page");
+        revalidatePath("/services/[...slug]", "page");
         if (deletedSlug) {
           revalidatePath(`/services/${deletedSlug}`);
         }
@@ -327,6 +328,7 @@ export async function POST(req: Request) {
       } else if (type === "conditions") {
         revalidatePath("/conditions");
         revalidatePath("/conditions/[slug]", "page");
+        revalidatePath("/conditions/[...slug]", "page");
         if (deletedSlug) {
           revalidatePath(`/conditions/${deletedSlug}`);
         }
@@ -339,8 +341,10 @@ export async function POST(req: Request) {
         revalidatePath("/", "layout");
         revalidatePath("/");
         revalidatePath("/about");
+        revalidatePath("/about/[...slug]", "page");
         revalidatePath("/contact");
         revalidatePath("/services");
+        revalidatePath("/conditions");
       } else {
         revalidatePath("/", "layout");
       }

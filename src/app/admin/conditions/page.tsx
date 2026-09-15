@@ -312,9 +312,93 @@ export default function AdminConditionsPage() {
         // ignore in static export
       }
 
+      // 4. Cross-Sync into Navigation Header Menu
+      try {
+        const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
+        let currentSettings = savedSettingsRaw ? JSON.parse(savedSettingsRaw) : null;
+        if (!currentSettings) {
+          const sRes = await fetch("/api/content?type=settings");
+          if (sRes.ok) currentSettings = await sRes.json();
+        }
+
+        if (currentSettings?.navigation?.header?.menu) {
+          const menu = [...currentSettings.navigation.header.menu];
+          const condMenu = menu.find((m: any) => m.id === "nav-conditions" || m.href === "/conditions");
+          if (condMenu) {
+            condMenu.children = condMenu.children ? [...condMenu.children] : [];
+            const childHref = cond.parentSlug
+              ? `/conditions/${cond.parentSlug}/${cond.slug}`
+              : `/conditions/${cond.slug}`;
+            const targetId = `cnd-${cond.slug}`;
+
+            if (cond.parentSlug) {
+              // Nested sub-condition: find parent condition in menu
+              const parentItem = condMenu.children.find((c: any) => 
+                c.id === `cnd-${cond.parentSlug}` || c.href === `/conditions/${cond.parentSlug}` || c.href.endsWith(`/${cond.parentSlug}`)
+              );
+              if (parentItem) {
+                parentItem.children = parentItem.children ? [...parentItem.children] : [];
+                const existIdx = parentItem.children.findIndex((sub: any) => sub.id === targetId || sub.href.endsWith(`/${cond.slug}`));
+                if (existIdx >= 0) {
+                  parentItem.children[existIdx] = { ...parentItem.children[existIdx], label: cond.name, href: childHref };
+                } else {
+                  parentItem.children.push({ id: targetId, label: cond.name, href: childHref, enabled: true });
+                }
+              }
+            } else {
+              // Top-level condition
+              const existIdx = condMenu.children.findIndex((c: any) => c.id === targetId || c.href === childHref || c.href.endsWith(`/${cond.slug}`));
+              if (existIdx >= 0) {
+                condMenu.children[existIdx] = { ...condMenu.children[existIdx], label: cond.name, href: childHref };
+              } else {
+                condMenu.children.push({ id: targetId, label: cond.name, href: childHref, enabled: true });
+              }
+            }
+
+            currentSettings.navigation.header.menu = menu;
+            if (typeof window !== "undefined") {
+              localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+              window.dispatchEvent(new Event("settingsUpdated"));
+            }
+            fetch("/api/admin/save-content", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ type: "settings", data: currentSettings })
+            }).catch(() => {});
+          }
+        }
+      } catch (syncErr) {
+        console.warn("Navigation cross-sync warning:", syncErr);
+      }
+
+      // 5. Auto-register 301 Redirect if URL changed
+      if (editingCondition && (editingCondition.slug !== cond.slug || editingCondition.parentSlug !== cond.parentSlug)) {
+        const oldPath = editingCondition.parentSlug
+          ? `/conditions/${editingCondition.parentSlug}/${editingCondition.slug}`
+          : `/conditions/${editingCondition.slug}`;
+        const newPath = cond.parentSlug
+          ? `/conditions/${cond.parentSlug}/${cond.slug}`
+          : `/conditions/${cond.slug}`;
+        if (oldPath !== newPath) {
+          fetch("/api/admin/redirects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              rule: {
+                fromPath: oldPath,
+                toPath: newPath,
+                statusCode: 301,
+                enabled: true,
+                notes: `Auto-redirect from Condition Manager update: ${editingCondition.name}`
+              }
+            })
+          }).catch(() => {});
+        }
+      }
+
       setConditions(allUpdated);
       setEditingCondition(null);
-      setToastMessage(`✓ Condition "${cond.name}" saved successfully!`);
+      setToastMessage(`✓ Condition "${cond.name}" saved & synchronized across website!`);
     } catch (err: any) {
       console.error("Save condition failed:", err);
       alert("⚠️ Error saving: " + (err.message || err));

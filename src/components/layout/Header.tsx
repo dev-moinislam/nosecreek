@@ -29,7 +29,17 @@ export default function Header() {
         if (res.ok) {
           const data = await res.json();
           if (data && (data.clinicName || data.navigation || data.contact)) {
-            setSiteSettings((prev) => ({ ...prev, ...data }));
+            setSiteSettings((prev) => {
+              const incomingMenu = data?.navigation?.header?.menu;
+              const prevMenu = prev?.navigation?.header?.menu;
+              let finalNav = data.navigation || prev.navigation;
+              if (Array.isArray(prevMenu) && prevMenu.length > 0) {
+                if (!Array.isArray(incomingMenu) || incomingMenu.length < prevMenu.length) {
+                  finalNav = prev.navigation;
+                }
+              }
+              return { ...prev, ...data, navigation: finalNav };
+            });
           }
         }
       } catch {}
@@ -209,24 +219,44 @@ export default function Header() {
           label: "Services",
           href: "/services",
           enabled: true,
-          children: dynamicServices.map((s) => ({
-            id: `srv-${s.slug}`,
-            label: s.title,
-            href: `/services/${s.slug}`,
-            enabled: true,
-          })),
+          children: dynamicServices
+            .filter((s) => !s.parentSlug)
+            .map((s) => ({
+              id: `srv-${s.slug}`,
+              label: s.title,
+              href: `/services/${s.slug}`,
+              enabled: true,
+              children: dynamicServices
+                .filter((sub) => sub.parentSlug === s.slug)
+                .map((sub) => ({
+                  id: `srv-${sub.slug}`,
+                  label: sub.title,
+                  href: `/services/${s.slug}/${sub.slug}`,
+                  enabled: true
+                }))
+            })),
         },
         {
           id: "nav-conditions",
           label: "What We Treat",
           href: "/conditions",
           enabled: true,
-          children: dynamicConditions.map((c) => ({
-            id: `cnd-${c.slug}`,
-            label: c.name,
-            href: `/conditions/${c.slug}`,
-            enabled: true,
-          })),
+          children: dynamicConditions
+            .filter((c) => !c.parentSlug)
+            .map((c) => ({
+              id: `cnd-${c.slug}`,
+              label: c.name,
+              href: `/conditions/${c.slug}`,
+              enabled: true,
+              children: dynamicConditions
+                .filter((sub) => sub.parentSlug === c.slug)
+                .map((sub) => ({
+                  id: `cnd-${sub.slug}`,
+                  label: sub.name,
+                  href: `/conditions/${c.slug}/${sub.slug}`,
+                  enabled: true
+                }))
+            })),
         },
         {
           id: "nav-about",
