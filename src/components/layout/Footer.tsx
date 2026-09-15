@@ -52,10 +52,10 @@ export default function Footer() {
     }
     sync();
 
-    // Idle background fetch
+    // Fast initial background fetch
     const timer = setTimeout(() => {
       fetchFreshSettings();
-    }, 6000);
+    }, 100);
 
     window.addEventListener("settingsUpdated", sync);
     window.addEventListener("servicesUpdated", sync);

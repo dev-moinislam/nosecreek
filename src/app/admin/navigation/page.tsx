@@ -16,6 +16,170 @@ interface EditingItemState {
   isNew: boolean;
 }
 
+// Reconcile navigation tree with authoritative services and conditions
+function reconcileNavigationWithContent(
+  baseNav: HeaderFooterNavigation,
+  services: Service[],
+  conditions: Condition[],
+  deletedSlugs: string[] = []
+): HeaderFooterNavigation {
+  const nav: HeaderFooterNavigation = JSON.parse(JSON.stringify(baseNav));
+  if (!nav.header) nav.header = { menu: [] };
+  if (!Array.isArray(nav.header.menu)) nav.header.menu = [];
+  if (!nav.footer) nav.footer = { columns: [] };
+  if (!Array.isArray(nav.footer.columns)) nav.footer.columns = [];
+
+  const isSlugDeleted = (slug?: string, href?: string, id?: string) => {
+    if (!slug && !href && !id) return false;
+    return deletedSlugs.some((d) =>
+      (slug && slug === d) ||
+      (id && (id === d || id === `srv-${d}` || id === `cnd-${d}`)) ||
+      (href && (href === `/services/${d}` || href === `/conditions/${d}` || href.endsWith(`/${d}`)))
+    );
+  };
+
+  // 1. RECONCILE SERVICES MENU
+  let srvMenu = nav.header.menu.find((m) => m.id === "nav-services" || m.href === "/services");
+  if (!srvMenu) {
+    srvMenu = { id: "nav-services", href: "/services", label: "Services", enabled: true, children: [] };
+    nav.header.menu.unshift(srvMenu);
+  }
+  if (!Array.isArray(srvMenu.children)) srvMenu.children = [];
+
+  const rootServices = services.filter((s) => !s.parentSlug && !isSlugDeleted(s.slug, `/services/${s.slug}`, `srv-${s.slug}`));
+  const subServices = services.filter((s) => Boolean(s.parentSlug) && !isSlugDeleted(s.slug, `/services/${s.parentSlug}/${s.slug}`, `srv-${s.slug}`));
+
+  // Prune deleted or nonexistent services
+  srvMenu.children = srvMenu.children.filter((c) => {
+    if (c.id === "srv-all" || c.href === "/services") return true;
+    if (isSlugDeleted(undefined, c.href, c.id)) return false;
+    const parts = (c.href || "").replace("/services/", "").split("/").filter(Boolean);
+    const slug = parts[parts.length - 1];
+    return !slug || services.some((s) => s.slug === slug);
+  });
+
+  // Reconcile root services
+  rootServices.forEach((root) => {
+    const rootHref = `/services/${root.slug}`;
+    const targetId = `srv-${root.slug}`;
+    const idx = srvMenu!.children!.findIndex((c) => c.id === targetId || c.href === rootHref || c.href?.endsWith(`/${root.slug}`));
+    if (idx >= 0) {
+      srvMenu!.children![idx].label = root.title;
+      srvMenu!.children![idx].href = rootHref;
+      srvMenu!.children![idx].enabled = true;
+    } else {
+      const viewAllIdx = srvMenu!.children!.findIndex((c) => c.id === "srv-all" || c.href === "/services");
+      const item: NavMenuItem = { id: targetId, label: root.title, href: rootHref, enabled: true, children: [] };
+      if (viewAllIdx >= 0) {
+        srvMenu!.children!.splice(viewAllIdx, 0, item);
+      } else {
+        srvMenu!.children!.push(item);
+      }
+    }
+  });
+
+  // Reconcile sub services
+  subServices.forEach((sub) => {
+    const subHref = `/services/${sub.parentSlug}/${sub.slug}`;
+    const targetId = `srv-${sub.slug}`;
+    const parent = srvMenu!.children!.find((c) => c.id === `srv-${sub.parentSlug}` || c.href === `/services/${sub.parentSlug}` || c.href?.endsWith(`/${sub.parentSlug}`));
+    if (parent) {
+      if (!Array.isArray(parent.children)) parent.children = [];
+      const subIdx = parent.children.findIndex((c) => c.id === targetId || c.href === subHref || c.href?.endsWith(`/${sub.slug}`));
+      if (subIdx >= 0) {
+        parent.children[subIdx].label = sub.title;
+        parent.children[subIdx].href = subHref;
+      } else {
+        parent.children.push({ id: targetId, label: sub.title, href: subHref, enabled: true, children: [] });
+      }
+    }
+  });
+
+  // 2. RECONCILE CONDITIONS MENU
+  let condMenu = nav.header.menu.find((m) => m.id === "nav-conditions" || m.href === "/conditions");
+  if (!condMenu) {
+    condMenu = { id: "nav-conditions", href: "/conditions", label: "What We Treat", enabled: true, children: [] };
+    const srvIdx = nav.header.menu.indexOf(srvMenu);
+    nav.header.menu.splice(srvIdx + 1, 0, condMenu);
+  }
+  if (!Array.isArray(condMenu.children)) condMenu.children = [];
+
+  const rootConditions = conditions.filter((c) => !c.parentSlug && !isSlugDeleted(c.slug, `/conditions/${c.slug}`, `cnd-${c.slug}`));
+  const subConditions = conditions.filter((c) => Boolean(c.parentSlug) && !isSlugDeleted(c.slug, `/conditions/${c.parentSlug}/${c.slug}`, `cnd-${c.slug}`));
+
+  // Prune deleted or nonexistent conditions
+  condMenu.children = condMenu.children.filter((c) => {
+    if (c.id === "cnd-all" || c.href === "/conditions") return true;
+    if (isSlugDeleted(undefined, c.href, c.id)) return false;
+    const parts = (c.href || "").replace("/conditions/", "").split("/").filter(Boolean);
+    const slug = parts[parts.length - 1];
+    return !slug || conditions.some((cond) => cond.slug === slug);
+  });
+
+  // Reconcile root conditions (THIS ENSURES "Back Pain & Sciatica" BECOMES "Back Pain")
+  rootConditions.forEach((root) => {
+    const rootHref = `/conditions/${root.slug}`;
+    const targetId = `cnd-${root.slug}`;
+    const idx = condMenu!.children!.findIndex((c) => c.id === targetId || c.href === rootHref || c.href?.endsWith(`/${root.slug}`));
+    if (idx >= 0) {
+      condMenu!.children![idx].label = root.name;
+      condMenu!.children![idx].href = rootHref;
+      condMenu!.children![idx].enabled = true;
+    } else {
+      const viewAllIdx = condMenu!.children!.findIndex((c) => c.id === "cnd-all" || c.href === "/conditions");
+      const item: NavMenuItem = { id: targetId, label: root.name, href: rootHref, enabled: true, children: [] };
+      if (viewAllIdx >= 0) {
+        condMenu!.children!.splice(viewAllIdx, 0, item);
+      } else {
+        condMenu!.children!.push(item);
+      }
+    }
+  });
+
+  // Reconcile sub conditions (THIS ADDS "Lower Back Pain" AND UPDATES "Sciatica Nerve Relief" TO "Sciatica")
+  subConditions.forEach((sub) => {
+    const subHref = `/conditions/${sub.parentSlug}/${sub.slug}`;
+    const targetId = `cnd-${sub.slug}`;
+    const parent = condMenu!.children!.find((c) => c.id === `cnd-${sub.parentSlug}` || c.href === `/conditions/${sub.parentSlug}` || c.href?.endsWith(`/${sub.parentSlug}`));
+    if (parent) {
+      if (!Array.isArray(parent.children)) parent.children = [];
+      // Clean out non-existent sub-items
+      parent.children = parent.children.filter((c) => {
+        if (isSlugDeleted(undefined, c.href, c.id)) return false;
+        const leaf = (c.href || "").split("/").filter(Boolean).pop();
+        return !leaf || conditions.some((cond) => cond.slug === leaf);
+      });
+
+      const subIdx = parent.children.findIndex((c) => c.id === targetId || c.href === subHref || c.href?.endsWith(`/${sub.slug}`));
+      if (subIdx >= 0) {
+        parent.children[subIdx].label = sub.name;
+        parent.children[subIdx].href = subHref;
+      } else {
+        parent.children.push({ id: targetId, label: sub.name, href: subHref, enabled: true, children: [] });
+      }
+    }
+  });
+
+  // 3. RECONCILE FOOTER COLUMNS
+  const srvCol = nav.footer.columns.find((c) => c.id === "ft-col-services" || c.title?.toLowerCase().includes("service"));
+  if (srvCol) {
+    srvCol.links = rootServices.map((s) => ({
+      label: s.title,
+      href: `/services/${s.slug}`
+    }));
+  }
+
+  const condCol = nav.footer.columns.find((c) => c.id === "ft-col-conditions" || c.title?.toLowerCase().includes("treat") || c.title?.toLowerCase().includes("condition"));
+  if (condCol) {
+    condCol.links = rootConditions.map((c) => ({
+      label: c.name,
+      href: `/conditions/${c.slug}`
+    }));
+  }
+
+  return nav;
+}
+
 export default function AdminNavigationPage() {
   const { isAdmin } = useRole();
   const [activeTab, setActiveTab] = useState<"header" | "footer" | "topbar">("header");
@@ -25,7 +189,8 @@ export default function AdminNavigationPage() {
 
   // Core navigation state
   const [navData, setNavData] = useState<HeaderFooterNavigation>(() => {
-    return (defaultSettings as any).navigation || {
+    const raw = (defaultSettings as any).marketing?.navigation || (defaultSettings as any).navigation;
+    return raw || {
       header: {
         topBarEnabled: true,
         phone: "403-295-8590",
@@ -58,39 +223,183 @@ export default function AdminNavigationPage() {
   const [editingColumn, setEditingColumn] = useState<{ id: string; title: string; isNew: boolean } | null>(null);
   const [editingFooterLink, setEditingFooterLink] = useState<{ colId: string; index: number; label: string; href: string; isNew: boolean } | null>(null);
 
-  // Load live settings on mount
+  // Load live settings, services, conditions on mount & auto-reconcile
   useEffect(() => {
     async function loadData() {
+      let liveNav: HeaderFooterNavigation = (defaultSettings as any).marketing?.navigation || (defaultSettings as any).navigation;
+      let liveServices: Service[] = defaultServices as Service[];
+      let liveConditions: Condition[] = defaultConditions as Condition[];
+      let deletedSlugs: string[] = [];
+
+      if (typeof window !== "undefined") {
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          if (dRaw) deletedSlugs = JSON.parse(dRaw);
+        } catch {}
+
+        try {
+          const localS = localStorage.getItem("adm_settings");
+          if (localS) {
+            const p = JSON.parse(localS);
+            const n = p.navigation || p.marketing?.navigation;
+            if (n && n.header?.menu?.length > 0) liveNav = n;
+          }
+        } catch {}
+
+        try {
+          const localSrv = localStorage.getItem("adm_services");
+          if (localSrv) {
+            const parsed = JSON.parse(localSrv);
+            if (Array.isArray(parsed) && parsed.length > 0) liveServices = parsed;
+          }
+        } catch {}
+
+        try {
+          const localCond = localStorage.getItem("adm_conditions");
+          if (localCond) {
+            const parsed = JSON.parse(localCond);
+            if (Array.isArray(parsed) && parsed.length > 0) liveConditions = parsed;
+          }
+        } catch {}
+      }
+
       try {
-        const res = await fetch("/api/content?type=settings");
-        if (res.ok) {
-          const s = await res.json();
-          if (s.navigation) {
-            setNavData(s.navigation);
+        const [settingsRes, srvRes, condRes] = await Promise.all([
+          fetch("/api/content?type=settings"),
+          fetch("/api/content?type=services"),
+          fetch("/api/content?type=conditions")
+        ]);
+
+        if (settingsRes.ok) {
+          const s = await settingsRes.json();
+          const n = s.navigation || s.marketing?.navigation;
+          if (n && n.header?.menu?.length > 0) liveNav = n;
+          if (Array.isArray(s.marketing?.deleted_slugs)) {
+            s.marketing.deleted_slugs.forEach((d: string) => {
+              if (!deletedSlugs.includes(d)) deletedSlugs.push(d);
+            });
+          }
+        }
+
+        if (srvRes.ok) {
+          const srv = await srvRes.json();
+          if (Array.isArray(srv) && srv.length > 0) {
+            liveServices = srv;
+            setServicesList(srv);
+          }
+        }
+
+        if (condRes.ok) {
+          const cond = await condRes.json();
+          if (Array.isArray(cond) && cond.length > 0) {
+            liveConditions = cond;
+            setConditionsList(cond);
           }
         }
       } catch {}
 
-      try {
-        const [srvRes, condRes] = await Promise.all([
-          fetch("/api/content?type=services"),
-          fetch("/api/content?type=conditions")
-        ]);
-        if (srvRes.ok) {
-          const s = await srvRes.json();
-          if (Array.isArray(s)) setServicesList(s);
-        }
-        if (condRes.ok) {
-          const c = await condRes.json();
-          if (Array.isArray(c)) setConditionsList(c);
-        }
-      } catch {}
+      // Auto-reconcile live navigation with live services & conditions
+      const reconciled = reconcileNavigationWithContent(liveNav, liveServices, liveConditions, deletedSlugs);
+      setNavData(reconciled);
+
+      // Persist reconciled navigation to localStorage to purge stale cached menus
+      if (typeof window !== "undefined") {
+        try {
+          const cur = localStorage.getItem("adm_settings");
+          let parsed = cur ? JSON.parse(cur) : {};
+          parsed.navigation = reconciled;
+          if (!parsed.marketing) parsed.marketing = {};
+          parsed.marketing.navigation = reconciled;
+          localStorage.setItem("adm_settings", JSON.stringify(parsed));
+          window.dispatchEvent(new Event("settingsUpdated"));
+        } catch {}
+      }
 
       setLoading(false);
     }
 
     loadData();
+
+    // Listen to background changes from Conditions or Services tabs
+    const handleContentSync = () => {
+      let curServices = servicesList;
+      let curConditions = conditionsList;
+      let curDeleted: string[] = [];
+
+      if (typeof window !== "undefined") {
+        try {
+          const sRaw = localStorage.getItem("adm_services");
+          if (sRaw) curServices = JSON.parse(sRaw);
+        } catch {}
+        try {
+          const cRaw = localStorage.getItem("adm_conditions");
+          if (cRaw) curConditions = JSON.parse(cRaw);
+        } catch {}
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          if (dRaw) curDeleted = JSON.parse(dRaw);
+        } catch {}
+      }
+
+      setServicesList(curServices);
+      setConditionsList(curConditions);
+      setNavData((prev) => reconcileNavigationWithContent(prev, curServices, curConditions, curDeleted));
+    };
+
+    window.addEventListener("conditionsUpdated", handleContentSync);
+    window.addEventListener("servicesUpdated", handleContentSync);
+    window.addEventListener("storage", handleContentSync);
+
+    return () => {
+      window.removeEventListener("conditionsUpdated", handleContentSync);
+      window.removeEventListener("servicesUpdated", handleContentSync);
+      window.removeEventListener("storage", handleContentSync);
+    };
   }, []);
+
+  // 1-Click Sync from Services and Conditions
+  const handleSyncFromContent = () => {
+    let deletedSlugs: string[] = [];
+    if (typeof window !== "undefined") {
+      try {
+        const dRaw = localStorage.getItem("adm_deleted_slugs");
+        if (dRaw) deletedSlugs = JSON.parse(dRaw);
+      } catch {}
+    }
+
+    const reconciled = reconcileNavigationWithContent(navData, servicesList, conditionsList, deletedSlugs);
+    setNavData(reconciled);
+
+    if (typeof window !== "undefined") {
+      const cur = localStorage.getItem("adm_settings");
+      let parsed = cur ? JSON.parse(cur) : {};
+      parsed.navigation = reconciled;
+      if (!parsed.marketing) parsed.marketing = {};
+      parsed.marketing.navigation = reconciled;
+      localStorage.setItem("adm_settings", JSON.stringify(parsed));
+      window.dispatchEvent(new Event("settingsUpdated"));
+    }
+
+    // Persist to server
+    fetch("/api/admin/save-content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "settings",
+        data: {
+          ...defaultSettings,
+          navigation: reconciled,
+          marketing: {
+            ...((defaultSettings as any).marketing || {}),
+            navigation: reconciled
+          }
+        }
+      })
+    }).catch(() => {});
+
+    setSaveStatus(`✓ Navigation synced with all ${servicesList.length} services and ${conditionsList.length} conditions!`);
+    setTimeout(() => setSaveStatus(null), 4000);
+  };
 
   const toggleExpand = (id: string) => {
     setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -852,14 +1161,37 @@ export default function AdminNavigationPage() {
                 Add Level 1 root items, drop-down submenus (Level 2), and nested sub-submenus (Level 3).
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => handleOpenAdd(1)}
-              className="adm-btn adm-btn-secondary"
-              style={{ fontSize: 13.5, fontWeight: 600, padding: "8px 16px" }}
-            >
-              + Add Root Menu Item
-            </button>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <button
+                type="button"
+                onClick={handleSyncFromContent}
+                className="adm-btn"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  padding: "8px 14px",
+                  background: "#eff6ff",
+                  color: "#1d4ed8",
+                  border: "1px solid #bfdbfe",
+                  borderRadius: 8,
+                  cursor: "pointer"
+                }}
+                title="Synchronize menu items and submenus to match Services and Conditions tabs exactly"
+              >
+                ⚡ Sync from Services &amp; Conditions
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenAdd(1)}
+                className="adm-btn adm-btn-secondary"
+                style={{ fontSize: 13.5, fontWeight: 600, padding: "8px 16px" }}
+              >
+                + Add Root Menu Item
+              </button>
+            </div>
           </div>
 
           {menu.length === 0 ? (

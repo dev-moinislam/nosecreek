@@ -29,17 +29,11 @@ export default function Header() {
         if (res.ok) {
           const data = await res.json();
           if (data && (data.clinicName || data.navigation || data.contact)) {
-            setSiteSettings((prev) => {
-              const incomingMenu = data?.navigation?.header?.menu;
-              const prevMenu = prev?.navigation?.header?.menu;
-              let finalNav = data.navigation || prev.navigation;
-              if (Array.isArray(prevMenu) && prevMenu.length > 0) {
-                if (!Array.isArray(incomingMenu) || incomingMenu.length < prevMenu.length) {
-                  finalNav = prev.navigation;
-                }
-              }
-              return { ...prev, ...data, navigation: finalNav };
-            });
+            setSiteSettings((prev) => ({
+              ...prev,
+              ...data,
+              navigation: data.navigation || prev.navigation
+            }));
           }
         }
       } catch {}
@@ -73,16 +67,10 @@ export default function Header() {
       try {
         const savedSettings = localStorage.getItem("adm_settings");
         if (savedSettings) {
-          // If cached settings still contain stale #hash links or outdated flat condition links in navigation, refresh from clean defaults
-          if (savedSettings.includes('"/about#') || savedSettings.includes('"/conditions/sciatica"')) {
-            localStorage.removeItem("adm_settings");
-            setSiteSettings(defaultSettingsData as SiteSettings);
-          } else {
-            const parsed = JSON.parse(savedSettings);
-            const s = parsed.settings || parsed;
-            if (s && (s.contact || s.clinicName || s.primaryCTA || s.bookingUrl || s.navigation)) {
-              setSiteSettings((prev) => ({ ...prev, ...s }));
-            }
+          const parsed = JSON.parse(savedSettings);
+          const s = parsed.settings || parsed;
+          if (s && (s.contact || s.clinicName || s.primaryCTA || s.bookingUrl || s.navigation)) {
+            setSiteSettings((prev) => ({ ...prev, ...s }));
           }
         }
         const savedServices = localStorage.getItem("adm_services");
@@ -103,20 +91,12 @@ export default function Header() {
     }
     syncContent();
 
-    // Defer background API freshness sync until after initial page render is fully complete (5s delay or idle)
+    // Fast initial freshness sync
     const idleTimer = setTimeout(() => {
-      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        (window as any).requestIdleCallback(() => {
-          fetchFreshSettings();
-          fetchFreshServices();
-          fetchFreshConditions();
-        });
-      } else {
-        fetchFreshSettings();
-        fetchFreshServices();
-        fetchFreshConditions();
-      }
-    }, 5000);
+      fetchFreshSettings();
+      fetchFreshServices();
+      fetchFreshConditions();
+    }, 100);
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);
