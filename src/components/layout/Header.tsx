@@ -237,9 +237,31 @@ export default function Header() {
   const menuItems: NavMenuItem[] = baseMenuItems.map((item) => {
     // 1. DYNAMICALLY MERGE SERVICES
     if (item.id === "nav-services" || item.href === "/services") {
-      const existingChildren = item.children ? [...item.children] : [];
-      const rootServices = dynamicServices.filter((s) => !s.parentSlug);
-      const subServices = dynamicServices.filter((s) => Boolean(s.parentSlug));
+      let deletedSlugs: string[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          if (dRaw) deletedSlugs = JSON.parse(dRaw);
+        } catch {}
+      }
+      const stDeleted = (siteSettings.marketing as any)?.deleted_slugs;
+      if (Array.isArray(stDeleted)) {
+        stDeleted.forEach((s: string) => {
+          if (!deletedSlugs.includes(s)) deletedSlugs.push(s);
+        });
+      }
+
+      const isSvcDeleted = (href?: string, id?: string): boolean => {
+        if (!href && !id) return false;
+        return deletedSlugs.some((d) => 
+          id === `srv-${d}` || id === d || (href && (href === `/services/${d}` || href.endsWith(`/${d}`)))
+        );
+      };
+
+      const validServiceSlugs = new Set(dynamicServices.map((s) => s.slug));
+      const existingChildren = (item.children ? [...item.children] : []).filter((c) => !isSvcDeleted(c.href, c.id));
+      const rootServices = dynamicServices.filter((s) => !s.parentSlug && !deletedSlugs.includes(s.slug));
+      const subServices = dynamicServices.filter((s) => Boolean(s.parentSlug) && !deletedSlugs.includes(s.slug));
 
       const mergedChildren: NavMenuItem[] = [...existingChildren];
       rootServices.forEach((root) => {
@@ -270,7 +292,20 @@ export default function Header() {
         }
       });
 
-      // Attach all sub-services to their parent service
+      // Attach all sub-services to their parent service and prune deleted/non-existent ones
+      mergedChildren.forEach((parent) => {
+        if (parent.children && parent.children.length > 0) {
+          parent.children = parent.children.filter((ch) => {
+            if (isSvcDeleted(ch.href, ch.id)) return false;
+            if (dynamicServices.length > 0 && ch.href) {
+              const leaf = ch.href.split("/").filter(Boolean).pop();
+              if (leaf && !validServiceSlugs.has(leaf)) return false;
+            }
+            return true;
+          });
+        }
+      });
+
       subServices.forEach((sub) => {
         const subHref = `/services/${sub.parentSlug}/${sub.slug}`;
         const targetId = `srv-${sub.slug}`;
@@ -305,9 +340,31 @@ export default function Header() {
 
     // 2. DYNAMICALLY MERGE CONDITIONS
     if (item.id === "nav-conditions" || item.href === "/conditions") {
-      const existingChildren = item.children ? [...item.children] : [];
-      const rootConditions = dynamicConditions.filter((c) => !c.parentSlug);
-      const subConditions = dynamicConditions.filter((c) => Boolean(c.parentSlug));
+      let deletedSlugs: string[] = [];
+      if (typeof window !== "undefined") {
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          if (dRaw) deletedSlugs = JSON.parse(dRaw);
+        } catch {}
+      }
+      const stDeleted = (siteSettings.marketing as any)?.deleted_slugs;
+      if (Array.isArray(stDeleted)) {
+        stDeleted.forEach((s: string) => {
+          if (!deletedSlugs.includes(s)) deletedSlugs.push(s);
+        });
+      }
+
+      const isCondDeleted = (href?: string, id?: string): boolean => {
+        if (!href && !id) return false;
+        return deletedSlugs.some((d) => 
+          id === `cnd-${d}` || id === d || (href && (href === `/conditions/${d}` || href.endsWith(`/${d}`)))
+        );
+      };
+
+      const validConditionSlugs = new Set(dynamicConditions.map((c) => c.slug));
+      const existingChildren = (item.children ? [...item.children] : []).filter((c) => !isCondDeleted(c.href, c.id));
+      const rootConditions = dynamicConditions.filter((c) => !c.parentSlug && !deletedSlugs.includes(c.slug));
+      const subConditions = dynamicConditions.filter((c) => Boolean(c.parentSlug) && !deletedSlugs.includes(c.slug));
 
       const mergedChildren: NavMenuItem[] = [...existingChildren];
       rootConditions.forEach((root) => {
@@ -338,7 +395,20 @@ export default function Header() {
         }
       });
 
-      // Attach all sub-conditions to their parent condition
+      // Attach all sub-conditions to their parent condition and prune deleted/non-existent ones
+      mergedChildren.forEach((parent) => {
+        if (parent.children && parent.children.length > 0) {
+          parent.children = parent.children.filter((ch) => {
+            if (isCondDeleted(ch.href, ch.id)) return false;
+            if (dynamicConditions.length > 0 && ch.href) {
+              const leaf = ch.href.split("/").filter(Boolean).pop();
+              if (leaf && !validConditionSlugs.has(leaf)) return false;
+            }
+            return true;
+          });
+        }
+      });
+
       subConditions.forEach((sub) => {
         const subHref = `/conditions/${sub.parentSlug}/${sub.slug}`;
         const targetId = `cnd-${sub.slug}`;

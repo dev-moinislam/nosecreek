@@ -183,11 +183,32 @@ export default function Footer() {
 
         {/* Dynamic or Fallback Columns */}
         {(() => {
+          let deletedSlugs: string[] = [];
+          if (typeof window !== "undefined") {
+            try {
+              const dRaw = localStorage.getItem("adm_deleted_slugs");
+              if (dRaw) deletedSlugs = JSON.parse(dRaw);
+            } catch {}
+          }
+          const stDeleted = (siteSettings.marketing as any)?.deleted_slugs;
+          if (Array.isArray(stDeleted)) {
+            stDeleted.forEach((s: string) => {
+              if (!deletedSlugs.includes(s)) deletedSlugs.push(s);
+            });
+          }
+
+          const isLinkDeleted = (href?: string): boolean => {
+            if (!href) return false;
+            return deletedSlugs.some((d) => 
+              href === `/conditions/${d}` || href === `/services/${d}` || href.endsWith(`/${d}`)
+            );
+          };
+
           const renderedColumns = (customColumns || []).map((col) => {
             // Augment Clinical Services column with dynamic services
             if (col.id === "ft-col-services" || col.title?.toLowerCase().includes("service")) {
-              const mergedLinks = [...(col.links || [])];
-              services.filter((s) => !s.parentSlug).forEach((s) => {
+              const mergedLinks = (col.links || []).filter((l: any) => !isLinkDeleted(l.href));
+              services.filter((s) => !s.parentSlug && !deletedSlugs.includes(s.slug)).forEach((s) => {
                 const href = `/services/${s.slug}`;
                 if (!mergedLinks.some((l) => l.href === href || l.href.endsWith(`/${s.slug}`))) {
                   mergedLinks.push({ label: s.title, href });
@@ -197,8 +218,8 @@ export default function Footer() {
             }
             // Augment Conditions column with dynamic conditions
             if (col.id === "ft-col-conditions" || col.title?.toLowerCase().includes("treat") || col.title?.toLowerCase().includes("condition")) {
-              const mergedLinks = [...(col.links || [])];
-              conditions.filter((c) => !c.parentSlug).forEach((c) => {
+              const mergedLinks = (col.links || []).filter((l: any) => !isLinkDeleted(l.href));
+              conditions.filter((c) => !c.parentSlug && !deletedSlugs.includes(c.slug)).forEach((c) => {
                 const href = `/conditions/${c.slug}`;
                 if (!mergedLinks.some((l) => l.href === href || l.href.endsWith(`/${c.slug}`))) {
                   mergedLinks.push({ label: c.name, href });
@@ -206,7 +227,10 @@ export default function Footer() {
               });
               return { ...col, links: mergedLinks };
             }
-            return col;
+            return {
+              ...col,
+              links: (col.links || []).filter((l: any) => !isLinkDeleted(l.href))
+            };
           });
 
           if (renderedColumns.length > 0) {

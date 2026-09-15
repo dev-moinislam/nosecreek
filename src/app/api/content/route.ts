@@ -34,9 +34,8 @@ export async function GET(req: Request) {
               const supaNav = supaSettings.marketing?.navigation || supaSettings.navigation;
               const diskNav = settingsResult?.navigation;
               const supaMenuLen = supaNav?.header?.menu?.length || 0;
-              const diskMenuLen = diskNav?.header?.menu?.length || 0;
-              // Prefer whichever navigation is richer / has more items, preventing stale empty Supabase states from wiping disk
-              const effectiveNav = (diskMenuLen >= supaMenuLen && diskMenuLen > 0) ? diskNav : (supaNav || diskNav);
+              // Authoritative: Prefer supaNav whenever it has menu items, so deletions/edits in Supabase stick
+              const effectiveNav = (supaMenuLen > 0) ? supaNav : (diskNav || supaNav);
 
               settingsResult = {
                 ...(settingsResult || {}),
@@ -73,6 +72,22 @@ export async function GET(req: Request) {
         } catch {}
       }
 
+      // Fetch deleted slugs to ensure permanently deleted items never resurrect
+      const deletedSlugs = new Set<string>();
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data: stRow } = await supabase
+            .from("site_settings")
+            .select("marketing")
+            .eq("id", "main")
+            .maybeSingle();
+          const delList = stRow?.marketing?.deleted_slugs;
+          if (Array.isArray(delList)) {
+            delList.forEach((s: string) => deletedSlugs.add(s));
+          }
+        } catch {}
+      }
+
       if (type === "services" && isSupabaseConfigured && supabase) {
         try {
           const { data: supaServices } = await supabase
@@ -81,42 +96,44 @@ export async function GET(req: Request) {
             .eq("is_published", true)
             .order("sort_order", { ascending: true });
           if (supaServices) {
-            const list = supaServices.map((s: any) => {
-              const existing = diskData.find((d) => d.slug === s.slug);
-              return {
-                id: s.id,
-                slug: s.slug,
-                title: s.title,
-                shortDescription: s.short_description || existing?.shortDescription || "",
-                description: s.description || existing?.description || "",
-                heroImage: s.hero_image || existing?.heroImage || null,
-                heroImageAlt: s.hero_image_alt || s.seo?.heroImageAlt || existing?.heroImageAlt || existing?.seo?.heroImageAlt || "",
-                sideImage: s.side_image || existing?.sideImage || null,
-                sideImageAlt: s.side_image_alt || s.seo?.sideImageAlt || existing?.sideImageAlt || existing?.seo?.sideImageAlt || "",
-                cardImage: s.card_image || s.cardImage || s.seo?.cardImage || null,
-                cardImageAlt: s.card_image_alt || s.seo?.cardImageAlt || existing?.cardImageAlt || existing?.seo?.cardImageAlt || "",
-                iconType: s.icon_type || existing?.iconType || "stethoscope",
-                iconBg: s.icon_bg || existing?.iconBg || "#e9f5fb",
-                iconColor: s.icon_color || existing?.iconColor || "#1c9fd8",
-                ctaText: s.cta_text || existing?.ctaText || "Book Online",
-                ctaMuted: s.cta_muted ?? existing?.ctaMuted ?? false,
-                benefits: s.benefits || existing?.benefits || [],
-                symptoms: s.symptoms || existing?.symptoms || [],
-                treatmentApproach: s.treatment_approach || existing?.treatmentApproach || [],
-                customSections: s.custom_sections || existing?.customSections || [],
-                faqs: s.faqs || existing?.faqs || [],
-                relatedServices: s.related_services || existing?.relatedServices || [],
-                relatedConditions: s.related_conditions || existing?.relatedConditions || [],
-                teamMembers: s.team_members || existing?.teamMembers || [],
-                locations: s.locations || existing?.locations || [],
-                testimonials: s.testimonials || existing?.testimonials || [],
-                parentSlug: s.parent_slug || s.parentSlug || existing?.parentSlug || undefined,
-                seo: s.seo || existing?.seo || {}
-              };
-            });
-            // Combine with any disk items not in Supabase
+            const list = supaServices
+              .filter((s: any) => !deletedSlugs.has(s.slug))
+              .map((s: any) => {
+                const existing = diskData.find((d) => d.slug === s.slug);
+                return {
+                  id: s.id,
+                  slug: s.slug,
+                  title: s.title,
+                  shortDescription: s.short_description || existing?.shortDescription || "",
+                  description: s.description || existing?.description || "",
+                  heroImage: s.hero_image || existing?.heroImage || null,
+                  heroImageAlt: s.hero_image_alt || s.seo?.heroImageAlt || existing?.heroImageAlt || existing?.seo?.heroImageAlt || "",
+                  sideImage: s.side_image || existing?.sideImage || null,
+                  sideImageAlt: s.side_image_alt || s.seo?.sideImageAlt || existing?.sideImageAlt || existing?.seo?.sideImageAlt || "",
+                  cardImage: s.card_image || s.cardImage || s.seo?.cardImage || null,
+                  cardImageAlt: s.card_image_alt || s.seo?.cardImageAlt || existing?.cardImageAlt || existing?.seo?.cardImageAlt || "",
+                  iconType: s.icon_type || existing?.iconType || "stethoscope",
+                  iconBg: s.icon_bg || existing?.iconBg || "#e9f5fb",
+                  iconColor: s.icon_color || existing?.iconColor || "#1c9fd8",
+                  ctaText: s.cta_text || existing?.ctaText || "Book Online",
+                  ctaMuted: s.cta_muted ?? existing?.ctaMuted ?? false,
+                  benefits: s.benefits || existing?.benefits || [],
+                  symptoms: s.symptoms || existing?.symptoms || [],
+                  treatmentApproach: s.treatment_approach || existing?.treatmentApproach || [],
+                  customSections: s.custom_sections || existing?.customSections || [],
+                  faqs: s.faqs || existing?.faqs || [],
+                  relatedServices: s.related_services || existing?.relatedServices || [],
+                  relatedConditions: s.related_conditions || existing?.relatedConditions || [],
+                  teamMembers: s.team_members || existing?.teamMembers || [],
+                  locations: s.locations || existing?.locations || [],
+                  testimonials: s.testimonials || existing?.testimonials || [],
+                  parentSlug: s.parent_slug || s.parentSlug || existing?.parentSlug || undefined,
+                  seo: s.seo || existing?.seo || {}
+                };
+              });
+            // Combine with any disk items not in Supabase and NOT deleted
             const supaSlugs = new Set(supaServices.map((s: any) => s.slug));
-            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug));
+            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug) && !deletedSlugs.has(d.slug));
             return NextResponse.json([...list, ...missingFromSupa]);
           }
         } catch {}
@@ -130,47 +147,49 @@ export async function GET(req: Request) {
             .eq("is_published", true)
             .order("sort_order", { ascending: true });
           if (supaConditions) {
-            const list = supaConditions.map((c: any) => {
-              const existing = diskData.find((d) => d.slug === c.slug);
-              return {
-                id: c.id,
-                slug: c.slug,
-                name: c.name,
-                shortDescription: c.short_description || existing?.shortDescription || "",
-                description: c.description || existing?.description || "",
-                heroImage: c.hero_image || existing?.heroImage || null,
-                heroImageAlt: c.hero_image_alt || c.seo?.heroImageAlt || existing?.heroImageAlt || existing?.seo?.heroImageAlt || "",
-                sideImage: c.side_image || existing?.sideImage || null,
-                cardImage: c.card_image || c.cardImage || c.seo?.cardImage || null,
-                cardImageAlt: c.card_image_alt || c.seo?.cardImageAlt || existing?.cardImageAlt || existing?.seo?.cardImageAlt || "",
-                iconType: c.icon_type || c.iconType || existing?.iconType || "activity",
-                iconBg: c.icon_bg || c.iconBg || existing?.iconBg || "#f2f8fb",
-                iconColor: c.icon_color || c.iconColor || existing?.iconColor || "#0e78a8",
-                ctaText: c.cta_text || existing?.ctaText || "Book Online",
-                ctaMuted: c.cta_muted ?? existing?.ctaMuted ?? false,
-                benefits: c.benefits || existing?.benefits || [],
-                symptoms: c.symptoms || existing?.symptoms || [],
-                treatmentApproach: c.treatment_approach || existing?.treatmentApproach || [],
-                customSections: c.custom_sections || existing?.customSections || [],
-                faqs: c.faqs || existing?.faqs || [],
-                hiddenSections: c.hidden_sections || existing?.hiddenSections || [],
-                sectionOrder: c.section_order || c.sectionOrder || existing?.sectionOrder || [],
-                relatedServices: c.related_services || existing?.relatedServices || [],
-                category: c.category || existing?.category || "general",
-                parentSlug: c.parent_slug || c.parentSlug || existing?.parentSlug || undefined,
-                seo: c.seo || existing?.seo || {}
-              };
-            });
-            // Combine with any disk items not in Supabase
+            const list = supaConditions
+              .filter((c: any) => !deletedSlugs.has(c.slug))
+              .map((c: any) => {
+                const existing = diskData.find((d) => d.slug === c.slug);
+                return {
+                  id: c.id,
+                  slug: c.slug,
+                  name: c.name,
+                  shortDescription: c.short_description || existing?.shortDescription || "",
+                  description: c.description || existing?.description || "",
+                  heroImage: c.hero_image || existing?.heroImage || null,
+                  heroImageAlt: c.hero_image_alt || c.seo?.heroImageAlt || existing?.heroImageAlt || existing?.seo?.heroImageAlt || "",
+                  sideImage: c.side_image || existing?.sideImage || null,
+                  cardImage: c.card_image || c.cardImage || c.seo?.cardImage || null,
+                  cardImageAlt: c.card_image_alt || c.seo?.cardImageAlt || existing?.cardImageAlt || existing?.seo?.cardImageAlt || "",
+                  iconType: c.icon_type || c.iconType || existing?.iconType || "activity",
+                  iconBg: c.icon_bg || c.iconBg || existing?.iconBg || "#f2f8fb",
+                  iconColor: c.icon_color || c.iconColor || existing?.iconColor || "#0e78a8",
+                  ctaText: c.cta_text || existing?.ctaText || "Book Online",
+                  ctaMuted: c.cta_muted ?? existing?.ctaMuted ?? false,
+                  benefits: c.benefits || existing?.benefits || [],
+                  symptoms: c.symptoms || existing?.symptoms || [],
+                  treatmentApproach: c.treatment_approach || existing?.treatmentApproach || [],
+                  customSections: c.custom_sections || existing?.customSections || [],
+                  faqs: c.faqs || existing?.faqs || [],
+                  hiddenSections: c.hidden_sections || existing?.hiddenSections || [],
+                  sectionOrder: c.section_order || c.sectionOrder || existing?.sectionOrder || [],
+                  relatedServices: c.related_services || existing?.relatedServices || [],
+                  category: c.category || existing?.category || "general",
+                  parentSlug: c.parent_slug || c.parentSlug || existing?.parentSlug || undefined,
+                  seo: c.seo || existing?.seo || {}
+                };
+              });
+            // Combine with any disk items not in Supabase and NOT deleted
             const supaSlugs = new Set(supaConditions.map((c: any) => c.slug));
-            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug));
+            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug) && !deletedSlugs.has(d.slug));
             return NextResponse.json([...list, ...missingFromSupa]);
           }
         } catch {}
       }
 
       if (diskData.length > 0) {
-        return NextResponse.json(diskData);
+        return NextResponse.json(diskData.filter((d) => !deletedSlugs.has(d.slug)));
       }
       return NextResponse.json({ error: `File ${type}.json not found` }, { status: 404 });
     }

@@ -138,6 +138,7 @@ export interface SiteSettings {
   notifications?: EmailNotificationSettings;
   customSchemas?: CustomSchemaItem[];
   navigation?: HeaderFooterNavigation;
+  marketing?: Record<string, any>;
 }
 
 export interface SectionBlockConfig {

@@ -196,12 +196,26 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
 
     // 6. Navigation Custom Pages Discovery
     const siteSettings = await getSiteSettings().catch(() => null);
+    const deletedSlugs = new Set<string>();
+    if (typeof window !== "undefined") {
+      try {
+        const dRaw = localStorage.getItem("adm_deleted_slugs");
+        if (dRaw) JSON.parse(dRaw).forEach((s: string) => deletedSlugs.add(s));
+      } catch {}
+    }
+    if (siteSettings?.marketing?.deleted_slugs && Array.isArray(siteSettings.marketing.deleted_slugs)) {
+      siteSettings.marketing.deleted_slugs.forEach((s: string) => deletedSlugs.add(s));
+    }
+
     if (siteSettings?.navigation?.header?.menu) {
       const scanNav = (items: any[]) => {
         items.forEach((item: any) => {
           if (item.href && item.href.startsWith("/") && !item.href.includes("#")) {
             const cleanPath = item.href.split("?")[0];
-            if (!routes.some((r) => r.path === cleanPath)) {
+            const isDel = Array.from(deletedSlugs).some((d) => 
+              cleanPath === `/conditions/${d}` || cleanPath === `/services/${d}` || cleanPath.endsWith(`/${d}`)
+            );
+            if (!isDel && !routes.some((r) => r.path === cleanPath)) {
               routes.push({
                 path: cleanPath,
                 name: `${item.label} (Custom Page)`,
@@ -222,7 +236,20 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
     console.warn("Error discovering dynamic site routes:", err);
   }
 
-  return routes;
+  // Filter out any route matching deleted slugs
+  const finalDeletedSlugs = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const dRaw = localStorage.getItem("adm_deleted_slugs");
+      if (dRaw) JSON.parse(dRaw).forEach((s: string) => finalDeletedSlugs.add(s));
+    } catch {}
+  }
+
+  return routes.filter((r) => {
+    return !Array.from(finalDeletedSlugs).some((d) => 
+      r.path === `/conditions/${d}` || r.path === `/services/${d}` || r.path.endsWith(`/${d}`)
+    );
+  });
 }
 
 /**

@@ -188,6 +188,15 @@ export default function AdminConditionsPage() {
       const fresh = await getConditions();
       let data = fresh.map(sanitizeConditionOrder);
       if (typeof window !== "undefined") {
+        let deletedSlugs: string[] = [];
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          if (dRaw) {
+            const parsedD = JSON.parse(dRaw);
+            if (Array.isArray(parsedD)) deletedSlugs = parsedD;
+          }
+        } catch {}
+
         const saved = localStorage.getItem("adm_conditions");
         if (saved) {
           try {
@@ -195,8 +204,9 @@ export default function AdminConditionsPage() {
             if (Array.isArray(parsed) && parsed.length > 0) {
               if (fresh.length > 0) {
                 const map = new Map<string, Condition>();
-                fresh.forEach((c) => map.set(c.slug, c));
+                fresh.filter((c) => !deletedSlugs.includes(c.slug)).forEach((c) => map.set(c.slug, c));
                 parsed.forEach((p) => {
+                  if (deletedSlugs.includes(p.slug)) return;
                   if (map.has(p.slug)) {
                     map.set(p.slug, { ...map.get(p.slug)!, ...p });
                   } else {
@@ -204,13 +214,14 @@ export default function AdminConditionsPage() {
                     map.set(p.slug, p);
                   }
                 });
-                data = Array.from(map.values()).map(sanitizeConditionOrder);
+                data = Array.from(map.values()).filter((c) => !deletedSlugs.includes(c.slug)).map(sanitizeConditionOrder);
               } else {
-                data = parsed.map(sanitizeConditionOrder);
+                data = parsed.filter((c: any) => !deletedSlugs.includes(c.slug)).map(sanitizeConditionOrder);
               }
             }
           } catch {}
         }
+        data = data.filter((c) => !deletedSlugs.includes(c.slug));
         localStorage.setItem("adm_conditions", JSON.stringify(data));
         window.dispatchEvent(new Event("conditionsUpdated"));
       }
@@ -437,19 +448,37 @@ export default function AdminConditionsPage() {
     const { slug, title } = deleteTarget;
 
     try {
+      // 1. Immediately record in adm_deleted_slugs in localStorage
+      if (typeof window !== "undefined") {
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          const arr: string[] = dRaw ? JSON.parse(dRaw) : [];
+          if (!arr.includes(slug)) {
+            arr.push(slug);
+            localStorage.setItem("adm_deleted_slugs", JSON.stringify(arr));
+          }
+        } catch {}
+      }
+
+      // 2. Delete from Supabase
       if (isSupabaseConfigured && supabase) {
         try {
           await supabase.from("conditions").delete().eq("slug", slug);
           await supabase.from("conditions").delete().eq("id", slug);
+          await supabase.from("conditions").delete().eq("id", `cnd-${slug}`);
         } catch (e) {
           console.warn("Supabase delete condition error:", e);
         }
       }
+
+      // 3. Update conditions state & localStorage
       const updated = conditions.filter((c) => c.slug !== slug);
       if (typeof window !== "undefined") {
         localStorage.setItem("adm_conditions", JSON.stringify(updated));
         window.dispatchEvent(new Event("conditionsUpdated"));
       }
+
+      // 4. Save to content API with deletedSlug
       try {
         await fetch("/api/admin/save-content", {
           method: "POST",
@@ -458,16 +487,27 @@ export default function AdminConditionsPage() {
         });
       } catch {}
 
-      // Also remove this condition from Navigation in localStorage adm_settings & dispatch
+      // 5. Clean up Navigation & SEO pages in adm_settings & sync to backend
       try {
         const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
+        let currentSettings: any = null;
         if (savedSettingsRaw) {
-          const currentSettings = JSON.parse(savedSettingsRaw);
+          try {
+            const p = JSON.parse(savedSettingsRaw);
+            currentSettings = p.settings || p;
+          } catch {}
+        }
+        if (!currentSettings) {
+          const sRes = await fetch("/api/content?type=settings");
+          if (sRes.ok) currentSettings = await sRes.json();
+        }
+
+        if (currentSettings) {
           const filterNav = (items: any[]): any[] => {
             if (!Array.isArray(items)) return [];
             return items
               .filter((item) => {
-                const idMatches = item.id === `cnd-${slug}`;
+                const idMatches = item.id === `cnd-${slug}` || item.id === slug;
                 const hrefMatches = item.href && (item.href === `/conditions/${slug}` || item.href.endsWith(`/${slug}`));
                 return !idMatches && !hrefMatches;
               })
@@ -489,16 +529,43 @@ export default function AdminConditionsPage() {
             }));
           }
 
-          localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
-          window.dispatchEvent(new Event("settingsUpdated"));
+          // Clean SEO pages for this condition
+          if (currentSettings.seo?.pages) {
+            const cleanedPages: Record<string, any> = {};
+            Object.keys(currentSettings.seo.pages).forEach((key) => {
+              if (key !== `/conditions/${slug}` && !key.endsWith(`/${slug}`)) {
+                cleanedPages[key] = currentSettings.seo.pages[key];
+              }
+            });
+            currentSettings.seo.pages = cleanedPages;
+          }
+
+          // Record in marketing.deleted_slugs
+          if (!currentSettings.marketing) currentSettings.marketing = {};
+          const curD = Array.isArray(currentSettings.marketing.deleted_slugs) ? currentSettings.marketing.deleted_slugs : [];
+          if (!curD.includes(slug)) {
+            currentSettings.marketing.deleted_slugs = [...curD, slug];
+          }
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+            window.dispatchEvent(new Event("settingsUpdated"));
+          }
+
+          // Authoritative save to backend so Header/Footer & SEO tab never resurrect this item
+          await fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "settings", data: currentSettings })
+          });
         }
       } catch (navErr) {
-        console.warn("Client navigation clean error on delete condition:", navErr);
+        console.warn("Client navigation/seo clean error on delete condition:", navErr);
       }
 
       setConditions(updated);
       setEditingCondition(null);
-      setToastMessage(`✓ Condition "${title}" permanently deleted and removed from navigation!`);
+      setToastMessage(`✓ Condition "${title}" permanently deleted from site and navigation!`);
     } catch (err: any) {
       console.error("Delete condition failed:", err);
       alert("⚠️ Error deleting: " + (err.message || err));

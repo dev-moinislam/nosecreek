@@ -109,11 +109,37 @@ function getFreshConditionsData(): Condition[] {
   return conditionsList;
 }
 
+async function getDeletedSlugsSet(): Promise<Set<string>> {
+  const set = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const local = localStorage.getItem("adm_deleted_slugs");
+      if (local) {
+        const arr = JSON.parse(local);
+        if (Array.isArray(arr)) arr.forEach((s: string) => set.add(s));
+      }
+    } catch {}
+  }
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("marketing")
+        .eq("id", "main")
+        .maybeSingle();
+      const arr = data?.marketing?.deleted_slugs;
+      if (Array.isArray(arr)) arr.forEach((s: string) => set.add(s));
+    } catch {}
+  }
+  return set;
+}
+
 /**
  * Clinic Services
  */
 export async function getServices(): Promise<Service[]> {
-  const currentList = getFreshServicesData();
+  const deletedSlugs = await getDeletedSlugsSet();
+  const currentList = getFreshServicesData().filter((s) => !deletedSlugs.has(s.slug));
 
   if (isSupabaseConfigured && supabase) {
     try {
@@ -124,44 +150,46 @@ export async function getServices(): Promise<Service[]> {
         .order("sort_order", { ascending: true });
       if (!error && data) {
         // Authoritative mapping from Supabase database rows + local disk items
-        const list = data.map((d: any) => {
-          const localItem = currentList.find((s) => s.slug === d.slug);
-          return {
-            id: d.id,
-            slug: d.slug,
-            title: d.title,
-            shortDescription: d.short_description || localItem?.shortDescription || "",
-            description: d.description || localItem?.description || "",
-            heroImage: d.hero_image || localItem?.heroImage,
-            heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
-            sideImage: d.side_image || localItem?.sideImage,
-            sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
-            cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
-            cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
-            iconType: d.icon_type || localItem?.iconType,
-            iconBg: d.icon_bg || localItem?.iconBg,
-            iconColor: d.icon_color || localItem?.iconColor,
-            ctaText: d.cta_text || localItem?.ctaText,
-            ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
-            benefits: d.benefits || localItem?.benefits || [],
-            symptoms: d.symptoms || localItem?.symptoms || [],
-            treatmentApproach: d.treatment_approach || localItem?.treatmentApproach || [],
-            customSections: d.custom_sections || localItem?.customSections || [],
-            sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || localItem?.sectionsData || {},
-            faqs: d.faqs || localItem?.faqs || [],
-            hiddenSections: d.hidden_sections || localItem?.hiddenSections || [],
-            sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
-            relatedServices: d.related_services || localItem?.relatedServices || [],
-            relatedConditions: d.related_conditions || localItem?.relatedConditions || [],
-            teamMembers: d.team_members || localItem?.teamMembers || [],
-            locations: d.locations || localItem?.locations || [],
-            testimonials: d.testimonials || localItem?.testimonials || [],
-            parentSlug: d.parent_slug || d.seo?.parentSlug || d.seo?.parent_slug || localItem?.parentSlug || undefined,
-            seo: d.seo || localItem?.seo || {}
-          };
-        });
+        const list = data
+          .filter((d: any) => !deletedSlugs.has(d.slug))
+          .map((d: any) => {
+            const localItem = currentList.find((s) => s.slug === d.slug);
+            return {
+              id: d.id,
+              slug: d.slug,
+              title: d.title,
+              shortDescription: d.short_description || localItem?.shortDescription || "",
+              description: d.description || localItem?.description || "",
+              heroImage: d.hero_image || localItem?.heroImage,
+              heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
+              sideImage: d.side_image || localItem?.sideImage,
+              sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
+              cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
+              cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
+              iconType: d.icon_type || localItem?.iconType,
+              iconBg: d.icon_bg || localItem?.iconBg,
+              iconColor: d.icon_color || localItem?.iconColor,
+              ctaText: d.cta_text || localItem?.ctaText,
+              ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
+              benefits: d.benefits || localItem?.benefits || [],
+              symptoms: d.symptoms || localItem?.symptoms || [],
+              treatmentApproach: d.treatment_approach || localItem?.treatmentApproach || [],
+              customSections: d.custom_sections || localItem?.customSections || [],
+              sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || localItem?.sectionsData || {},
+              faqs: d.faqs || localItem?.faqs || [],
+              hiddenSections: d.hidden_sections || localItem?.hiddenSections || [],
+              sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
+              relatedServices: d.related_services || localItem?.relatedServices || [],
+              relatedConditions: d.related_conditions || localItem?.relatedConditions || [],
+              teamMembers: d.team_members || localItem?.teamMembers || [],
+              locations: d.locations || localItem?.locations || [],
+              testimonials: d.testimonials || localItem?.testimonials || [],
+              parentSlug: d.parent_slug || d.seo?.parentSlug || d.seo?.parent_slug || localItem?.parentSlug || undefined,
+              seo: d.seo || localItem?.seo || {}
+            };
+          });
         const supaSlugs = new Set(data.map((d: any) => d.slug));
-        const missingLocal = currentList.filter((s) => !supaSlugs.has(s.slug));
+        const missingLocal = currentList.filter((s) => !supaSlugs.has(s.slug) && !deletedSlugs.has(s.slug));
         return [...list, ...missingLocal];
       }
     } catch (e) {
@@ -175,7 +203,7 @@ export async function getServices(): Promise<Service[]> {
       const res = await fetch("/api/content?type=services", { cache: "no-store" });
       if (res.ok) {
         const list = await res.json();
-        if (Array.isArray(list)) return list;
+        if (Array.isArray(list)) return list.filter((s: Service) => !deletedSlugs.has(s.slug));
       }
     } catch {}
   }
@@ -186,6 +214,8 @@ export async function getServices(): Promise<Service[]> {
 export async function getServiceBySlug(slugInput: string | string[]): Promise<Service | undefined> {
   const fullSlug = Array.isArray(slugInput) ? slugInput.join("/") : slugInput;
   const leafSlug = Array.isArray(slugInput) ? slugInput[slugInput.length - 1] : slugInput;
+  const deletedSlugs = await getDeletedSlugsSet();
+  if (deletedSlugs.has(fullSlug) || deletedSlugs.has(leafSlug)) return undefined;
 
   if (isSupabaseConfigured && supabase) {
     try {
@@ -423,7 +453,8 @@ export async function getLocationBySlug(slug: string): Promise<Location | undefi
  * Treatable Conditions
  */
 export async function getConditions(): Promise<Condition[]> {
-  const currentList = getFreshConditionsData();
+  const deletedSlugs = await getDeletedSlugsSet();
+  const currentList = getFreshConditionsData().filter((c) => !deletedSlugs.has(c.slug));
 
   if (isSupabaseConfigured && supabase) {
     try {
@@ -433,41 +464,43 @@ export async function getConditions(): Promise<Condition[]> {
         .eq("is_published", true)
         .order("sort_order", { ascending: true });
       if (!error && data) {
-        const list = data.map((d: any) => {
-          const localItem = currentList.find((c) => c.slug === d.slug);
-          return {
-            id: d.id,
-            slug: d.slug,
-            name: d.name,
-            shortDescription: d.short_description || localItem?.shortDescription || "",
-            description: d.description || localItem?.description || "",
-            heroImage: d.hero_image || localItem?.heroImage,
-            heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
-            sideImage: d.side_image || localItem?.sideImage,
-            sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
-            cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
-            cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
-            ctaText: d.cta_text || localItem?.ctaText,
-            ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
-            benefits: d.benefits || localItem?.benefits || [],
-            symptoms: d.symptoms || localItem?.symptoms || [],
-            treatmentApproach: d.treatment_approach || localItem?.treatmentApproach || [],
-            customSections: d.custom_sections || localItem?.customSections || [],
-            sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || localItem?.sectionsData || {},
-            faqs: d.faqs || localItem?.faqs || [],
-            hiddenSections: d.hidden_sections || localItem?.hiddenSections || [],
-            sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
-            relatedServices: d.related_services || localItem?.relatedServices || [],
-            category: d.category || localItem?.category || "general",
-            parentSlug: d.parent_slug || d.seo?.parentSlug || d.seo?.parent_slug || localItem?.parentSlug || undefined,
-            iconType: d.icon_type || d.iconType || localItem?.iconType,
-            iconBg: d.icon_bg || d.iconBg || localItem?.iconBg,
-            iconColor: d.icon_color || d.iconColor || localItem?.iconColor,
-            seo: d.seo || localItem?.seo || {}
-          };
-        });
+        const list = data
+          .filter((d: any) => !deletedSlugs.has(d.slug))
+          .map((d: any) => {
+            const localItem = currentList.find((c) => c.slug === d.slug);
+            return {
+              id: d.id,
+              slug: d.slug,
+              name: d.name,
+              shortDescription: d.short_description || localItem?.shortDescription || "",
+              description: d.description || localItem?.description || "",
+              heroImage: d.hero_image || localItem?.heroImage,
+              heroImageAlt: d.hero_image_alt || d.seo?.heroImageAlt || localItem?.heroImageAlt || localItem?.seo?.heroImageAlt || "",
+              sideImage: d.side_image || localItem?.sideImage,
+              sideImageAlt: d.side_image_alt || d.seo?.sideImageAlt || localItem?.sideImageAlt || localItem?.seo?.sideImageAlt || "",
+              cardImage: d.card_image || d.cardImage || d.seo?.cardImage || null,
+              cardImageAlt: d.card_image_alt || d.seo?.cardImageAlt || localItem?.cardImageAlt || localItem?.seo?.cardImageAlt || "",
+              ctaText: d.cta_text || localItem?.ctaText,
+              ctaMuted: d.cta_muted ?? localItem?.ctaMuted,
+              benefits: d.benefits || localItem?.benefits || [],
+              symptoms: d.symptoms || localItem?.symptoms || [],
+              treatmentApproach: d.treatment_approach || localItem?.treatmentApproach || [],
+              customSections: d.custom_sections || localItem?.customSections || [],
+              sectionsData: d.sections_data || d.seo?.sectionsData || d.sectionsData || localItem?.sectionsData || {},
+              faqs: d.faqs || localItem?.faqs || [],
+              hiddenSections: d.hidden_sections || localItem?.hiddenSections || [],
+              sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
+              relatedServices: d.related_services || localItem?.relatedServices || [],
+              category: d.category || localItem?.category || "general",
+              parentSlug: d.parent_slug || d.seo?.parentSlug || d.seo?.parent_slug || localItem?.parentSlug || undefined,
+              iconType: d.icon_type || d.iconType || localItem?.iconType,
+              iconBg: d.icon_bg || d.iconBg || localItem?.iconBg,
+              iconColor: d.icon_color || d.iconColor || localItem?.iconColor,
+              seo: d.seo || localItem?.seo || {}
+            };
+          });
         const supaSlugs = new Set(data.map((d: any) => d.slug));
-        const missingLocal = currentList.filter((c) => !supaSlugs.has(c.slug));
+        const missingLocal = currentList.filter((c) => !supaSlugs.has(c.slug) && !deletedSlugs.has(c.slug));
         return [...list, ...missingLocal];
       }
     } catch (e) {
@@ -481,7 +514,7 @@ export async function getConditions(): Promise<Condition[]> {
       const res = await fetch("/api/content?type=conditions", { cache: "no-store" });
       if (res.ok) {
         const list = await res.json();
-        if (Array.isArray(list)) return list;
+        if (Array.isArray(list)) return list.filter((c: Condition) => !deletedSlugs.has(c.slug));
       }
     } catch {}
   }
@@ -492,6 +525,8 @@ export async function getConditions(): Promise<Condition[]> {
 export async function getConditionBySlug(slugInput: string | string[]): Promise<Condition | undefined> {
   const fullSlug = Array.isArray(slugInput) ? slugInput.join("/") : slugInput;
   const leafSlug = Array.isArray(slugInput) ? slugInput[slugInput.length - 1] : slugInput;
+  const deletedSlugs = await getDeletedSlugsSet();
+  if (deletedSlugs.has(fullSlug) || deletedSlugs.has(leafSlug)) return undefined;
 
   if (isSupabaseConfigured && supabase) {
     try {

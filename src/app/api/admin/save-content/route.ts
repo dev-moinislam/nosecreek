@@ -225,15 +225,9 @@ export async function POST(req: Request) {
       }
     }
 
-    // Clean up deleted service/condition from navigation in settings.json and Supabase site_settings
+    // Clean up deleted service/condition from navigation, SEO pages, and record in deleted_slugs
     if (deletedSlug && (type === "services" || type === "conditions")) {
       try {
-        const settingsFilePath = path.resolve(process.cwd(), "src/data/settings.json");
-        let settingsData: any = null;
-        if (fs.existsSync(settingsFilePath)) {
-          settingsData = JSON.parse(fs.readFileSync(settingsFilePath, "utf-8"));
-        }
-
         const filterNavItems = (items: any[]): any[] => {
           if (!Array.isArray(items)) return [];
           return items
@@ -248,48 +242,97 @@ export async function POST(req: Request) {
             }));
         };
 
-        let settingsChanged = false;
-        if (settingsData?.navigation) {
-          if (Array.isArray(settingsData.navigation.header?.menu)) {
-            settingsData.navigation.header.menu = filterNavItems(settingsData.navigation.header.menu);
-            settingsChanged = true;
-          }
-          if (Array.isArray(settingsData.navigation.footer?.columns)) {
-            settingsData.navigation.footer.columns = settingsData.navigation.footer.columns.map((col: any) => ({
-              ...col,
-              links: Array.isArray(col.links)
-                ? col.links.filter((l: any) => !(l.href && (l.href === `/${type}/${deletedSlug}` || l.href.endsWith(`/${deletedSlug}`))))
-                : []
-            }));
-            settingsChanged = true;
-          }
-        }
+        const filterFooterCols = (columns: any[]): any[] => {
+          if (!Array.isArray(columns)) return [];
+          return columns.map((col: any) => ({
+            ...col,
+            links: Array.isArray(col.links)
+              ? col.links.filter((l: any) => !(l.href && (l.href === `/${type}/${deletedSlug}` || l.href.endsWith(`/${deletedSlug}`))))
+              : []
+          }));
+        };
 
-        if (settingsChanged) {
+        const filterSeoPages = (pages: Record<string, any>): Record<string, any> => {
+          if (!pages || typeof pages !== "object") return {};
+          const nextPages: Record<string, any> = {};
+          Object.keys(pages).forEach((key) => {
+            if (key !== `/${type}/${deletedSlug}` && !key.endsWith(`/${deletedSlug}`)) {
+              nextPages[key] = pages[key];
+            }
+          });
+          return nextPages;
+        };
+
+        // 1. Update local settings.json if exists
+        const settingsFilePath = path.resolve(process.cwd(), "src/data/settings.json");
+        if (fs.existsSync(settingsFilePath)) {
           try {
+            const settingsData = JSON.parse(fs.readFileSync(settingsFilePath, "utf-8"));
+            if (settingsData?.navigation) {
+              if (Array.isArray(settingsData.navigation.header?.menu)) {
+                settingsData.navigation.header.menu = filterNavItems(settingsData.navigation.header.menu);
+              }
+              if (Array.isArray(settingsData.navigation.footer?.columns)) {
+                settingsData.navigation.footer.columns = filterFooterCols(settingsData.navigation.footer.columns);
+              }
+            }
+            if (settingsData?.seo?.pages) {
+              settingsData.seo.pages = filterSeoPages(settingsData.seo.pages);
+            }
+            if (!settingsData.marketing) settingsData.marketing = {};
+            const curDeleted = Array.isArray(settingsData.marketing.deleted_slugs) ? settingsData.marketing.deleted_slugs : [];
+            if (!curDeleted.includes(deletedSlug)) {
+              settingsData.marketing.deleted_slugs = [...curDeleted, deletedSlug];
+            }
             fs.writeFileSync(settingsFilePath, JSON.stringify(settingsData, null, 2), "utf-8");
           } catch (sfErr) {
             console.warn("[save-content] settings.json write skipped on read-only system.");
           }
+        }
 
-          if (isSupabaseConfigured && supabase) {
-            try {
-              const { data: cur } = await supabase.from("site_settings").select("marketing").eq("id", "main").maybeSingle();
-              const updatedMarketing = {
-                ...(cur?.marketing || {}),
-                navigation: settingsData.navigation
+        // 2. Authoritative Supabase site_settings cleanup & deleted_slugs recording
+        if (isSupabaseConfigured && supabase) {
+          try {
+            const { data: curRow } = await supabase.from("site_settings").select("*").eq("id", "main").maybeSingle();
+            if (curRow) {
+              const curMarketing = curRow.marketing || {};
+              const curNav = curMarketing.navigation || curRow.navigation || {};
+              const curDeleted = Array.isArray(curMarketing.deleted_slugs) ? curMarketing.deleted_slugs : [];
+              const updatedDeleted = curDeleted.includes(deletedSlug) ? curDeleted : [...curDeleted, deletedSlug];
+
+              const cleanedHeaderMenu = filterNavItems(curNav.header?.menu || []);
+              const cleanedFooterCols = filterFooterCols(curNav.footer?.columns || []);
+              const cleanedNav = {
+                ...curNav,
+                header: { ...(curNav.header || {}), menu: cleanedHeaderMenu },
+                footer: { ...(curNav.footer || {}), columns: cleanedFooterCols }
               };
+
+              const curSeo = curRow.seo || {};
+              const cleanedSeoPages = filterSeoPages(curSeo.pages || {});
+
               await supabase
                 .from("site_settings")
-                .update({ marketing: updatedMarketing })
+                .update({
+                  marketing: {
+                    ...curMarketing,
+                    deleted_slugs: updatedDeleted,
+                    navigation: cleanedNav
+                  },
+                  seo: {
+                    ...curSeo,
+                    pages: cleanedSeoPages
+                  },
+                  updated_at: new Date().toISOString()
+                })
                 .eq("id", "main");
-            } catch (supaNavErr) {
-              console.warn("Supabase navigation sync error on delete:", supaNavErr);
             }
+          } catch (supaNavErr) {
+            console.warn("Supabase navigation/seo sync error on delete:", supaNavErr);
           }
         }
       } catch (cleanNavErr) {
-        console.warn("Error cleaning up navigation references on delete:", cleanNavErr);
+        console.warn("Error cleaning up navigation/seo references on delete:", cleanNavErr);
       }
     }
 
@@ -369,9 +412,14 @@ export async function POST(req: Request) {
               ? incomingMarketing.navigation
               : existingMarketing.navigation);
 
+        const existingDeleted = Array.isArray(existingMarketing.deleted_slugs) ? existingMarketing.deleted_slugs : [];
+        const incomingDeleted = Array.isArray(incomingMarketing.deleted_slugs) ? incomingMarketing.deleted_slugs : [];
+        const mergedDeletedSlugs = Array.from(new Set([...existingDeleted, ...incomingDeleted]));
+
         const mergedMarketing = {
           ...existingMarketing,
           ...incomingMarketing,
+          deleted_slugs: mergedDeletedSlugs,
           customSchemas,
           notifications,
           navigation,

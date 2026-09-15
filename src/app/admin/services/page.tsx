@@ -187,6 +187,15 @@ export default function AdminServicesPage() {
         let list = fresh.map(sanitizeServiceOrder);
 
         if (typeof window !== "undefined") {
+          let deletedSlugs: string[] = [];
+          try {
+            const dRaw = localStorage.getItem("adm_deleted_slugs");
+            if (dRaw) {
+              const parsedD = JSON.parse(dRaw);
+              if (Array.isArray(parsedD)) deletedSlugs = parsedD;
+            }
+          } catch {}
+
           const saved = localStorage.getItem("adm_services");
           if (saved) {
             try {
@@ -195,8 +204,9 @@ export default function AdminServicesPage() {
                 // If fresh is available from Supabase, only keep items in fresh and overlay draft edits
                 if (fresh.length > 0) {
                   const map = new Map<string, Service>();
-                  fresh.forEach((f) => map.set(f.slug, f));
+                  fresh.filter((f) => !deletedSlugs.includes(f.slug)).forEach((f) => map.set(f.slug, f));
                   parsed.forEach((p) => {
+                    if (deletedSlugs.includes(p.slug)) return;
                     if (map.has(p.slug)) {
                       const serverItem = map.get(p.slug)!;
                       const cardImage = p.cardImage !== undefined ? (p.cardImage || null) : (serverItem.cardImage || null);
@@ -207,13 +217,14 @@ export default function AdminServicesPage() {
                       map.set(p.slug, p);
                     }
                   });
-                  list = Array.from(map.values()).map(sanitizeServiceOrder);
+                  list = Array.from(map.values()).filter((s) => !deletedSlugs.includes(s.slug)).map(sanitizeServiceOrder);
                 } else {
-                  list = parsed.map(sanitizeServiceOrder);
+                  list = parsed.filter((s: any) => !deletedSlugs.includes(s.slug)).map(sanitizeServiceOrder);
                 }
               }
             } catch {}
           }
+          list = list.filter((s) => !deletedSlugs.includes(s.slug));
           localStorage.setItem("adm_services", JSON.stringify(list));
           window.dispatchEvent(new Event("servicesUpdated"));
         }
@@ -450,20 +461,38 @@ export default function AdminServicesPage() {
     if (!deleteTarget) return;
     const { slug, title } = deleteTarget;
     try {
+      // 1. Record in adm_deleted_slugs immediately in localStorage
+      if (typeof window !== "undefined") {
+        try {
+          const dRaw = localStorage.getItem("adm_deleted_slugs");
+          const arr: string[] = dRaw ? JSON.parse(dRaw) : [];
+          if (!arr.includes(slug)) {
+            arr.push(slug);
+            localStorage.setItem("adm_deleted_slugs", JSON.stringify(arr));
+          }
+        } catch {}
+      }
+
+      // 2. Delete from Supabase
       if (isSupabaseConfigured && supabase) {
         try {
           await supabase.from("services").delete().eq("slug", slug);
           await supabase.from("services").delete().eq("id", slug);
+          await supabase.from("services").delete().eq("id", `srv-${slug}`);
         } catch (e) {
           console.warn("Supabase delete error:", e);
         }
       }
+
+      // 3. Update local state & localStorage
       const remaining = services.filter((s) => s.slug !== slug);
       setServices(remaining);
       if (typeof window !== "undefined") {
         localStorage.setItem("adm_services", JSON.stringify(remaining));
         window.dispatchEvent(new Event("servicesUpdated"));
       }
+
+      // 4. Save to content API with deletedSlug
       try {
         await fetch("/api/admin/save-content", {
           method: "POST",
@@ -472,16 +501,27 @@ export default function AdminServicesPage() {
         });
       } catch {}
 
-      // Also remove this service from Navigation in localStorage adm_settings & dispatch
+      // 5. Clean up Navigation & SEO pages in adm_settings & sync to backend
       try {
         const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
+        let currentSettings: any = null;
         if (savedSettingsRaw) {
-          const currentSettings = JSON.parse(savedSettingsRaw);
+          try {
+            const p = JSON.parse(savedSettingsRaw);
+            currentSettings = p.settings || p;
+          } catch {}
+        }
+        if (!currentSettings) {
+          const sRes = await fetch("/api/content?type=settings");
+          if (sRes.ok) currentSettings = await sRes.json();
+        }
+
+        if (currentSettings) {
           const filterNav = (items: any[]): any[] => {
             if (!Array.isArray(items)) return [];
             return items
               .filter((item) => {
-                const idMatches = item.id === `srv-${slug}`;
+                const idMatches = item.id === `srv-${slug}` || item.id === slug;
                 const hrefMatches = item.href && (item.href === `/services/${slug}` || item.href.endsWith(`/${slug}`));
                 return !idMatches && !hrefMatches;
               })
@@ -503,15 +543,42 @@ export default function AdminServicesPage() {
             }));
           }
 
-          localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
-          window.dispatchEvent(new Event("settingsUpdated"));
+          // Clean SEO pages for this service
+          if (currentSettings.seo?.pages) {
+            const cleanedPages: Record<string, any> = {};
+            Object.keys(currentSettings.seo.pages).forEach((key) => {
+              if (key !== `/services/${slug}` && !key.endsWith(`/${slug}`)) {
+                cleanedPages[key] = currentSettings.seo.pages[key];
+              }
+            });
+            currentSettings.seo.pages = cleanedPages;
+          }
+
+          // Record in marketing.deleted_slugs
+          if (!currentSettings.marketing) currentSettings.marketing = {};
+          const curD = Array.isArray(currentSettings.marketing.deleted_slugs) ? currentSettings.marketing.deleted_slugs : [];
+          if (!curD.includes(slug)) {
+            currentSettings.marketing.deleted_slugs = [...curD, slug];
+          }
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+            window.dispatchEvent(new Event("settingsUpdated"));
+          }
+
+          // Authoritative save to backend so Header/Footer & SEO tab never resurrect this item
+          await fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "settings", data: currentSettings })
+          });
         }
       } catch (navErr) {
-        console.warn("Client navigation clean error on delete service:", navErr);
+        console.warn("Client navigation/seo clean error on delete service:", navErr);
       }
 
       setEditingService(null);
-      setToastMessage(`✓ Service "${title}" permanently deleted and removed from navigation!`);
+      setToastMessage(`✓ Service "${title}" permanently deleted from site and navigation!`);
     } catch (err: any) {
       console.error("Failed to delete service", err);
       alert("⚠️ Error deleting: " + (err.message || err));

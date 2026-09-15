@@ -53,9 +53,38 @@ export default function AdminSeoManagerPage() {
           })()
         ]);
 
-        setRoutes(allRoutes);
+        let deletedSlugs: string[] = [];
+        if (typeof window !== "undefined") {
+          try {
+            const dRaw = localStorage.getItem("adm_deleted_slugs");
+            if (dRaw) deletedSlugs = JSON.parse(dRaw);
+          } catch {}
+        }
+        const stDeleted = (fetchedSettings.marketing as any)?.deleted_slugs;
+        if (Array.isArray(stDeleted)) {
+          stDeleted.forEach((s: string) => {
+            if (!deletedSlugs.includes(s)) deletedSlugs.push(s);
+          });
+        }
+
+        const isDel = (path: string): boolean => {
+          return deletedSlugs.some((d) => 
+            path === `/conditions/${d}` || path === `/services/${d}` || path.endsWith(`/${d}`)
+          );
+        };
+
+        const activeRoutes = allRoutes.filter((r) => !isDel(r.path));
+        setRoutes(activeRoutes);
         setSettings(fetchedSettings);
-        setCustomPages(fetchedSettings.seo?.pages || {});
+
+        const pages = fetchedSettings.seo?.pages || {};
+        const cleanedPages: Record<string, any> = {};
+        Object.keys(pages).forEach((key) => {
+          if (!isDel(key)) {
+            cleanedPages[key] = pages[key];
+          }
+        });
+        setCustomPages(cleanedPages);
       } catch (err) {
         console.error("Error loading SEO data:", err);
       } finally {
@@ -64,6 +93,15 @@ export default function AdminSeoManagerPage() {
     }
 
     loadData();
+
+    window.addEventListener("conditionsUpdated", loadData);
+    window.addEventListener("servicesUpdated", loadData);
+    window.addEventListener("settingsUpdated", loadData);
+    return () => {
+      window.removeEventListener("conditionsUpdated", loadData);
+      window.removeEventListener("servicesUpdated", loadData);
+      window.removeEventListener("settingsUpdated", loadData);
+    };
   }, []);
 
   const categories = ["All", "Core Pages", "Clinical Services", "Conditions We Treat", "Blog Posts", "Team & Locations"];

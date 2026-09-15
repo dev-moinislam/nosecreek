@@ -334,17 +334,20 @@ export default function AdminNavigationPage() {
     let updatedConditions = [...conditionsList];
     let updatedServices = [...servicesList];
 
+    const allDeletedSlugs: string[] = [];
     for (const href of deletedHrefs) {
       const clean = href.trim().split("?")[0].split("#")[0];
       if (clean.startsWith("/conditions/")) {
         const parts = clean.replace("/conditions/", "").split("/").filter(Boolean);
         const slug = parts[parts.length - 1];
         if (slug) {
+          allDeletedSlugs.push(slug);
           updatedConditions = updatedConditions.filter((c) => c.slug !== slug);
           if (isSupabaseConfigured && supabase) {
             try {
               await supabase.from("conditions").delete().eq("slug", slug);
               await supabase.from("conditions").delete().eq("id", slug);
+              await supabase.from("conditions").delete().eq("id", `cnd-${slug}`);
             } catch {}
           }
           fetch("/api/admin/save-content", {
@@ -357,11 +360,13 @@ export default function AdminNavigationPage() {
         const parts = clean.replace("/services/", "").split("/").filter(Boolean);
         const slug = parts[parts.length - 1];
         if (slug) {
+          allDeletedSlugs.push(slug);
           updatedServices = updatedServices.filter((s) => s.slug !== slug);
           if (isSupabaseConfigured && supabase) {
             try {
               await supabase.from("services").delete().eq("slug", slug);
               await supabase.from("services").delete().eq("id", slug);
+              await supabase.from("services").delete().eq("id", `srv-${slug}`);
             } catch {}
           }
           fetch("/api/admin/save-content", {
@@ -371,6 +376,15 @@ export default function AdminNavigationPage() {
           }).catch(() => {});
         }
       }
+    }
+
+    if (allDeletedSlugs.length > 0 && typeof window !== "undefined") {
+      try {
+        const dRaw = localStorage.getItem("adm_deleted_slugs");
+        const existingDel: string[] = dRaw ? JSON.parse(dRaw) : [];
+        const mergedDel = Array.from(new Set([...existingDel, ...allDeletedSlugs]));
+        localStorage.setItem("adm_deleted_slugs", JSON.stringify(mergedDel));
+      } catch {}
     }
 
     if (updatedConditions.length !== conditionsList.length) {
@@ -419,13 +433,18 @@ export default function AdminNavigationPage() {
     setNavData(newNavData);
 
     // 4. Auto-persist navigation immediately
+    let parsedSettings: any = {};
     if (typeof window !== "undefined") {
       const local = localStorage.getItem("adm_settings");
-      let parsed = local ? JSON.parse(local) : {};
-      parsed.navigation = newNavData;
-      if (!parsed.marketing) parsed.marketing = {};
-      parsed.marketing.navigation = newNavData;
-      localStorage.setItem("adm_settings", JSON.stringify(parsed));
+      parsedSettings = local ? JSON.parse(local) : {};
+      parsedSettings.navigation = newNavData;
+      if (!parsedSettings.marketing) parsedSettings.marketing = {};
+      parsedSettings.marketing.navigation = newNavData;
+      if (allDeletedSlugs.length > 0) {
+        const curD = Array.isArray(parsedSettings.marketing.deleted_slugs) ? parsedSettings.marketing.deleted_slugs : [];
+        parsedSettings.marketing.deleted_slugs = Array.from(new Set([...curD, ...allDeletedSlugs]));
+      }
+      localStorage.setItem("adm_settings", JSON.stringify(parsedSettings));
       window.dispatchEvent(new Event("settingsUpdated"));
     }
 
@@ -436,8 +455,12 @@ export default function AdminNavigationPage() {
         type: "settings",
         data: {
           ...defaultSettings,
+          ...parsedSettings,
           navigation: newNavData,
-          marketing: { navigation: newNavData }
+          marketing: {
+            ...(parsedSettings.marketing || {}),
+            navigation: newNavData
+          }
         }
       })
     }).catch(() => {});
