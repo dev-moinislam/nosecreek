@@ -289,14 +289,6 @@
                 "label": "Pelvic Health",
                 "enabled": true,
                 "children": []
-              },
-              {
-                "id": "srv-all",
-                "href": "/services",
-                "badge": "Directory",
-                "label": "View All Services →",
-                "enabled": true,
-                "children": []
               }
             ]
           },
@@ -443,14 +435,6 @@
                     "children": []
                   }
                 ]
-              },
-              {
-                "id": "cnd-all",
-                "href": "/conditions",
-                "badge": "Overview",
-                "label": "Browse All Conditions →",
-                "enabled": true,
-                "children": []
               }
             ]
           },
@@ -756,14 +740,6 @@
               "label": "Pelvic Health",
               "enabled": true,
               "children": []
-            },
-            {
-              "id": "srv-all",
-              "href": "/services",
-              "badge": "Directory",
-              "label": "View All Services →",
-              "enabled": true,
-              "children": []
             }
           ]
         },
@@ -910,14 +886,6 @@
                   "children": []
                 }
               ]
-            },
-            {
-              "id": "cnd-all",
-              "href": "/conditions",
-              "badge": "Overview",
-              "label": "Browse All Conditions →",
-              "enabled": true,
-              "children": []
             }
           ]
         },

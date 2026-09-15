@@ -104,17 +104,26 @@ export default function AdminSeoManagerPage() {
     };
   }, []);
 
-  const categories = ["All", "Core Pages", "Clinical Services", "Conditions We Treat", "Blog Posts", "Team & Locations"];
+  const categories = ["All", "Core Pages", "Clinical Services", "Conditions We Treat", "Sub-Pages", "Blog Posts", "Team & Locations"];
 
   const filteredRoutes = routes.filter((r) => {
     const matchesCategory =
       activeCategory === "All" ||
       (activeCategory === "Team & Locations" ? r.category === "Team Members" || r.category === "Clinic Locations" : r.category === activeCategory);
 
+    const q = searchQuery.toLowerCase().trim();
+    const custom = customPages[r.path];
     const matchesSearch =
-      r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.path.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.defaultTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      !q ||
+      r.name.toLowerCase().includes(q) ||
+      r.path.toLowerCase().includes(q) ||
+      r.category.toLowerCase().includes(q) ||
+      (r.parentSlug && r.parentSlug.toLowerCase().includes(q)) ||
+      (r.parentName && r.parentName.toLowerCase().includes(q)) ||
+      r.defaultTitle.toLowerCase().includes(q) ||
+      r.defaultDescription.toLowerCase().includes(q) ||
+      (custom?.title && custom.title.toLowerCase().includes(q)) ||
+      (custom?.description && custom.description.toLowerCase().includes(q));
 
     return matchesCategory && matchesSearch;
   });
@@ -403,7 +412,20 @@ export default function AdminSeoManagerPage() {
                             ↗
                           </a>
                         </div>
-                        <div style={{ marginTop: 6 }}>
+                        <div style={{ marginTop: 6, display: "flex", flexWrap: "wrap", gap: 5 }}>
+                          {route.isSubPage && (
+                            <span style={{
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              padding: "2px 8px",
+                              borderRadius: 999,
+                              background: "#e0f2fe",
+                              color: "#0369a1",
+                              border: "1px solid #bae6fd"
+                            }}>
+                              ↳ Sub-page of {route.parentName || route.parentSlug}
+                            </span>
+                          )}
                           <span style={{
                             fontSize: 10.5,
                             fontWeight: 700,

@@ -188,9 +188,9 @@ export async function getServices(): Promise<Service[]> {
               seo: d.seo || localItem?.seo || {}
             };
           });
-        const supaSlugs = new Set(data.map((d: any) => d.slug));
-        const missingLocal = currentList.filter((s) => !supaSlugs.has(s.slug) && !deletedSlugs.has(s.slug));
-        return [...list, ...missingLocal];
+        if (data.length > 0) {
+          return list;
+        }
       }
     } catch (e) {
       console.warn("Supabase fetch failed for services, using local fallback", e);
@@ -499,9 +499,9 @@ export async function getConditions(): Promise<Condition[]> {
               seo: d.seo || localItem?.seo || {}
             };
           });
-        const supaSlugs = new Set(data.map((d: any) => d.slug));
-        const missingLocal = currentList.filter((c) => !supaSlugs.has(c.slug) && !deletedSlugs.has(c.slug));
-        return [...list, ...missingLocal];
+        if (data.length > 0) {
+          return list;
+        }
       }
     } catch (e) {
       console.warn("Supabase fetch failed for conditions, using local fallback", e);

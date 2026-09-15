@@ -49,9 +49,9 @@ function reconcileNavigationWithContent(
   const rootServices = services.filter((s) => !s.parentSlug && !isSlugDeleted(s.slug, `/services/${s.slug}`, `srv-${s.slug}`));
   const subServices = services.filter((s) => Boolean(s.parentSlug) && !isSlugDeleted(s.slug, `/services/${s.parentSlug}/${s.slug}`, `srv-${s.slug}`));
 
-  // Prune deleted or nonexistent services
+  // Prune deleted, directory "View All", or nonexistent services
   srvMenu.children = srvMenu.children.filter((c) => {
-    if (c.id === "srv-all" || c.href === "/services") return true;
+    if (c.id === "srv-all" || c.href === "/services" || c.label?.includes("View All")) return false;
     if (isSlugDeleted(undefined, c.href, c.id)) return false;
     const parts = (c.href || "").replace("/services/", "").split("/").filter(Boolean);
     const slug = parts[parts.length - 1];
@@ -62,19 +62,14 @@ function reconcileNavigationWithContent(
   rootServices.forEach((root) => {
     const rootHref = `/services/${root.slug}`;
     const targetId = `srv-${root.slug}`;
+    const cleanTitle = root.title.replace(/\s*subtopics?\b/gi, "").trim();
     const idx = srvMenu!.children!.findIndex((c) => c.id === targetId || c.href === rootHref || c.href?.endsWith(`/${root.slug}`));
     if (idx >= 0) {
-      srvMenu!.children![idx].label = root.title;
+      srvMenu!.children![idx].label = cleanTitle;
       srvMenu!.children![idx].href = rootHref;
       srvMenu!.children![idx].enabled = true;
     } else {
-      const viewAllIdx = srvMenu!.children!.findIndex((c) => c.id === "srv-all" || c.href === "/services");
-      const item: NavMenuItem = { id: targetId, label: root.title, href: rootHref, enabled: true, children: [] };
-      if (viewAllIdx >= 0) {
-        srvMenu!.children!.splice(viewAllIdx, 0, item);
-      } else {
-        srvMenu!.children!.push(item);
-      }
+      srvMenu!.children!.push({ id: targetId, label: cleanTitle, href: rootHref, enabled: true, children: [] });
     }
   });
 
@@ -82,15 +77,16 @@ function reconcileNavigationWithContent(
   subServices.forEach((sub) => {
     const subHref = `/services/${sub.parentSlug}/${sub.slug}`;
     const targetId = `srv-${sub.slug}`;
+    const cleanTitle = sub.title.replace(/\s*subtopics?\b/gi, "").trim();
     const parent = srvMenu!.children!.find((c) => c.id === `srv-${sub.parentSlug}` || c.href === `/services/${sub.parentSlug}` || c.href?.endsWith(`/${sub.parentSlug}`));
     if (parent) {
       if (!Array.isArray(parent.children)) parent.children = [];
       const subIdx = parent.children.findIndex((c) => c.id === targetId || c.href === subHref || c.href?.endsWith(`/${sub.slug}`));
       if (subIdx >= 0) {
-        parent.children[subIdx].label = sub.title;
+        parent.children[subIdx].label = cleanTitle;
         parent.children[subIdx].href = subHref;
       } else {
-        parent.children.push({ id: targetId, label: sub.title, href: subHref, enabled: true, children: [] });
+        parent.children.push({ id: targetId, label: cleanTitle, href: subHref, enabled: true, children: [] });
       }
     }
   });
@@ -107,9 +103,9 @@ function reconcileNavigationWithContent(
   const rootConditions = conditions.filter((c) => !c.parentSlug && !isSlugDeleted(c.slug, `/conditions/${c.slug}`, `cnd-${c.slug}`));
   const subConditions = conditions.filter((c) => Boolean(c.parentSlug) && !isSlugDeleted(c.slug, `/conditions/${c.parentSlug}/${c.slug}`, `cnd-${c.slug}`));
 
-  // Prune deleted or nonexistent conditions
+  // Prune deleted, directory "Browse All", or nonexistent conditions
   condMenu.children = condMenu.children.filter((c) => {
-    if (c.id === "cnd-all" || c.href === "/conditions") return true;
+    if (c.id === "cnd-all" || c.href === "/conditions" || c.label?.includes("Browse All")) return false;
     if (isSlugDeleted(undefined, c.href, c.id)) return false;
     const parts = (c.href || "").replace("/conditions/", "").split("/").filter(Boolean);
     const slug = parts[parts.length - 1];
@@ -120,19 +116,14 @@ function reconcileNavigationWithContent(
   rootConditions.forEach((root) => {
     const rootHref = `/conditions/${root.slug}`;
     const targetId = `cnd-${root.slug}`;
+    const cleanName = root.name.replace(/\s*subtopics?\b/gi, "").trim();
     const idx = condMenu!.children!.findIndex((c) => c.id === targetId || c.href === rootHref || c.href?.endsWith(`/${root.slug}`));
     if (idx >= 0) {
-      condMenu!.children![idx].label = root.name;
+      condMenu!.children![idx].label = cleanName;
       condMenu!.children![idx].href = rootHref;
       condMenu!.children![idx].enabled = true;
     } else {
-      const viewAllIdx = condMenu!.children!.findIndex((c) => c.id === "cnd-all" || c.href === "/conditions");
-      const item: NavMenuItem = { id: targetId, label: root.name, href: rootHref, enabled: true, children: [] };
-      if (viewAllIdx >= 0) {
-        condMenu!.children!.splice(viewAllIdx, 0, item);
-      } else {
-        condMenu!.children!.push(item);
-      }
+      condMenu!.children!.push({ id: targetId, label: cleanName, href: rootHref, enabled: true, children: [] });
     }
   });
 
@@ -140,6 +131,7 @@ function reconcileNavigationWithContent(
   subConditions.forEach((sub) => {
     const subHref = `/conditions/${sub.parentSlug}/${sub.slug}`;
     const targetId = `cnd-${sub.slug}`;
+    const cleanName = sub.name.replace(/\s*subtopics?\b/gi, "").trim();
     const parent = condMenu!.children!.find((c) => c.id === `cnd-${sub.parentSlug}` || c.href === `/conditions/${sub.parentSlug}` || c.href?.endsWith(`/${sub.parentSlug}`));
     if (parent) {
       if (!Array.isArray(parent.children)) parent.children = [];
@@ -152,13 +144,14 @@ function reconcileNavigationWithContent(
 
       const subIdx = parent.children.findIndex((c) => c.id === targetId || c.href === subHref || c.href?.endsWith(`/${sub.slug}`));
       if (subIdx >= 0) {
-        parent.children[subIdx].label = sub.name;
+        parent.children[subIdx].label = cleanName;
         parent.children[subIdx].href = subHref;
       } else {
-        parent.children.push({ id: targetId, label: sub.name, href: subHref, enabled: true, children: [] });
+        parent.children.push({ id: targetId, label: cleanName, href: subHref, enabled: true, children: [] });
       }
     }
   });
+
 
   // 3. RECONCILE FOOTER COLUMNS
   const srvCol = nav.footer.columns.find((c) => c.id === "ft-col-services" || c.title?.toLowerCase().includes("service"));

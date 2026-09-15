@@ -131,10 +131,7 @@ export async function GET(req: Request) {
                   seo: s.seo || existing?.seo || {}
                 };
               });
-            // Combine with any disk items not in Supabase and NOT deleted
-            const supaSlugs = new Set(supaServices.map((s: any) => s.slug));
-            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug) && !deletedSlugs.has(d.slug));
-            return NextResponse.json([...list, ...missingFromSupa]);
+            return NextResponse.json(list);
           }
         } catch {}
       }
@@ -146,7 +143,7 @@ export async function GET(req: Request) {
             .select("*")
             .eq("is_published", true)
             .order("sort_order", { ascending: true });
-          if (supaConditions) {
+          if (supaConditions && supaConditions.length > 0) {
             const list = supaConditions
               .filter((c: any) => !deletedSlugs.has(c.slug))
               .map((c: any) => {
@@ -180,10 +177,7 @@ export async function GET(req: Request) {
                   seo: c.seo || existing?.seo || {}
                 };
               });
-            // Combine with any disk items not in Supabase and NOT deleted
-            const supaSlugs = new Set(supaConditions.map((c: any) => c.slug));
-            const missingFromSupa = diskData.filter((d) => !supaSlugs.has(d.slug) && !deletedSlugs.has(d.slug));
-            return NextResponse.json([...list, ...missingFromSupa]);
+            return NextResponse.json(list);
           }
         } catch {}
       }

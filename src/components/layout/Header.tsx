@@ -8,6 +8,11 @@ import defaultConditionsData from "@/data/conditions.json";
 import defaultSettingsData from "@/data/settings.json";
 import { Service, Condition, SiteSettings, NavMenuItem } from "@/types/content";
 
+function cleanNavLabel(text?: string): string {
+  if (!text) return "";
+  return text.replace(/\s*subtopics?\b/gi, "").trim();
+}
+
 export default function Header() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -239,7 +244,9 @@ export default function Header() {
       };
 
       const validServiceSlugs = new Set(dynamicServices.map((s) => s.slug));
-      const existingChildren = (item.children ? [...item.children] : []).filter((c) => !isSvcDeleted(c.href, c.id));
+      const existingChildren = (item.children ? [...item.children] : []).filter(
+        (c) => !isSvcDeleted(c.href, c.id) && c.id !== "srv-all" && c.href !== "/services" && !c.label?.includes("View All")
+      );
       const rootServices = dynamicServices.filter((s) => !s.parentSlug && !deletedSlugs.includes(s.slug));
       const subServices = dynamicServices.filter((s) => Boolean(s.parentSlug) && !deletedSlugs.includes(s.slug));
 
@@ -256,19 +263,13 @@ export default function Header() {
             children: mergedChildren[idx].children ? [...mergedChildren[idx].children] : []
           };
         } else {
-          const viewAllIdx = mergedChildren.findIndex((c) => c.id === "srv-all" || c.href === "/services");
-          const newRootItem: NavMenuItem = {
+          mergedChildren.push({
             id: targetId,
             label: root.title,
             href: rootHref,
             enabled: true,
             children: []
-          };
-          if (viewAllIdx >= 0) {
-            mergedChildren.splice(viewAllIdx, 0, newRootItem);
-          } else {
-            mergedChildren.push(newRootItem);
-          }
+          });
         }
       });
 
@@ -342,7 +343,9 @@ export default function Header() {
       };
 
       const validConditionSlugs = new Set(dynamicConditions.map((c) => c.slug));
-      const existingChildren = (item.children ? [...item.children] : []).filter((c) => !isCondDeleted(c.href, c.id));
+      const existingChildren = (item.children ? [...item.children] : []).filter(
+        (c) => !isCondDeleted(c.href, c.id) && c.id !== "cnd-all" && c.href !== "/conditions" && !c.label?.includes("Browse All")
+      );
       const rootConditions = dynamicConditions.filter((c) => !c.parentSlug && !deletedSlugs.includes(c.slug));
       const subConditions = dynamicConditions.filter((c) => Boolean(c.parentSlug) && !deletedSlugs.includes(c.slug));
 
@@ -359,19 +362,13 @@ export default function Header() {
             children: mergedChildren[idx].children ? [...mergedChildren[idx].children] : []
           };
         } else {
-          const viewAllIdx = mergedChildren.findIndex((c) => c.id === "cnd-all" || c.href === "/conditions");
-          const newRootItem: NavMenuItem = {
+          mergedChildren.push({
             id: targetId,
             label: root.name,
             href: rootHref,
             enabled: true,
             children: []
-          };
-          if (viewAllIdx >= 0) {
-            mergedChildren.splice(viewAllIdx, 0, newRootItem);
-          } else {
-            mergedChildren.push(newRootItem);
-          }
+          });
         }
       });
 
@@ -532,11 +529,13 @@ export default function Header() {
                   onMouseEnter={() => setOpenDropdownId(item.id)}
                   onMouseLeave={() => setOpenDropdownId(null)}
                 >
-                  <button
-                    onClick={() => setOpenDropdownId(isOpen ? null : item.id)}
+                  <Link
+                    href={item.href || "#"}
+                    onClick={() => handleLinkClick(item.href)}
                     style={{
                       background: "none",
                       border: "none",
+                      textDecoration: "none",
                       padding: "6px 0",
                       fontFamily: "'Poppins',sans-serif",
                       fontWeight: active ? 700 : 600,
@@ -548,7 +547,7 @@ export default function Header() {
                       gap: 5,
                     }}
                   >
-                    <span>{item.label}</span>
+                    <span>{cleanNavLabel(item.label)}</span>
                     {item.badge && (
                       <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 10, background: "#e0f2fe", color: "#0284c7", fontWeight: 700 }}>
                         {item.badge}
@@ -557,7 +556,7 @@ export default function Header() {
                     <span className={`arrow-rotatable ${isOpen ? "rotated" : ""}`} style={{ fontSize: 10 }}>
                       ▼
                     </span>
-                  </button>
+                  </Link>
 
                   {/* Level 2 Dropdown Panel */}
                   {isOpen && (
@@ -616,7 +615,7 @@ export default function Header() {
                                 }
                               }}
                             >
-                              <span>{sub.label}</span>
+                              <span>{cleanNavLabel(sub.label)}</span>
                               {sub.badge && (
                                 <span style={{ fontSize: 9.5, padding: "1px 5px", borderRadius: 8, background: "#ecfdf5", color: "#059669", fontWeight: 700 }}>
                                   {sub.badge}
@@ -673,7 +672,7 @@ export default function Header() {
                                   flex: 1,
                                 }}
                               >
-                                {sub.label}
+                                {cleanNavLabel(sub.label)}
                               </Link>
                               <span style={{ fontSize: 13, color: "#94a3b8", marginLeft: 8, fontWeight: 700 }}>
                                 ›
@@ -682,9 +681,6 @@ export default function Header() {
 
                             {/* Level 3 Flyout Submenu */}
                             <div className="nav-level3-flyout">
-                              <div style={{ padding: "4px 10px 6px", fontSize: 11, fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: 0.5, borderBottom: "1px solid #f1f5f9", marginBottom: 4 }}>
-                                {sub.label} Subtopics
-                              </div>
                               {sub.children?.filter(nested => nested.enabled !== false).map((nested) => {
                                 const nestedActive = isItemActive(nested.href);
                                 return (
@@ -718,7 +714,7 @@ export default function Header() {
                                       }
                                     }}
                                   >
-                                    <span>{nested.label}</span>
+                                    <span>{cleanNavLabel(nested.label)}</span>
                                     {nested.badge && (
                                       <span style={{ fontSize: 9, padding: "1px 4px", borderRadius: 6, background: "#ecfdf5", color: "#059669", fontWeight: 700 }}>
                                         {nested.badge}
@@ -838,7 +834,7 @@ export default function Header() {
                       alignItems: "center",
                     }}
                   >
-                    <span>{item.label}</span>
+                    <span>{cleanNavLabel(item.label)}</span>
                     {item.badge && (
                       <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 8, background: "#e0f2fe", color: "#0284c7" }}>
                         {item.badge}
@@ -863,7 +859,7 @@ export default function Header() {
                         flex: 1,
                       }}
                     >
-                      {item.label}
+                      {cleanNavLabel(item.label)}
                     </Link>
                     <button
                       onClick={() => toggleMobileKey(item.id)}
@@ -874,7 +870,7 @@ export default function Header() {
                         fontWeight: 700,
                         cursor: "pointer",
                       }}
-                      aria-label={`Toggle ${item.label} sub-items`}
+                      aria-label={`Toggle ${cleanNavLabel(item.label)} sub-items`}
                     >
                       {isLevel1Open ? "−" : "+"}
                     </button>
@@ -906,7 +902,7 @@ export default function Header() {
                                 justifyContent: "space-between",
                               }}
                             >
-                              <span>{sub.label}</span>
+                              <span>{cleanNavLabel(sub.label)}</span>
                               {sub.badge && (
                                 <span style={{ fontSize: 9.5, padding: "1px 5px", borderRadius: 6, background: "#ecfdf5", color: "#059669" }}>
                                   {sub.badge}
@@ -932,7 +928,7 @@ export default function Header() {
                                   flex: 1,
                                 }}
                               >
-                                {sub.label}
+                                {cleanNavLabel(sub.label)}
                               </Link>
                               <button
                                 onClick={() => toggleMobileKey(sub.id)}
@@ -943,7 +939,7 @@ export default function Header() {
                                   fontWeight: 700,
                                   cursor: "pointer",
                                 }}
-                                aria-label={`Toggle ${sub.label} nested sub-items`}
+                                aria-label={`Toggle ${cleanNavLabel(sub.label)} nested sub-items`}
                               >
                                 {isLevel2Open ? "−" : "+"}
                               </button>
@@ -971,7 +967,7 @@ export default function Header() {
                                       }}
                                     >
                                       <span style={{ color: "#94a3b8" }}>↳</span>
-                                      <span>{nested.label}</span>
+                                      <span>{cleanNavLabel(nested.label)}</span>
                                     </Link>
                                   );
                                 })}

@@ -5,7 +5,10 @@ import { PageMetaItem } from "@/types/content";
 export interface SiteRouteInfo {
   path: string;
   name: string;
-  category: "Core Pages" | "Clinical Services" | "Conditions We Treat" | "Blog Posts" | "Team Members" | "Clinic Locations";
+  category: "Core Pages" | "Clinical Services" | "Conditions We Treat" | "Sub-Pages" | "Blog Posts" | "Team Members" | "Clinic Locations";
+  parentName?: string;
+  parentSlug?: string;
+  isSubPage?: boolean;
   defaultTitle: string;
   defaultDescription: string;
   defaultOgImage?: string;
@@ -114,48 +117,38 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
 
     // 1. Services
     services.forEach((s) => {
-      const canonicalPath = s.parentSlug ? `/services/${s.parentSlug}/${s.slug}` : `/services/${s.slug}`;
+      const isSub = Boolean(s.parentSlug);
+      const parentSvc = isSub ? services.find((p) => p.slug === s.parentSlug) : undefined;
+      const canonicalPath = isSub ? `/services/${s.parentSlug}/${s.slug}` : `/services/${s.slug}`;
       routes.push({
         path: canonicalPath,
-        name: s.parentSlug ? `${s.title} (Sub-Service)` : `${s.title} (Service)`,
-        category: "Clinical Services",
+        name: s.title,
+        category: isSub ? "Sub-Pages" : "Clinical Services",
+        parentSlug: s.parentSlug,
+        parentName: parentSvc?.title,
+        isSubPage: isSub,
         defaultTitle: s.seo?.title || `${s.title} Calgary North | Nose Creek Physiotherapy`,
         defaultDescription: s.seo?.description || s.shortDescription || `Expert ${s.title.toLowerCase()} care at Nose Creek Physiotherapy in Calgary.`,
         defaultOgImage: s.cardImage || s.heroImage || undefined
       });
-      if (s.parentSlug) {
-        routes.push({
-          path: `/services/${s.slug}`,
-          name: `${s.title} (Service Direct Link)`,
-          category: "Clinical Services",
-          defaultTitle: s.seo?.title || `${s.title} Calgary North | Nose Creek Physiotherapy`,
-          defaultDescription: s.seo?.description || s.shortDescription || `Expert ${s.title.toLowerCase()} care at Nose Creek Physiotherapy in Calgary.`,
-          defaultOgImage: s.cardImage || s.heroImage || undefined
-        });
-      }
     });
 
     // 2. Conditions
     conditions.forEach((c) => {
-      const canonicalPath = c.parentSlug ? `/conditions/${c.parentSlug}/${c.slug}` : `/conditions/${c.slug}`;
+      const isSub = Boolean(c.parentSlug);
+      const parentCond = isSub ? conditions.find((p) => p.slug === c.parentSlug) : undefined;
+      const canonicalPath = isSub ? `/conditions/${c.parentSlug}/${c.slug}` : `/conditions/${c.slug}`;
       routes.push({
         path: canonicalPath,
-        name: c.parentSlug ? `${c.name} (Sub-Condition)` : `${c.name} (Condition)`,
-        category: "Conditions We Treat",
+        name: c.name,
+        category: isSub ? "Sub-Pages" : "Conditions We Treat",
+        parentSlug: c.parentSlug,
+        parentName: parentCond?.name,
+        isSubPage: isSub,
         defaultTitle: c.seo?.title || `${c.name} Treatment Calgary | Nose Creek Physiotherapy`,
         defaultDescription: c.seo?.description || c.shortDescription || `Targeted evidence-based rehabilitation for ${c.name.toLowerCase()} in Calgary.`,
         defaultOgImage: c.cardImage || c.heroImage || undefined
       });
-      if (c.parentSlug) {
-        routes.push({
-          path: `/conditions/${c.slug}`,
-          name: `${c.name} (Condition Direct Link)`,
-          category: "Conditions We Treat",
-          defaultTitle: c.seo?.title || `${c.name} Treatment Calgary | Nose Creek Physiotherapy`,
-          defaultDescription: c.seo?.description || c.shortDescription || `Targeted evidence-based rehabilitation for ${c.name.toLowerCase()} in Calgary.`,
-          defaultOgImage: c.cardImage || c.heroImage || undefined
-        });
-      }
     });
 
     // 3. Blog Posts
