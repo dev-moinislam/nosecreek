@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { HomePageData, TeamMember, BlogPost, Service, Condition, Testimonial, ServiceCustomSection } from "@/types/content";
 import defaultHomeData from "@/data/home.json";
 import ConditionTiles from "@/components/ui/ConditionTiles";
@@ -161,16 +162,12 @@ export default function HomeLiveView({
               </div>
 
               <div style={{ position: "relative" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <OptimizedImage
                   src={heroImg ? heroImg.replace(/\.jpg$/, ".webp") : "/images/clinic/reception-desktop.webp"}
                   alt={(h as any)?.imageAlt || (homeData.hero as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
                   width={600}
                   height={450}
-                  loading="eager"
-                  decoding="async"
-                  // @ts-ignore
-                  fetchPriority="high"
+                  priority
                   style={{ width: "100%", height: "auto", borderRadius: 18, boxShadow: "0 24px 60px rgba(18,60,80,0.18)", objectFit: "cover", aspectRatio: "4/3" }}
                 />
                 <div style={{ position: "absolute", left: 18, bottom: -22, background: "#fff", borderRadius: 14, padding: "14px 18px", boxShadow: "0 14px 34px rgba(18,60,80,0.16)", display: "flex", alignItems: "center", gap: 12 }}>
@@ -276,18 +273,27 @@ export default function HomeLiveView({
           <section key="about_clinic" style={{ background: bg, color: textColor, padding: "clamp(56px,7vw,96px) 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: "clamp(32px,4vw,56px)", alignItems: "center" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={cfg?.image || "/images/clinic/clinic-mobile.jpg"} alt={cfg?.imageAlt || (homeData.aboutClinic as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
-                  loading="lazy" decoding="async"
-                  style={{ width: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "3/4", gridRow: "span 2" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/clinic/reception-three.jpg" alt="Nose Creek Physiotherapy Treatment Area Calgary"
-                  loading="lazy" decoding="async"
-                  style={{ width: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "4/3" }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/clinic/reception-four.jpg" alt="Nose Creek Physiotherapy Reception Desk Calgary"
-                  loading="lazy" decoding="async"
-                  style={{ width: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "4/3" }} />
+                <OptimizedImage
+                  src={cfg?.image || "/images/clinic/clinic-mobile.jpg"}
+                  alt={cfg?.imageAlt || (homeData.aboutClinic as any)?.imageAlt || "Nose Creek Physiotherapy Clinic Calgary"}
+                  width={300}
+                  height={400}
+                  style={{ width: "100%", height: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "3/4", gridRow: "span 2" }}
+                />
+                <OptimizedImage
+                  src="/images/clinic/reception-three.jpg"
+                  alt="Nose Creek Physiotherapy Treatment Area Calgary"
+                  width={300}
+                  height={225}
+                  style={{ width: "100%", height: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "4/3" }}
+                />
+                <OptimizedImage
+                  src="/images/clinic/reception-four.jpg"
+                  alt="Nose Creek Physiotherapy Reception Desk Calgary"
+                  width={300}
+                  height={225}
+                  style={{ width: "100%", height: "100%", borderRadius: 14, objectFit: "cover", aspectRatio: "4/3" }}
+                />
               </div>
               <div>
                 {eyebrow(eyebrowText, cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
@@ -327,14 +333,12 @@ export default function HomeLiveView({
           <section key="director" style={{ background: bg, color: textColor, padding: "clamp(56px,7vw,96px) 0" }}>
             <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: "clamp(32px,4vw,56px)", alignItems: "center" }}>
               <div style={{ textAlign: "center" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <OptimizedImage
                   src={image}
                   alt={(d as any)?.imageAlt || (homeData.director as any)?.imageAlt || `${title}, ${role}`}
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  style={{ width: "min(300px,80%)", aspectRatio: "1/1", objectFit: "cover", borderRadius: "50%", border: "6px solid var(--primary, #1c9fd8)", margin: "0 auto", boxShadow: "0 20px 50px rgba(0,0,0,0.3)" }}
+                  width={300}
+                  height={300}
+                  style={{ width: "min(300px,80%)", height: "auto", aspectRatio: "1/1", objectFit: "cover", borderRadius: "50%", border: "6px solid var(--primary, #1c9fd8)", margin: "0 auto", boxShadow: "0 20px 50px rgba(0,0,0,0.3)" }}
                 />
               </div>
               <div>
@@ -426,13 +430,12 @@ export default function HomeLiveView({
                   { src: "/images/credentials/ortho-division.png", alt: "Orthopaedic Division - Canadian Physiotherapy Association", height: 52 },
                   { src: "/images/credentials/sport-physiotherapy-canada.png", alt: "Sport Physiotherapy Canada", height: 56 },
                 ].map((logo) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <OptimizedImage
                     key={logo.alt}
                     src={logo.src}
                     alt={logo.alt}
-                    loading="lazy"
-                    decoding="async"
+                    width={160}
+                    height={logo.height || 52}
                     style={{
                       height: logo.height || 52,
                       width: "auto",
@@ -613,8 +616,13 @@ export default function HomeLiveView({
                       href={`/blog/${post.slug}`}
                       style={{ display: "flex", flexDirection: "column", background: "#fff", border: "1px solid #e7edf1", borderRadius: 16, overflow: "hidden", boxShadow: "0 6px 20px rgba(18,60,80,0.05)", textDecoration: "none" }}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={post.featuredImage} alt={post.title} loading="lazy" decoding="async" style={{ width: "100%", aspectRatio: "16/9", objectFit: "cover" }} />
+                      <OptimizedImage
+                        src={post.featuredImage}
+                        alt={post.title}
+                        width={400}
+                        height={225}
+                        style={{ width: "100%", height: "auto", aspectRatio: "16/9", objectFit: "cover" }}
+                      />
                       <div style={{ padding: 22, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
                         {metaText && (
                           <div style={{ fontSize: 12.5, fontWeight: 600, color: "#8a97a1", fontFamily: "'Poppins',sans-serif" }}>
@@ -784,12 +792,11 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
         {hasImage && imagePosition === "top" && (
           <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <OptimizedImage
               src={section.image!}
               alt={section.title}
-              loading="lazy"
-              decoding="async"
+              width={1200}
+              height={440}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           </div>
@@ -808,12 +815,11 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
         >
           {hasImage && imagePosition === "left" && (
             <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src={section.image!}
                 alt={section.title}
-                loading="lazy"
-                decoding="async"
+                width={600}
+                height={450}
                 style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
               />
             </div>
@@ -871,12 +877,11 @@ function CustomStorySection({ section }: { section: ServiceCustomSection }) {
 
           {hasImage && imagePosition === "right" && (
             <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src={section.image!}
                 alt={section.title}
-                loading="lazy"
-                decoding="async"
+                width={600}
+                height={450}
                 style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
               />
             </div>

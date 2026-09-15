@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { getTeamMembers } from "@/lib/api";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 import { resolvePageMetadata } from "@/lib/seo";
 
@@ -57,12 +58,12 @@ export default async function TeamPage() {
                     overflow: "hidden"
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <OptimizedImage
                     src={member.profileImage}
                     alt={member.name}
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
+                    width={320}
+                    height={426}
+                    fallbackSrc="/images/team/default-physio.jpg"
                     style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
                   />
                 </div>

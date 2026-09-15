@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import WorkshopRegistrationForm from "@/components/forms/WorkshopRegistrationForm";
 import WorkshopReplayModal from "@/components/forms/WorkshopReplayModal";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 const benefitsList = [
   "All those painkillers and anti-inflammatories just don't seem to help anymore",
@@ -235,14 +236,12 @@ export default function WorkshopsPage() {
           >
             {/* Webinar Poster Image */}
             <div style={{ padding: "clamp(24px, 4vw, 36px)", background: "linear-gradient(135deg, #f0f7fa 0%, #e2f0f7 100%)", display: "flex", justifyContent: "center", alignItems: "center" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src="/images/workshops/orthotics-webinar.jpg"
                 alt="Orthotics Webinar with Dr. Alex Toutant"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/images/workshops/orthotics-webinar.jpg";
-                }}
+                width={280}
+                height={280}
+                fallbackSrc="/images/clinic/reception-desktop.jpg"
                 style={{
                   maxWidth: "280px",
                   width: "100%",

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import defaultServicesData from "@/data/services.json";
 import defaultConditionsData from "@/data/conditions.json";
 import defaultSettingsData from "@/data/settings.json";
@@ -131,15 +132,12 @@ export default function Footer({
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 32 }}>
         {/* Column 1: Clinic Identity */}
         <div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <Link href="/">
-            <img
+            <OptimizedImage
               src="/images/logo/nose-creek-logo.webp"
               alt="Nose Creek Physiotherapy Calgary"
               width={248}
               height={48}
-              loading="lazy"
-              decoding="async"
               style={{ height: 48, width: "auto", aspectRatio: "372/72", filter: "brightness(0) invert(1)", opacity: 0.95, marginBottom: 16 }}
             />
           </Link>

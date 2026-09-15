@@ -4,6 +4,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
 import { getTestimonials } from "@/lib/api";
 import { resolvePageMetadata } from "@/lib/seo";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 export async function generateMetadata() {
   return resolvePageMetadata("/about", {
@@ -69,10 +70,12 @@ export default async function AboutPage() {
 
             {/* Right Clinic Hero Image */}
             <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 50px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src="/images/clinic/reception-desktop.jpg"
                 alt="Nose Creek Physiotherapy Clinic in Calgary"
+                width={600}
+                height={450}
+                priority
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
@@ -212,10 +215,11 @@ export default async function AboutPage() {
             {/* Blair Image Card */}
             <div style={{ position: "relative" }}>
               <div style={{ borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 50px rgba(18,60,80,0.15)", aspectRatio: "4/5" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <OptimizedImage
                   src="/images/team/blair-schachterle.jpg"
                   alt="Blair Schachterle, Founder of Nose Creek Physiotherapy"
+                  width={500}
+                  height={625}
                   style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               </div>

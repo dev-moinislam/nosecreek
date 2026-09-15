@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import SchemaMarkup from "@/components/seo/SchemaMarkup";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import {
   getTeamMemberBySlug,
   getTeamMembers,
@@ -96,11 +97,13 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
             
             {/* Avatar Headshot */}
             <div style={{ maxWidth: 320, borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 45px rgba(18,60,80,0.14)", aspectRatio: "3/4", backgroundColor: "#eef3f6" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src={member.profileImage}
                 alt={member.profileImageAlt || member.seo?.profileImageAlt || (member.socialLinks as any)?.profileImageAlt || `${member.name} - ${member.role} at Nose Creek Physiotherapy Calgary`}
-                referrerPolicy="no-referrer"
+                width={320}
+                height={426}
+                priority
+                fallbackSrc="/images/team/default-physio.jpg"
                 style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
               />
             </div>
@@ -392,11 +395,12 @@ export default async function TeamMemberDetailPage({ params }: PageProps) {
                       href={`/team/${other.slug}`}
                       style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", padding: "6px 8px", borderRadius: 10, background: "#f8fafc" }}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <OptimizedImage
                         src={other.profileImage}
                         alt={other.name}
-                        referrerPolicy="no-referrer"
+                        width={40}
+                        height={40}
+                        fallbackSrc="/images/team/default-physio.jpg"
                         style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }}
                       />
                       <div style={{ flex: 1, minWidth: 0 }}>

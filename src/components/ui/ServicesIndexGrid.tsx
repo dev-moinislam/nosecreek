@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Service } from "@/types/content";
 import defaultServicesData from "@/data/services.json";
 import ServiceIcon from "@/components/ui/ServiceIcon";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { getServices } from "@/lib/api";
 
 interface ServicesIndexGridProps {
@@ -82,9 +83,11 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
             }}>
               {hasImage ? (
                 <div style={{ height: 160, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb", marginBottom: 20 }}>
-                  <img
+                  <OptimizedImage
                     src={imageSrc!}
                     alt={svc.cardImageAlt || svc.seo?.cardImageAlt || svc.heroImageAlt || svc.seo?.heroImageAlt || svc.title}
+                    width={400}
+                    height={160}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = "none";

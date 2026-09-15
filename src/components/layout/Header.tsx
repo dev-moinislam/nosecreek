@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 import defaultServicesData from "@/data/services.json";
 import defaultConditionsData from "@/data/conditions.json";
@@ -489,12 +490,12 @@ export default function Header({
         >
           {/* Logo */}
           <Link href="/" onClick={() => handleLinkClick("/")} style={{ display: "flex", alignItems: "center", flex: "0 0 auto" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <OptimizedImage
               src="/images/logo/nose-creek-logo.webp"
               alt="Nose Creek Physiotherapy"
               width={258}
               height={50}
+              priority
               style={{ height: 50, width: "auto", aspectRatio: "372/72" }}
             />
           </Link>

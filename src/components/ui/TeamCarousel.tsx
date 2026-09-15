@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import Link from "next/link";
 import { TeamMember } from "@/types/content";
 import defaultTeamData from "@/data/team.json";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface TeamCarouselProps {
   members?: TeamMember[];
@@ -82,12 +83,12 @@ export default function TeamCarousel({ members, customEyebrow, customTitle }: Te
                 flexDirection: "column",
                 transition: "transform 0.2s ease, box-shadow 0.2s ease"
               }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <OptimizedImage
                   src={m.profileImage}
                   alt={m.profileImageAlt || m.seo?.profileImageAlt || (m.socialLinks as any)?.profileImageAlt || `${m.name} - ${m.role}`}
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
+                  width={300}
+                  height={400}
+                  fallbackSrc="/images/team/default-physio.jpg"
                   style={{ width: "100%", aspectRatio: "3/4", objectFit: "cover", objectPosition: "top", background: "#eef3f6", display: "block" }}
                 />
                 <div style={{ padding: "16px 12px", textAlign: "center", flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>

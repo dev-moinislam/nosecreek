@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Testimonial } from "@/types/content";
 import defaultTestimonialsData from "@/data/testimonials.json";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 export interface ReviewCarouselProps {
   id?: string;
@@ -480,12 +481,12 @@ export default function ReviewCarousel({
                             }}
                           >
                             {review.avatar ? (
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              <img
+                              <OptimizedImage
                                 src={review.avatar}
                                 alt={review.author}
-                                referrerPolicy="no-referrer"
-                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                width={40}
+                                height={40}
+                                style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
                                 onError={(e) => {
                                   const target = e.target as HTMLElement;
                                   target.style.display = "none";

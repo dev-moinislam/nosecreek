@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BlogPost } from "@/types/content";
 import defaultBlogData from "@/data/blog.json";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface BlogIndexGridProps {
   initialPosts?: BlogPost[];
@@ -64,11 +65,11 @@ export default function BlogIndexGrid({ initialPosts }: BlogIndexGridProps) {
                 href={`/blog/${post.slug}`}
                 style={{ width: "100%", aspectRatio: "16/9", overflow: "hidden", backgroundColor: "#eef3f6", display: "block" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <OptimizedImage
                   src={post.featuredImage}
                   alt={post.title}
-                  loading="lazy"
+                  width={400}
+                  height={225}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />
               </Link>

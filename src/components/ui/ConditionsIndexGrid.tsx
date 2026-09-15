@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Condition } from "@/types/content";
 import defaultConditionsData from "@/data/conditions.json";
 import ServiceIcon from "@/components/ui/ServiceIcon";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import { getConditions } from "@/lib/api";
 
 interface ConditionsIndexGridProps {
@@ -81,9 +82,11 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
           >
             {hasImage ? (
               <div style={{ height: 160, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb", marginBottom: 18 }}>
-                <img
+                <OptimizedImage
                   src={imageSrc!}
                   alt={condition.cardImageAlt || condition.seo?.cardImageAlt || condition.heroImageAlt || condition.seo?.heroImageAlt || condition.name}
+                  width={400}
+                  height={160}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = "none";

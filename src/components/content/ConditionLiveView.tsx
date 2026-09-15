@@ -12,6 +12,7 @@ import VisitUsSection from "./VisitUsSection";
 import CustomStorySection from "./CustomStorySection";
 import ReviewCarousel from "@/components/ui/ReviewCarousel";
 import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 const eyebrowEl = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase" as const, marginBottom: 12 }}>
@@ -315,9 +316,12 @@ export default function ConditionLiveView({
 
                 <div style={{ position: "relative" }}>
                   <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 24px 60px rgba(18,60,80,0.18)", aspectRatio: "4/3", background: "#e2e8f0" }}>
-                    <img
+                    <OptimizedImage
                       src={cfg?.image || condition.heroImage || "/images/clinic/reception-three.jpg"}
                       alt={cfg?.imageAlt || condition.heroImageAlt || condition.seo?.heroImageAlt || `${condition.name} treatment Calgary`}
+                      width={600}
+                      height={450}
+                      priority
                       style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
                   </div>
@@ -405,7 +409,7 @@ export default function ConditionLiveView({
               
               {hasTopImg && (
                 <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
-                  <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <OptimizedImage src={image!} alt={overviewAlt} width={1200} height={440} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               )}
 
@@ -419,7 +423,7 @@ export default function ConditionLiveView({
               >
                 {hasLeftImg && (
                   <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-                    <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <OptimizedImage src={image!} alt={overviewAlt} width={600} height={450} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
                 )}
 
@@ -469,14 +473,14 @@ export default function ConditionLiveView({
 
                 {hasRightImg && (
                   <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "0 20px 48px rgba(18,60,80,0.14)", aspectRatio: "4/3" }}>
-                    <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    <OptimizedImage src={image!} alt={overviewAlt} width={600} height={450} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                   </div>
                 )}
               </div>
 
               {hasBottomImg && (
                 <div style={{ marginTop: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
-                  <img src={image!} alt={overviewAlt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  <OptimizedImage src={image!} alt={overviewAlt} width={1200} height={440} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               )}
             </div>

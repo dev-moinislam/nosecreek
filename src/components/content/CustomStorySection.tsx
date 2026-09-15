@@ -3,6 +3,7 @@
 import React from "react";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
 import { ServiceCustomSection } from "@/types/content";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 const eyebrow = (text: string, color = "var(--primary, #1c9fd8)") => (
   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 700, color, letterSpacing: "1.5px", fontSize: 13, textTransform: "uppercase", marginBottom: 12 }}>
@@ -29,10 +30,11 @@ export default function CustomStorySection({ section }: { section: ServiceCustom
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
         {hasImage && imagePosition === "top" && (
           <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <OptimizedImage
               src={section.image!}
               alt={section.title}
+              width={1200}
+              height={440}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           </div>
@@ -51,10 +53,11 @@ export default function CustomStorySection({ section }: { section: ServiceCustom
         >
           {hasImage && imagePosition === "left" && (
             <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src={section.image!}
                 alt={section.title}
+                width={600}
+                height={450}
                 style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
               />
             </div>
@@ -112,10 +115,11 @@ export default function CustomStorySection({ section }: { section: ServiceCustom
 
           {hasImage && imagePosition === "right" && (
             <div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src={section.image!}
                 alt={section.title}
+                width={600}
+                height={450}
                 style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
               />
             </div>
@@ -124,10 +128,11 @@ export default function CustomStorySection({ section }: { section: ServiceCustom
 
         {hasImage && imagePosition === "bottom" && (
           <div style={{ marginTop: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <OptimizedImage
               src={section.image!}
               alt={section.title}
+              width={1200}
+              height={440}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           </div>

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Service } from "@/types/content";
 import defaultServicesData from "@/data/services.json";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import { getServices } from "@/lib/api";
 
@@ -83,11 +84,11 @@ export default function HomeServicesGrid({ initialServices }: HomeServicesGridPr
             }}>
               {hasImage ? (
                 <div style={{ height: 160, overflow: "hidden", position: "relative", backgroundColor: "#f2f8fb", marginBottom: 18 }}>
-                  <img
+                  <OptimizedImage
                     src={imageSrc!}
                     alt={svc.cardImageAlt || svc.seo?.cardImageAlt || svc.heroImageAlt || svc.seo?.heroImageAlt || svc.title}
-                    loading="lazy"
-                    decoding="async"
+                    width={400}
+                    height={160}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     onError={(e) => {
                       (e.target as HTMLElement).style.display = "none";

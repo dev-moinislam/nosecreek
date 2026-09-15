@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { BlogPost } from "@/types/content";
 import BlogBlockRenderer from "./BlogBlockRenderer";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface BlogPostLiveViewProps {
   initialPost: BlogPost;
@@ -99,11 +100,12 @@ export default function BlogPostLiveView({ initialPost, allPosts }: BlogPostLive
           {/* Prominent Featured Image / Thumbnail */}
           {post.featuredImage && (
             <div style={{ marginBottom: 40, borderRadius: 20, overflow: "hidden", boxShadow: "0 18px 48px rgba(18,60,80,0.12)", aspectRatio: "16/9", maxHeight: 540, backgroundColor: "#eef3f6" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <OptimizedImage
                 src={post.featuredImage}
                 alt={post.featuredImageAlt || post.seo?.featuredImageAlt || post.title}
-                referrerPolicy="no-referrer"
+                width={1060}
+                height={596}
+                priority
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
@@ -222,11 +224,11 @@ export default function BlogPostLiveView({ initialPost, allPosts }: BlogPostLive
                 >
                   {related.featuredImage && (
                     <div style={{ height: 180, width: "100%", overflow: "hidden", backgroundColor: "#eef3f6" }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <OptimizedImage
                         src={related.featuredImage}
                         alt={related.title}
-                        referrerPolicy="no-referrer"
+                        width={400}
+                        height={180}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     </div>

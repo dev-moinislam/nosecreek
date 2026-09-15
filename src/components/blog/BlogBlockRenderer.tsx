@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { BlogContentBlock } from "@/types/content";
 import styles from "@/app/blog/[slug]/blog-post.module.css";
+import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface BlogBlockRendererProps {
   blocks?: BlogContentBlock[];
@@ -82,9 +83,11 @@ function SingleBlockView({ block }: { block: BlogContentBlock }) {
           {/* Top Banner Image if selected */}
           {hasImage && imagePosition === "top" && (
             <div style={{ marginBottom: 24, borderRadius: 14, overflow: "hidden", maxHeight: 380 }}>
-              <img
+              <OptimizedImage
                 src={block.image!}
                 alt={block.title || "Section visual"}
+                width={1060}
+                height={380}
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
@@ -104,9 +107,11 @@ function SingleBlockView({ block }: { block: BlogContentBlock }) {
             {/* Left Image */}
             {hasImage && imagePosition === "left" && (
               <div style={{ borderRadius: 14, overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.08)", order: 1 }}>
-                <img
+                <OptimizedImage
                   src={block.image!}
                   alt={block.title || "Section illustration"}
+                  width={500}
+                  height={350}
                   style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
                 />
               </div>
@@ -230,9 +235,11 @@ function SingleBlockView({ block }: { block: BlogContentBlock }) {
             {/* Right Image */}
             {hasImage && imagePosition === "right" && (
               <div style={{ borderRadius: 14, overflow: "hidden", boxShadow: "0 6px 20px rgba(0,0,0,0.08)", order: 2 }}>
-                <img
+                <OptimizedImage
                   src={block.image!}
                   alt={block.title || "Section illustration"}
+                  width={500}
+                  height={350}
                   style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
                 />
               </div>
@@ -242,9 +249,11 @@ function SingleBlockView({ block }: { block: BlogContentBlock }) {
           {/* Bottom Banner Image if selected */}
           {hasImage && imagePosition === "bottom" && (
             <div style={{ marginTop: 24, borderRadius: 14, overflow: "hidden", maxHeight: 380 }}>
-              <img
+              <OptimizedImage
                 src={block.image!}
                 alt={block.title || "Section visual"}
+                width={1060}
+                height={380}
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
@@ -328,9 +337,11 @@ function SingleBlockView({ block }: { block: BlogContentBlock }) {
       return (
         <figure style={{ margin: "16px 0", width: "100%" }}>
           <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 10px 30px rgba(18,60,80,0.1)", maxHeight: 500 }}>
-            <img
+            <OptimizedImage
               src={block.image}
               alt={block.title || "Article visual"}
+              width={1060}
+              height={500}
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           </div>
