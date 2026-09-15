@@ -133,51 +133,166 @@ export default function AdminNavigationPage() {
       return;
     }
 
-    setNavData((prev) => {
-      const menu = [...(prev.header?.menu || [])];
+    const updatedMenu = [...(navData.header?.menu || [])];
 
-      if (level === 1) {
+    if (level === 1) {
+      if (isNew) {
+        updatedMenu.push(item);
+      } else {
+        const idx = updatedMenu.findIndex((m) => m.id === item.id);
+        if (idx !== -1) updatedMenu[idx] = { ...updatedMenu[idx], ...item };
+      }
+    } else if (level === 2 && parentLevel1Id) {
+      const p1 = updatedMenu.find((m) => m.id === parentLevel1Id);
+      if (p1) {
+        p1.children = p1.children ? [...p1.children] : [];
         if (isNew) {
-          menu.push(item);
+          p1.children.push(item);
         } else {
-          const idx = menu.findIndex((m) => m.id === item.id);
-          if (idx !== -1) menu[idx] = { ...menu[idx], ...item };
+          const idx = p1.children.findIndex((c) => c.id === item.id);
+          if (idx !== -1) p1.children[idx] = { ...p1.children[idx], ...item };
         }
-      } else if (level === 2 && parentLevel1Id) {
-        const p1 = menu.find((m) => m.id === parentLevel1Id);
-        if (p1) {
-          p1.children = p1.children ? [...p1.children] : [];
+      }
+    } else if (level === 3 && parentLevel1Id && parentLevel2Id) {
+      const p1 = updatedMenu.find((m) => m.id === parentLevel1Id);
+      if (p1 && p1.children) {
+        const p2 = p1.children.find((c) => c.id === parentLevel2Id);
+        if (p2) {
+          p2.children = p2.children ? [...p2.children] : [];
           if (isNew) {
-            p1.children.push(item);
+            p2.children.push(item);
           } else {
-            const idx = p1.children.findIndex((c) => c.id === item.id);
-            if (idx !== -1) p1.children[idx] = { ...p1.children[idx], ...item };
-          }
-        }
-      } else if (level === 3 && parentLevel1Id && parentLevel2Id) {
-        const p1 = menu.find((m) => m.id === parentLevel1Id);
-        if (p1 && p1.children) {
-          const p2 = p1.children.find((c) => c.id === parentLevel2Id);
-          if (p2) {
-            p2.children = p2.children ? [...p2.children] : [];
-            if (isNew) {
-              p2.children.push(item);
-            } else {
-              const idx = p2.children.findIndex((c) => c.id === item.id);
-              if (idx !== -1) p2.children[idx] = { ...p2.children[idx], ...item };
-            }
+            const idx = p2.children.findIndex((c) => c.id === item.id);
+            if (idx !== -1) p2.children[idx] = { ...p2.children[idx], ...item };
           }
         }
       }
+    }
 
-      return {
-        ...prev,
-        header: {
-          ...(prev.header || {}),
-          menu
+    const updatedNavData: HeaderFooterNavigation = {
+      ...navData,
+      header: {
+        ...(navData.header || {}),
+        menu: updatedMenu
+      }
+    };
+    setNavData(updatedNavData);
+
+    // Auto-create/sync matching Service or Condition page immediately
+    if (item.href && typeof item.href === "string") {
+      const cleanHref = item.href.trim().split("?")[0].split("#")[0];
+
+      if (cleanHref.startsWith("/services/")) {
+        const parts = cleanHref.replace("/services/", "").split("/").filter(Boolean);
+        if (parts.length > 0) {
+          const slug = parts[parts.length - 1];
+          const parentSlug = parts.length > 1 ? parts[0] : undefined;
+          const existing = servicesList.find((s) => s.slug === slug);
+          let nextServices = [...servicesList];
+          if (!existing) {
+            const newSvc: Service = {
+              id: `srv-${slug}`,
+              slug,
+              title: item.label,
+              parentSlug,
+              shortDescription: `Professional ${item.label.toLowerCase()} services delivered by registered clinicians in Calgary.`,
+              description: `Specialized ${item.label.toLowerCase()} treatments designed to restore mobility, accelerate healing, and optimize physical performance.`,
+              heroImage: "/images/services/physio-hero.webp",
+              cardImage: "/images/services/physio-hero.webp",
+              iconType: "stethoscope",
+              iconBg: "#e9f5fb",
+              iconColor: "#1c9fd8",
+              benefits: ["Accelerated tissue healing and restored functional movement", "One-on-one treatment sessions", "Direct billing to major health insurance providers"],
+              symptoms: ["Acute pain following strain or injury", "Chronic muscle stiffness", "Limited range of motion"],
+              treatmentApproach: ["Comprehensive diagnostic evaluation", "Hands-on joint mobilization and manual release", "Guided exercise and rehabilitation"],
+              faqs: [{ question: `What is involved in ${item.label}?`, answer: `Comprehensive clinical assessment followed by tailored therapeutic intervention for ${item.label.toLowerCase()}.` }],
+              ctaText: "Book Online",
+              ctaMuted: false,
+              sectionOrder: ["hero", "clinical_overview", "symptoms", "treatment_approach", "faqs", "bottom_cta"],
+              seo: {
+                parentSlug,
+                title: `${item.label} Calgary | Nose Creek Physiotherapy`,
+                description: `Specialized ${item.label.toLowerCase()} treatments at Nose Creek Physiotherapy in Calgary.`,
+                heroImageAlt: `${item.label} treatment`,
+                cardImageAlt: `${item.label} clinic Calgary`
+              }
+            };
+            nextServices.push(newSvc);
+          } else {
+            nextServices = nextServices.map((s) => s.slug === slug ? { ...s, title: item.label, parentSlug: s.parentSlug || parentSlug } : s);
+          }
+          setServicesList(nextServices);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("adm_services", JSON.stringify(nextServices));
+            window.dispatchEvent(new Event("servicesUpdated"));
+          }
+          fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "services", data: nextServices })
+          }).catch(() => {});
         }
-      };
-    });
+      } else if (cleanHref.startsWith("/conditions/")) {
+        const parts = cleanHref.replace("/conditions/", "").split("/").filter(Boolean);
+        if (parts.length > 0) {
+          const slug = parts[parts.length - 1];
+          const parentSlug = parts.length > 1 ? parts[0] : undefined;
+          const existing = conditionsList.find((c) => c.slug === slug);
+          let nextConditions = [...conditionsList];
+          if (!existing) {
+            const newCond: Condition = {
+              id: `cond-${slug}`,
+              slug,
+              name: item.label,
+              parentSlug,
+              category: parentSlug ? "specialized" : "general",
+              shortDescription: `Targeted clinical rehabilitation and evidence-based treatment for ${item.label.toLowerCase()} in Calgary.`,
+              description: `Comprehensive diagnostic assessment, manual therapy, and active rehabilitation plans tailored for ${item.label.toLowerCase()} at Nose Creek Physiotherapy.`,
+              heroImage: "/images/conditions/back-hero.webp",
+              cardImage: "/images/conditions/back-hero.webp",
+              benefits: ["Rapid symptom relief", "Targeted manual therapy", "Customized home exercise program"],
+              symptoms: ["Persistent ache or stiffness", "Reduced mobility", "Muscular tension"],
+              treatmentApproach: ["In-depth physical assessment", "Hands-on joint mobilization", "Progressive strengthening"],
+              faqs: [{ question: `How is ${item.label} treated?`, answer: `Through dedicated assessment and personalized physiotherapy care for ${item.label.toLowerCase()}.` }],
+              ctaText: "Book Assessment Online",
+              ctaMuted: false,
+              sectionOrder: ["hero", "clinical_overview", "symptoms", "treatment_approach", "faqs", "bottom_cta"],
+              seo: {
+                parentSlug,
+                title: `${item.label} Treatment Calgary | Nose Creek Physiotherapy`,
+                description: `Specialized physiotherapy, manual therapy, and rehabilitation for ${item.label.toLowerCase()} at Nose Creek Physiotherapy in Calgary.`,
+                heroImageAlt: `${item.label} treatment`,
+                cardImageAlt: `${item.label} clinic Calgary`
+              }
+            };
+            nextConditions.push(newCond);
+          } else {
+            nextConditions = nextConditions.map((c) => c.slug === slug ? { ...c, name: item.label, parentSlug: c.parentSlug || parentSlug } : c);
+          }
+          setConditionsList(nextConditions);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("adm_conditions", JSON.stringify(nextConditions));
+            window.dispatchEvent(new Event("conditionsUpdated"));
+          }
+          fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "conditions", data: nextConditions })
+          }).catch(() => {});
+        }
+      }
+    }
+
+    // Auto-save updated settings to localStorage and trigger settingsUpdated
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("adm_settings");
+      let parsed = saved ? JSON.parse(saved) : {};
+      parsed.navigation = updatedNavData;
+      if (!parsed.marketing) parsed.marketing = {};
+      parsed.marketing.navigation = updatedNavData;
+      localStorage.setItem("adm_settings", JSON.stringify(parsed));
+      window.dispatchEvent(new Event("settingsUpdated"));
+    }
 
     if (parentLevel1Id) setExpandedIds((prev) => ({ ...prev, [parentLevel1Id]: true }));
     if (parentLevel2Id) setExpandedIds((prev) => ({ ...prev, [parentLevel2Id]: true }));
@@ -432,6 +547,7 @@ export default function AdminNavigationPage() {
                 ctaMuted: false,
                 sectionOrder: ["hero", "clinical_overview", "symptoms", "treatment_approach", "faqs", "bottom_cta"],
                 seo: {
+                  parentSlug,
                   title: `${item.label || slug} Treatment Calgary | Nose Creek Physiotherapy`,
                   description: `Specialized physiotherapy, manual therapy, and rehabilitation for ${(item.label || slug).toLowerCase()} at Nose Creek Physiotherapy in Calgary NW & NE.`,
                   heroImageAlt: `${item.label || slug} treatment at Nose Creek Physiotherapy`,
@@ -488,6 +604,7 @@ export default function AdminNavigationPage() {
                 ctaMuted: false,
                 sectionOrder: ["hero", "clinical_overview", "symptoms", "treatment_approach", "faqs", "bottom_cta"],
                 seo: {
+                  parentSlug,
                   title: `${item.label || slug} Calgary North | Nose Creek Physiotherapy`,
                   description: `Comprehensive ${(item.label || slug).toLowerCase()} treatments at Nose Creek Physiotherapy Beddington. Direct billing available.`,
                   heroImageAlt: `${item.label || slug} at Nose Creek Physiotherapy`,

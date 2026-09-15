@@ -91,6 +91,7 @@ CREATE TABLE IF NOT EXISTS services (
 ALTER TABLE services ADD COLUMN IF NOT EXISTS hidden_sections JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE services ADD COLUMN IF NOT EXISTS section_order JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE services ADD COLUMN IF NOT EXISTS sections_data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE services ADD COLUMN IF NOT EXISTS parent_slug TEXT;
 
 DROP TRIGGER IF EXISTS update_services_modtime ON services;
 CREATE TRIGGER update_services_modtime
@@ -139,6 +140,7 @@ ALTER TABLE conditions ADD COLUMN IF NOT EXISTS custom_sections JSONB DEFAULT '[
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS faqs JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS hidden_sections JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE conditions ADD COLUMN IF NOT EXISTS section_order JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE conditions ADD COLUMN IF NOT EXISTS parent_slug TEXT;
 
 DROP TRIGGER IF EXISTS update_conditions_modtime ON conditions;
 CREATE TRIGGER update_conditions_modtime

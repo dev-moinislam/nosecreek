@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import defaultServicesData from "@/data/services.json";
+import defaultConditionsData from "@/data/conditions.json";
 import defaultSettingsData from "@/data/settings.json";
-import { Service, SiteSettings } from "@/types/content";
+import { Service, Condition, SiteSettings } from "@/types/content";
 
 export default function Footer() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettingsData as SiteSettings);
   const [services, setServices] = useState<Service[]>(defaultServicesData as Service[]);
+  const [conditions, setConditions] = useState<Condition[]>(defaultConditionsData as Condition[]);
 
   useEffect(() => {
     async function fetchFreshSettings() {
@@ -32,11 +34,18 @@ export default function Footer() {
             setSiteSettings((prev) => ({ ...prev, ...s }));
           }
         }
-        const saved = localStorage.getItem("adm_services");
-        if (saved) {
-          const parsed = JSON.parse(saved);
+        const savedServices = localStorage.getItem("adm_services");
+        if (savedServices) {
+          const parsed = JSON.parse(savedServices);
           if (Array.isArray(parsed)) {
             setServices(parsed);
+          }
+        }
+        const savedConditions = localStorage.getItem("adm_conditions");
+        if (savedConditions) {
+          const parsed = JSON.parse(savedConditions);
+          if (Array.isArray(parsed)) {
+            setConditions(parsed);
           }
         }
       } catch {}
@@ -50,11 +59,13 @@ export default function Footer() {
 
     window.addEventListener("settingsUpdated", sync);
     window.addEventListener("servicesUpdated", sync);
+    window.addEventListener("conditionsUpdated", sync);
     window.addEventListener("storage", sync);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("settingsUpdated", sync);
       window.removeEventListener("servicesUpdated", sync);
+      window.removeEventListener("conditionsUpdated", sync);
       window.removeEventListener("storage", sync);
     };
   }, []);
@@ -171,20 +182,62 @@ export default function Footer() {
         </div>
 
         {/* Dynamic or Fallback Columns */}
-        {customColumns ? (
-          customColumns.map((col) => (
-            <div key={col.id || col.title}>
-              <div style={headStyle}>{col.title}</div>
-              <div style={colStyle}>
-                {col.links.map((link, idx) => {
-                  const isExternal = link.external || link.href.startsWith("http") || link.href.startsWith("tel:");
-                  if (isExternal) {
+        {(() => {
+          const renderedColumns = (customColumns || []).map((col) => {
+            // Augment Clinical Services column with dynamic services
+            if (col.id === "ft-col-services" || col.title?.toLowerCase().includes("service")) {
+              const mergedLinks = [...(col.links || [])];
+              services.filter((s) => !s.parentSlug).forEach((s) => {
+                const href = `/services/${s.slug}`;
+                if (!mergedLinks.some((l) => l.href === href || l.href.endsWith(`/${s.slug}`))) {
+                  mergedLinks.push({ label: s.title, href });
+                }
+              });
+              return { ...col, links: mergedLinks };
+            }
+            // Augment Conditions column with dynamic conditions
+            if (col.id === "ft-col-conditions" || col.title?.toLowerCase().includes("treat") || col.title?.toLowerCase().includes("condition")) {
+              const mergedLinks = [...(col.links || [])];
+              conditions.filter((c) => !c.parentSlug).forEach((c) => {
+                const href = `/conditions/${c.slug}`;
+                if (!mergedLinks.some((l) => l.href === href || l.href.endsWith(`/${c.slug}`))) {
+                  mergedLinks.push({ label: c.name, href });
+                }
+              });
+              return { ...col, links: mergedLinks };
+            }
+            return col;
+          });
+
+          if (renderedColumns.length > 0) {
+            return renderedColumns.map((col) => (
+              <div key={col.id || col.title}>
+                <div style={headStyle}>{col.title}</div>
+                <div style={colStyle}>
+                  {col.links.map((link, idx) => {
+                    const isExternal = link.external || link.href.startsWith("http") || link.href.startsWith("tel:");
+                    if (isExternal) {
+                      return (
+                        <a
+                          key={idx}
+                          href={link.href}
+                          target={link.href.startsWith("tel:") ? undefined : "_blank"}
+                          rel="noopener noreferrer"
+                          style={{
+                            color: link.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd",
+                            fontWeight: link.highlight ? 700 : 400,
+                            textDecoration: "none",
+                            transition: "color 0.15s",
+                          }}
+                        >
+                          {link.label}
+                        </a>
+                      );
+                    }
                     return (
-                      <a
+                      <Link
                         key={idx}
                         href={link.href}
-                        target={link.href.startsWith("tel:") ? undefined : "_blank"}
-                        rel="noopener noreferrer"
                         style={{
                           color: link.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd",
                           fontWeight: link.highlight ? 700 : 400,
@@ -193,32 +246,19 @@ export default function Footer() {
                         }}
                       >
                         {link.label}
-                      </a>
+                      </Link>
                     );
-                  }
-                  return (
-                    <Link
-                      key={idx}
-                      href={link.href}
-                      style={{
-                        color: link.highlight ? "var(--accent, #8cc63f)" : "#a9c1cd",
-                        fontWeight: link.highlight ? 700 : 400,
-                        textDecoration: "none",
-                        transition: "color 0.15s",
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
+                  })}
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <>
-            {/* Fallback Column 2: Clinical Services */}
-            <div>
-              <div style={headStyle}>Clinical Services</div>
+            ));
+          }
+
+          return (
+            <>
+              {/* Fallback Column 2: Clinical Services */}
+              <div>
+                <div style={headStyle}>Clinical Services</div>
               <div style={colStyle}>
                 {services.slice(0, 6).map((s) => (
                   <Link key={s.slug || s.id} href={`/services/${s.slug}`} style={{ color: "#a9c1cd", textDecoration: "none", transition: "color 0.15s" }}>
@@ -286,7 +326,8 @@ export default function Footer() {
               </div>
             </div>
           </>
-        )}
+          );
+        })()}
       </div>
 
       {/* Disclaimer Notice if present */}

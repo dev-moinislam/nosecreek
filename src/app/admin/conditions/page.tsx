@@ -199,6 +199,9 @@ export default function AdminConditionsPage() {
                 parsed.forEach((p) => {
                   if (map.has(p.slug)) {
                     map.set(p.slug, { ...map.get(p.slug)!, ...p });
+                  } else {
+                    // Preserve locally created sub-pages or conditions so refresh never deletes them
+                    map.set(p.slug, p);
                   }
                 });
                 data = Array.from(map.values()).map(sanitizeConditionOrder);
@@ -276,6 +279,7 @@ export default function AdminConditionsPage() {
           parent_slug: cond.parentSlug || null,
           seo: {
             ...(cond.seo || {}),
+            parentSlug: cond.parentSlug || null,
             cardImage: cond.cardImage || null,
             sectionsData: cond.sectionsData || {},
             heroImageAlt: cond.heroImageAlt || cond.seo?.heroImageAlt || "",
@@ -286,9 +290,17 @@ export default function AdminConditionsPage() {
           updated_at: new Date().toISOString()
         };
 
-        const { error } = await supabase
+        let { error } = await supabase
           .from("conditions")
           .upsert(fullPayload, { onConflict: "slug" });
+
+        if (error && (error.code === "PGRST204" || JSON.stringify(error).includes("parent_slug"))) {
+          console.warn("Retrying conditions upsert without parent_slug column (preserved in seo)...");
+          const fallbackPayload = { ...fullPayload };
+          delete (fallbackPayload as any).parent_slug;
+          const res = await supabase.from("conditions").upsert(fallbackPayload, { onConflict: "slug" });
+          error = res.error;
+        }
 
         if (error) {
           console.error("Supabase condition upsert error:", error);
@@ -312,7 +324,7 @@ export default function AdminConditionsPage() {
         // ignore in static export
       }
 
-      // 4. Cross-Sync into Navigation Header Menu
+      // 4. Cross-Sync into Navigation Header Menu & Footer Columns
       try {
         const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
         let currentSettings = savedSettingsRaw ? JSON.parse(savedSettingsRaw) : null;
@@ -321,51 +333,66 @@ export default function AdminConditionsPage() {
           if (sRes.ok) currentSettings = await sRes.json();
         }
 
-        if (currentSettings?.navigation?.header?.menu) {
-          const menu = [...currentSettings.navigation.header.menu];
-          const condMenu = menu.find((m: any) => m.id === "nav-conditions" || m.href === "/conditions");
-          if (condMenu) {
-            condMenu.children = condMenu.children ? [...condMenu.children] : [];
-            const childHref = cond.parentSlug
-              ? `/conditions/${cond.parentSlug}/${cond.slug}`
-              : `/conditions/${cond.slug}`;
-            const targetId = `cnd-${cond.slug}`;
+        if (currentSettings?.navigation) {
+          const childHref = cond.parentSlug
+            ? `/conditions/${cond.parentSlug}/${cond.slug}`
+            : `/conditions/${cond.slug}`;
+          const targetId = `cnd-${cond.slug}`;
 
-            if (cond.parentSlug) {
-              // Nested sub-condition: find parent condition in menu
-              const parentItem = condMenu.children.find((c: any) => 
-                c.id === `cnd-${cond.parentSlug}` || c.href === `/conditions/${cond.parentSlug}` || c.href.endsWith(`/${cond.parentSlug}`)
-              );
-              if (parentItem) {
-                parentItem.children = parentItem.children ? [...parentItem.children] : [];
-                const existIdx = parentItem.children.findIndex((sub: any) => sub.id === targetId || sub.href.endsWith(`/${cond.slug}`));
+          // Sync Header Menu
+          if (Array.isArray(currentSettings.navigation.header?.menu)) {
+            const menu = [...currentSettings.navigation.header.menu];
+            const condMenu = menu.find((m: any) => m.id === "nav-conditions" || m.href === "/conditions");
+            if (condMenu) {
+              condMenu.children = condMenu.children ? [...condMenu.children] : [];
+
+              if (cond.parentSlug) {
+                const parentItem = condMenu.children.find((c: any) => 
+                  c.id === `cnd-${cond.parentSlug}` || c.href === `/conditions/${cond.parentSlug}` || c.href.endsWith(`/${cond.parentSlug}`)
+                );
+                if (parentItem) {
+                  parentItem.children = parentItem.children ? [...parentItem.children] : [];
+                  const existIdx = parentItem.children.findIndex((sub: any) => sub.id === targetId || sub.href.endsWith(`/${cond.slug}`));
+                  if (existIdx >= 0) {
+                    parentItem.children[existIdx] = { ...parentItem.children[existIdx], label: cond.name, href: childHref };
+                  } else {
+                    parentItem.children.push({ id: targetId, label: cond.name, href: childHref, enabled: true });
+                  }
+                }
+              } else {
+                const existIdx = condMenu.children.findIndex((c: any) => c.id === targetId || c.href === childHref || c.href.endsWith(`/${cond.slug}`));
                 if (existIdx >= 0) {
-                  parentItem.children[existIdx] = { ...parentItem.children[existIdx], label: cond.name, href: childHref };
+                  condMenu.children[existIdx] = { ...condMenu.children[existIdx], label: cond.name, href: childHref };
                 } else {
-                  parentItem.children.push({ id: targetId, label: cond.name, href: childHref, enabled: true });
+                  condMenu.children.push({ id: targetId, label: cond.name, href: childHref, enabled: true });
                 }
               }
-            } else {
-              // Top-level condition
-              const existIdx = condMenu.children.findIndex((c: any) => c.id === targetId || c.href === childHref || c.href.endsWith(`/${cond.slug}`));
-              if (existIdx >= 0) {
-                condMenu.children[existIdx] = { ...condMenu.children[existIdx], label: cond.name, href: childHref };
+              currentSettings.navigation.header.menu = menu;
+            }
+          }
+
+          // Sync Footer Columns
+          if (Array.isArray(currentSettings.navigation.footer?.columns)) {
+            const ftCol = currentSettings.navigation.footer.columns.find((col: any) => col.id === "ft-col-conditions" || col.title?.toLowerCase().includes("treat") || col.title?.toLowerCase().includes("condition"));
+            if (ftCol && Array.isArray(ftCol.links)) {
+              const existLinkIdx = ftCol.links.findIndex((l: any) => l.href === childHref || l.href.endsWith(`/${cond.slug}`));
+              if (existLinkIdx >= 0) {
+                ftCol.links[existLinkIdx] = { ...ftCol.links[existLinkIdx], label: cond.name, href: childHref };
               } else {
-                condMenu.children.push({ id: targetId, label: cond.name, href: childHref, enabled: true });
+                ftCol.links.push({ label: cond.name, href: childHref });
               }
             }
-
-            currentSettings.navigation.header.menu = menu;
-            if (typeof window !== "undefined") {
-              localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
-              window.dispatchEvent(new Event("settingsUpdated"));
-            }
-            fetch("/api/admin/save-content", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ type: "settings", data: currentSettings })
-            }).catch(() => {});
           }
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+            window.dispatchEvent(new Event("settingsUpdated"));
+          }
+          fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "settings", data: currentSettings })
+          }).catch(() => {});
         }
       } catch (syncErr) {
         console.warn("Navigation cross-sync warning:", syncErr);

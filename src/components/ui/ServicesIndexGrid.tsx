@@ -65,7 +65,7 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
         return (
           <Link
             key={svc.id || svc.slug}
-            href={`/services/${svc.slug}`}
+            href={svc.parentSlug ? `/services/${svc.parentSlug}/${svc.slug}` : `/services/${svc.slug}`}
             style={{ display: "block", textDecoration: "none" }}
           >
             <div style={{

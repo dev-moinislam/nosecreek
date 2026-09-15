@@ -202,6 +202,9 @@ export default function AdminServicesPage() {
                       const cardImage = p.cardImage !== undefined ? (p.cardImage || null) : (serverItem.cardImage || null);
                       const heroImage = p.heroImage !== undefined ? (p.heroImage || null) : (serverItem.heroImage || null);
                       map.set(p.slug, { ...serverItem, ...p, cardImage, heroImage });
+                    } else {
+                      // Preserve locally created sub-pages or services so page refresh never deletes them
+                      map.set(p.slug, p);
                     }
                   });
                   list = Array.from(map.values()).map(sanitizeServiceOrder);
@@ -283,6 +286,7 @@ export default function AdminServicesPage() {
             parent_slug: updatedService.parentSlug || null,
             seo: {
               ...(updatedService.seo || {}),
+              parentSlug: updatedService.parentSlug || null,
               cardImage: updatedService.cardImage || null,
               sectionsData: updatedService.sectionsData || {},
               heroImageAlt: updatedService.heroImageAlt || updatedService.seo?.heroImageAlt || "",
@@ -293,9 +297,17 @@ export default function AdminServicesPage() {
             updated_at: new Date().toISOString()
           };
 
-          const { error } = await supabase
+          let { error } = await supabase
             .from("services")
             .upsert(payload, { onConflict: "slug" });
+
+          if (error && (error.code === "PGRST204" || JSON.stringify(error).includes("parent_slug"))) {
+            console.warn("Retrying services upsert without parent_slug column (preserved in seo)...");
+            const fallbackPayload = { ...payload };
+            delete (fallbackPayload as any).parent_slug;
+            const res = await supabase.from("services").upsert(fallbackPayload, { onConflict: "slug" });
+            error = res.error;
+          }
 
           if (error) {
             console.error("Supabase upsert error:", error);
@@ -324,7 +336,7 @@ export default function AdminServicesPage() {
         // ignore
       }
 
-      // 4. Cross-Sync into Navigation Header Menu
+      // 4. Cross-Sync into Navigation Header Menu & Footer Columns
       try {
         const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
         let currentSettings = savedSettingsRaw ? JSON.parse(savedSettingsRaw) : null;
@@ -333,51 +345,66 @@ export default function AdminServicesPage() {
           if (sRes.ok) currentSettings = await sRes.json();
         }
 
-        if (currentSettings?.navigation?.header?.menu) {
-          const menu = [...currentSettings.navigation.header.menu];
-          const srvMenu = menu.find((m: any) => m.id === "nav-services" || m.href === "/services");
-          if (srvMenu) {
-            srvMenu.children = srvMenu.children ? [...srvMenu.children] : [];
-            const childHref = updatedService.parentSlug
-              ? `/services/${updatedService.parentSlug}/${updatedService.slug}`
-              : `/services/${updatedService.slug}`;
-            const targetId = `srv-${updatedService.slug}`;
+        if (currentSettings?.navigation) {
+          const childHref = updatedService.parentSlug
+            ? `/services/${updatedService.parentSlug}/${updatedService.slug}`
+            : `/services/${updatedService.slug}`;
+          const targetId = `srv-${updatedService.slug}`;
 
-            if (updatedService.parentSlug) {
-              // Nested sub-service: find parent service in menu
-              const parentItem = srvMenu.children.find((s: any) => 
-                s.id === `srv-${updatedService.parentSlug}` || s.href === `/services/${updatedService.parentSlug}` || s.href.endsWith(`/${updatedService.parentSlug}`)
-              );
-              if (parentItem) {
-                parentItem.children = parentItem.children ? [...parentItem.children] : [];
-                const existIdx = parentItem.children.findIndex((sub: any) => sub.id === targetId || sub.href.endsWith(`/${updatedService.slug}`));
+          // Sync Header Menu
+          if (Array.isArray(currentSettings.navigation.header?.menu)) {
+            const menu = [...currentSettings.navigation.header.menu];
+            const srvMenu = menu.find((m: any) => m.id === "nav-services" || m.href === "/services");
+            if (srvMenu) {
+              srvMenu.children = srvMenu.children ? [...srvMenu.children] : [];
+
+              if (updatedService.parentSlug) {
+                const parentItem = srvMenu.children.find((s: any) => 
+                  s.id === `srv-${updatedService.parentSlug}` || s.href === `/services/${updatedService.parentSlug}` || s.href.endsWith(`/${updatedService.parentSlug}`)
+                );
+                if (parentItem) {
+                  parentItem.children = parentItem.children ? [...parentItem.children] : [];
+                  const existIdx = parentItem.children.findIndex((sub: any) => sub.id === targetId || sub.href.endsWith(`/${updatedService.slug}`));
+                  if (existIdx >= 0) {
+                    parentItem.children[existIdx] = { ...parentItem.children[existIdx], label: updatedService.title, href: childHref };
+                  } else {
+                    parentItem.children.push({ id: targetId, label: updatedService.title, href: childHref, enabled: true });
+                  }
+                }
+              } else {
+                const existIdx = srvMenu.children.findIndex((s: any) => s.id === targetId || s.href === childHref || s.href.endsWith(`/${updatedService.slug}`));
                 if (existIdx >= 0) {
-                  parentItem.children[existIdx] = { ...parentItem.children[existIdx], label: updatedService.title, href: childHref };
+                  srvMenu.children[existIdx] = { ...srvMenu.children[existIdx], label: updatedService.title, href: childHref };
                 } else {
-                  parentItem.children.push({ id: targetId, label: updatedService.title, href: childHref, enabled: true });
+                  srvMenu.children.push({ id: targetId, label: updatedService.title, href: childHref, enabled: true });
                 }
               }
-            } else {
-              // Top-level service
-              const existIdx = srvMenu.children.findIndex((s: any) => s.id === targetId || s.href === childHref || s.href.endsWith(`/${updatedService.slug}`));
-              if (existIdx >= 0) {
-                srvMenu.children[existIdx] = { ...srvMenu.children[existIdx], label: updatedService.title, href: childHref };
+              currentSettings.navigation.header.menu = menu;
+            }
+          }
+
+          // Sync Footer Columns
+          if (Array.isArray(currentSettings.navigation.footer?.columns)) {
+            const ftCol = currentSettings.navigation.footer.columns.find((col: any) => col.id === "ft-col-services" || col.title?.toLowerCase().includes("service"));
+            if (ftCol && Array.isArray(ftCol.links)) {
+              const existLinkIdx = ftCol.links.findIndex((l: any) => l.href === childHref || l.href.endsWith(`/${updatedService.slug}`));
+              if (existLinkIdx >= 0) {
+                ftCol.links[existLinkIdx] = { ...ftCol.links[existLinkIdx], label: updatedService.title, href: childHref };
               } else {
-                srvMenu.children.push({ id: targetId, label: updatedService.title, href: childHref, enabled: true });
+                ftCol.links.push({ label: updatedService.title, href: childHref });
               }
             }
-
-            currentSettings.navigation.header.menu = menu;
-            if (typeof window !== "undefined") {
-              localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
-              window.dispatchEvent(new Event("settingsUpdated"));
-            }
-            fetch("/api/admin/save-content", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ type: "settings", data: currentSettings })
-            }).catch(() => {});
           }
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+            window.dispatchEvent(new Event("settingsUpdated"));
+          }
+          fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "settings", data: currentSettings })
+          }).catch(() => {});
         }
       } catch (syncErr) {
         console.warn("Navigation cross-sync warning:", syncErr);

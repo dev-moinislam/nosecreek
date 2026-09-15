@@ -75,6 +75,7 @@ export async function POST(req: Request) {
               parent_slug: s.parentSlug || s.parent_slug || null,
               seo: {
                 ...(s.seo || {}),
+                parentSlug: s.parentSlug || s.parent_slug || null,
                 cardImage: s.cardImage || s.card_image || null,
                 sectionsData: s.sectionsData || {},
                 heroImageAlt: s.heroImageAlt || s.hero_image_alt || s.seo?.heroImageAlt || "",
@@ -84,7 +85,19 @@ export async function POST(req: Request) {
               is_published: s.is_published !== false,
               updated_at: new Date().toISOString()
             }));
-            await supabase.from("services").upsert(sRows, { onConflict: "slug" });
+            let { error: sUpsertErr } = await supabase.from("services").upsert(sRows, { onConflict: "slug" });
+            if (sUpsertErr && (sUpsertErr.code === "PGRST204" || JSON.stringify(sUpsertErr).includes("parent_slug"))) {
+              console.warn("Retrying services upsert without parent_slug column (preserved in seo.parentSlug)...");
+              const fallbackRows = sRows.map((r: any) => {
+                const copy = { ...r };
+                delete copy.parent_slug;
+                return copy;
+              });
+              const { error: retryErr } = await supabase.from("services").upsert(fallbackRows, { onConflict: "slug" });
+              if (retryErr) console.error("Services retry upsert error:", retryErr);
+            } else if (sUpsertErr) {
+              console.error("Backend Supabase services upsert error:", sUpsertErr);
+            }
           }
         } catch (supaErr) {
           console.warn("Backend Supabase services sync warning:", supaErr);
@@ -182,6 +195,7 @@ export async function POST(req: Request) {
               parent_slug: c.parentSlug || c.parent_slug || null,
               seo: {
                 ...(c.seo || {}),
+                parentSlug: c.parentSlug || c.parent_slug || null,
                 cardImage: c.cardImage || c.card_image || null,
                 sectionsData: c.sectionsData || {},
                 heroImageAlt: c.heroImageAlt || c.hero_image_alt || c.seo?.heroImageAlt || "",
@@ -191,8 +205,17 @@ export async function POST(req: Request) {
               is_published: c.is_published !== false,
               updated_at: new Date().toISOString()
             }));
-            const { error: upsertErr } = await supabase.from("conditions").upsert(rows, { onConflict: "slug" });
-            if (upsertErr) {
+            let { error: upsertErr } = await supabase.from("conditions").upsert(rows, { onConflict: "slug" });
+            if (upsertErr && (upsertErr.code === "PGRST204" || JSON.stringify(upsertErr).includes("parent_slug"))) {
+              console.warn("Retrying conditions upsert without parent_slug column (preserved in seo.parentSlug)...");
+              const fallbackRows = rows.map((r: any) => {
+                const copy = { ...r };
+                delete copy.parent_slug;
+                return copy;
+              });
+              const { error: retryErr } = await supabase.from("conditions").upsert(fallbackRows, { onConflict: "slug" });
+              if (retryErr) console.error("Conditions retry upsert error:", retryErr);
+            } else if (upsertErr) {
               console.error("Backend Supabase conditions upsert error:", upsertErr);
             }
           }

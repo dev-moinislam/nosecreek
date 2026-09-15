@@ -210,54 +210,12 @@ export default function Header() {
     }));
   };
 
-  // Determine navigation menu items (from dynamic settings or fallback)
-  const menuItems: NavMenuItem[] = (siteSettings.navigation?.header?.menu && siteSettings.navigation.header.menu.length > 0)
+  // Determine navigation menu items (blending dynamic services & conditions into the menu tree)
+  const baseMenuItems: NavMenuItem[] = (siteSettings.navigation?.header?.menu && siteSettings.navigation.header.menu.length > 0)
     ? siteSettings.navigation.header.menu.filter((m) => m.enabled !== false)
     : [
-        {
-          id: "nav-services",
-          label: "Services",
-          href: "/services",
-          enabled: true,
-          children: dynamicServices
-            .filter((s) => !s.parentSlug)
-            .map((s) => ({
-              id: `srv-${s.slug}`,
-              label: s.title,
-              href: `/services/${s.slug}`,
-              enabled: true,
-              children: dynamicServices
-                .filter((sub) => sub.parentSlug === s.slug)
-                .map((sub) => ({
-                  id: `srv-${sub.slug}`,
-                  label: sub.title,
-                  href: `/services/${s.slug}/${sub.slug}`,
-                  enabled: true
-                }))
-            })),
-        },
-        {
-          id: "nav-conditions",
-          label: "What We Treat",
-          href: "/conditions",
-          enabled: true,
-          children: dynamicConditions
-            .filter((c) => !c.parentSlug)
-            .map((c) => ({
-              id: `cnd-${c.slug}`,
-              label: c.name,
-              href: `/conditions/${c.slug}`,
-              enabled: true,
-              children: dynamicConditions
-                .filter((sub) => sub.parentSlug === c.slug)
-                .map((sub) => ({
-                  id: `cnd-${sub.slug}`,
-                  label: sub.name,
-                  href: `/conditions/${c.slug}/${sub.slug}`,
-                  enabled: true
-                }))
-            })),
-        },
+        { id: "nav-services", label: "Services", href: "/services", enabled: true, children: [] },
+        { id: "nav-conditions", label: "What We Treat", href: "/conditions", enabled: true, children: [] },
         {
           id: "nav-about",
           label: "About",
@@ -275,6 +233,146 @@ export default function Header() {
         { id: "nav-blog", label: "Blog", href: "/blog", enabled: true },
         { id: "nav-contact", label: "Contact", href: "/contact", enabled: true },
       ];
+
+  const menuItems: NavMenuItem[] = baseMenuItems.map((item) => {
+    // 1. DYNAMICALLY MERGE SERVICES
+    if (item.id === "nav-services" || item.href === "/services") {
+      const existingChildren = item.children ? [...item.children] : [];
+      const rootServices = dynamicServices.filter((s) => !s.parentSlug);
+      const subServices = dynamicServices.filter((s) => Boolean(s.parentSlug));
+
+      const mergedChildren: NavMenuItem[] = [...existingChildren];
+      rootServices.forEach((root) => {
+        const rootHref = `/services/${root.slug}`;
+        const targetId = `srv-${root.slug}`;
+        const idx = mergedChildren.findIndex((c) => c.id === targetId || c.href === rootHref || c.href.endsWith(`/${root.slug}`));
+        if (idx >= 0) {
+          mergedChildren[idx] = {
+            ...mergedChildren[idx],
+            label: root.title || mergedChildren[idx].label,
+            href: rootHref,
+            children: mergedChildren[idx].children ? [...mergedChildren[idx].children] : []
+          };
+        } else {
+          const viewAllIdx = mergedChildren.findIndex((c) => c.id === "srv-all" || c.href === "/services");
+          const newRootItem: NavMenuItem = {
+            id: targetId,
+            label: root.title,
+            href: rootHref,
+            enabled: true,
+            children: []
+          };
+          if (viewAllIdx >= 0) {
+            mergedChildren.splice(viewAllIdx, 0, newRootItem);
+          } else {
+            mergedChildren.push(newRootItem);
+          }
+        }
+      });
+
+      // Attach all sub-services to their parent service
+      subServices.forEach((sub) => {
+        const subHref = `/services/${sub.parentSlug}/${sub.slug}`;
+        const targetId = `srv-${sub.slug}`;
+        const parentItem = mergedChildren.find((c) => 
+          c.id === `srv-${sub.parentSlug}` || c.href === `/services/${sub.parentSlug}` || c.href.endsWith(`/${sub.parentSlug}`)
+        );
+        if (parentItem) {
+          parentItem.children = parentItem.children ? [...parentItem.children] : [];
+          const subIdx = parentItem.children.findIndex((sc) => sc.id === targetId || sc.href === subHref || sc.href.endsWith(`/${sub.slug}`));
+          if (subIdx >= 0) {
+            parentItem.children[subIdx] = {
+              ...parentItem.children[subIdx],
+              label: sub.title || parentItem.children[subIdx].label,
+              href: subHref
+            };
+          } else {
+            parentItem.children.push({
+              id: targetId,
+              label: sub.title,
+              href: subHref,
+              enabled: true
+            });
+          }
+        }
+      });
+
+      return {
+        ...item,
+        children: mergedChildren
+      };
+    }
+
+    // 2. DYNAMICALLY MERGE CONDITIONS
+    if (item.id === "nav-conditions" || item.href === "/conditions") {
+      const existingChildren = item.children ? [...item.children] : [];
+      const rootConditions = dynamicConditions.filter((c) => !c.parentSlug);
+      const subConditions = dynamicConditions.filter((c) => Boolean(c.parentSlug));
+
+      const mergedChildren: NavMenuItem[] = [...existingChildren];
+      rootConditions.forEach((root) => {
+        const rootHref = `/conditions/${root.slug}`;
+        const targetId = `cnd-${root.slug}`;
+        const idx = mergedChildren.findIndex((c) => c.id === targetId || c.href === rootHref || c.href.endsWith(`/${root.slug}`));
+        if (idx >= 0) {
+          mergedChildren[idx] = {
+            ...mergedChildren[idx],
+            label: root.name || mergedChildren[idx].label,
+            href: rootHref,
+            children: mergedChildren[idx].children ? [...mergedChildren[idx].children] : []
+          };
+        } else {
+          const viewAllIdx = mergedChildren.findIndex((c) => c.id === "cnd-all" || c.href === "/conditions");
+          const newRootItem: NavMenuItem = {
+            id: targetId,
+            label: root.name,
+            href: rootHref,
+            enabled: true,
+            children: []
+          };
+          if (viewAllIdx >= 0) {
+            mergedChildren.splice(viewAllIdx, 0, newRootItem);
+          } else {
+            mergedChildren.push(newRootItem);
+          }
+        }
+      });
+
+      // Attach all sub-conditions to their parent condition
+      subConditions.forEach((sub) => {
+        const subHref = `/conditions/${sub.parentSlug}/${sub.slug}`;
+        const targetId = `cnd-${sub.slug}`;
+        const parentItem = mergedChildren.find((c) => 
+          c.id === `cnd-${sub.parentSlug}` || c.href === `/conditions/${sub.parentSlug}` || c.href.endsWith(`/${sub.parentSlug}`)
+        );
+        if (parentItem) {
+          parentItem.children = parentItem.children ? [...parentItem.children] : [];
+          const subIdx = parentItem.children.findIndex((sc) => sc.id === targetId || sc.href === subHref || sc.href.endsWith(`/${sub.slug}`));
+          if (subIdx >= 0) {
+            parentItem.children[subIdx] = {
+              ...parentItem.children[subIdx],
+              label: sub.name || parentItem.children[subIdx].label,
+              href: subHref
+            };
+          } else {
+            parentItem.children.push({
+              id: targetId,
+              label: sub.name,
+              href: subHref,
+              enabled: true
+            });
+          }
+        }
+      });
+
+      return {
+        ...item,
+        children: mergedChildren
+      };
+    }
+
+    return item;
+  });
 
   const topBarPhone = siteSettings.navigation?.header?.phone || siteSettings.contact?.phone || "403.295.8590";
   const ctaButtonText = siteSettings.navigation?.header?.ctaButtonText || siteSettings.primaryCTA || "Book Online";

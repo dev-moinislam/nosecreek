@@ -174,7 +174,7 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
 
               <div style={{ borderTop: "1px solid #f0f4f7", paddingTop: 14, marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <Link
-                  href={`/conditions/${condition.slug}`}
+                  href={condition.parentSlug ? `/conditions/${condition.parentSlug}/${condition.slug}` : `/conditions/${condition.slug}`}
                   style={{
                     color: "#0e78a8",
                     fontWeight: 700,

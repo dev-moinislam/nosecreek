@@ -156,7 +156,7 @@ export async function getServices(): Promise<Service[]> {
             teamMembers: d.team_members || localItem?.teamMembers || [],
             locations: d.locations || localItem?.locations || [],
             testimonials: d.testimonials || localItem?.testimonials || [],
-            parentSlug: d.parent_slug || localItem?.parentSlug || undefined,
+            parentSlug: d.parent_slug || d.seo?.parentSlug || d.seo?.parent_slug || localItem?.parentSlug || undefined,
             seo: d.seo || localItem?.seo || {}
           };
         });
@@ -211,7 +211,7 @@ export async function getServiceBySlug(slugInput: string | string[]): Promise<Se
         return {
           id: data.id,
           slug: data.slug,
-          parentSlug: data.parent_slug || localItem?.parentSlug || undefined,
+          parentSlug: data.parent_slug || data.seo?.parentSlug || data.seo?.parent_slug || localItem?.parentSlug || undefined,
           title: data.title,
           shortDescription: data.short_description || localItem?.shortDescription || "",
           description: data.description || localItem?.description || "",
@@ -459,7 +459,7 @@ export async function getConditions(): Promise<Condition[]> {
             sectionOrder: d.section_order || d.sectionOrder || localItem?.sectionOrder || [],
             relatedServices: d.related_services || localItem?.relatedServices || [],
             category: d.category || localItem?.category || "general",
-            parentSlug: d.parent_slug || localItem?.parentSlug || undefined,
+            parentSlug: d.parent_slug || d.seo?.parentSlug || d.seo?.parent_slug || localItem?.parentSlug || undefined,
             iconType: d.icon_type || d.iconType || localItem?.iconType,
             iconBg: d.icon_bg || d.iconBg || localItem?.iconBg,
             iconColor: d.icon_color || d.iconColor || localItem?.iconColor,
@@ -517,7 +517,7 @@ export async function getConditionBySlug(slugInput: string | string[]): Promise<
         return {
           id: data.id,
           slug: data.slug,
-          parentSlug: data.parent_slug || localItem?.parentSlug || undefined,
+          parentSlug: data.parent_slug || data.seo?.parentSlug || data.seo?.parent_slug || localItem?.parentSlug || undefined,
           name: data.name,
           shortDescription: data.short_description || localItem?.shortDescription || "",
           description: data.description || localItem?.description || "",
