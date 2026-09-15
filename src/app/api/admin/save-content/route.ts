@@ -268,13 +268,18 @@ export async function POST(req: Request) {
         if (fs.existsSync(settingsFilePath)) {
           try {
             const settingsData = JSON.parse(fs.readFileSync(settingsFilePath, "utf-8"));
-            if (settingsData?.navigation) {
-              if (Array.isArray(settingsData.navigation.header?.menu)) {
-                settingsData.navigation.header.menu = filterNavItems(settingsData.navigation.header.menu);
+            const cleanNavObj = (navObj: any) => {
+              if (!navObj) return;
+              if (Array.isArray(navObj.header?.menu)) {
+                navObj.header.menu = filterNavItems(navObj.header.menu);
               }
-              if (Array.isArray(settingsData.navigation.footer?.columns)) {
-                settingsData.navigation.footer.columns = filterFooterCols(settingsData.navigation.footer.columns);
+              if (Array.isArray(navObj.footer?.columns)) {
+                navObj.footer.columns = filterFooterCols(navObj.footer.columns);
               }
+            };
+            cleanNavObj(settingsData.navigation);
+            if (settingsData.marketing) {
+              cleanNavObj(settingsData.marketing.navigation);
             }
             if (settingsData?.seo?.pages) {
               settingsData.seo.pages = filterSeoPages(settingsData.seo.pages);

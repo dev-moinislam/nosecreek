@@ -58,68 +58,6 @@
     }
   },
   {
-    "id": "lower-back-pain",
-    "slug": "lower-back-pain",
-    "parentSlug": "back-pain",
-    "name": "Lower Back Pain",
-    "shortDescription": "Targeted spinal rehabilitation, lumbar facet decompression, and deep core retraining for acute and chronic lumbar spine pain.",
-    "description": "Lower back pain affects nearly 80% of adults at some point in their lives. Whether caused by lumbar disc herniation, facet joint irritation, ligament sprain, or postural muscle imbalance, our registered Calgary physiotherapists use advanced orthopaedic manual therapy and functional core stabilization to stop pain and prevent recurrences.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [
-      "Rapid reduction of acute lumbar spasms and stiffness",
-      "Restores painless bending, lifting, and prolonged sitting",
-      "Identifies the root mechanical cause to prevent future flare-ups"
-    ],
-    "symptoms": [
-      "Dull or throbbing ache across the lumbar spine and beltline",
-      "Morning stiffness that takes 30+ minutes to loosen up",
-      "Sharp pinching pain when bending forward, coughing, or standing up",
-      "Muscle spasms across the lower back and gluteal region"
-    ],
-    "treatmentApproach": [
-      "CAMPT-certified joint mobilizations and spinal manual therapy",
-      "Gunn IMS / Dry Needling to release chronic deep paraspinal muscle spasms",
-      "Custom core stabilization exercises (McKenzie and Stuart McGill protocols)",
-      "Ergonomic computer and sitting posture modifications"
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [
-      "hero",
-      "at_a_glance",
-      "clinical_overview",
-      "custom_sections",
-      "symptoms",
-      "treatment_approach",
-      "related_therapies",
-      "team_carousel",
-      "faqs",
-      "location_map",
-      "decision_ctas",
-      "other_links",
-      "bottom_cta"
-    ],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy",
-      "acupuncture"
-    ],
-    "category": "Spine & Core",
-    "seo": {
-      "title": "Lower Back Pain Treatment Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Lower Back Pain Relief | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Evidence-based lower back pain therapy, IMS dry needling, and spinal rehabilitation in Calgary NW & NE.",
-      "sectionsData": {},
-      "ogDescription": "End lower back pain without pills or surgery with evidence-based physical therapy in Calgary."
-    }
-  },
-  {
     "id": "si-joint-dysfunction",
     "slug": "si-joint-dysfunction",
     "parentSlug": "back-pain",
@@ -666,50 +604,6 @@
       "description": "Targeted nerve decompression, neural glide therapy, and pain management in Calgary.",
       "sectionsData": {},
       "ogDescription": "Resolve carpal tunnel, pinched nerves, and neuropathy with specialized physical therapy."
-    }
-  },
-  {
-    "id": "headaches",
-    "slug": "headaches",
-    "parentSlug": "neck-shoulder-pain",
-    "name": "Headaches",
-    "shortDescription": "Relief from cervicogenic headaches, tension headaches, and posture-induced migraine triggers.",
-    "description": "Up to 80% of persistent tension headaches originate from the upper cervical spine (cervicogenic headaches). When upper neck joints and suboccipital muscles are irritated, referred pain radiates upward over the skull into the temples and behind the eyes.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Aching pain starting at the base of the skull spreading forward to the forehead",
-      "Headache intensity that increases after prolonged screen work",
-      "Neck tightness or tenderness to touch at the top of the neck",
-      "Light or sound sensitivity linked with neck stiffness"
-    ],
-    "treatmentApproach": [
-      "Upper cervical (C1–C3) facet joint assessment and gentle mobilization",
-      "Suboccipital trigger point release and acupuncture",
-      "Ergonomic computer and sitting posture adjustment",
-      "Cervical stabilization and progressive postural endurance exercises"
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy",
-      "acupuncture"
-    ],
-    "category": "Head & Neck",
-    "seo": {
-      "title": "Cervicogenic Headache Treatment Calgary | Nose Creek",
-      "ogTitle": "Headache Relief Clinic | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Stop tension and neck headaches with cervical manual therapy and dry needling in Calgary.",
-      "sectionsData": {},
-      "ogDescription": "Target the cervical root cause of chronic headaches for lasting relief without daily pills."
     }
   },
   {

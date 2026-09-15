@@ -6,7 +6,7 @@ import ThemeApplier from "@/components/theme/ThemeApplier";
 import { buildThemeCss, ThemeColors } from "@/lib/theme";
 import { RoleProvider } from "@/components/admin/RoleGuard";
 import settingsData from "@/data/settings.json";
-import { getSiteSettings } from "@/lib/api";
+import { getSiteSettings, getServices, getConditions } from "@/lib/api";
 import { getSiteBaseUrl } from "@/lib/seo";
 
 export const revalidate = 60;
@@ -90,7 +90,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  const [settings, services, conditions] = await Promise.all([
+    getSiteSettings(),
+    getServices().catch(() => []),
+    getConditions().catch(() => [])
+  ]);
   const serverThemeColors = ((settings as any)?.marketing?.theme_colors || (settings as any)?.themeColors) as ThemeColors | undefined;
   const serverThemeCss = serverThemeColors ? buildThemeCss(serverThemeColors) : null;
 
@@ -132,7 +136,14 @@ export default async function RootLayout({
       <body>
         <ThemeApplier initialTheme={serverThemeColors} />
         <RoleProvider>
-          <SiteLayout initialSchemas={settings.customSchemas || []}>{children}</SiteLayout>
+          <SiteLayout
+            initialSchemas={settings.customSchemas || []}
+            initialSettings={settings}
+            initialServices={services}
+            initialConditions={conditions}
+          >
+            {children}
+          </SiteLayout>
         </RoleProvider>
       </body>
     </html>

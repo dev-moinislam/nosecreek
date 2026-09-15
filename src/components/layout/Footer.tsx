@@ -6,10 +6,20 @@ import defaultConditionsData from "@/data/conditions.json";
 import defaultSettingsData from "@/data/settings.json";
 import { Service, Condition, SiteSettings } from "@/types/content";
 
-export default function Footer() {
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettingsData as SiteSettings);
-  const [services, setServices] = useState<Service[]>(defaultServicesData as Service[]);
-  const [conditions, setConditions] = useState<Condition[]>(defaultConditionsData as Condition[]);
+interface FooterProps {
+  initialSettings?: SiteSettings;
+  initialServices?: Service[];
+  initialConditions?: Condition[];
+}
+
+export default function Footer({
+  initialSettings,
+  initialServices,
+  initialConditions
+}: FooterProps = {}) {
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSettings || (defaultSettingsData as SiteSettings));
+  const [services, setServices] = useState<Service[]>(initialServices || (defaultServicesData as Service[]));
+  const [conditions, setConditions] = useState<Condition[]>(initialConditions || (defaultConditionsData as Condition[]));
 
   useEffect(() => {
     async function fetchFreshSettings() {
@@ -26,6 +36,14 @@ export default function Footer() {
 
     function sync() {
       try {
+        let deletedSlugs: string[] = [];
+        const dRaw = localStorage.getItem("adm_deleted_slugs");
+        if (dRaw) {
+          try {
+            deletedSlugs = JSON.parse(dRaw);
+          } catch {}
+        }
+
         const savedSettings = localStorage.getItem("adm_settings");
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings);
@@ -38,31 +56,28 @@ export default function Footer() {
         if (savedServices) {
           const parsed = JSON.parse(savedServices);
           if (Array.isArray(parsed)) {
-            setServices(parsed);
+            setServices(parsed.filter((svc: Service) => !deletedSlugs.includes(svc.slug)));
           }
         }
         const savedConditions = localStorage.getItem("adm_conditions");
         if (savedConditions) {
           const parsed = JSON.parse(savedConditions);
           if (Array.isArray(parsed)) {
-            setConditions(parsed);
+            setConditions(parsed.filter((cond: Condition) => !deletedSlugs.includes(cond.slug)));
           }
         }
       } catch {}
     }
     sync();
 
-    // Fast initial background fetch
-    const timer = setTimeout(() => {
-      fetchFreshSettings();
-    }, 100);
+    // Fast immediate background fetch
+    fetchFreshSettings();
 
     window.addEventListener("settingsUpdated", sync);
     window.addEventListener("servicesUpdated", sync);
     window.addEventListener("conditionsUpdated", sync);
     window.addEventListener("storage", sync);
     return () => {
-      clearTimeout(timer);
       window.removeEventListener("settingsUpdated", sync);
       window.removeEventListener("servicesUpdated", sync);
       window.removeEventListener("conditionsUpdated", sync);

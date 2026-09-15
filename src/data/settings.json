@@ -305,13 +305,6 @@
                 "enabled": true,
                 "children": [
                   {
-                    "id": "cnd-lower-back-pain",
-                    "href": "/conditions/back-pain/lower-back-pain",
-                    "label": "Lower Back Pain",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
                     "id": "cnd-si-joint-dysfunction",
                     "href": "/conditions/back-pain/si-joint-dysfunction",
                     "label": "SI Joint Dysfunction",
@@ -351,13 +344,6 @@
                     "id": "cnd-nerve-pain",
                     "href": "/conditions/neck-shoulder-pain/nerve-pain",
                     "label": "Nerve Pain",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
-                    "id": "cnd-headaches",
-                    "href": "/conditions/neck-shoulder-pain/headaches",
-                    "label": "Headaches",
                     "enabled": true,
                     "children": []
                   }
@@ -509,7 +495,11 @@
         "ctaButtonText": "Book Online",
         "topBarEnabled": true
       }
-    }
+    },
+    "deleted_slugs": [
+      "lower-back-pain",
+      "headaches"
+    ]
   },
   "notifications": {
     "enabled": true,
@@ -756,13 +746,6 @@
               "enabled": true,
               "children": [
                 {
-                  "id": "cnd-lower-back-pain",
-                  "href": "/conditions/back-pain/lower-back-pain",
-                  "label": "Lower Back Pain",
-                  "enabled": true,
-                  "children": []
-                },
-                {
                   "id": "cnd-si-joint-dysfunction",
                   "href": "/conditions/back-pain/si-joint-dysfunction",
                   "label": "SI Joint Dysfunction",
@@ -802,13 +785,6 @@
                   "id": "cnd-nerve-pain",
                   "href": "/conditions/neck-shoulder-pain/nerve-pain",
                   "label": "Nerve Pain",
-                  "enabled": true,
-                  "children": []
-                },
-                {
-                  "id": "cnd-headaches",
-                  "href": "/conditions/neck-shoulder-pain/headaches",
-                  "label": "Headaches",
                   "enabled": true,
                   "children": []
                 }

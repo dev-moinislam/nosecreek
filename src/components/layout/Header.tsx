@@ -13,15 +13,25 @@ function cleanNavLabel(text?: string): string {
   return text.replace(/\s*subtopics?\b/gi, "").trim();
 }
 
-export default function Header() {
+interface HeaderProps {
+  initialSettings?: SiteSettings;
+  initialServices?: Service[];
+  initialConditions?: Condition[];
+}
+
+export default function Header({
+  initialSettings,
+  initialServices,
+  initialConditions
+}: HeaderProps = {}) {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExpandedKeys, setMobileExpandedKeys] = useState<Record<string, boolean>>({});
   const [currentHash, setCurrentHash] = useState("");
 
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSettingsData as SiteSettings);
-  const [dynamicServices, setDynamicServices] = useState<Service[]>(defaultServicesData as Service[]);
-  const [dynamicConditions, setDynamicConditions] = useState<Condition[]>(defaultConditionsData as Condition[]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSettings || (defaultSettingsData as SiteSettings));
+  const [dynamicServices, setDynamicServices] = useState<Service[]>(initialServices || (defaultServicesData as Service[]));
+  const [dynamicConditions, setDynamicConditions] = useState<Condition[]>(initialConditions || (defaultConditionsData as Condition[]));
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -70,6 +80,14 @@ export default function Header() {
 
     function syncContent() {
       try {
+        let deletedSlugs: string[] = [];
+        const dRaw = localStorage.getItem("adm_deleted_slugs");
+        if (dRaw) {
+          try {
+            deletedSlugs = JSON.parse(dRaw);
+          } catch {}
+        }
+
         const savedSettings = localStorage.getItem("adm_settings");
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings);
@@ -82,33 +100,30 @@ export default function Header() {
         if (savedServices) {
           const parsed = JSON.parse(savedServices);
           if (Array.isArray(parsed)) {
-            setDynamicServices(parsed);
+            setDynamicServices(parsed.filter((svc: Service) => !deletedSlugs.includes(svc.slug)));
           }
         }
         const savedConditions = localStorage.getItem("adm_conditions");
         if (savedConditions) {
           const parsed = JSON.parse(savedConditions);
           if (Array.isArray(parsed)) {
-            setDynamicConditions(parsed);
+            setDynamicConditions(parsed.filter((cond: Condition) => !deletedSlugs.includes(cond.slug)));
           }
         }
       } catch {}
     }
     syncContent();
 
-    // Fast initial freshness sync
-    const idleTimer = setTimeout(() => {
-      fetchFreshSettings();
-      fetchFreshServices();
-      fetchFreshConditions();
-    }, 100);
+    // Fast immediate freshness sync from API
+    fetchFreshSettings();
+    fetchFreshServices();
+    fetchFreshConditions();
 
     window.addEventListener("settingsUpdated", syncContent);
     window.addEventListener("servicesUpdated", syncContent);
     window.addEventListener("conditionsUpdated", syncContent);
     window.addEventListener("storage", syncContent);
     return () => {
-      clearTimeout(idleTimer);
       window.removeEventListener("settingsUpdated", syncContent);
       window.removeEventListener("servicesUpdated", syncContent);
       window.removeEventListener("conditionsUpdated", syncContent);

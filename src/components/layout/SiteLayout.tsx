@@ -9,14 +9,23 @@ import MarketingScripts from "@/components/marketing/MarketingScripts";
 import FloatingReviewsWidget from "@/components/ui/FloatingReviewsWidget";
 import NavigationProgressBar from "@/components/ui/NavigationProgressBar";
 
-import { CustomSchemaItem } from "@/types/content";
+import { CustomSchemaItem, SiteSettings, Service, Condition } from "@/types/content";
 
 interface SiteLayoutProps {
   children: React.ReactNode;
   initialSchemas?: CustomSchemaItem[];
+  initialSettings?: SiteSettings;
+  initialServices?: Service[];
+  initialConditions?: Condition[];
 }
 
-export default function SiteLayout({ children, initialSchemas }: SiteLayoutProps) {
+export default function SiteLayout({
+  children,
+  initialSchemas,
+  initialSettings,
+  initialServices,
+  initialConditions
+}: SiteLayoutProps) {
   const pathname = usePathname();
   
   // Exclude all Admin, Portal, and Login routes (/admin, /client-login, /admin-login)
@@ -38,9 +47,17 @@ export default function SiteLayout({ children, initialSchemas }: SiteLayoutProps
       <React.Suspense fallback={null}>
         <NavigationProgressBar />
       </React.Suspense>
-      <Header />
+      <Header
+        initialSettings={initialSettings}
+        initialServices={initialServices}
+        initialConditions={initialConditions}
+      />
       <main id="main-content" style={{ minHeight: "100vh" }}>{children}</main>
-      <Footer />
+      <Footer
+        initialSettings={initialSettings}
+        initialServices={initialServices}
+        initialConditions={initialConditions}
+      />
       <CustomSchemasInjector initialSchemas={initialSchemas} />
       <MarketingScripts />
       <FloatingReviewsWidget />
