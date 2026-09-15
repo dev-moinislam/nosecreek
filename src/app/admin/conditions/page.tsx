@@ -431,9 +431,47 @@ export default function AdminConditionsPage() {
         });
       } catch {}
 
+      // Also remove this condition from Navigation in localStorage adm_settings & dispatch
+      try {
+        const savedSettingsRaw = typeof window !== "undefined" ? localStorage.getItem("adm_settings") : null;
+        if (savedSettingsRaw) {
+          const currentSettings = JSON.parse(savedSettingsRaw);
+          const filterNav = (items: any[]): any[] => {
+            if (!Array.isArray(items)) return [];
+            return items
+              .filter((item) => {
+                const idMatches = item.id === `cnd-${slug}`;
+                const hrefMatches = item.href && (item.href === `/conditions/${slug}` || item.href.endsWith(`/${slug}`));
+                return !idMatches && !hrefMatches;
+              })
+              .map((item) => ({
+                ...item,
+                children: item.children ? filterNav(item.children) : []
+              }));
+          };
+
+          if (currentSettings.navigation?.header?.menu) {
+            currentSettings.navigation.header.menu = filterNav(currentSettings.navigation.header.menu);
+          }
+          if (Array.isArray(currentSettings.navigation?.footer?.columns)) {
+            currentSettings.navigation.footer.columns = currentSettings.navigation.footer.columns.map((col: any) => ({
+              ...col,
+              links: Array.isArray(col.links)
+                ? col.links.filter((l: any) => !(l.href && (l.href === `/conditions/${slug}` || l.href.endsWith(`/${slug}`))))
+                : []
+            }));
+          }
+
+          localStorage.setItem("adm_settings", JSON.stringify(currentSettings));
+          window.dispatchEvent(new Event("settingsUpdated"));
+        }
+      } catch (navErr) {
+        console.warn("Client navigation clean error on delete condition:", navErr);
+      }
+
       setConditions(updated);
       setEditingCondition(null);
-      setToastMessage(`✓ Condition "${title}" permanently deleted!`);
+      setToastMessage(`✓ Condition "${title}" permanently deleted and removed from navigation!`);
     } catch (err: any) {
       console.error("Delete condition failed:", err);
       alert("⚠️ Error deleting: " + (err.message || err));

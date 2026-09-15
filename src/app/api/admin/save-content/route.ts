@@ -202,6 +202,74 @@ export async function POST(req: Request) {
       }
     }
 
+    // Clean up deleted service/condition from navigation in settings.json and Supabase site_settings
+    if (deletedSlug && (type === "services" || type === "conditions")) {
+      try {
+        const settingsFilePath = path.resolve(process.cwd(), "src/data/settings.json");
+        let settingsData: any = null;
+        if (fs.existsSync(settingsFilePath)) {
+          settingsData = JSON.parse(fs.readFileSync(settingsFilePath, "utf-8"));
+        }
+
+        const filterNavItems = (items: any[]): any[] => {
+          if (!Array.isArray(items)) return [];
+          return items
+            .filter((item) => {
+              const idMatches = item.id === `srv-${deletedSlug}` || item.id === `cnd-${deletedSlug}`;
+              const hrefMatches = item.href && (item.href === `/${type}/${deletedSlug}` || item.href.endsWith(`/${deletedSlug}`));
+              return !idMatches && !hrefMatches;
+            })
+            .map((item) => ({
+              ...item,
+              children: item.children ? filterNavItems(item.children) : []
+            }));
+        };
+
+        let settingsChanged = false;
+        if (settingsData?.navigation) {
+          if (Array.isArray(settingsData.navigation.header?.menu)) {
+            settingsData.navigation.header.menu = filterNavItems(settingsData.navigation.header.menu);
+            settingsChanged = true;
+          }
+          if (Array.isArray(settingsData.navigation.footer?.columns)) {
+            settingsData.navigation.footer.columns = settingsData.navigation.footer.columns.map((col: any) => ({
+              ...col,
+              links: Array.isArray(col.links)
+                ? col.links.filter((l: any) => !(l.href && (l.href === `/${type}/${deletedSlug}` || l.href.endsWith(`/${deletedSlug}`))))
+                : []
+            }));
+            settingsChanged = true;
+          }
+        }
+
+        if (settingsChanged) {
+          try {
+            fs.writeFileSync(settingsFilePath, JSON.stringify(settingsData, null, 2), "utf-8");
+          } catch (sfErr) {
+            console.warn("[save-content] settings.json write skipped on read-only system.");
+          }
+
+          if (isSupabaseConfigured && supabase) {
+            try {
+              const { data: cur } = await supabase.from("site_settings").select("marketing").eq("id", "main").maybeSingle();
+              const updatedMarketing = {
+                ...(cur?.marketing || {}),
+                navigation: settingsData.navigation
+              };
+              await supabase
+                .from("site_settings")
+                .update({ marketing: updatedMarketing })
+                .eq("id", "main");
+            } catch (supaNavErr) {
+              console.warn("Supabase navigation sync error on delete:", supaNavErr);
+            }
+          }
+        }
+      } catch (cleanNavErr) {
+        console.warn("Error cleaning up navigation references on delete:", cleanNavErr);
+      }
+    }
+
     // Backend Supabase sync for team data
     if (type === "team" && isSupabaseConfigured && supabase && Array.isArray(data)) {
       try {

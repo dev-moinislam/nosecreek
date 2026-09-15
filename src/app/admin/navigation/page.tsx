@@ -184,37 +184,148 @@ export default function AdminNavigationPage() {
     setEditingItem(null);
   };
 
-  const handleDeleteItem = (id: string, level: 1 | 2 | 3, parentLevel1Id?: string, parentLevel2Id?: string) => {
-    if (!confirm("Are you sure you want to delete this menu item and any of its nested submenus?")) return;
+  const handleDeleteItem = async (id: string, level: 1 | 2 | 3, parentLevel1Id?: string, parentLevel2Id?: string) => {
+    if (!confirm("Are you sure you want to delete this menu item and any of its nested submenus? This will also remove the corresponding page from Services / Conditions.")) return;
 
-    setNavData((prev) => {
-      let menu = [...(prev.header?.menu || [])];
+    // 1. Find the target item and all its descendants to collect their URLs
+    let itemToDelete: NavMenuItem | undefined;
+    const currentMenu = navData.header?.menu || [];
+    if (level === 1) {
+      itemToDelete = currentMenu.find((m) => m.id === id);
+    } else if (level === 2 && parentLevel1Id) {
+      const p1 = currentMenu.find((m) => m.id === parentLevel1Id);
+      itemToDelete = p1?.children?.find((c) => c.id === id);
+    } else if (level === 3 && parentLevel1Id && parentLevel2Id) {
+      const p1 = currentMenu.find((m) => m.id === parentLevel1Id);
+      const p2 = p1?.children?.find((c) => c.id === parentLevel2Id);
+      itemToDelete = p2?.children?.find((c) => c.id === id);
+    }
 
-      if (level === 1) {
-        menu = menu.filter((m) => m.id !== id);
-      } else if (level === 2 && parentLevel1Id) {
-        const p1 = menu.find((m) => m.id === parentLevel1Id);
-        if (p1 && p1.children) {
-          p1.children = p1.children.filter((c) => c.id !== id);
-        }
-      } else if (level === 3 && parentLevel1Id && parentLevel2Id) {
-        const p1 = menu.find((m) => m.id === parentLevel1Id);
-        if (p1 && p1.children) {
-          const p2 = p1.children.find((c) => c.id === parentLevel2Id);
-          if (p2 && p2.children) {
-            p2.children = p2.children.filter((c) => c.id !== id);
+    const collectHrefs = (item?: NavMenuItem): string[] => {
+      if (!item) return [];
+      let res: string[] = [];
+      if (item.href) res.push(item.href);
+      if (item.children && item.children.length > 0) {
+        item.children.forEach((ch) => {
+          res = res.concat(collectHrefs(ch));
+        });
+      }
+      return res;
+    };
+
+    const deletedHrefs = collectHrefs(itemToDelete);
+
+    // 2. Cross-delete matching Conditions & Services
+    let updatedConditions = [...conditionsList];
+    let updatedServices = [...servicesList];
+
+    for (const href of deletedHrefs) {
+      const clean = href.trim().split("?")[0].split("#")[0];
+      if (clean.startsWith("/conditions/")) {
+        const parts = clean.replace("/conditions/", "").split("/").filter(Boolean);
+        const slug = parts[parts.length - 1];
+        if (slug) {
+          updatedConditions = updatedConditions.filter((c) => c.slug !== slug);
+          if (isSupabaseConfigured && supabase) {
+            try {
+              await supabase.from("conditions").delete().eq("slug", slug);
+              await supabase.from("conditions").delete().eq("id", slug);
+            } catch {}
           }
+          fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "conditions", data: updatedConditions, deletedSlug: slug })
+          }).catch(() => {});
+        }
+      } else if (clean.startsWith("/services/")) {
+        const parts = clean.replace("/services/", "").split("/").filter(Boolean);
+        const slug = parts[parts.length - 1];
+        if (slug) {
+          updatedServices = updatedServices.filter((s) => s.slug !== slug);
+          if (isSupabaseConfigured && supabase) {
+            try {
+              await supabase.from("services").delete().eq("slug", slug);
+              await supabase.from("services").delete().eq("id", slug);
+            } catch {}
+          }
+          fetch("/api/admin/save-content", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "services", data: updatedServices, deletedSlug: slug })
+          }).catch(() => {});
         }
       }
+    }
 
-      return {
-        ...prev,
-        header: {
-          ...(prev.header || {}),
-          menu
+    if (updatedConditions.length !== conditionsList.length) {
+      setConditionsList(updatedConditions);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_conditions", JSON.stringify(updatedConditions));
+        window.dispatchEvent(new Event("conditionsUpdated"));
+      }
+    }
+
+    if (updatedServices.length !== servicesList.length) {
+      setServicesList(updatedServices);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("adm_services", JSON.stringify(updatedServices));
+        window.dispatchEvent(new Event("servicesUpdated"));
+      }
+    }
+
+    // 3. Update navigation state
+    let menu = [...(navData.header?.menu || [])];
+    if (level === 1) {
+      menu = menu.filter((m) => m.id !== id);
+    } else if (level === 2 && parentLevel1Id) {
+      const p1 = menu.find((m) => m.id === parentLevel1Id);
+      if (p1 && p1.children) {
+        p1.children = p1.children.filter((c) => c.id !== id);
+      }
+    } else if (level === 3 && parentLevel1Id && parentLevel2Id) {
+      const p1 = menu.find((m) => m.id === parentLevel1Id);
+      if (p1 && p1.children) {
+        const p2 = p1.children.find((c) => c.id === parentLevel2Id);
+        if (p2 && p2.children) {
+          p2.children = p2.children.filter((c) => c.id !== id);
         }
-      };
-    });
+      }
+    }
+
+    const newNavData: HeaderFooterNavigation = {
+      ...navData,
+      header: {
+        ...(navData.header || {}),
+        menu
+      }
+    };
+
+    setNavData(newNavData);
+
+    // 4. Auto-persist navigation immediately
+    if (typeof window !== "undefined") {
+      const local = localStorage.getItem("adm_settings");
+      let parsed = local ? JSON.parse(local) : {};
+      parsed.navigation = newNavData;
+      if (!parsed.marketing) parsed.marketing = {};
+      parsed.marketing.navigation = newNavData;
+      localStorage.setItem("adm_settings", JSON.stringify(parsed));
+      window.dispatchEvent(new Event("settingsUpdated"));
+    }
+
+    fetch("/api/admin/save-content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "settings",
+        data: {
+          ...defaultSettings,
+          navigation: newNavData,
+          marketing: { navigation: newNavData }
+        }
+      })
+    }).catch(() => {});
   };
 
   const handleMoveItem = (index: number, direction: "up" | "down", level: 1 | 2 | 3, parentLevel1Id?: string, parentLevel2Id?: string) => {
