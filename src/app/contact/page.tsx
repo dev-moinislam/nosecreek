@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ContactInquiryForm from "@/components/forms/ContactInquiryForm";
 import VisitUsSection from "@/components/content/VisitUsSection";
@@ -58,10 +59,8 @@ export default function ContactPage() {
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 14 }}>
-            <a
-              href="https://www.nosecreekphysiotherapy.com/inquire/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/inquire"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -79,12 +78,10 @@ export default function ContactPage() {
               }}
             >
               Inquire About Cost &amp; Availability
-            </a>
+            </Link>
 
-            <a
-              href="https://www.nosecreekphysiotherapy.com/telephone-consultation/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/telephone-consultation"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -102,12 +99,10 @@ export default function ContactPage() {
               }}
             >
               Request a Free Telephone Consultation
-            </a>
+            </Link>
 
-            <a
-              href="https://www.nosecreekphysiotherapy.com/free-discovery-session/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/free-discovery-session"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -125,7 +120,7 @@ export default function ContactPage() {
               }}
             >
               Apply for a Free Discovery Session
-            </a>
+            </Link>
           </div>
 
         </div>

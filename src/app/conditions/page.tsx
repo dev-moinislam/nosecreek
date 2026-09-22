@@ -100,20 +100,20 @@ export default async function ConditionsPage() {
               <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                 Unsure if physio will work for your condition? Come in, meet our team, and let us confirm whether we can help — no treatment, no pressure.
               </p>
-              <a href="https://www.nosecreekphysiotherapy.com/free-discovery-session/"
-                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9 }}>
+              <Link href="/free-discovery-session"
+                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                 Apply for a Free Discovery Session →
-              </a>
+              </Link>
             </div>
             <div style={{ background: "linear-gradient(160deg,#1c9fd8,#1179ab)", color: "#fff", borderRadius: 20, padding: 34 }}>
               <h3 style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>Talk to a Physio First</h3>
               <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                 Have questions about your symptoms? Schedule a free telephone consultation and one of our physiotherapists will answer everything over the phone.
               </p>
-              <a href="https://www.nosecreekphysiotherapy.com/telephone-consultation/"
-                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9 }}>
+              <Link href="/telephone-consultation"
+                style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                 Arrange a free phone consult →
-              </a>
+              </Link>
             </div>
           </div>
         </div>

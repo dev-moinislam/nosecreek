@@ -364,7 +364,7 @@ export default async function AboutPage() {
               <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                 Unsure if Physiotherapy is right for you? Come in and chat with us first. Completely free, no-obligation, and risk-free on your part.
               </p>
-              <Link href="/contact"
+              <Link href="/free-discovery-session"
                 style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#5c9515", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                 Apply For A Free Discovery Session →
               </Link>
@@ -374,7 +374,7 @@ export default async function AboutPage() {
               <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                 Want to know treatment costs, direct billing options, and upcoming appointment availability at our clinic? Complete our quick inquiry form.
               </p>
-              <Link href="/contact"
+              <Link href="/inquire"
                 style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "#1179ab", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                 Inquire About Cost &amp; Availability →
               </Link>

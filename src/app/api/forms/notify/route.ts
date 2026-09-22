@@ -68,6 +68,30 @@ function getFormBadge(formType: string = "") {
       icon: "📅"
     };
   }
+  if (normalized.includes("cost") || normalized.includes("inquire")) {
+    return {
+      title: "Cost & Availability Inquiry",
+      tag: "COST & AVAILABILITY",
+      color: "#0e78a8",
+      icon: "📋"
+    };
+  }
+  if (normalized.includes("telephone") || normalized.includes("phone_consult")) {
+    return {
+      title: "Free Telephone Consultation",
+      tag: "PHONE CONSULTATION",
+      color: "#059669",
+      icon: "📞"
+    };
+  }
+  if (normalized.includes("discovery")) {
+    return {
+      title: "Free Discovery Session",
+      tag: "DISCOVERY SESSION",
+      color: "#7c3aed",
+      icon: "🎯"
+    };
+  }
   if (normalized.includes("contact") || normalized === "inquiry") {
     return {
       title: "Contact Page Inquiry",
@@ -225,6 +249,17 @@ function buildClinicNotificationHtml(lead: any, isTest = false): string {
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Preferred Location</td>
               <td style="padding: 10px 0; font-size: 14px; color: #0f172a; font-weight: 600;">${lead.preferredLocation}</td>
             </tr>` : ""}
+            ${lead.metadata ? Object.entries(lead.metadata)
+              .filter(([k, v]) => Boolean(v) && !["page", "requested_service"].includes(k))
+              .map(([key, val]) => {
+                const prettyKey = key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                return `
+                  <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">${prettyKey}</td>
+                    <td style="padding: 10px 0; font-size: 14px; color: #0f172a; font-weight: 600;">${String(val)}</td>
+                  </tr>
+                `;
+              }).join("") : ""}
             <tr>
               <td style="padding: 10px 0; font-size: 13px; font-weight: 600; color: #64748b;">Date & Time</td>
               <td style="padding: 10px 0; font-size: 13px; color: #64748b;">${dateStr}</td>
@@ -406,6 +441,27 @@ export async function POST(req: Request) {
 
     const formInfo = getFormBadge(leadData.form_type || leadData.formType || (isTest ? "test" : "inquiry"));
     const prefix = notifSettings?.subjectPrefix || "[New Website Lead]";
+
+    // Save lead into Supabase leads table for unified Admin Leads inbox
+    if (!isTest && isSupabaseConfigured && supabase) {
+      try {
+        const leadName = leadData.name || `${leadData.first_name || ""} ${leadData.last_name || ""}`.trim() || undefined;
+        await supabase.from("leads").insert([{
+          form_type: leadData.form_type || leadData.formType || "inquiry",
+          name: leadName,
+          first_name: leadData.first_name || undefined,
+          last_name: leadData.last_name || undefined,
+          email: leadData.email || "",
+          phone: leadData.phone || undefined,
+          service_interest: leadData.service_interest || leadData.metadata?.discipline || undefined,
+          message: leadData.message || undefined,
+          metadata: leadData.metadata || {},
+          status: "new"
+        }]);
+      } catch (insertErr) {
+        console.warn("Could not insert lead into Supabase leads table:", insertErr);
+      }
+    }
 
     // Crystal-clear subject line stating WHICH form was submitted
     const subject = isTest

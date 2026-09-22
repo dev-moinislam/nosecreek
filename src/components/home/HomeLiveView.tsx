@@ -512,13 +512,22 @@ export default function HomeLiveView({
         const title = cfg?.title || decide?.title || "Want help deciding if physio is right for you?";
         const desc = cfg?.content || decide?.description || "Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first.";
         const discTitle = decide?.discoveryTitle || "Free Discovery Session";
+        const cleanUrl = (u: string | undefined, fallback: string) => {
+          if (!u) return fallback;
+          if (u.includes("/inquire")) return "/inquire";
+          if (u.includes("/telephone-consultation")) return "/telephone-consultation";
+          if (u.includes("/free-discovery-session")) return "/free-discovery-session";
+          return u;
+        };
+
         const discDesc = decide?.discoveryDesc || "Unsure if physio will work for you, or had a bad experience in the past? Come in, see the clinic and find out for yourself how we can help — no treatment, no pressure.";
         const discBtn = decide?.discoveryBtnText || "Apply for a Free Discovery Session →";
-        const discUrl = decide?.discoveryBtnUrl || "https://www.nosecreekphysiotherapy.com/free-discovery-session/";
+        const discUrl = cleanUrl(decide?.discoveryBtnUrl, "/free-discovery-session");
         const phoneTitle = decide?.phoneTitle || "Talk to a Physio First";
         const phoneDesc = decide?.phoneDesc || "Have questions and want to be 100% sure we can help before booking? Schedule a free call and one of our physios will answer everything over the phone.";
         const phoneBtn = decide?.phoneBtnText || "Arrange a free phone consult →";
-        const phoneUrl = decide?.phoneBtnUrl || "https://www.nosecreekphysiotherapy.com/telephone-consultation/";
+        const phoneUrl = cleanUrl(decide?.phoneBtnUrl, "/telephone-consultation");
+        const costUrl = cleanUrl(decide?.costLinkUrl, "/inquire");
 
         return (
           <section key="decide_ctas" style={{ padding: "clamp(56px,7vw,96px) 0" }}>
@@ -535,29 +544,29 @@ export default function HomeLiveView({
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
                     {discDesc}
                   </p>
-                  <a href={discUrl}
+                  <Link href={discUrl}
                     style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--secondary-hover, #5c9515)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     {discBtn}
-                  </a>
+                  </Link>
                 </div>
                 <div style={{ background: "linear-gradient(160deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff", borderRadius: 20, padding: 34 }}>
                   <h3 style={{ fontSize: 22, fontWeight: 700, color: "#fff" }}>{phoneTitle}</h3>
                   <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
                     {phoneDesc}
                   </p>
-                  <a href={phoneUrl}
+                  <Link href={phoneUrl}
                     style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--primary-hover, #1179ab)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                     {phoneBtn}
-                  </a>
+                  </Link>
                 </div>
               </div>
               <p style={{ textAlign: "center", marginTop: 22, fontSize: 13, color: "#8a97a1" }}>
                 {decide?.noteText || "There is no treatment given at a discovery session — it's for you to ask questions and for us to confirm whether we can help."}
               </p>
               <div style={{ textAlign: "center", marginTop: 20 }}>
-                <a href={decide?.costLinkUrl || "https://www.nosecreekphysiotherapy.com/inquire/"} style={{ color: "var(--primary, #0e78a8)", fontFamily: "'Poppins',sans-serif", fontWeight: 700 }}>
+                <Link href={costUrl} style={{ color: "var(--primary, #0e78a8)", fontFamily: "'Poppins',sans-serif", fontWeight: 700 }}>
                   {decide?.costLinkText || "Just want to know cost & availability? Inquire here →"}
-                </a>
+                </Link>
               </div>
             </div>
           </section>

@@ -255,7 +255,18 @@ export default function Header({
         },
         { id: "nav-workshops", label: "Workshops", href: "/workshops", enabled: true },
         { id: "nav-blog", label: "Blog", href: "/blog", enabled: true },
-        { id: "nav-contact", label: "Contact", href: "/contact", enabled: true },
+        {
+          id: "nav-contact",
+          label: "Contact",
+          href: "/contact",
+          enabled: true,
+          children: [
+            { id: "cnt-main", label: "Contact Us", href: "/contact", enabled: true },
+            { id: "cnt-inquire", label: "Inquire About Cost & Availability", href: "/inquire", enabled: true },
+            { id: "cnt-phone", label: "Free Telephone Consultation", href: "/telephone-consultation", enabled: true },
+            { id: "cnt-discovery", label: "Free Discovery Session", href: "/free-discovery-session", enabled: true }
+          ]
+        },
       ];
 
   const menuItems: NavMenuItem[] = baseMenuItems.map((item) => {

@@ -71,6 +71,30 @@ export const CORE_PAGES: InternalRouteItem[] = [
     description: "Free community workshops on back pain, knee arthritis, and posture."
   },
   {
+    id: "page-inquire",
+    title: "Inquire About Cost & Availability",
+    url: "/inquire",
+    category: "page",
+    badge: "Inquiry Form",
+    description: "Inquire directly about treatment cost, availability, and insurance coverage."
+  },
+  {
+    id: "page-telephone-consultation",
+    title: "Free Telephone Consultation",
+    url: "/telephone-consultation",
+    category: "page",
+    badge: "Free Consultation",
+    description: "Arrange a free 15-minute telephone consultation with a physiotherapist."
+  },
+  {
+    id: "page-free-discovery-session",
+    title: "Free Discovery Session",
+    url: "/free-discovery-session",
+    category: "page",
+    badge: "Free Discovery",
+    description: "Apply for a no-obligation 15-minute in-person discovery session."
+  },
+  {
     id: "page-blog",
     title: "Health & Clinical Insights Blog",
     url: "/blog",
