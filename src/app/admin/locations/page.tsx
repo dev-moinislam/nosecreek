@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Location } from "@/types/content";
-import locationsData from "@/data/locations.json";
 import AdminToast from "@/components/admin/AdminToast";
 import AdminImageUploader from "@/components/admin/AdminImageUploader";
 
@@ -19,7 +18,7 @@ export default function AdminLocationsPage() {
 
   const fetchLocations = async () => {
     setLoading(true);
-    let currentData = locationsData as any[];
+    let currentData: any[] = [];
 
     if (isSupabaseConfigured && supabase) {
       try {

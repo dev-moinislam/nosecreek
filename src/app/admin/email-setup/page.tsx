@@ -4,7 +4,29 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { EmailNotificationSettings } from "@/types/content";
-import settingsData from "@/data/settings.json";
+
+const DEFAULT_NOTIFICATION_SETTINGS: EmailNotificationSettings = {
+  enabled: true,
+  receiverEmail: "info@nosecreekphysiotherapy.com",
+  subjectPrefix: "[New Website Lead]",
+  provider: "smtp",
+  resendApiKey: "",
+  senderName: "Nose Creek Website Forms",
+  senderEmail: "",
+  smtpHost: "smtp.gmail.com",
+  smtpPort: 465,
+  smtpUser: "",
+  smtpPass: "",
+  webhookUrl: "",
+  notifyOnAppointment: true,
+  notifyOnContact: true,
+  notifyOnGeneral: true,
+  autoReply: {
+    enabled: true,
+    subject: "Thank you for contacting Nose Creek Physiotherapy - We've received your request",
+    customMessage: "Thank you for reaching out to Nose Creek Physiotherapy! We have received your request and our clinical care team will contact you shortly to confirm your details or appointment."
+  }
+} as any as EmailNotificationSettings;
 
 export default function AdminEmailSetupPage() {
   const { role, isAdmin } = useRole();
@@ -13,28 +35,7 @@ export default function AdminEmailSetupPage() {
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  const [notifications, setNotifications] = useState<EmailNotificationSettings>(() => {
-    const n = (settingsData as any).notifications || {};
-    return {
-      enabled: n.enabled ?? true,
-      receiverEmail: n.receiverEmail || "info@nosecreekphysiotherapy.com",
-      subjectPrefix: n.subjectPrefix || "[New Website Lead]",
-      provider: n.provider || "smtp",
-      resendApiKey: n.resendApiKey || "",
-      senderName: n.senderName || "Nose Creek Website Forms",
-      senderEmail: n.senderEmail || "",
-      smtpHost: n.smtpHost || "smtp.gmail.com",
-      smtpPort: n.smtpPort || 465,
-      smtpUser: n.smtpUser || "",
-      smtpPass: n.smtpPass || "",
-      webhookUrl: n.webhookUrl || "",
-      autoReply: n.autoReply || {
-        enabled: true,
-        subject: "Thank you for contacting Nose Creek Physiotherapy - We've received your request",
-        customMessage: "Thank you for reaching out to Nose Creek Physiotherapy! We have received your request and our clinical care team will contact you shortly to confirm your details or appointment."
-      }
-    };
-  });
+  const [notifications, setNotifications] = useState<EmailNotificationSettings>(DEFAULT_NOTIFICATION_SETTINGS);
 
   const [testEmailStatus, setTestEmailStatus] = useState<{
     loading: boolean;
@@ -191,7 +192,7 @@ export default function AdminEmailSetupPage() {
       }
 
       // 2. Persist to Disk via API
-      const baseData = { ...(settingsData as any) };
+      const baseData: any = {};
       if (typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
         if (local) {

@@ -136,28 +136,31 @@ export const LOCATION_ROUTES: InternalRouteItem[] = [
   }
 ];
 
-import servicesData from "@/data/services.json";
-import conditionsData from "@/data/conditions.json";
-
 // 4. Default Services List (derived from active clinic services)
-export const DEFAULT_SERVICE_ROUTES: InternalRouteItem[] = (servicesData as any[]).map((s) => ({
-  id: `srv-${s.slug || s.id}`,
-  title: s.title || s.name,
-  url: `/services/${s.slug}`,
-  category: "service" as const,
-  badge: "Service",
-  description: s.shortDescription || `Specialized ${s.title} treatments at Nose Creek.`
-}));
+export const DEFAULT_SERVICE_ROUTES: InternalRouteItem[] = [
+  { id: "srv-physiotherapy", title: "Physiotherapy", url: "/services/physiotherapy", category: "service", badge: "Service", description: "Comprehensive physiotherapy assessments and hands-on rehabilitation." },
+  { id: "srv-massage-therapy", title: "Massage Therapy", url: "/services/massage-therapy", category: "service", badge: "Service", description: "Therapeutic and deep tissue massage therapy for pain relief." },
+  { id: "srv-custom-orthotics", title: "Custom Orthotics", url: "/services/custom-orthotics", category: "service", badge: "Service", description: "Custom foot orthotics for biomechanical correction and comfort." },
+  { id: "srv-shockwave-therapy", title: "Shockwave Therapy", url: "/services/shockwave-therapy", category: "service", badge: "Service", description: "Acoustic wave therapy accelerating tissue regeneration." },
+  { id: "srv-acupuncture", title: "Acupuncture & Dry Needling", url: "/services/acupuncture", category: "service", badge: "Service", description: "Trigger point dry needling and evidence-based acupuncture." },
+  { id: "srv-knee-bracing", title: "Custom Knee Bracing", url: "/services/custom-knee-bracing", category: "service", badge: "Service", description: "Custom knee braces for ligament instability and osteoarthritis." },
+  { id: "srv-chiropractic", title: "Chiropractic Care", url: "/services/chiropractic", category: "service", badge: "Service", description: "Spinal alignment and musculoskeletal joint adjustments." },
+  { id: "srv-pelvic-health", title: "Pelvic Health Physiotherapy", url: "/services/pelvic-health-physiotherapy", category: "service", badge: "Service", description: "Specialized pelvic floor rehabilitation." },
+  { id: "srv-vestibular", title: "Vestibular Rehabilitation", url: "/services/vestibular-rehabilitation", category: "service", badge: "Service", description: "Targeted balance and dizziness therapy." }
+];
 
 // 5. Default Conditions List (derived from active clinic conditions)
-export const DEFAULT_CONDITION_ROUTES: InternalRouteItem[] = (conditionsData as any[]).map((c) => ({
-  id: `cnd-${c.slug || c.id}`,
-  title: c.name || c.title,
-  url: `/conditions/${c.slug}`,
-  category: "condition" as const,
-  badge: "Condition",
-  description: c.shortDescription || `Targeted care for ${c.name || c.title}.`
-}));
+export const DEFAULT_CONDITION_ROUTES: InternalRouteItem[] = [
+  { id: "cnd-back-pain", title: "Back Pain & Sciatica", url: "/conditions/back-pain", category: "condition", badge: "Condition", description: "Targeted relief for lower back pain, disc issues, and sciatica." },
+  { id: "cnd-neck-pain", title: "Neck Pain & Whiplash", url: "/conditions/neck-pain", category: "condition", badge: "Condition", description: "Cervical spine rehabilitation and postural strain care." },
+  { id: "cnd-shoulder-pain", title: "Shoulder Pain & Rotator Cuff", url: "/conditions/shoulder-pain", category: "condition", badge: "Condition", description: "Rotator cuff and impingement solutions." },
+  { id: "cnd-knee-pain", title: "Knee Pain & Meniscus", url: "/conditions/knee-pain", category: "condition", badge: "Condition", description: "Comprehensive knee joint recovery." },
+  { id: "cnd-hip-pain", title: "Hip Pain & Labral Tears", url: "/conditions/hip-pain", category: "condition", badge: "Condition", description: "Targeted hip stabilization and pain relief." },
+  { id: "cnd-foot-ankle-pain", title: "Foot & Ankle Pain", url: "/conditions/foot-ankle-pain", category: "condition", badge: "Condition", description: "Plantar fasciitis and ankle sprain therapy." },
+  { id: "cnd-headaches", title: "Headaches & Migraines", url: "/conditions/headaches", category: "condition", badge: "Condition", description: "Cervicogenic headache relief." },
+  { id: "cnd-tmj", title: "TMJ Dysfunction", url: "/conditions/tmj-dysfunction", category: "condition", badge: "Condition", description: "Jaw clicking, locking, and muscular relief." },
+  { id: "cnd-concussion", title: "Concussion Rehabilitation", url: "/conditions/concussion", category: "condition", badge: "Condition", description: "Evidence-based post-concussion recovery." }
+];
 
 // Helper to get all routes dynamically with optional localStorage overrides
 export function getAllInternalRoutes(customServices?: any[], customConditions?: any[]): InternalRouteItem[] {

@@ -1,12 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRole } from "@/components/admin/RoleGuard";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
-import servicesData from "@/data/services.json";
-import teamData from "@/data/team.json";
-import conditionsData from "@/data/conditions.json";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 
 import {
   ServiceIconSvg,
@@ -18,6 +15,27 @@ import {
 
 export default function AdminOverviewPage() {
   const { role } = useRole();
+  const [counts, setCounts] = useState({ services: 9, conditions: 17, team: 14 });
+
+  useEffect(() => {
+    async function loadStats() {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const [sRes, cRes, tRes] = await Promise.all([
+            supabase.from("services").select("id", { count: "exact", head: true }),
+            supabase.from("conditions").select("id", { count: "exact", head: true }),
+            supabase.from("team_members").select("id", { count: "exact", head: true })
+          ]);
+          setCounts({
+            services: sRes.count ?? 9,
+            conditions: cRes.count ?? 17,
+            team: tRes.count ?? 14
+          });
+        } catch {}
+      }
+    }
+    loadStats();
+  }, []);
 
   return (
     <div>
@@ -59,7 +77,7 @@ export default function AdminOverviewPage() {
             <ServiceIconSvg size={22} />
           </div>
           <div className="adm-stat-info">
-            <h3>{servicesData.length}</h3>
+            <h3>{counts.services}</h3>
             <p>Clinical Services</p>
           </div>
         </div>
@@ -69,7 +87,7 @@ export default function AdminOverviewPage() {
             <ConditionIconSvg size={22} />
           </div>
           <div className="adm-stat-info">
-            <h3>{conditionsData.length}</h3>
+            <h3>{counts.conditions}</h3>
             <p>Conditions We Treat</p>
           </div>
         </div>
@@ -79,7 +97,7 @@ export default function AdminOverviewPage() {
             <TeamIcon size={22} />
           </div>
           <div className="adm-stat-info">
-            <h3>{teamData.length}</h3>
+            <h3>{counts.team}</h3>
             <p>Practitioners &amp; Staff</p>
           </div>
         </div>

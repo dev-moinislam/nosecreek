@@ -5,11 +5,12 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { HomePageData, TeamMember, BlogPost, Service, Condition, Testimonial, ServiceCustomSection } from "@/types/content";
-import defaultHomeData from "@/data/home.json";
 import ConditionTiles from "@/components/ui/ConditionTiles";
 import HomeServicesGrid from "@/components/ui/HomeServicesGrid";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
 import DynamicFAQSchema from "@/components/seo/DynamicFAQSchema";
+import CustomStorySection from "@/components/content/CustomStorySection";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 
 const TeamCarousel = dynamic(() => import("@/components/ui/TeamCarousel"), {
   ssr: false,
@@ -49,9 +50,9 @@ export default function HomeLiveView({
   conditions,
   testimonials
 }: HomeLiveViewProps) {
-  const [homeData, setHomeData] = useState<HomePageData>(initialHomeData || (defaultHomeData as unknown as HomePageData));
+  const [homeData, setHomeData] = useState<HomePageData>(initialHomeData || ({} as HomePageData));
 
-  // Sync with local admin updates in real-time
+  // Sync with local admin updates and Supabase in real-time
   useEffect(() => {
     function sync() {
       try {
@@ -59,15 +60,36 @@ export default function HomeLiveView({
         if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && typeof parsed === "object") {
-            setHomeData({
-              ...(defaultHomeData as unknown as HomePageData),
+            setHomeData((prev) => ({
+              ...prev,
               ...parsed
-            });
+            }));
           }
         }
       } catch {}
     }
     sync();
+
+    // Live sync from Supabase database on mount
+    if (isSupabaseConfigured && supabase) {
+      supabase
+        .from("site_settings")
+        .select("marketing")
+        .eq("id", "main")
+        .single()
+        .then(
+          ({ data }) => {
+            if (data?.marketing?.home_page_content) {
+              setHomeData((prev) => ({
+                ...prev,
+                ...data.marketing.home_page_content
+              }));
+            }
+          },
+          () => {}
+        );
+    }
+
     window.addEventListener("homeUpdated", sync);
     window.addEventListener("storage", sync);
     return () => {
@@ -79,7 +101,26 @@ export default function HomeLiveView({
   const hiddenSections = homeData.hiddenSections || [];
   const sectionOrder = homeData.sectionOrder && homeData.sectionOrder.length > 0
     ? homeData.sectionOrder
-    : (defaultHomeData.sectionOrder as string[]);
+    : [
+        "hero",
+        "quick_facts",
+        "stats",
+        "services_grid",
+        "conditions",
+        "about_clinic",
+        "director",
+        "team_carousel",
+        "free_reports",
+        "credentials",
+        "reviews",
+        "decide_ctas",
+        "workshops",
+        "seo_copy",
+        "blog_section",
+        "faqs",
+        "location_map",
+        "final_cta"
+      ];
 
   // Director fallback
   const directorMember = allTeam.find((m) => m.isDirector || m.slug === "blair-schachterle") || allTeam[0];
@@ -104,7 +145,7 @@ export default function HomeLiveView({
     switch (key) {
       // ── 1. HERO BANNER ──
       case "hero": {
-        const h = homeData.hero || defaultHomeData.hero;
+        const h = homeData.hero || ({} as any);
         const eyebrowText = cfg?.eyebrow || h.eyebrow;
         const titleLine1 = cfg?.title || h.titleLine1;
         const titleLine2 = cfg?.subtitle || h.titleLine2;
@@ -184,12 +225,12 @@ export default function HomeLiveView({
 
       // ── 2. QUICK FACTS ──
       case "quick_facts": {
-        const facts = homeData.quickFacts || defaultHomeData.quickFacts;
+        const facts = homeData.quickFacts || [];
         return (
           <section key="quick_facts" style={{ background: "#f8fafc", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1", padding: "24px 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-                {facts.map((item, idx) => (
+                {facts.map((item: any, idx: number) => (
                   <div key={idx} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 18px", background: "#fff", borderRadius: 12, border: "1px solid #d7e6ef", boxShadow: "0 4px 12px rgba(18,60,80,0.04)" }}>
                     <span style={{ fontSize: 24 }}>{item.icon}</span>
                     <div>
@@ -206,11 +247,11 @@ export default function HomeLiveView({
 
       // ── 3. TRUST STATS BAR ──
       case "stats": {
-        const stats = homeData.stats || defaultHomeData.stats;
+        const stats = homeData.stats || [];
         return (
           <section key="stats" style={{ background: "var(--dark, #12303d)", color: "#eaf3f8" }}>
             <div style={{ maxWidth: 1100, margin: "0 auto", padding: "clamp(30px,4vw,44px) 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 24, textAlign: "center" }}>
-              {stats.map((s, idx) => (
+              {stats.map((s: any, idx: number) => (
                 <div key={idx}>
                   <div style={{ fontFamily: "'Poppins',sans-serif", fontWeight: 800, fontSize: "clamp(28px,3.4vw,38px)", color: "var(--accent, #8cc63f)" }}>{s.num}</div>
                   <div style={{ fontSize: 13.5, color: "#b9cdd8", fontWeight: 600, marginTop: 4 }}>{s.label}</div>
@@ -258,7 +299,7 @@ export default function HomeLiveView({
 
       // ── 6. ABOUT NOSE CREEK CLINIC (Configurable) ──
       case "about_clinic": {
-        const about = homeData.aboutClinic || defaultHomeData.aboutClinic;
+        const about = homeData.aboutClinic || ({} as any);
         const title = cfg?.title || about.title;
         const eyebrowText = cfg?.eyebrow || about.eyebrow;
         const content = cfg?.content || about.content;
@@ -300,9 +341,13 @@ export default function HomeLiveView({
                 <h2 style={{ fontSize: "clamp(26px,3.6vw,40px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.15, color: textColor }}>
                   {title}
                 </h2>
-                <p style={{ marginTop: 18, fontSize: 16, lineHeight: 1.7, color: descColor }}>
-                  {content}
-                </p>
+                <div style={{ marginTop: 18 }}>
+                  <FormattedNarrative
+                    content={content || ""}
+                    isDark={isDark}
+                    style={{ fontSize: 16, lineHeight: 1.7, color: descColor }}
+                  />
+                </div>
                 {linkUrl && (
                   <a href={linkUrl} style={{ display: "inline-block", marginTop: 22, color: isDark ? "#8cc63f" : "#0e78a8", fontFamily: "'Poppins',sans-serif", fontWeight: 700 }}>
                     {linkText || "Follow our story →"}
@@ -316,9 +361,9 @@ export default function HomeLiveView({
 
       // ── 7. DIRECTOR SPOTLIGHT (Configurable) ──
       case "director": {
-        const d = homeData.director || defaultHomeData.director;
+        const d = homeData.director || ({} as any);
         const title = cfg?.title || d.title;
-        const role = cfg?.subtitle || `${d.role}${d.titleSuffix ? ` — ${d.titleSuffix}` : ""}`;
+        const role = cfg?.subtitle || `${d.role || ""}${d.titleSuffix ? ` — ${d.titleSuffix}` : ""}`;
         const eyebrowText = cfg?.eyebrow || d.eyebrow;
         const bio = cfg?.content || d.bio;
         const image = cfg?.image || d.image;
@@ -347,9 +392,13 @@ export default function HomeLiveView({
                 <p style={{ marginTop: 6, fontSize: 14, color: isDark ? "#9fc9d9" : "#64748b", fontWeight: 600 }}>
                   {role}
                 </p>
-                <p style={{ marginTop: 16, fontSize: 15.5, lineHeight: 1.7, color: descColor }}>
-                  {bio}
-                </p>
+                <div style={{ marginTop: 16 }}>
+                  <FormattedNarrative
+                    content={bio || ""}
+                    isDark={isDark}
+                    style={{ fontSize: 15.5, lineHeight: 1.7, color: descColor }}
+                  />
+                </div>
                 <a href={ctaUrl || `/team/blair-schachterle`}
                   style={{ display: "inline-block", marginTop: 22, background: isDark ? "var(--accent, #8cc63f)" : "var(--primary, #0e78a8)", color: isDark ? "var(--dark, #12303d)" : "#fff", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
                   {ctaText || "Meet our team →"}
@@ -644,7 +693,7 @@ export default function HomeLiveView({
 
       // ── 16. FAQS (Configurable) ──
       case "faqs": {
-        const faqs = homeData.faqs || defaultHomeData.faqs;
+        const faqs = homeData.faqs || [];
         const eyebrowText = cfg?.eyebrow || "FAQ";
         const title = cfg?.title || "Frequently asked questions";
 
@@ -656,7 +705,7 @@ export default function HomeLiveView({
                 <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, letterSpacing: "-0.5px" }}>{title}</h2>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {faqs.map((faq, idx) => (
+                {faqs.map((faq: any, idx: number) => (
                   <details key={idx} style={{ background: "#fff", border: "1px solid #e2ebf0", borderRadius: 14, padding: "4px 22px" }}>
                     <summary style={{ cursor: "pointer", listStyle: "none", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, padding: "18px 0", fontFamily: "'Poppins',sans-serif", fontWeight: 700, fontSize: 17, color: "#1d2b34" }}>
                       {(faq as any).q || (faq as any).question}
@@ -677,8 +726,8 @@ export default function HomeLiveView({
       }
 
       // ── 18. FAQS ACCORDION ──
-      case "faqs": {
-        const faqsList = homeData.faqs || defaultHomeData.faqs || [];
+      case "faqs_accordion": {
+        const faqsList = homeData.faqs || [];
         if (!faqsList || faqsList.length === 0) return null;
         const title = cfg?.title || "Frequently Asked Questions";
         const subtitle = cfg?.subtitle || "Everything you need to know before your first appointment with our Calgary clinic.";
@@ -769,125 +818,5 @@ export default function HomeLiveView({
         return rendered;
       })}
     </div>
-  );
-}
-
-// ── CUSTOM STORYTELLING SECTION COMPONENT ──
-function CustomStorySection({ section }: { section: ServiceCustomSection }) {
-  const isDark = section.background === "teal";
-  const bg = section.background === "teal"
-    ? "#12303d"
-    : section.background === "light"
-    ? "#f8fafc"
-    : "#ffffff";
-  const textColor = isDark ? "#ffffff" : "#1d2b34";
-  const descColor = isDark ? "#cbdbe4" : "#48535c";
-  const eyebrowColor = section.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8");
-
-  const imagePosition = section.imagePosition || (section.image ? "right" : "none");
-  const hasImage = Boolean(section.image && imagePosition !== "none");
-
-  return (
-    <section style={{ background: bg, color: textColor, padding: "clamp(56px,7vw,96px) 0" }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-        {hasImage && imagePosition === "top" && (
-          <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440 }}>
-            <OptimizedImage
-              src={section.image!}
-              alt={section.title}
-              width={1200}
-              height={440}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
-          </div>
-        )}
-
-        <div
-          style={{
-            display: hasImage && (imagePosition === "left" || imagePosition === "right") ? "grid" : "block",
-            gridTemplateColumns:
-              hasImage && (imagePosition === "left" || imagePosition === "right")
-                ? "repeat(auto-fit, minmax(320px, 1fr))"
-                : "1fr",
-            gap: "clamp(32px,4vw,56px)",
-            alignItems: "center"
-          }}
-        >
-          {hasImage && imagePosition === "left" && (
-            <div>
-              <OptimizedImage
-                src={section.image!}
-                alt={section.title}
-                width={600}
-                height={450}
-                style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
-              />
-            </div>
-          )}
-
-          <div>
-            {section.eyebrow && eyebrow(section.eyebrow, eyebrowColor)}
-            <h2 style={{ fontSize: "clamp(26px,3.6vw,40px)", fontWeight: 800, letterSpacing: "-0.5px", lineHeight: 1.18, color: textColor }}>
-              {section.title}
-            </h2>
-            {section.subtitle && (
-              <p style={{ marginTop: 8, fontSize: 16, fontWeight: 600, color: eyebrowColor }}>
-                {section.subtitle}
-              </p>
-            )}
-            {section.content && (
-              <FormattedNarrative
-                content={section.content}
-                isDark={isDark}
-                paragraphStyle={{ marginTop: 16, fontSize: 16, lineHeight: 1.7, color: descColor }}
-              />
-            )}
-
-            {section.bullets && section.bullets.length > 0 && (
-              <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 10 }}>
-                {section.bullets.map((b, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 15, color: descColor }}>
-                    <span style={{ color: eyebrowColor, fontWeight: 800, fontSize: 16, lineHeight: 1.2 }}>✓</span>
-                    <span>{b}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {(section.buttonText || section.ctaText) && (
-              <div style={{ marginTop: 26 }}>
-                <a
-                  href={section.buttonUrl || section.ctaHref || "#"}
-                  style={{
-                    display: "inline-block",
-                    background: isDark ? "var(--accent, #8cc63f)" : "var(--primary, #1c9fd8)",
-                    color: isDark ? "var(--dark, #12303d)" : "#fff",
-                    fontFamily: "'Poppins',sans-serif",
-                    fontWeight: 700,
-                    padding: "13px 26px",
-                    borderRadius: 10,
-                    textDecoration: "none"
-                  }}
-                >
-                  {section.buttonText || section.ctaText}
-                </a>
-              </div>
-            )}
-          </div>
-
-          {hasImage && imagePosition === "right" && (
-            <div>
-              <OptimizedImage
-                src={section.image!}
-                alt={section.title}
-                width={600}
-                height={450}
-                style={{ width: "100%", borderRadius: 18, objectFit: "cover", aspectRatio: "4/3", boxShadow: "0 18px 48px rgba(0,0,0,0.12)" }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
   );
 }

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
-import defaultTestimonialsData from "@/data/testimonials.json";
 import fs from "fs";
 import path from "path";
 
@@ -65,7 +64,7 @@ export async function GET(req: NextRequest) {
       } catch {}
     }
 
-    let fetchedReviews = defaultTestimonialsData;
+    let fetchedReviews: any[] = [];
     let placeRating = "4.9";
     let placeReviewCount = "545+ Calgary Reviews";
 
@@ -182,7 +181,7 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     console.error("Google reviews fetch error:", err);
     return NextResponse.json(
-      { success: false, error: err.message, reviews: defaultTestimonialsData },
+      { success: false, error: err.message, reviews: [] },
       { status: 500 }
     );
   }

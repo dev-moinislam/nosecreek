@@ -1,16 +1,44 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import settingsData from "@/data/settings.json";
 import CallTracking from "./CallTracking";
 import GoogleTagManager from "./GoogleTagManager";
 import GoogleAnalytics from "./GoogleAnalytics";
 import FacebookPixel from "./FacebookPixel";
 
+const DEFAULT_MARKETING = {
+  gtm: {
+    enabled: true,
+    containerIds: ["GTM-M3WLKSQ", "GTM-PJ447MK"]
+  },
+  googleAnalytics: {
+    enabled: true,
+    trackingId: "UA-121730452-1"
+  },
+  facebookPixel: {
+    enabled: true,
+    pixelId: "275772356383035"
+  },
+  callTracking: {
+    enabled: false
+  }
+};
+
 export default function MarketingScripts() {
   const [shouldLoad, setShouldLoad] = useState(false);
+  const [marketing, setMarketing] = useState<any>(DEFAULT_MARKETING);
 
   useEffect(() => {
+    // Fetch live marketing settings from API
+    fetch("/api/content?type=settings")
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data && data.marketing) {
+          setMarketing(data.marketing);
+        }
+      })
+      .catch(() => {});
+
     // 1. Load immediately upon real user interaction (scroll, touch, pointerdown, keydown)
     const triggerEvents = ["scroll", "touchstart", "pointerdown", "keydown"];
     const handleInteraction = () => {
@@ -34,8 +62,6 @@ export default function MarketingScripts() {
   }, []);
 
   if (!shouldLoad) return null;
-
-  const marketing = (settingsData as any).marketing || {};
 
   // GTM Container IDs (supports both GTM-M3WLKSQ and GTM-PJ447MK)
   const gtmIds = marketing.gtm?.containerIds ||

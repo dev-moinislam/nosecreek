@@ -1,5 +1,4 @@
 import { MetadataRoute } from "next";
-import settingsData from "@/data/settings.json";
 import {
   getServices,
   getTeamMembers,
@@ -7,11 +6,14 @@ import {
   getLocations,
   getConditions
 } from "@/lib/api";
+import { getSiteBaseUrl } from "@/lib/seo";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = settingsData.seo.canonicalUrl.replace(/\/$/, "");
+  const rawBaseUrl = await getSiteBaseUrl();
+  const baseUrl = rawBaseUrl.replace(/\/$/, "");
 
   // Static pages
   const staticPages = [

@@ -2,7 +2,6 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { Testimonial } from "@/types/content";
-import defaultTestimonialsData from "@/data/testimonials.json";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 
@@ -43,7 +42,7 @@ export default function ReviewCarousel({
   const [reviews, setReviews] = useState<Testimonial[]>(
     propTestimonials && propTestimonials.length > 0
       ? propTestimonials
-      : (defaultTestimonialsData as Testimonial[])
+      : []
   );
 
   const [widgetCode, setWidgetCode] = useState<string>(customWidgetCode || DEFAULT_MASONRY_WIDGET_CODE);
@@ -93,7 +92,7 @@ export default function ReviewCarousel({
     window.addEventListener("storage", syncFromSettings);
 
     async function fetchLiveContent() {
-      let liveReviews: Testimonial[] = defaultTestimonialsData as Testimonial[];
+      let liveReviews: Testimonial[] = propTestimonials || [];
 
       if (isSupabaseConfigured && supabase) {
         try {

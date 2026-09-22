@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BlogPost, BlogContentBlock, BlogBlockType } from "@/types/content";
-import defaultBlogData from "@/data/blog.json";
 import { getBlogPosts } from "@/lib/api";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import { useRole } from "@/components/admin/RoleGuard";
@@ -24,7 +23,7 @@ import AdminImageUploader from "@/components/admin/AdminImageUploader";
 
 export default function AdminBlogPage() {
   const { role, isAdmin } = useRole();
-  const [posts, setPosts] = useState<BlogPost[]>(defaultBlogData as BlogPost[]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -55,8 +54,6 @@ export default function AdminBlogPage() {
           const fetched = await getBlogPosts();
           if (fetched && fetched.length > 0) {
             list = fetched;
-          } else {
-            list = defaultBlogData as BlogPost[];
           }
         }
         setPosts(list);

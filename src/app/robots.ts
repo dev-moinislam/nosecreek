@@ -1,10 +1,12 @@
 import { MetadataRoute } from "next";
-import settingsData from "@/data/settings.json";
+import { getSiteBaseUrl } from "@/lib/seo";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-export default function robots(): MetadataRoute.Robots {
-  const baseUrl = settingsData.seo.canonicalUrl.replace(/\/$/, "");
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const rawBaseUrl = await getSiteBaseUrl();
+  const baseUrl = rawBaseUrl.replace(/\/$/, "");
 
   return {
     rules: {

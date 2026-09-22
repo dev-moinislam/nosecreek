@@ -148,6 +148,8 @@ export interface SectionBlockConfig {
   title?: string;
   subtitle?: string;
   content?: string;
+  contentCol2?: string; // Secondary narrative content for 2-column sections
+  contentLayout?: "1-column" | "2-column"; // Layout format for narrative content
   bullets?: string[];
   items?: string[];
   image?: string | null;

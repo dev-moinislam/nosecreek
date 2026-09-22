@@ -4,9 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { TeamMember, Service, Location } from "@/types/content";
-import teamData from "@/data/team.json";
-import servicesData from "@/data/services.json";
-import locationsData from "@/data/locations.json";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
 import AdminToast from "@/components/admin/AdminToast";
@@ -33,8 +30,8 @@ export default function AdminTeamPage() {
   const [deleteTarget, setDeleteTarget] = useState<{ slug: string; name: string } | null>(null);
 
   // Dynamic services & locations list (synced live with /admin/services and Supabase)
-  const [allServices, setAllServices] = useState<Service[]>(servicesData as Service[]);
-  const [allLocations, setAllLocations] = useState<Location[]>(locationsData as Location[]);
+  const [allServices, setAllServices] = useState<Service[]>([]);
+  const [allLocations, setAllLocations] = useState<Location[]>([]);
 
   const fetchServicesAndLocations = async () => {
     // 1. Instant sync from local storage cache if available
@@ -178,8 +175,8 @@ export default function AdminTeamPage() {
       } catch {}
     }
 
-    // 3. Static fallback
-    setTeam(teamData as TeamMember[]);
+    // 3. Fallback
+    setTeam([]);
     setLoading(false);
   };
 

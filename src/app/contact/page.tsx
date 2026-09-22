@@ -16,7 +16,8 @@ export async function generateMetadata() {
   });
 }
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default function ContactPage() {
   return (

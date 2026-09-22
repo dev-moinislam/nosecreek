@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { HomePageData, ServiceCustomSection, SectionBlockConfig } from "@/types/content";
-import defaultHomeData from "@/data/home.json";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import { useRole } from "@/components/admin/RoleGuard";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
@@ -10,6 +9,7 @@ import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
 import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomizerModal";
 import AdminImageUploader from "@/components/admin/AdminImageUploader";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import {
   SlidersIcon,
   LayoutIcon,
@@ -72,9 +72,41 @@ const homepageSectionDefs: Record<string, { title: string; category: string; des
   final_cta: { title: "Final Booking Callout Banner", category: "Conversion", desc: "Blue gradient closing banner with online booking and call buttons" }
 };
 
+const DEFAULT_HOME_ORDER = [
+  "hero",
+  "pain_points",
+  "services_grid",
+  "condition_tiles",
+  "about_clinic",
+  "director",
+  "why_choose_us",
+  "three_step",
+  "team_carousel",
+  "reviews_carousel",
+  "blog_posts",
+  "custom_sections",
+  "faqs",
+  "location_map",
+  "final_cta"
+];
+
+const DEFAULT_HOME_DATA: HomePageData = {
+  hero: {} as any,
+  painPoints: {} as any,
+  whyChooseUs: {} as any,
+  threeStepProcess: {} as any,
+  aboutClinic: {} as any,
+  director: {} as any,
+  finalCta: {} as any,
+  faqs: [],
+  customSections: [],
+  sectionOrder: DEFAULT_HOME_ORDER,
+  hiddenSections: []
+} as unknown as HomePageData;
+
 export default function AdminHomePage() {
   const { isAdmin } = useRole();
-  const [homeData, setHomeData] = useState<HomePageData>(defaultHomeData as unknown as HomePageData);
+  const [homeData, setHomeData] = useState<HomePageData>(DEFAULT_HOME_DATA);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -82,7 +114,7 @@ export default function AdminHomePage() {
   // Active section editing popup modal key
   const [editingModalKey, setEditingModalKey] = useState<string | null>(null);
   // Temporary edit state inside modal so Cancel button discards changes cleanly
-  const [tempData, setTempData] = useState<HomePageData>(defaultHomeData as unknown as HomePageData);
+  const [tempData, setTempData] = useState<HomePageData>(DEFAULT_HOME_DATA);
 
   // Helper inputs inside modals
   const [modalNewBadge, setModalNewBadge] = useState("");
@@ -99,7 +131,7 @@ export default function AdminHomePage() {
   // Initial Load from Supabase / localStorage / default
   useEffect(() => {
     async function loadData() {
-      let loaded: HomePageData = defaultHomeData as unknown as HomePageData;
+      let loaded: HomePageData = DEFAULT_HOME_DATA;
       if (typeof window !== "undefined") {
         const saved = localStorage.getItem("adm_home");
         if (saved) {
@@ -114,27 +146,17 @@ export default function AdminHomePage() {
 
       if (isSupabaseConfigured && supabase) {
         try {
-          // Check site_settings table for home_page_content
-          const { data: mainData } = await supabase
+          const { data: stRow } = await supabase
             .from("site_settings")
-            .select("home_page_content")
+            .select("marketing")
             .eq("id", "main")
             .single();
-          if (mainData && (mainData as any).home_page_content && Object.keys((mainData as any).home_page_content).length > 0) {
-            loaded = { ...loaded, ...(mainData as any).home_page_content };
+          if (stRow?.marketing?.home_page_content && Object.keys(stRow.marketing.home_page_content).length > 0) {
+            loaded = { ...loaded, ...stRow.marketing.home_page_content };
           }
-        } catch {}
-
-        try {
-          const { data, error } = await supabase
-            .from("site_settings")
-            .select("value")
-            .eq("key", "home_page_content")
-            .single();
-          if (!error && data && data.value) {
-            loaded = { ...loaded, ...data.value };
-          }
-        } catch {}
+        } catch (err) {
+          console.warn("Supabase fetch error for home_page_content:", err);
+        }
       }
 
       setHomeData(loaded);
@@ -167,28 +189,27 @@ export default function AdminHomePage() {
         console.warn("Disk save failed", err);
       }
 
-      // 3. Supabase persistence
+      // 3. Supabase persistence: Save directly to site_settings.marketing.home_page_content
       if (isSupabaseConfigured && supabase) {
         try {
-          // Update site_settings row 'main'
-          await supabase
+          const { data: stRow } = await supabase
             .from("site_settings")
-            .update({ home_page_content: dataToSave })
+            .select("marketing")
+            .eq("id", "main")
+            .single();
+          const updatedMarketing = {
+            ...(stRow?.marketing || {}),
+            home_page_content: dataToSave
+          };
+          const { error: supaErr } = await supabase
+            .from("site_settings")
+            .update({ marketing: updatedMarketing })
             .eq("id", "main");
-        } catch {}
-
-        try {
-          // Also upsert key-value pair
-          await supabase.from("site_settings").upsert(
-            {
-              key: "home_page_content",
-              value: dataToSave,
-              updated_at: new Date().toISOString()
-            },
-            { onConflict: "key" }
-          );
+          if (supaErr) {
+            console.warn("Supabase update error:", supaErr);
+          }
         } catch (err) {
-          console.warn("Supabase upsert failed", err);
+          console.warn("Supabase save failed", err);
         }
       }
 
@@ -218,7 +239,7 @@ export default function AdminHomePage() {
   };
 
   // Section Order helpers
-  const currentOrder = homeData.sectionOrder || defaultHomeData.sectionOrder;
+  const currentOrder = homeData.sectionOrder || DEFAULT_HOME_ORDER;
   const hiddenSections = homeData.hiddenSections || [];
 
   // Drag and Drop state for section reordering
@@ -927,12 +948,15 @@ export default function AdminHomePage() {
               </div>
 
               <div>
-                <label className="adm-label">Story Narrative Content</label>
-                <textarea
-                  className="adm-input"
-                  rows={4}
+                <label className="adm-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <span>Story Narrative Content (Rich Text)</span>
+                  <span style={{ fontSize: 11, color: "#0284c7", fontWeight: 700 }}>[H2–H6, Bullets, Center/Left, Bold, Links]</span>
+                </label>
+                <RichTextEditor
                   value={tempData.aboutClinic?.content || ""}
-                  onChange={(e) => setTempData({ ...tempData, aboutClinic: { ...tempData.aboutClinic!, content: e.target.value } })}
+                  onChange={(val) => setTempData({ ...tempData, aboutClinic: { ...tempData.aboutClinic!, content: val } })}
+                  minHeight={150}
+                  placeholder="Enter story narrative. Format with headings, bullet points, text alignment, or links..."
                 />
               </div>
 

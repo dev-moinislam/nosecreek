@@ -2,17 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./ReviewWidget.module.css";
-import testimonialsData from "@/data/testimonials.json";
 import { Testimonial } from "@/types/content";
+import { getTestimonials } from "@/lib/api";
 
 export default function ReviewWidget() {
   const [review, setReview] = useState<Testimonial | null>(null);
 
   useEffect(() => {
-    // Load the first review (Falgun Patel's review) from our dataset
-    if (testimonialsData && testimonialsData.length > 0) {
-      setReview(testimonialsData[0] as Testimonial);
-    }
+    getTestimonials()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setReview(data[0]);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   if (!review) return null;

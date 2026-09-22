@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { BlogPost } from "@/types/content";
-import defaultBlogData from "@/data/blog.json";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface BlogIndexGridProps {
@@ -11,11 +10,7 @@ interface BlogIndexGridProps {
 }
 
 export default function BlogIndexGrid({ initialPosts }: BlogIndexGridProps) {
-  const [posts, setPosts] = useState<BlogPost[]>(
-    initialPosts && initialPosts.length > 0
-      ? initialPosts
-      : (defaultBlogData as BlogPost[])
-  );
+  const [posts, setPosts] = useState<BlogPost[]>(initialPosts || []);
 
   useEffect(() => {
     function sync() {

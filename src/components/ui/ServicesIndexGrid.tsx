@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Service } from "@/types/content";
-import defaultServicesData from "@/data/services.json";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { getServices } from "@/lib/api";
@@ -12,11 +11,7 @@ interface ServicesIndexGridProps {
 }
 
 export default function ServicesIndexGrid({ initialServices }: ServicesIndexGridProps) {
-  const [services, setServices] = useState<Service[]>(
-    initialServices && initialServices.length > 0
-      ? initialServices
-      : (defaultServicesData as Service[])
-  );
+  const [services, setServices] = useState<Service[]>(initialServices || []);
 
   useEffect(() => {
     let isMounted = true;
@@ -25,7 +20,7 @@ export default function ServicesIndexGrid({ initialServices }: ServicesIndexGrid
       try {
         // 1. Fetch fresh authoritative list from Supabase / API
         const fresh = await getServices();
-        let list = Array.isArray(fresh) && fresh.length > 0 ? fresh : (initialServices || (defaultServicesData as Service[]));
+        let list = Array.isArray(fresh) && fresh.length > 0 ? fresh : (initialServices || []);
 
         // 2. Overlay any active localStorage draft updates
         if (typeof window !== "undefined") {

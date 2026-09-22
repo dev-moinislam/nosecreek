@@ -4,9 +4,24 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { NavMenuItem, FooterColumnItem, HeaderFooterNavigation, Service, Condition } from "@/types/content";
-import defaultSettings from "@/data/settings.json";
-import defaultServices from "@/data/services.json";
-import defaultConditions from "@/data/conditions.json";
+
+const DEFAULT_EMPTY_NAV: HeaderFooterNavigation = {
+  header: {
+    topBarEnabled: true,
+    phone: "403-295-8590",
+    ctaButtonText: "Book Online",
+    ctaButtonUrl: "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
+    menu: []
+  },
+  footer: {
+    columns: [],
+    contactPhone: "403-295-8590",
+    contactEmail: "info@nosecreekphysiotherapy.com",
+    contactAddress: "8220 Centre St NE #153, Calgary, AB T3K 1J7",
+    copyrightText: "© 2026 Nose Creek Physiotherapy. All rights reserved.",
+    disclaimerText: "The information on this website is for educational purposes only and is not medical advice."
+  }
+};
 
 interface EditingItemState {
   item: NavMenuItem;
@@ -181,30 +196,11 @@ export default function AdminNavigationPage() {
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
   // Core navigation state
-  const [navData, setNavData] = useState<HeaderFooterNavigation>(() => {
-    const raw = (defaultSettings as any).marketing?.navigation || (defaultSettings as any).navigation;
-    return raw || {
-      header: {
-        topBarEnabled: true,
-        phone: "403-295-8590",
-        ctaButtonText: "Book Online",
-        ctaButtonUrl: "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
-        menu: []
-      },
-      footer: {
-        columns: [],
-        contactPhone: "403-295-8590",
-        contactEmail: "info@nosecreekphysiotherapy.com",
-        contactAddress: "#22, 8120 Beddington Blvd NW, Calgary, AB T3K 2A8",
-        copyrightText: "© 2026 Nose Creek Physiotherapy. All rights reserved.",
-        disclaimerText: "The information on this website is for educational purposes only and is not medical advice."
-      }
-    };
-  });
+  const [navData, setNavData] = useState<HeaderFooterNavigation>(DEFAULT_EMPTY_NAV);
 
   // Services and conditions for autocomplete quick-add
-  const [servicesList, setServicesList] = useState<Service[]>(defaultServices as Service[]);
-  const [conditionsList, setConditionsList] = useState<Condition[]>(defaultConditions as Condition[]);
+  const [servicesList, setServicesList] = useState<Service[]>([]);
+  const [conditionsList, setConditionsList] = useState<Condition[]>([]);
 
   // Expanded parent IDs for tree view
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
@@ -219,9 +215,9 @@ export default function AdminNavigationPage() {
   // Load live settings, services, conditions on mount & auto-reconcile
   useEffect(() => {
     async function loadData() {
-      let liveNav: HeaderFooterNavigation = (defaultSettings as any).marketing?.navigation || (defaultSettings as any).navigation;
-      let liveServices: Service[] = defaultServices as Service[];
-      let liveConditions: Condition[] = defaultConditions as Condition[];
+      let liveNav: HeaderFooterNavigation = DEFAULT_EMPTY_NAV;
+      let liveServices: Service[] = [];
+      let liveConditions: Condition[] = [];
       let deletedSlugs: string[] = [];
 
       if (typeof window !== "undefined") {
@@ -380,10 +376,8 @@ export default function AdminNavigationPage() {
       body: JSON.stringify({
         type: "settings",
         data: {
-          ...defaultSettings,
           navigation: reconciled,
           marketing: {
-            ...((defaultSettings as any).marketing || {}),
             navigation: reconciled
           }
         }
@@ -756,7 +750,6 @@ export default function AdminNavigationPage() {
       body: JSON.stringify({
         type: "settings",
         data: {
-          ...defaultSettings,
           ...parsedSettings,
           navigation: newNavData,
           marketing: {
@@ -982,7 +975,7 @@ export default function AdminNavigationPage() {
       }
 
       // 2. Base settings payload
-      const baseData = { ...(defaultSettings as any) };
+      const baseData: any = {};
       if (typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
         if (local) {

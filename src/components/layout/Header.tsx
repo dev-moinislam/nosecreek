@@ -4,15 +4,38 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 
-import defaultServicesData from "@/data/services.json";
-import defaultConditionsData from "@/data/conditions.json";
-import defaultSettingsData from "@/data/settings.json";
 import { Service, Condition, SiteSettings, NavMenuItem } from "@/types/content";
 
 function cleanNavLabel(text?: string): string {
   if (!text) return "";
   return text.replace(/\s*subtopics?\b/gi, "").trim();
 }
+
+const DEFAULT_FALLBACK_SETTINGS: SiteSettings = {
+  clinicName: "Nose Creek Physiotherapy",
+  tagline: "Restoring mobility, strength & balance naturally since 2001",
+  phone: "403-295-8590",
+  email: "info@nosecreekphysiotherapy.com",
+  bookingUrl: "https://nosecreekphysiotherapy.janeapp.com/",
+  logo: "/images/logo/nosecreek-logo.png",
+  navigation: {
+    mainMenu: [
+      { label: "Home", href: "/" },
+      { label: "About Us", href: "/about" },
+      { label: "Services", href: "/services" },
+      { label: "Conditions", href: "/conditions" },
+      { label: "Reviews", href: "/reviews" },
+      { label: "Team", href: "/team" },
+      { label: "Blog", href: "/blog" },
+      { label: "Locations", href: "/locations" },
+      { label: "Contact", href: "/contact" }
+    ],
+    ctaButton: {
+      label: "Book Appointment",
+      href: "https://nosecreekphysiotherapy.janeapp.com/"
+    }
+  }
+} as unknown as SiteSettings;
 
 interface HeaderProps {
   initialSettings?: SiteSettings;
@@ -30,9 +53,9 @@ export default function Header({
   const [mobileExpandedKeys, setMobileExpandedKeys] = useState<Record<string, boolean>>({});
   const [currentHash, setCurrentHash] = useState("");
 
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSettings || (defaultSettingsData as SiteSettings));
-  const [dynamicServices, setDynamicServices] = useState<Service[]>(initialServices || (defaultServicesData as Service[]));
-  const [dynamicConditions, setDynamicConditions] = useState<Condition[]>(initialConditions || (defaultConditionsData as Condition[]));
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSettings || DEFAULT_FALLBACK_SETTINGS);
+  const [dynamicServices, setDynamicServices] = useState<Service[]>(initialServices || []);
+  const [dynamicConditions, setDynamicConditions] = useState<Condition[]>(initialConditions || []);
 
   const dropdownContainerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();

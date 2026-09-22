@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Condition } from "@/types/content";
-import defaultConditionsData from "@/data/conditions.json";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { getConditions } from "@/lib/api";
@@ -12,11 +11,7 @@ interface ConditionsIndexGridProps {
 }
 
 export default function ConditionsIndexGrid({ initialConditions }: ConditionsIndexGridProps) {
-  const [conditions, setConditions] = useState<Condition[]>(
-    initialConditions && initialConditions.length > 0
-      ? initialConditions
-      : (defaultConditionsData as Condition[])
-  );
+  const [conditions, setConditions] = useState<Condition[]>(initialConditions || []);
 
   useEffect(() => {
     let isMounted = true;
@@ -24,7 +19,7 @@ export default function ConditionsIndexGrid({ initialConditions }: ConditionsInd
     async function syncConditions() {
       try {
         const fresh = await getConditions();
-        let list = Array.isArray(fresh) && fresh.length > 0 ? fresh : (initialConditions || (defaultConditionsData as Condition[]));
+        let list = Array.isArray(fresh) && fresh.length > 0 ? fresh : (initialConditions || []);
 
         if (typeof window !== "undefined") {
           const saved = localStorage.getItem("adm_conditions");

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { CustomSchemaItem } from "@/types/content";
-import settingsData from "@/data/settings.json";
 
 const DEFAULT_BUSINESS_SCHEMA_TEMPLATE = JSON.stringify({
   "@context": "https://schema.org",
@@ -107,11 +106,7 @@ export default function AdminSchemasPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
-  const [customSchemas, setCustomSchemas] = useState<CustomSchemaItem[]>(() => {
-    const s = (settingsData as any).customSchemas;
-    if (Array.isArray(s)) return s;
-    return [];
-  });
+  const [customSchemas, setCustomSchemas] = useState<CustomSchemaItem[]>([]);
 
   const [jsonValidationErrors, setJsonValidationErrors] = useState<Record<string, string | null>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -256,7 +251,7 @@ export default function AdminSchemasPage() {
       }
 
       // 2. Persist to Disk via API & sync to Supabase server-side
-      const baseData = { ...(settingsData as any) };
+      const baseData: any = {};
       if (typeof window !== "undefined") {
         const local = localStorage.getItem("adm_settings");
         if (local) {

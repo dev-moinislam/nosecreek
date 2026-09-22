@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { CustomSchemaItem } from "@/types/content";
-import settingsData from "@/data/settings.json";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 function matchesTargetScope(
@@ -63,12 +62,12 @@ export default function CustomSchemasInjector({ initialSchemas }: CustomSchemasI
   const pathname = usePathname() || "/";
   const [mounted, setMounted] = useState(false);
 
-  // Initial schemas from SSR prop or static settings data
+  // Initial schemas from SSR prop or empty array
   const [schemas, setSchemas] = useState<CustomSchemaItem[]>(() => {
     if (initialSchemas && Array.isArray(initialSchemas)) {
       return initialSchemas;
     }
-    return (settingsData as any).customSchemas || [];
+    return [];
   });
 
   useEffect(() => {

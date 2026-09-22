@@ -46,24 +46,12 @@ async function getNotificationSettings(): Promise<NotificationSettings | null> {
     }
   }
 
-  // 2. Read from settings.json
-  try {
-    const settingsPath = path.resolve(process.cwd(), "src/data/settings.json");
-    if (fs.existsSync(settingsPath)) {
-      const raw = fs.readFileSync(settingsPath, "utf-8");
-      const parsed = JSON.parse(raw);
-      if (parsed.notifications) {
-        return parsed.notifications;
-      }
-      if (parsed.marketing?.notifications) {
-        return parsed.marketing.notifications;
-      }
-    }
-  } catch (err) {
-    console.warn("Could not read settings.json for notifications:", err);
-  }
-
-  return null;
+  return {
+    enabled: true,
+    receiverEmail: "info@nosecreekphysiotherapy.com",
+    subjectPrefix: "[New Website Lead]",
+    provider: "smtp"
+  };
 }
 
 /**

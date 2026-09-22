@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Condition } from "@/types/content";
-import defaultConditionsData from "@/data/conditions.json";
 import { getConditions } from "@/lib/api";
 
 interface ConditionTilesProps {
@@ -10,11 +9,7 @@ interface ConditionTilesProps {
 }
 
 export default function ConditionTiles({ conditions }: ConditionTilesProps) {
-  const [displayConditions, setDisplayConditions] = useState<Condition[]>(
-    conditions && conditions.length > 0
-      ? conditions
-      : (defaultConditionsData as Condition[])
-  );
+  const [displayConditions, setDisplayConditions] = useState<Condition[]>(conditions || []);
 
   useEffect(() => {
     function sync(isBackgroundFetch = false) {

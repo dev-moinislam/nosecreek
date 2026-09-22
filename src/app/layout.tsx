@@ -5,11 +5,11 @@ import SiteLayout from "@/components/layout/SiteLayout";
 import ThemeApplier from "@/components/theme/ThemeApplier";
 import { buildThemeCss, ThemeColors } from "@/lib/theme";
 import { RoleProvider } from "@/components/admin/RoleGuard";
-import settingsData from "@/data/settings.json";
 import { getSiteSettings, getServices, getConditions } from "@/lib/api";
 import { getSiteBaseUrl } from "@/lib/seo";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -38,10 +38,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: settings.seo?.title || settingsData.seo.title,
-      template: `%s | ${settings.clinicName || settingsData.clinicName}`
+      default: settings.seo?.title || "Nose Creek Physiotherapy | Calgary Physiotherapy & Massage",
+      template: `%s | ${settings.clinicName || "Nose Creek Physiotherapy"}`
     },
-    description: settings.seo?.description || settingsData.seo.description,
+    description: settings.seo?.description || "Physiotherapy clinic in North Calgary restoring movement, mobility and strength.",
     metadataBase: new URL(baseUrl),
     icons: {
       icon: [
@@ -55,12 +55,12 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: faviconUrl,
     },
     openGraph: {
-      title: settings.seo?.ogTitle || settingsData.seo.ogTitle,
-      description: settings.seo?.ogDescription || settingsData.seo.ogDescription,
-      images: [{ url: settings.seo?.ogImage || settingsData.seo.ogImage }],
+      title: settings.seo?.ogTitle || settings.seo?.title || "Nose Creek Physiotherapy",
+      description: settings.seo?.ogDescription || settings.seo?.description || "",
+      images: [{ url: settings.seo?.ogImage || "/images/clinic/reception-desktop.webp" }],
       type: "website",
       locale: "en_CA",
-      siteName: settings.clinicName || settingsData.clinicName
+      siteName: settings.clinicName || "Nose Creek Physiotherapy"
     },
     robots: {
       index: true,

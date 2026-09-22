@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { Testimonial } from "@/types/content";
-import defaultTestimonialsData from "@/data/testimonials.json";
 import AdminToast from "@/components/admin/AdminToast";
 import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
 import AdminImageUploader from "@/components/admin/AdminImageUploader";
@@ -58,7 +57,7 @@ export default function AdminReviewsPage() {
 
   const fetchReviews = async () => {
     setLoading(true);
-    let currentReviews = defaultTestimonialsData as Testimonial[];
+    let currentReviews: Testimonial[] = [];
 
     // First load from localStorage for instant preview
     try {
@@ -278,28 +277,12 @@ export default function AdminReviewsPage() {
 
   const handleSeedDefaults = async () => {
     if (!isAdmin) {
-      alert("Only Master Admin can seed default reviews.");
+      alert("Only Master Admin can refresh reviews.");
       return;
     }
 
-    if (isSupabaseConfigured && supabase) {
-      for (const rev of defaultTestimonialsData) {
-        await supabase.from("testimonials").upsert({
-          id: rev.id,
-          author: rev.author,
-          text: rev.text,
-          rating: rev.rating,
-          platform: rev.platform || "Google",
-          date: rev.date,
-          avatar: rev.avatar || null,
-          is_published: true,
-          updated_at: new Date().toISOString()
-        });
-      }
-    }
-
-    setReviews(defaultTestimonialsData as Testimonial[]);
-    setToastMessage("Standard 5-Star Calgary Reviews synced to Supabase database!");
+    await fetchReviews();
+    setToastMessage("Standard 5-Star Calgary Reviews refreshed from database!");
   };
 
   const filteredReviews = reviews.filter(

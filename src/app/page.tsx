@@ -19,7 +19,8 @@ export async function generateMetadata() {
   });
 }
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   const [homeData, allTeam, blogPosts, services, conditions, testimonials, settings] = await Promise.all([

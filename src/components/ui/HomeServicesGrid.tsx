@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Service } from "@/types/content";
-import defaultServicesData from "@/data/services.json";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import { getServices } from "@/lib/api";
@@ -12,11 +11,7 @@ interface HomeServicesGridProps {
 }
 
 export default function HomeServicesGrid({ initialServices }: HomeServicesGridProps) {
-  const [services, setServices] = useState<Service[]>(
-    initialServices && initialServices.length > 0
-      ? initialServices
-      : (defaultServicesData as Service[])
-  );
+  const [services, setServices] = useState<Service[]>(initialServices || []);
 
   useEffect(() => {
     let isMounted = true;

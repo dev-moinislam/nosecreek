@@ -15,7 +15,7 @@ import {
 } from "./AdminIcons";
 import AdminImageUploader from "./AdminImageUploader";
 import InternalLinkPickerModal from "./InternalLinkPickerModal";
-import LinkedContentEditor from "./LinkedContentEditor";
+import RichTextEditor from "./RichTextEditor";
 
 interface SectionBlockCustomizerModalProps {
   isOpen: boolean;
@@ -40,6 +40,8 @@ export default function SectionBlockCustomizerModal({
     eyebrowColor: config?.eyebrowColor || "#1c9fd8",
     subtitle: config?.subtitle || "",
     content: config?.content || "",
+    contentCol2: config?.contentCol2 || "",
+    contentLayout: config?.contentLayout || (config?.contentCol2 ? "2-column" : "1-column"),
     image: config?.image || "",
     imagePosition: config?.imagePosition || "none",
     background: config?.background || "white",
@@ -60,6 +62,8 @@ export default function SectionBlockCustomizerModal({
         eyebrowColor: config.eyebrowColor || "#1c9fd8",
         subtitle: config.subtitle || "",
         content: config.content || "",
+        contentCol2: config.contentCol2 || "",
+        contentLayout: config.contentLayout || (config.contentCol2 ? "2-column" : "1-column"),
         image: config.image || "",
         imagePosition: config.imagePosition || (config.image ? "right" : "none"),
         background: config.background || "white",
@@ -75,6 +79,8 @@ export default function SectionBlockCustomizerModal({
         eyebrowColor: "#1c9fd8",
         subtitle: "",
         content: "",
+        contentCol2: "",
+        contentLayout: "1-column",
         image: "",
         imagePosition: "none",
         background: "white",
@@ -400,47 +406,114 @@ export default function SectionBlockCustomizerModal({
             </div>
           )}
 
-          {/* 3. Main Narrative Body Paragraphs (Shown on Story, Overview, Hero, Decision CTAs, or Bottom CTA) */}
+          {/* 3. Main Narrative Body Paragraphs & Multi-Column Rich Text Editor */}
           {(isMediaRichStory || isBottomCTA || isDecisionCTAs || isHero) && (
-            <div className="adm-form-group">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <label className="adm-form-label" style={{ margin: 0 }}>
-                  {isHero
-                    ? "Hero Intro Subheading / Description"
-                    : isDecisionCTAs
-                    ? "Call-to-Action Subtitle / Description"
-                    : isBottomCTA
-                    ? "Banner Message / Call-to-Action Text"
-                    : "Narrative Content (Paragraphs)"}
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setPickerMode("content")}
+            <div className="adm-form-group" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              
+              {/* Layout Switcher (Only for Storytelling & Overview) */}
+              {isMediaRichStory && (
+                <div
                   style={{
-                    background: "#eff6ff",
-                    border: "1px solid #bfdbfe",
-                    borderRadius: 6,
-                    padding: "3px 8px",
-                    fontSize: 11.5,
-                    fontWeight: 600,
-                    color: "#0369a1",
-                    cursor: "pointer",
-                    display: "inline-flex",
+                    background: "#f1f5f9",
+                    padding: "10px 14px",
+                    borderRadius: 10,
+                    display: "flex",
                     alignItems: "center",
-                    gap: 4
+                    justifyContent: "space-between",
+                    border: "1px solid #e2e8f0"
                   }}
                 >
-                  <LinkIcon size={12} />
-                  <span>🔗 + Insert Link (Internal / External)</span>
-                </button>
+                  <div>
+                    <strong style={{ fontSize: 13, color: "#1e293b", display: "block" }}>
+                      Narrative Columns Layout
+                    </strong>
+                    <span style={{ fontSize: 11.5, color: "#64748b" }}>
+                      Choose between standard 1-column or side-by-side 2-column rich text
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, contentLayout: "1-column" })}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: 6,
+                        border: "1px solid",
+                        borderColor: formData.contentLayout !== "2-column" ? "#0284c7" : "#cbd5e1",
+                        background: formData.contentLayout !== "2-column" ? "#ffffff" : "transparent",
+                        color: formData.contentLayout !== "2-column" ? "#0284c7" : "#64748b",
+                        fontWeight: 700,
+                        fontSize: 12,
+                        cursor: "pointer"
+                      }}
+                    >
+                      1 Column (Standard)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, contentLayout: "2-column" })}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: 6,
+                        border: "1px solid",
+                        borderColor: formData.contentLayout === "2-column" ? "#0284c7" : "#cbd5e1",
+                        background: formData.contentLayout === "2-column" ? "#ffffff" : "transparent",
+                        color: formData.contentLayout === "2-column" ? "#0284c7" : "#64748b",
+                        fontWeight: 700,
+                        fontSize: 12,
+                        cursor: "pointer"
+                      }}
+                    >
+                      2 Columns (Side-by-Side)
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Column 1 Editor */}
+              <div>
+                <label className="adm-form-label" style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+                  <span>
+                    {isHero
+                      ? "Hero Intro Subheading / Description"
+                      : isDecisionCTAs
+                      ? "Call-to-Action Subtitle / Description"
+                      : isBottomCTA
+                      ? "Banner Message / Call-to-Action Text"
+                      : formData.contentLayout === "2-column"
+                      ? "Column 1: Main Narrative Content (Rich Text)"
+                      : "Narrative Content (Rich Text Paragraphs)"}
+                  </span>
+                  <span style={{ fontSize: 11, color: "#0284c7", fontWeight: 700 }}>
+                    [H2–H6, Bullets, Center/Left, Bold, Links]
+                  </span>
+                </label>
+                <RichTextEditor
+                  value={formData.content || ""}
+                  onChange={(val) => setFormData({ ...formData, content: val })}
+                  minHeight={isBottomCTA ? 90 : 150}
+                  placeholder="Enter narrative text. Use toolbar for headings, bullet points, text alignment, bold, or links..."
+                />
               </div>
-              <LinkedContentEditor
-                value={formData.content || ""}
-                onChange={(val) => setFormData({ ...formData, content: val })}
-                onOpenLinkPicker={() => setPickerMode("content")}
-                minHeight={isBottomCTA ? 80 : 120}
-                placeholder="Enter description for this section. Separate paragraphs with double enter..."
-              />
+
+              {/* Column 2 Editor (Shown only if 2-Column layout selected) */}
+              {isMediaRichStory && formData.contentLayout === "2-column" && (
+                <div style={{ marginTop: 6 }}>
+                  <label className="adm-form-label" style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>Column 2: Secondary Narrative Content (Rich Text)</span>
+                    <span style={{ fontSize: 11, color: "#059669", fontWeight: 700 }}>
+                      [Independent H2–H6, Bullets, Center/Left, Bold, Links]
+                    </span>
+                  </label>
+                  <RichTextEditor
+                    value={formData.contentCol2 || ""}
+                    onChange={(val) => setFormData({ ...formData, contentCol2: val })}
+                    minHeight={150}
+                    placeholder="Enter secondary column narrative. Use toolbar for headings, bullet points, text alignment, bold, or links..."
+                  />
+                </div>
+              )}
+
             </div>
           )}
 

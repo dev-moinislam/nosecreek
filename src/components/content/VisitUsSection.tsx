@@ -1,13 +1,31 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import defaultLocations from "@/data/locations.json";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
 interface VisitUsSectionProps {
   customEyebrow?: string;
   customTitle?: string;
 }
+
+const FALLBACK_LOCATION: any = {
+  name: "Nose Creek Physiotherapy - Beddington",
+  address: "8220 Centre St NE #153\nCalgary, AB T3K 1J7",
+  phone: "403-295-8590",
+  email: "info@nosecreekphysiotherapy.com",
+  seo: {
+    eyebrow: "Visit us",
+    title: "One clinic, ideally located in Calgary",
+    directionsUrl: "https://www.google.com/maps/dir//Nose+Creek+Physiotherapy",
+    insuranceNote: "Insurance-covered physiotherapy · Extended-health direct billing available.",
+    hoursList: [
+      { day: "Monday – Friday", hours: "6:45 AM – 7:15 PM" },
+      { day: "Saturday", hours: "8:00 AM – 2:00 PM" },
+      { day: "Sunday", hours: "Closed" }
+    ],
+    mapEmbedUrl: "https://www.google.com/maps?q=Nose+Creek+Physiotherapy+8220+Centre+St+NE+%23153,+Calgary,+AB+T3K+1J7&output=embed"
+  }
+};
 
 function getEmbedMapUrl(rawUrl?: string, address?: string, name?: string): string {
   const defaultPinUrl = `https://www.google.com/maps?q=${encodeURIComponent(
@@ -64,7 +82,7 @@ function getEmbedMapUrl(rawUrl?: string, address?: string, name?: string): strin
 
 export default function VisitUsSection({ customEyebrow, customTitle }: VisitUsSectionProps) {
   // Grab primary location config
-  const initialLoc = defaultLocations[0] as any;
+  const initialLoc = FALLBACK_LOCATION;
   const [loc, setLoc] = useState(initialLoc);
 
   useEffect(() => {
@@ -106,10 +124,8 @@ export default function VisitUsSection({ customEyebrow, customTitle }: VisitUsSe
         } catch {}
       }
 
-      // 2. Fallback to default locations data
-      if (defaultLocations && defaultLocations.length > 0) {
-        setLoc(defaultLocations[0]);
-      }
+      // 2. Fallback to constant location
+      setLoc(FALLBACK_LOCATION);
     }
 
     const locTimer = setTimeout(() => {

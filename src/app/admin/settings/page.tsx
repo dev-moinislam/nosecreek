@@ -4,45 +4,55 @@ import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { SiteSettings, EmailNotificationSettings, CustomSchemaItem } from "@/types/content";
-import settingsData from "@/data/settings.json";
 import AdminImageUploader from "@/components/admin/AdminImageUploader";
+
+const DEFAULT_SITE_SETTINGS: SiteSettings = {
+  clinicName: "Nose Creek Physiotherapy",
+  tagline: "Restoring mobility, strength & balance naturally since 2001",
+  logoText: "Nose Creek Physiotherapy",
+  contact: {
+    phone: "403-295-8590",
+    email: "info@nosecreekphysiotherapy.com",
+    address: "8220 Centre St NE #153, Calgary, AB T3K 1J7"
+  },
+  openingHours: {
+    weekdays: "6:45 AM – 7:15 PM",
+    saturday: "8:00 AM – 2:00 PM",
+    sunday: "Closed"
+  },
+  socialLinks: {},
+  bookingUrl: "https://nosecreekphysiotherapy.janeapp.com/",
+  primaryCTA: {
+    label: "Book Appointment",
+    href: "https://nosecreekphysiotherapy.janeapp.com/"
+  },
+  footerContent: {
+    copyright: "© 2026 Nose Creek Physiotherapy. All rights reserved.",
+    disclaimer: "The information provided on this site is not medical advice."
+  },
+  seo: {
+    title: "Nose Creek Physiotherapy Calgary | Physiotherapy, Massage & Movement",
+    description: "Physiotherapy in Calgary North (Beddington). Since 2001, restoring mobility, strength & balance naturally."
+  }
+} as unknown as SiteSettings;
 
 export default function AdminSettingsPage() {
   const { role, isAdmin, canEditMarketingScripts } = useRole();
-  const [settings, setSettings] = useState<SiteSettings>(settingsData as SiteSettings);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SITE_SETTINGS);
   // Keep background copy of notifications and customSchemas so saving general settings doesn't overwrite them
-  const [notifications, setNotifications] = useState<EmailNotificationSettings>(() => {
-    return (settingsData as any).notifications || {};
-  });
-  const [customSchemas, setCustomSchemas] = useState<CustomSchemaItem[]>(() => {
-    return (settingsData as any).customSchemas || [];
-  });
+  const [notifications, setNotifications] = useState<EmailNotificationSettings>({} as any);
+  const [customSchemas, setCustomSchemas] = useState<CustomSchemaItem[]>([]);
 
   const [marketing, setMarketing] = useState<{
     callTracking: { enabled: boolean; scriptUrl: string };
     gtm: { enabled: boolean; containerId: string };
     googleAnalytics: { enabled: boolean; trackingId: string };
     facebookPixel: { enabled: boolean; pixelId: string };
-  }>(() => {
-    const m = (settingsData as any).marketing || {};
-    return {
-      callTracking: {
-        enabled: m.callTracking?.enabled ?? true,
-        scriptUrl: m.callTracking?.scriptUrl ?? ""
-      },
-      gtm: {
-        enabled: m.gtm?.enabled ?? true,
-        containerId: m.gtm?.containerId ?? (Array.isArray(m.gtm?.containerIds) ? m.gtm.containerIds.join(", ") : "")
-      },
-      googleAnalytics: {
-        enabled: m.googleAnalytics?.enabled ?? true,
-        trackingId: m.googleAnalytics?.trackingId ?? ""
-      },
-      facebookPixel: {
-        enabled: m.facebookPixel?.enabled ?? true,
-        pixelId: m.facebookPixel?.pixelId ?? ""
-      }
-    };
+  }>({
+    callTracking: { enabled: false, scriptUrl: "" },
+    gtm: { enabled: true, containerId: "GTM-M3WLKSQ, GTM-PJ447MK" },
+    googleAnalytics: { enabled: true, trackingId: "UA-121730452-1" },
+    facebookPixel: { enabled: true, pixelId: "275772356383035" }
   });
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -60,16 +70,16 @@ export default function AdminSettingsPage() {
             .single();
           if (!error && data) {
             setSettings({
-              clinicName: data.clinic_name || settingsData.clinicName,
-              logoText: data.logo_text || settingsData.logoText,
-              contact: data.contact || settingsData.contact,
-              openingHours: data.opening_hours || settingsData.openingHours,
-              socialLinks: data.social_links || settingsData.socialLinks,
-              bookingUrl: data.booking_url || settingsData.bookingUrl,
-              primaryCTA: data.primary_cta || settingsData.primaryCTA,
-              footerContent: data.footer_content || settingsData.footerContent,
-              seo: data.seo || settingsData.seo,
-              favicon: data.seo?.favicon || (data as any).favicon || (settingsData as any).favicon
+              clinicName: data.clinic_name || DEFAULT_SITE_SETTINGS.clinicName,
+              logoText: data.logo_text || DEFAULT_SITE_SETTINGS.logoText,
+              contact: data.contact || DEFAULT_SITE_SETTINGS.contact,
+              openingHours: data.opening_hours || DEFAULT_SITE_SETTINGS.openingHours,
+              socialLinks: data.social_links || DEFAULT_SITE_SETTINGS.socialLinks,
+              bookingUrl: data.booking_url || DEFAULT_SITE_SETTINGS.bookingUrl,
+              primaryCTA: data.primary_cta || DEFAULT_SITE_SETTINGS.primaryCTA,
+              footerContent: data.footer_content || DEFAULT_SITE_SETTINGS.footerContent,
+              seo: data.seo || DEFAULT_SITE_SETTINGS.seo,
+              favicon: data.seo?.favicon || (data as any).favicon || DEFAULT_SITE_SETTINGS.favicon
             });
             if (data.marketing) {
               const m = data.marketing;
@@ -197,8 +207,8 @@ export default function AdminSettingsPage() {
             ...formattedMarketing,
             notifications,
             customSchemas,
-            auth_credentials: cur?.marketing?.auth_credentials || (settingsData as any)?.marketing?.auth_credentials,
-            theme_colors: cur?.marketing?.theme_colors || (settingsData as any)?.marketing?.theme_colors
+            auth_credentials: cur?.marketing?.auth_credentials,
+            theme_colors: cur?.marketing?.theme_colors
           };
 
           await supabase.from("site_settings").upsert({
@@ -222,11 +232,10 @@ export default function AdminSettingsPage() {
         }
       }
 
-      // 2. Disk persistence via API route (updates src/data/settings.json)
+      // 2. Disk persistence via API route
       try {
         const diskMarketing = {
-          ...formattedMarketing,
-          auth_credentials: (settingsData as any)?.marketing?.auth_credentials
+          ...formattedMarketing
         };
         await fetch("/api/admin/save-content", {
           method: "POST",

@@ -73,12 +73,38 @@ export default function CustomStorySection({ section }: { section: ServiceCustom
                 {section.subtitle}
               </p>
             )}
-            {section.content && (
-              <FormattedNarrative
-                content={section.content}
-                isDark={isDark}
-                paragraphStyle={{ marginTop: 16, fontSize: 16, lineHeight: 1.7, color: descColor }}
-              />
+            {Boolean(section.content || section.contentCol2) && (
+              (section.contentLayout === "2-column" || Boolean(section.contentCol2?.trim())) ? (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+                    gap: "clamp(24px, 3.5vw, 44px)",
+                    marginTop: 18,
+                    alignItems: "start"
+                  }}
+                >
+                  <div className="story-column-1">
+                    <FormattedNarrative
+                      content={section.content || ""}
+                      isDark={isDark}
+                    />
+                  </div>
+                  <div className="story-column-2">
+                    <FormattedNarrative
+                      content={section.contentCol2 || ""}
+                      isDark={isDark}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div style={{ marginTop: 16 }}>
+                  <FormattedNarrative
+                    content={section.content || ""}
+                    isDark={isDark}
+                  />
+                </div>
+              )
             )}
 
             {section.bullets && section.bullets.length > 0 && (

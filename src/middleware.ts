@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import staticRedirectsData from "@/data/redirects.json";
 
 interface CachedRule {
   id: string;
@@ -12,7 +11,7 @@ interface CachedRule {
 }
 
 // In-memory cache for ultra-fast middleware execution
-let cachedRules: CachedRule[] = (staticRedirectsData as any)?.rules || [];
+let cachedRules: CachedRule[] = [];
 let lastFetchTime = 0;
 const CACHE_TTL_MS = 60000; // Refresh rules from API every 60 seconds
 

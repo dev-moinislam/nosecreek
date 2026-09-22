@@ -2,7 +2,6 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { TeamMember } from "@/types/content";
-import defaultTeamData from "@/data/team.json";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 
 interface TeamCarouselProps {
@@ -14,11 +13,8 @@ interface TeamCarouselProps {
 export default function TeamCarousel({ members, customEyebrow, customTitle }: TeamCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // If members prop is provided, use it; otherwise fallback to defaultTeamData
-  const displayMembers: TeamMember[] =
-    members && members.length > 0
-      ? members
-      : (defaultTeamData as TeamMember[]);
+  // If members prop is provided, use it; otherwise fallback to empty array
+  const displayMembers: TeamMember[] = members && members.length > 0 ? members : [];
 
   const scroll = (dir: number) => {
     const el = scrollRef.current;

@@ -5,14 +5,22 @@ import Link from "next/link";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { SiteSettings, PageMetaItem } from "@/types/content";
-import settingsData from "@/data/settings.json";
 import { getAllSiteRoutes, SiteRouteInfo } from "@/lib/seo";
 import { GlobeIcon, SearchIcon } from "@/components/admin/AdminIcons";
+
+const DEFAULT_SEO_SETTINGS: SiteSettings = {
+  clinicName: "Nose Creek Physiotherapy",
+  seo: {
+    title: "Nose Creek Physiotherapy Calgary | Physiotherapy, Massage & Movement",
+    description: "Physiotherapy in Calgary North (Beddington). Since 2001, restoring mobility, strength & balance naturally.",
+    pages: {}
+  }
+} as any;
 
 export default function AdminSeoManagerPage() {
   const { role, isAdmin } = useRole();
   const [routes, setRoutes] = useState<SiteRouteInfo[]>([]);
-  const [settings, setSettings] = useState<SiteSettings>(settingsData as SiteSettings);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SEO_SETTINGS);
   const [customPages, setCustomPages] = useState<Record<string, PageMetaItem>>({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("All");
@@ -34,9 +42,9 @@ export default function AdminSeoManagerPage() {
               const { data } = await supabase.from("site_settings").select("*").eq("id", "main").single();
               if (data) {
                 return {
-                  ...(settingsData as SiteSettings),
+                  ...DEFAULT_SEO_SETTINGS,
                   ...data,
-                  seo: data.seo || settingsData.seo
+                  seo: data.seo || DEFAULT_SEO_SETTINGS.seo
                 } as SiteSettings;
               }
             }
@@ -49,7 +57,7 @@ export default function AdminSeoManagerPage() {
                 } catch {}
               }
             }
-            return settingsData as SiteSettings;
+            return DEFAULT_SEO_SETTINGS;
           })()
         ]);
 

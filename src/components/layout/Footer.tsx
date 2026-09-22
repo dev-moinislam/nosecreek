@@ -2,10 +2,16 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import OptimizedImage from "@/components/ui/OptimizedImage";
-import defaultServicesData from "@/data/services.json";
-import defaultConditionsData from "@/data/conditions.json";
-import defaultSettingsData from "@/data/settings.json";
 import { Service, Condition, SiteSettings } from "@/types/content";
+
+const DEFAULT_FOOTER_SETTINGS: SiteSettings = {
+  clinicName: "Nose Creek Physiotherapy",
+  tagline: "Restoring mobility, strength & balance naturally since 2001",
+  phone: "403-295-8590",
+  email: "info@nosecreekphysiotherapy.com",
+  bookingUrl: "https://nosecreekphysiotherapy.janeapp.com/",
+  logo: "/images/logo/nosecreek-logo.png"
+} as unknown as SiteSettings;
 
 interface FooterProps {
   initialSettings?: SiteSettings;
@@ -18,9 +24,9 @@ export default function Footer({
   initialServices,
   initialConditions
 }: FooterProps = {}) {
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSettings || (defaultSettingsData as SiteSettings));
-  const [services, setServices] = useState<Service[]>(initialServices || (defaultServicesData as Service[]));
-  const [conditions, setConditions] = useState<Condition[]>(initialConditions || (defaultConditionsData as Condition[]));
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(initialSettings || DEFAULT_FOOTER_SETTINGS);
+  const [services, setServices] = useState<Service[]>(initialServices || []);
+  const [conditions, setConditions] = useState<Condition[]>(initialConditions || []);
 
   useEffect(() => {
     async function fetchFreshSettings() {
