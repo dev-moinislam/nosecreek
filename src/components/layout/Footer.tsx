@@ -117,8 +117,9 @@ export default function Footer({
       highlight: true,
       external: true
     },
-    { label: "Free Discovery Session", href: "/contact", highlight: false },
-    { label: "Free Phone Consultation",href: "/contact", highlight: false },
+    { label: "Free Discovery Session", href: "/free-discovery-session", highlight: false },
+    { label: "Free Phone Consultation", href: "/telephone-consultation", highlight: false },
+    { label: "Cost & Availability Inquiry", href: "/inquire", highlight: false },
     { label: "Clinic Contact & Map",   href: "/contact", highlight: false },
     { label: "Patient Reviews (5-Star)",href: "/reviews", highlight: false },
   ];

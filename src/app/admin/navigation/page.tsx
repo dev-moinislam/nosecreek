@@ -168,7 +168,30 @@ function reconcileNavigationWithContent(
   });
 
 
-  // 3. RECONCILE FOOTER COLUMNS
+  // 3. RECONCILE CONTACT MENU
+  let contactMenu = nav.header.menu.find((m) => m.id === "nav-contact" || m.href === "/contact" || m.label?.toLowerCase() === "contact");
+  if (contactMenu) {
+    if (!Array.isArray(contactMenu.children)) contactMenu.children = [];
+    const defaultContactChildren: NavMenuItem[] = [
+      { id: "cnt-main", label: "Contact Us", href: "/contact", enabled: true },
+      { id: "cnt-inquire", label: "Inquire About Cost & Availability", href: "/inquire", enabled: true },
+      { id: "cnt-phone", label: "Free Telephone Consultation", href: "/telephone-consultation", enabled: true },
+      { id: "cnt-discovery", label: "Free Discovery Session", href: "/free-discovery-session", enabled: true }
+    ];
+    defaultContactChildren.forEach((def) => {
+      const idx = contactMenu!.children!.findIndex(
+        (c) => c.id === def.id || c.href === def.href || c.href?.endsWith(def.href)
+      );
+      if (idx >= 0) {
+        contactMenu!.children![idx].label = def.label;
+        contactMenu!.children![idx].href = def.href;
+      } else {
+        contactMenu!.children!.push(def);
+      }
+    });
+  }
+
+  // 4. RECONCILE FOOTER COLUMNS
   const srvCol = nav.footer.columns.find((c) => c.id === "ft-col-services" || c.title?.toLowerCase().includes("service"));
   if (srvCol) {
     srvCol.links = rootServices.map((s) => ({

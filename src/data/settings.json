@@ -487,7 +487,12 @@
             "href": "/contact",
             "label": "Contact",
             "enabled": true,
-            "children": []
+            "children": [
+              { "id": "cnt-main", "label": "Contact Us", "href": "/contact", "enabled": true },
+              { "id": "cnt-inquire", "label": "Inquire About Cost & Availability", "href": "/inquire", "enabled": true },
+              { "id": "cnt-phone", "label": "Free Telephone Consultation", "href": "/telephone-consultation", "enabled": true },
+              { "id": "cnt-discovery", "label": "Free Discovery Session", "href": "/free-discovery-session", "enabled": true }
+            ]
           }
         ],
         "phone": "403-295-8590",
@@ -928,7 +933,12 @@
           "href": "/contact",
           "label": "Contact",
           "enabled": true,
-          "children": []
+          "children": [
+            { "id": "cnt-main", "label": "Contact Us", "href": "/contact", "enabled": true },
+            { "id": "cnt-inquire", "label": "Inquire About Cost & Availability", "href": "/inquire", "enabled": true },
+            { "id": "cnt-phone", "label": "Free Telephone Consultation", "href": "/telephone-consultation", "enabled": true },
+            { "id": "cnt-discovery", "label": "Free Discovery Session", "href": "/free-discovery-session", "enabled": true }
+          ]
         }
       ],
       "phone": "403-295-8590",

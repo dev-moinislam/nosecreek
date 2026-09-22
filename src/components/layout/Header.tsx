@@ -468,6 +468,38 @@ export default function Header({
       };
     }
 
+    // 3. DYNAMICALLY MERGE CONTACT SUBMENU
+    if (item.id === "nav-contact" || item.href === "/contact" || item.label?.toLowerCase() === "contact") {
+      const defaultContactChildren: NavMenuItem[] = [
+        { id: "cnt-main", label: "Contact Us", href: "/contact", enabled: true },
+        { id: "cnt-inquire", label: "Inquire About Cost & Availability", href: "/inquire", enabled: true },
+        { id: "cnt-phone", label: "Free Telephone Consultation", href: "/telephone-consultation", enabled: true },
+        { id: "cnt-discovery", label: "Free Discovery Session", href: "/free-discovery-session", enabled: true }
+      ];
+
+      const currentChildren: NavMenuItem[] = Array.isArray(item.children) && item.children.length > 0
+        ? [...item.children]
+        : [];
+
+      defaultContactChildren.forEach((def) => {
+        const existingIdx = currentChildren.findIndex(
+          (c) => c.id === def.id || c.href === def.href || c.href?.endsWith(def.href)
+        );
+        if (existingIdx >= 0) {
+          if (!currentChildren[existingIdx].label || currentChildren[existingIdx].label.trim().toLowerCase() === "contact") {
+            currentChildren[existingIdx].label = def.label;
+          }
+        } else {
+          currentChildren.push(def);
+        }
+      });
+
+      return {
+        ...item,
+        children: currentChildren
+      };
+    }
+
     return item;
   });
 
