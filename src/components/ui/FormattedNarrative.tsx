@@ -42,7 +42,7 @@ export default function FormattedNarrative({
       const isInternal = href.startsWith("/") || href.startsWith("#") || href.includes("nosecreekphysiotherapy.com");
       const cleanHref = href.replace(/^https?:\/\/(www\.)?nosecreekphysiotherapy\.com/, "");
       const targetAttr = isInternal ? "" : ' target="_blank" rel="noopener noreferrer"';
-      return `<a href="${cleanHref || "/"}"${targetAttr} style="color: ${linkColor}; text-decoration: underline; text-underline-offset: 3px; font-weight: 600;">${text}</a>`;
+      return `<a href="${cleanHref || "/"}"${targetAttr} class="nc-content-link">${text}</a>`;
     });
 
     return (
@@ -118,15 +118,22 @@ export default function FormattedNarrative({
             line-height: 1.65;
             color: ${isDark ? "#e2e8f0" : "#334155"};
           }
-          .formatted-narrative-prose a {
-            color: ${linkColor};
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            font-weight: 600;
-            transition: color 0.15s ease;
+          .formatted-narrative-prose a,
+          .formatted-narrative-prose a.nc-content-link {
+            color: ${linkColor} !important;
+            text-decoration: underline !important;
+            text-decoration-thickness: 1.5px !important;
+            text-underline-offset: 3.5px !important;
+            text-decoration-color: ${isDark ? "rgba(103, 232, 249, 0.45)" : "rgba(2, 132, 199, 0.45)"} !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease-in-out !important;
+            cursor: pointer;
           }
-          .formatted-narrative-prose a:hover {
-            color: ${isDark ? "#a5f3fc" : "#0369a1"};
+          .formatted-narrative-prose a:hover,
+          .formatted-narrative-prose a.nc-content-link:hover {
+            color: ${isDark ? "#a5f3fc" : "#0369a1"} !important;
+            text-decoration-color: ${isDark ? "#8cc63f" : "#6faf1c"} !important;
+            text-decoration-thickness: 2.5px !important;
           }
           .formatted-narrative-prose blockquote {
             border-left: 4px solid #1c9fd8;
@@ -183,13 +190,14 @@ export default function FormattedNarrative({
             key={`link-${matchStart}`}
             href={cleanHref || "/"}
             title={linkText}
+            className="nc-content-link"
             rel={isNofollowInMarkdown ? "nofollow" : undefined}
             style={{
               color: linkColor,
               textDecoration: "underline",
-              textUnderlineOffset: "3px",
-              fontWeight: 600,
-              transition: "color 0.15s ease"
+              textUnderlineOffset: "3.5px",
+              textDecorationThickness: "1.5px",
+              fontWeight: 600
             }}
           >
             {linkText}
@@ -202,12 +210,14 @@ export default function FormattedNarrative({
             key={`link-${matchStart}`}
             href={cleanLinkHref}
             target="_blank"
+            className="nc-content-link"
             rel={relVal}
             title={linkText}
             style={{
               color: linkColor,
               textDecoration: "underline",
-              textUnderlineOffset: "3px",
+              textUnderlineOffset: "3.5px",
+              textDecorationThickness: "1.5px",
               fontWeight: 600
             }}
           >

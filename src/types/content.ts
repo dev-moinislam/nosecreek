@@ -158,6 +158,8 @@ export interface SectionBlockConfig {
   imagePosition?: "left" | "right" | "top" | "bottom" | "none";
   background?: "white" | "light" | "teal" | "gradient";
   align?: "left" | "center" | "right";
+  reverseMobileOrder?: boolean;
+  reverse_mobile_order?: boolean;
   ctaText?: string;
   ctaHref?: string;
   buttonText?: string;

@@ -112,7 +112,7 @@ export default function RichTextEditor({
     const targetAttr = openInNewTab ? ' target="_blank"' : "";
     const relAttr = relParts.length > 0 ? ` rel="${relParts.join(" ")}"` : "";
 
-    const linkHtml = `<a href="${url}" title="${title}"${targetAttr}${relAttr} style="color: #0284c7; text-decoration: underline; font-weight: 600;">${linkText}</a>&nbsp;`;
+    const linkHtml = `<a href="${url}" title="${title}"${targetAttr}${relAttr} class="nc-content-link">${linkText}</a>&nbsp;`;
     const success = document.execCommand("insertHTML", false, linkHtml);
     if (!success && editorRef.current) {
       editorRef.current.innerHTML += linkHtml;
@@ -397,23 +397,41 @@ export default function RichTextEditor({
           }}
         />
       ) : (
-        <div
-          ref={editorRef}
-          contentEditable
-          onInput={handleInput}
-          onBlur={handleInput}
-          onPaste={handlePaste}
-          style={{
-            minHeight,
-            padding: "14px 16px",
-            fontSize: 15,
-            lineHeight: 1.7,
-            color: "#0f172a",
-            outline: "none",
-            overflowY: "auto",
-            wordBreak: "break-word"
-          }}
-        />
+        <>
+          <style dangerouslySetInnerHTML={{ __html: `
+            .adm-rich-editor-canvas a, .adm-rich-editor-canvas a.nc-content-link {
+              color: #0284c7 !important;
+              text-decoration: underline !important;
+              text-underline-offset: 3px !important;
+              text-decoration-thickness: 1.5px !important;
+              font-weight: 600 !important;
+              transition: all 0.2s ease !important;
+            }
+            .adm-rich-editor-canvas a:hover, .adm-rich-editor-canvas a.nc-content-link:hover {
+              color: #0369a1 !important;
+              text-decoration-color: #6faf1c !important;
+              text-decoration-thickness: 2.5px !important;
+            }
+          `}} />
+          <div
+            ref={editorRef}
+            className="adm-rich-editor-canvas"
+            contentEditable
+            onInput={handleInput}
+            onBlur={handleInput}
+            onPaste={handlePaste}
+            style={{
+              minHeight,
+              padding: "14px 16px",
+              fontSize: 15,
+              lineHeight: 1.7,
+              color: "#0f172a",
+              outline: "none",
+              overflowY: "auto",
+              wordBreak: "break-word"
+            }}
+          />
+        </>
       )}
 
       {/* ── FOOTER HINT ── */}

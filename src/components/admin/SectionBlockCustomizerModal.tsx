@@ -46,6 +46,7 @@ export default function SectionBlockCustomizerModal({
     imagePosition: config?.imagePosition || "none",
     background: config?.background || "white",
     align: config?.align || "left",
+    reverseMobileOrder: Boolean(config?.reverseMobileOrder || (config as any)?.reverse_mobile_order),
     ctaText: config?.ctaText || "",
     ctaHref: config?.ctaHref || "",
     bullets: config?.bullets || []
@@ -71,6 +72,7 @@ export default function SectionBlockCustomizerModal({
         imagePosition: config.imagePosition || (config.image ? "right" : "none"),
         background: config.background || "white",
         align: config.align || "left",
+        reverseMobileOrder: Boolean(config.reverseMobileOrder || (config as any)?.reverse_mobile_order),
         ctaText: config.ctaText || "",
         ctaHref: config.ctaHref || "",
         bullets: config.bullets ? [...config.bullets] : []
@@ -88,6 +90,7 @@ export default function SectionBlockCustomizerModal({
         imagePosition: "none",
         background: "white",
         align: "left",
+        reverseMobileOrder: false,
         ctaText: "",
         ctaHref: "",
         bullets: []
@@ -395,8 +398,8 @@ export default function SectionBlockCustomizerModal({
             </div>
           </div>
 
-          {/* Subtitle & Background Theme */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          {/* Subtitle, Background Theme & Content Alignment */}
+          <div style={{ display: "grid", gridTemplateColumns: isTestimonials ? "1fr 1fr" : "1.2fr 1fr 1fr", gap: 14 }}>
             <div className="adm-form-group">
               <label className="adm-form-label">Subtitle / Hook Line (Optional)</label>
               <input
@@ -420,42 +423,215 @@ export default function SectionBlockCustomizerModal({
                 <option value="teal">Dark Clinic Teal (#12303d)</option>
               </select>
             </div>
+
+            {!isTestimonials && (
+              <div className="adm-form-group">
+                <label className="adm-form-label">Content Alignment</label>
+                <div style={{ display: "flex", gap: 4 }}>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, align: "left" })}
+                    style={{
+                      flex: 1,
+                      padding: "8px 10px",
+                      borderRadius: 6,
+                      border: "1px solid",
+                      borderColor: (formData.align || "left") === "left" ? "#0284c7" : "#cbd5e1",
+                      background: (formData.align || "left") === "left" ? "#f0f9ff" : "#ffffff",
+                      color: (formData.align || "left") === "left" ? "#0284c7" : "#64748b",
+                      fontWeight: 700,
+                      fontSize: 12.5,
+                      cursor: "pointer"
+                    }}
+                    title="Left align content"
+                  >
+                    ⬅️ Left
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, align: "center" })}
+                    style={{
+                      flex: 1,
+                      padding: "8px 10px",
+                      borderRadius: 6,
+                      border: "1px solid",
+                      borderColor: formData.align === "center" ? "#0284c7" : "#cbd5e1",
+                      background: formData.align === "center" ? "#f0f9ff" : "#ffffff",
+                      color: formData.align === "center" ? "#0284c7" : "#64748b",
+                      fontWeight: 700,
+                      fontSize: 12.5,
+                      cursor: "pointer"
+                    }}
+                    title="Center align all content"
+                  >
+                    ↔️ Center
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 2. Media & Layout Placement (ONLY shown for Storytelling & Clinical Overview) */}
           {isMediaRichStory && (
-            <div style={{ background: "#f8fafc", padding: 16, borderRadius: 12, border: "1px solid #e2e8f0" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, fontWeight: 700, fontSize: 13.5, color: "#1e293b" }}>
-                <ImageIcon size={16} />
-                <span>Side Photo &amp; Media Placement</span>
+            <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, fontSize: 13.5, color: "#1e293b" }}>
+                  <ImageIcon size={16} />
+                  <span>Section Columns &amp; Media Layout</span>
+                </div>
+                <span style={{ fontSize: 12, color: "#64748b" }}>
+                  Choose 1-column, 2-column text, or text + photo
+                </span>
               </div>
 
-              <AdminImageUploader
-                label="Side Photo & Media"
-                value={formData.image || ""}
-                altValue={formData.imageAlt || ""}
-                onAltChange={(alt) => setFormData({ ...formData, imageAlt: alt })}
-                onChange={(url) => setFormData({ ...formData, image: url })}
-                folder="homepage"
-                placeholder="/images/clinic/reception-one.jpg"
-                aspectRatioNote="Landscape 16:9 or 4:3 recommended"
-                style={{ marginBottom: 14 }}
-              />
-
-              <div className="adm-form-group">
-                <label className="adm-form-label">Image Layout Position</label>
-                <select
-                  className="adm-select"
-                  value={formData.imagePosition || "none"}
-                  onChange={(e) => setFormData({ ...formData, imagePosition: e.target.value as any })}
+              {/* 4 Quick Layout Mode Presets */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8, marginBottom: 14 }}>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, contentLayout: "1-column", imagePosition: "none" })}
+                  style={{
+                    padding: "9px 10px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: formData.contentLayout !== "2-column" && (formData.imagePosition === "none" || !formData.imagePosition) ? "#0284c7" : "#cbd5e1",
+                    background: formData.contentLayout !== "2-column" && (formData.imagePosition === "none" || !formData.imagePosition) ? "#f0f9ff" : "#ffffff",
+                    color: formData.contentLayout !== "2-column" && (formData.imagePosition === "none" || !formData.imagePosition) ? "#0284c7" : "#334155",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textAlign: "center"
+                  }}
                 >
-                  <option value="none">No Image (Full Width Narrative)</option>
-                  <option value="right">Right Column (Split 2-Column)</option>
-                  <option value="left">Left Column (Split 2-Column)</option>
-                  <option value="top">Top Banner (Above Content)</option>
-                  <option value="bottom">Bottom Image (Below Content)</option>
-                </select>
+                  <div>📄 1-Col Text Only</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 500, color: "#64748b", marginTop: 2 }}>No Photo</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, contentLayout: "2-column", imagePosition: "none" })}
+                  style={{
+                    padding: "9px 10px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: formData.contentLayout === "2-column" && formData.imagePosition === "none" ? "#0284c7" : "#cbd5e1",
+                    background: formData.contentLayout === "2-column" && formData.imagePosition === "none" ? "#f0f9ff" : "#ffffff",
+                    color: formData.contentLayout === "2-column" && formData.imagePosition === "none" ? "#0284c7" : "#334155",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textAlign: "center"
+                  }}
+                >
+                  <div>📰 2-Col Text + Text</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 500, color: "#64748b", marginTop: 2 }}>Side-by-Side (No Photo)</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, contentLayout: "1-column", imagePosition: "right" })}
+                  style={{
+                    padding: "9px 10px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: formData.imagePosition === "right" ? "#0284c7" : "#cbd5e1",
+                    background: formData.imagePosition === "right" ? "#f0f9ff" : "#ffffff",
+                    color: formData.imagePosition === "right" ? "#0284c7" : "#334155",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textAlign: "center"
+                  }}
+                >
+                  <div>🖼️ Text + Right Photo</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 500, color: "#64748b", marginTop: 2 }}>2-Col Split</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, contentLayout: "1-column", imagePosition: "left" })}
+                  style={{
+                    padding: "9px 10px",
+                    borderRadius: 8,
+                    border: "1px solid",
+                    borderColor: formData.imagePosition === "left" ? "#0284c7" : "#cbd5e1",
+                    background: formData.imagePosition === "left" ? "#f0f9ff" : "#ffffff",
+                    color: formData.imagePosition === "left" ? "#0284c7" : "#334155",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    textAlign: "center"
+                  }}
+                >
+                  <div>🖼️ Left Photo + Text</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 500, color: "#64748b", marginTop: 2 }}>2-Col Split</div>
+                </button>
               </div>
+
+              {/* Photo Upload area (when image position is not none) */}
+              {formData.imagePosition && formData.imagePosition !== "none" ? (
+                <div>
+                  <AdminImageUploader
+                    label="Side Photo & Media"
+                    value={formData.image || ""}
+                    altValue={formData.imageAlt || ""}
+                    onAltChange={(alt) => setFormData({ ...formData, imageAlt: alt })}
+                    onChange={(url) => setFormData({ ...formData, image: url })}
+                    folder="homepage"
+                    placeholder="/images/clinic/reception-one.jpg"
+                    aspectRatioNote="Landscape 16:9 or 4:3 recommended"
+                    style={{ marginBottom: 14 }}
+                  />
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "center" }}>
+                    <div className="adm-form-group">
+                      <label className="adm-form-label">Image Placement Position</label>
+                      <select
+                        className="adm-select"
+                        value={formData.imagePosition || "none"}
+                        onChange={(e) => setFormData({ ...formData, imagePosition: e.target.value as any })}
+                      >
+                        <option value="right">Right Column (Split 2-Column)</option>
+                        <option value="left">Left Column (Split 2-Column)</option>
+                        <option value="top">Top Banner (Above Content)</option>
+                        <option value="bottom">Bottom Image (Below Content)</option>
+                        <option value="none">No Image (Text Only)</option>
+                      </select>
+                    </div>
+
+                    {/* Mobile Reverse Stacking Control */}
+                    {(formData.imagePosition === "left" || formData.imagePosition === "right") && (
+                      <div style={{ background: "#ffffff", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", marginTop: 6 }}>
+                        <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={Boolean(formData.reverseMobileOrder)}
+                            onChange={(e) => setFormData({ ...formData, reverseMobileOrder: e.target.checked })}
+                            style={{ marginTop: 3, width: 16, height: 16 }}
+                          />
+                          <div>
+                            <strong style={{ fontSize: 12.5, color: "#1e293b", display: "block" }}>
+                              🔄 Reverse Stack on Mobile
+                            </strong>
+                            <span style={{ fontSize: 11.5, color: "#64748b", lineHeight: 1.3, display: "block" }}>
+                              {formData.imagePosition === "left"
+                                ? "Shows Text first & Image below on phones (prevents 2 images in a row)."
+                                : "Shows Image first & Text below on phones."}
+                            </span>
+                          </div>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : formData.contentLayout === "2-column" ? (
+                <div style={{ padding: "12px 14px", background: "#e0f2fe", borderRadius: 8, border: "1px solid #bae6fd", fontSize: 12.5, color: "#0369a1", lineHeight: 1.5 }}>
+                  📰 <strong>2-Column Text Mode Active:</strong> Content displays in two side-by-side narrative text columns without needing an image. Both Column 1 and Column 2 editors are available below.
+                </div>
+              ) : (
+                <div style={{ padding: "12px 14px", background: "#f1f5f9", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12.5, color: "#64748b", lineHeight: 1.5 }}>
+                  📄 <strong>1-Column Full Width Narrative Mode:</strong> Text content spans the reading container. You can add bullets and CTA buttons below.
+                </div>
+              )}
             </div>
           )}
 

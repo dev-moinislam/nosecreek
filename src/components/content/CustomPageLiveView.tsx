@@ -414,6 +414,7 @@ export default function CustomPageLiveView({
             : { background: "#ffffff", color: "#1d2b34" };
 
         const isDark = cfg?.background === "teal";
+        const isCenter = cfg?.align === "center";
         const image = cfg?.image || null;
         const pos = cfg?.imagePosition || (image ? "right" : "none");
         const hasLeftImg = pos === "left" && image;
@@ -421,6 +422,7 @@ export default function CustomPageLiveView({
         const hasTopImg = pos === "top" && image;
         const hasBottomImg = pos === "bottom" && image;
         const hasNoImg = pos === "none" || !image;
+        const isMobileReverse = Boolean(cfg?.reverseMobileOrder || (cfg as any)?.reverse_mobile_order);
 
         const overviewAlt = cfg?.imageAlt || `${page.title} Clinical Overview - Nose Creek Physiotherapy Calgary`;
         const contentStr = cfg?.content || page.content || "";
@@ -430,6 +432,20 @@ export default function CustomPageLiveView({
         return (
           <section key="clinical_overview" style={{ ...bgStyle, padding: "clamp(56px, 7vw, 96px) 0" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+              {hasLeftImg || hasRightImg ? (
+                <style
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      @media (max-width: 768px) {
+                        .custom-page-overview-grid {
+                          display: flex !important;
+                          flex-direction: ${isMobileReverse ? "column-reverse" : "column"} !important;
+                        }
+                      }
+                    `
+                  }}
+                />
+              ) : null}
               
               {hasTopImg && (
                 <div style={{ marginBottom: 36, borderRadius: 18, overflow: "hidden", maxHeight: 440, boxShadow: "0 20px 48px rgba(18,60,80,0.14)" }}>
@@ -438,6 +454,7 @@ export default function CustomPageLiveView({
               )}
 
               <div
+                className="custom-page-overview-grid"
                 style={{
                   display: hasNoImg || hasTopImg || hasBottomImg ? "block" : "grid",
                   gridTemplateColumns: hasNoImg ? "1fr" : "repeat(auto-fit, minmax(320px, 1fr))",
@@ -451,7 +468,7 @@ export default function CustomPageLiveView({
                   </div>
                 )}
 
-                <div style={{ maxWidth: hasNoImg ? (isTwoCol ? "100%" : 900) : "none" }}>
+                <div style={{ maxWidth: hasNoImg ? (isTwoCol ? "100%" : 900) : "none", textAlign: isCenter ? "center" : "left", margin: isCenter ? "0 auto" : 0 }}>
                   {eyebrowEl(cfg?.eyebrow || "Comprehensive Clinical Care", cfg?.eyebrowColor || (isDark ? "#8cc63f" : "#1c9fd8"))}
 
                   <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, color: isDark ? "#fff" : "#1d2b34", letterSpacing: "-0.5px", lineHeight: 1.15, marginBottom: 18 }}>

@@ -3,6 +3,30 @@ html{scroll-behavior:smooth;font-size:16px}
 body{font-family:var(--font-open-sans),'Open Sans',system-ui,sans-serif;color:#2b3138;background:#fff;-webkit-font-smoothing:antialiased;line-height:1.6}
 a{color:#0e78a8;text-decoration:none}
 a:hover{color:#0b5e85}
+
+/* ─── EDITORIAL & NARRATIVE LINKS (THEME COLORS & INTERACTIVE HOVER) ─── */
+.nc-content-link,
+.formatted-narrative-prose a,
+.story-column-1 a,
+.story-column-2 a {
+  color: var(--nc-blue, #1c9fd8);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3.5px;
+  text-decoration-color: rgba(28, 159, 216, 0.45);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.nc-content-link:hover,
+.formatted-narrative-prose a:hover,
+.story-column-1 a:hover,
+.story-column-2 a:hover {
+  color: var(--nc-blue-dark, #1179ab) !important;
+  text-decoration-color: var(--nc-green, #6faf1c) !important;
+  text-decoration-thickness: 2.5px !important;
+}
 img{display:block;max-width:100%}
 h1,h2,h3,h4,h5,h6{font-family:var(--font-poppins),'Poppins',system-ui,sans-serif;color:#1d2b34;margin:0;line-height:1.2}
 p{margin:0}
