@@ -88,28 +88,11 @@ export default function AdminLoginPage() {
               fontSize: 13,
               marginBottom: 18,
               textAlign: "left",
-              lineHeight: 1.45
+              lineHeight: 1.45,
+              fontWeight: 600
             }}
           >
-            <div style={{ fontWeight: 600, marginBottom: error.includes("client-login") ? 8 : 0 }}>
-              ⚠️ {error}
-            </div>
-            {error.includes("client-login") && (
-              <a
-                href="/client-login"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  color: "#0369a1",
-                  fontWeight: 700,
-                  fontSize: 12.5,
-                  textDecoration: "underline"
-                }}
-              >
-                Go to Client Content Portal →
-              </a>
-            )}
+            ⚠️ {error}
           </div>
         )}
 
