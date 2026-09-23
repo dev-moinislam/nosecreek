@@ -270,24 +270,62 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
 
 /**
  * Dynamically resolves the base URL of the active deployment.
- * Supports Vercel preview/production domains, custom domains, and localhost.
+ * Dynamically inspects the incoming request host header (so any domain/subdomain automatically reflects),
+ * custom domain configured in site settings, environment variables, and fallback.
  */
-export async function getSiteBaseUrl(): Promise<string> {
+export async function getSiteBaseUrl(explicitReq?: Request): Promise<string> {
+  // 1. Browser context: always use the active window origin
   if (typeof window !== "undefined") {
     return window.location.origin;
   }
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
-  }
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+  // 2. Explicit request object passed into route handlers
+  if (explicitReq) {
+    try {
+      const host = explicitReq.headers.get("x-forwarded-host") || explicitReq.headers.get("host");
+      const proto = explicitReq.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+      if (host && !host.includes("undefined")) {
+        return `${proto}://${host}`.replace(/\/$/, "");
+      }
+    } catch {}
   }
 
-  return "https://nosecreekphysiotherapy.com";
+  // 3. Dynamic Server context: read current request headers
+  try {
+    const { headers } = await import("next/headers");
+    const headerList = await headers();
+    const host = headerList.get("x-forwarded-host") || headerList.get("host");
+    const proto = headerList.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+    if (host && !host.includes("undefined")) {
+      return `${proto}://${host}`.replace(/\/$/, "");
+    }
+  } catch {
+    // headers() might not be available during static build-time generation
+  }
+
+  // 4. Primary canonical URL configured in site settings
+  try {
+    const settings = await getSiteSettings().catch(() => null);
+    if (settings?.seo?.canonicalUrl && typeof settings.seo.canonicalUrl === "string") {
+      const trimmed = settings.seo.canonicalUrl.trim();
+      if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+        return trimmed.replace(/\/$/, "");
+      }
+    }
+  } catch {}
+
+  // 5. Explicit user-configured environment variable
+  if (process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("localhost")) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  }
+
+  // 6. Production project domain (NOT the temporary deployment git preview hash)
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`.replace(/\/$/, "");
+  }
+
+  // 7. Fallback to official clinic production domain
+  return "https://www.nosecreekphysiotherapy.com";
 }
 
 /**

@@ -3,6 +3,6 @@ import { GET as getMasterSitemap } from "@/app/sitemap.xml/route";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
-  return getMasterSitemap();
+export async function GET(request: Request) {
+  return getMasterSitemap(request);
 }

@@ -4,8 +4,8 @@ import { generateSitemapIndexXml, buildXmlResponse } from "@/lib/sitemap";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
-  const rawBase = await getSiteBaseUrl();
+export async function GET(request: Request) {
+  const rawBase = await getSiteBaseUrl(request);
   const baseUrl = rawBase.replace(/\/$/, "");
   const now = new Date();
 

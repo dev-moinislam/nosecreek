@@ -103,8 +103,8 @@ export async function getNoIndexPaths(): Promise<Set<string>> {
 /**
  * Core Pages + Custom Landing Pages URLs (excluding noIndex pages)
  */
-export async function getPageSitemapUrls(): Promise<SitemapUrlEntry[]> {
-  const rawBase = await getSiteBaseUrl();
+export async function getPageSitemapUrls(customBaseUrl?: string): Promise<SitemapUrlEntry[]> {
+  const rawBase = customBaseUrl || (await getSiteBaseUrl());
   const baseUrl = rawBase.replace(/\/$/, "");
   const noIndexPaths = await getNoIndexPaths();
 
@@ -165,8 +165,8 @@ export async function getPageSitemapUrls(): Promise<SitemapUrlEntry[]> {
 /**
  * Clinical Services URLs (excluding noIndex pages)
  */
-export async function getServiceSitemapUrls(): Promise<SitemapUrlEntry[]> {
-  const rawBase = await getSiteBaseUrl();
+export async function getServiceSitemapUrls(customBaseUrl?: string): Promise<SitemapUrlEntry[]> {
+  const rawBase = customBaseUrl || (await getSiteBaseUrl());
   const baseUrl = rawBase.replace(/\/$/, "");
   const noIndexPaths = await getNoIndexPaths();
 
@@ -196,8 +196,8 @@ export async function getServiceSitemapUrls(): Promise<SitemapUrlEntry[]> {
 /**
  * Conditions We Treat URLs (excluding noIndex pages)
  */
-export async function getConditionSitemapUrls(): Promise<SitemapUrlEntry[]> {
-  const rawBase = await getSiteBaseUrl();
+export async function getConditionSitemapUrls(customBaseUrl?: string): Promise<SitemapUrlEntry[]> {
+  const rawBase = customBaseUrl || (await getSiteBaseUrl());
   const baseUrl = rawBase.replace(/\/$/, "");
   const noIndexPaths = await getNoIndexPaths();
 
@@ -227,8 +227,8 @@ export async function getConditionSitemapUrls(): Promise<SitemapUrlEntry[]> {
 /**
  * Blog Posts URLs (excluding noIndex pages and drafts)
  */
-export async function getPostSitemapUrls(): Promise<SitemapUrlEntry[]> {
-  const rawBase = await getSiteBaseUrl();
+export async function getPostSitemapUrls(customBaseUrl?: string): Promise<SitemapUrlEntry[]> {
+  const rawBase = customBaseUrl || (await getSiteBaseUrl());
   const baseUrl = rawBase.replace(/\/$/, "");
   const noIndexPaths = await getNoIndexPaths();
 
@@ -254,8 +254,8 @@ export async function getPostSitemapUrls(): Promise<SitemapUrlEntry[]> {
 /**
  * Team Members URLs (excluding noIndex pages)
  */
-export async function getTeamSitemapUrls(): Promise<SitemapUrlEntry[]> {
-  const rawBase = await getSiteBaseUrl();
+export async function getTeamSitemapUrls(customBaseUrl?: string): Promise<SitemapUrlEntry[]> {
+  const rawBase = customBaseUrl || (await getSiteBaseUrl());
   const baseUrl = rawBase.replace(/\/$/, "");
   const noIndexPaths = await getNoIndexPaths();
 
@@ -280,8 +280,8 @@ export async function getTeamSitemapUrls(): Promise<SitemapUrlEntry[]> {
 /**
  * Clinic Locations URLs (excluding noIndex pages)
  */
-export async function getLocationSitemapUrls(): Promise<SitemapUrlEntry[]> {
-  const rawBase = await getSiteBaseUrl();
+export async function getLocationSitemapUrls(customBaseUrl?: string): Promise<SitemapUrlEntry[]> {
+  const rawBase = customBaseUrl || (await getSiteBaseUrl());
   const baseUrl = rawBase.replace(/\/$/, "");
   const noIndexPaths = await getNoIndexPaths();
 
