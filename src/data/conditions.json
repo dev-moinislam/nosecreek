@@ -1,62 +1,5 @@
 [
   {
-    "id": "back-pain",
-    "slug": "back-pain",
-    "name": "Back Pain",
-    "shortDescription": "Targeted spinal rehabilitation, manual mobilization, and core stabilization to resolve acute and chronic lower back pain.",
-    "description": "Lower back pain is one of the most common musculoskeletal complaints in Calgary. Whether caused by disc herniation, facet joint irritation, ligament sprains, or prolonged postural strain, our physiotherapists use advanced orthopaedic manual therapy and functional core retraining to eliminate pain and restore full spinal mobility.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Dull, persistent ache or sharp pinching in the lumbar spine",
-      "Stiffness when getting out of bed or rising from a chair",
-      "Spasms in the paraspinal and gluteal muscles",
-      "Difficulty bending forward, lifting, or standing for long periods"
-    ],
-    "treatmentApproach": [
-      "Comprehensive Biomechanical Assessment: In-depth lumbar spine, pelvic alignment, and posture evaluation.",
-      "CAMPT-Certified Manual Therapy: Hands-on spinal joint mobilizations and gentle manual therapy for rapid relief.",
-      "Deep Muscle Release: IMS / Dry Needling to release chronic deep lumbar muscle spasms and trigger points.",
-      "Targeted Core Stabilization: Custom active stabilization exercises based on McKenzie and Stuart McGill protocols."
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [
-      "hero",
-      "at_a_glance",
-      "clinical_overview",
-      "custom_sections",
-      "symptoms",
-      "treatment_approach",
-      "related_therapies",
-      "team_carousel",
-      "faqs",
-      "location_map",
-      "decision_ctas",
-      "other_links",
-      "bottom_cta"
-    ],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy",
-      "acupuncture"
-    ],
-    "category": "Spine & Core",
-    "seo": {
-      "title": "Back Pain Treatment Calgary | Nose Creek Physiotherapy",
-      "ogTitle": "Back Pain Treatment | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Comprehensive back pain therapy, IMS dry needling, and spinal manual therapy in Calgary NW & NE.",
-      "sectionsData": {},
-      "ogDescription": "End back pain without pills or surgery with evidence-based physical therapy in Calgary."
-    }
-  },
-  {
     "id": "si-joint-dysfunction",
     "slug": "si-joint-dysfunction",
     "parentSlug": "back-pain",
@@ -155,236 +98,6 @@
     "seo": {
       "cardImage": null,
       "sectionsData": {}
-    }
-  },
-  {
-    "id": "neck-shoulder-pain",
-    "slug": "neck-shoulder-pain",
-    "name": "Neck & Shoulder Pain",
-    "shortDescription": "Relief from cervical stiffness, pinched nerves, posture fatigue, and radiating shoulder tension.",
-    "description": "Neck and shoulder pain often stem from cervical joint restrictions, poor desk ergonomics ('tech neck'), or whiplash. When the cervical spine loses natural mobility, compensatory strain builds up across the upper trapezius and levator scapulae muscles, causing chronic aching and restricted rotation.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Stiffness turning the head or checking blind spots while driving",
-      "Radiating tension from the neck down into the shoulder blades",
-      "Tension headaches originating at the base of the skull (cervicogenic headaches)",
-      "Numbness or tingling sensations into the shoulder or arm"
-    ],
-    "treatmentApproach": [
-      "Cervical Joint Mobilization: Gentle cervical and upper thoracic joint mobilizations to restore freedom of motion.",
-      "Myofascial Decompression: Focused soft tissue release of suboccipital, levator scapulae, and shoulder girdle muscles.",
-      "Deep Flexor Retraining: Cervical deep flexor coordination and chin-tuck exercises to support the cervical spine.",
-      "Ergonomic Calibration: Workplace and lifestyle postural calibration to eliminate daily repetitive strain."
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy",
-      "acupuncture"
-    ],
-    "category": "Spine & Neck",
-    "seo": {
-      "title": "Neck & Shoulder Pain Treatment Calgary | Nose Creek",
-      "ogTitle": "Neck & Shoulder Pain Relief | Nose Creek",
-      "cardImage": null,
-      "description": "Relieve neck stiffness, tech-neck, and shoulder tension with hands-on physiotherapy and massage in Calgary.",
-      "sectionsData": {},
-      "ogDescription": "Restore neck mobility and stop tension headaches with targeted physical therapy."
-    }
-  },
-  {
-    "id": "knee-pain",
-    "slug": "knee-pain",
-    "name": "Knee Pain",
-    "shortDescription": "Specialized care for knee osteoarthritis, meniscus tears, patellar tendinitis, and ligament strains.",
-    "description": "Knee pain can severely limit your ability to walk, take stairs, or enjoy Calgary's outdoor lifestyle. We diagnose the root biomechanical cause — whether it is cartilage wear, patellofemoral tracking dysfunction, or ligament instability — and deliver non-invasive treatments to restore joint function.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Aching or grinding sensation under the kneecap when walking down stairs",
-      "Swelling, stiffness, or warmth around the joint after physical activity",
-      "Feeling of knee instability, catching, or giving way",
-      "Sharp pain during squatting, kneeling, or running"
-    ],
-    "treatmentApproach": [
-      "Biomechanical Evaluation: Patellar tracking analysis, gait review, and lower-limb kinetic chain assessment.",
-      "Targeted Strength Restoration: Quadriceps, hamstring, and hip abductor progressive resistance strengthening.",
-      "Acoustic Shockwave Therapy: Radial shockwave therapy to stimulate healing in chronic patellar tendinopathy.",
-      "Supportive Knee Bracing: Custom unloader or stabilizing knee bracing recommendations to reduce joint pressure."
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [
-      "hero",
-      "at_a_glance",
-      "clinical_overview",
-      "custom_sections",
-      "symptoms",
-      "treatment_approach",
-      "related_therapies",
-      "team_carousel",
-      "faqs",
-      "location_map",
-      "decision_ctas",
-      "other_links",
-      "bottom_cta"
-    ],
-    "relatedServices": [
-      "physiotherapy",
-      "knee-bracing",
-      "shockwave-therapy",
-      "custom-orthotics"
-    ],
-    "category": "Lower Extremity",
-    "seo": {
-      "title": "Knee Pain Treatment & Knee Bracing Calgary | Nose Creek",
-      "ogTitle": "Knee Pain Rehabilitation | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Evidence-based knee pain rehabilitation, custom knee bracing, and shockwave therapy in Calgary.",
-      "sectionsData": {},
-      "ogDescription": "Stop knee pain without injections or surgery. Personalized physical therapy in Calgary."
-    }
-  },
-  {
-    "id": "foot-pain",
-    "slug": "foot-pain",
-    "parentSlug": "knee-pain",
-    "name": "Foot Pain",
-    "shortDescription": "Targeted therapies for plantar fasciitis, Achilles tendinopathy, flat feet, and heel spurs.",
-    "description": "Your feet bear the weight of your entire body. Chronic foot pain — especially plantar fasciitis and Achilles tendinopathy — occurs when arches lack support or soft tissues undergo repetitive micro-trauma. Our combined shockwave and custom orthotic treatments provide rapid, lasting relief.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Sharp, stabbing heel pain during your very first morning steps",
-      "Aching arch pain after standing or walking on hard surfaces",
-      "Stiffness in the Achilles tendon after resting or exercising",
-      "Burning sensations in the ball of the foot (metatarsalgia)"
-    ],
-    "treatmentApproach": [
-      "Dynamic 3D Gait Analysis: High-precision computerized gait analysis and foot mechanics evaluation.",
-      "Radial Shockwave Therapy: Acoustic shockwave therapy to stimulate cellular collagen repair in the plantar fascia.",
-      "Custom Medical Orthotics: Lab-molded custom orthotics to realign arch structure and redistribute plantar pressure.",
-      "Intrinsic Foot Rehabilitation: Calf stretching, arch muscle strengthening, and supportive taping techniques."
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "custom-orthotics",
-      "shockwave-therapy",
-      "physiotherapy"
-    ],
-    "category": "Lower Extremity",
-    "seo": {
-      "title": "Foot Pain & Plantar Fasciitis Calgary | Nose Creek",
-      "ogTitle": "Foot & Heel Pain Treatment | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Heal plantar fasciitis, heel spurs, and Achilles tendon pain with shockwave therapy and custom orthotics in Calgary.",
-      "sectionsData": {},
-      "ogDescription": "Custom orthotics and acoustic shockwave therapy for lasting foot pain relief."
-    }
-  },
-  {
-    "id": "sports-injury",
-    "slug": "sports-injury",
-    "name": "Sports Injury",
-    "shortDescription": "Sport-specific physical therapy and rehabilitation to get athletes back in the game safely and fast.",
-    "description": "From weekend warriors to competitive athletes, sports injuries require progressive, phase-based rehabilitation. We treat acute ligament sprains, muscle tears, and overuse syndromes with a focus on restoring strength, agility, and neuromuscular control to prevent re-injury.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Sudden popping sensation or swelling in a joint during play",
-      "Inability to bear full weight or sprint at top speed",
-      "Recurring muscle pulls (hamstring, groin, or calf strains)",
-      "Persistent tendon inflammation following high-intensity training"
-    ],
-    "treatmentApproach": [
-      "Functional Movement Screen: Sport-specific movement screens, joint range of motion, and baseline strength testing.",
-      "Clinical Manual Therapy: Hands-on joint mobilization, soft tissue therapy, and IMS dry needling.",
-      "Progressive Kinetic Loading: Eccentric strengthening, agility conditioning, and sport-specific plyometrics.",
-      "Graduated Return-to-Sport: Structured return-to-play protocols and proactive re-injury prevention coaching."
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "physiotherapy",
-      "massage-therapy",
-      "shockwave-therapy"
-    ],
-    "category": "Athletic Rehab",
-    "seo": {
-      "title": "Sports Injury Rehabilitation Calgary | Nose Creek",
-      "ogTitle": "Sports Injury Clinic | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Sport physiotherapy and athletic rehabilitation in Calgary NW & NE for sprains, tears, and tendonitis.",
-      "sectionsData": {},
-      "ogDescription": "Recover faster and return to your sport stronger with certified sport physiotherapy."
-    }
-  },
-  {
-    "id": "balance-falls",
-    "slug": "balance-falls",
-    "parentSlug": "sports-injury",
-    "name": "Balance & Falls",
-    "shortDescription": "Vestibular therapy and balance retraining to improve stability, confidence, and fall prevention.",
-    "description": "Balance problems and dizziness significantly increase fall risk and reduce daily independence. Our vestibular physiotherapists assess inner ear function, vision-proprioception integration, and lower extremity strength to build steady, confident movement.",
-    "heroImage": null,
-    "sideImage": null,
-    "cardImage": null,
-    "ctaText": "Book Assessment Online",
-    "ctaMuted": false,
-    "benefits": [],
-    "symptoms": [
-      "Feeling unsteady, off-balance, or lightheaded when walking",
-      "Difficulty navigating dim rooms or uneven Calgary terrain",
-      "Fear of falling while stepping off curbs or ascending stairs",
-      "Dizziness or room-spinning sensations when turning the head (BPPV)"
-    ],
-    "treatmentApproach": [
-      "Vestibular Diagnostic Screening: Ocular motor screening and Dix-Hallpike diagnostic maneuvers.",
-      "Canalith Repositioning: Certified Epley maneuvers for rapid relief from BPPV vertigo and dizzy spells.",
-      "Dynamic Stability Training: Balance retraining on uneven and multi-surface sensory platforms.",
-      "Lower Limb Strengthening: Gait speed coaching and lower-limb stabilizer strengthening to prevent fall risks."
-    ],
-    "customSections": [],
-    "faqs": [],
-    "hiddenSections": [],
-    "sectionOrder": [],
-    "relatedServices": [
-      "physiotherapy"
-    ],
-    "category": "Vestibular & Balance",
-    "seo": {
-      "title": "Balance & Fall Prevention Clinic Calgary | Nose Creek",
-      "ogTitle": "Balance & Fall Prevention | Nose Creek Physiotherapy",
-      "cardImage": null,
-      "description": "Improve your balance, resolve vertigo, and prevent falls with specialized vestibular physiotherapy in Calgary.",
-      "sectionsData": {},
-      "ogDescription": "Build steady footing and confidence with specialized balance and vestibular therapy."
     }
   },
   {
@@ -778,6 +491,1426 @@
       "description": "Direct-billed auto insurance physiotherapy for whiplash and car accident injuries in Calgary.",
       "sectionsData": {},
       "ogDescription": "Complete whiplash and auto injury rehabilitation with 100% direct insurance billing in Alberta."
+    }
+  },
+  {
+    "id": "back-pain",
+    "slug": "back-pain",
+    "name": "Back Pain",
+    "category": "Spine & Core",
+    "shortDescription": "How to Put an End to Back Pain and Stiffness - Without Painkillers, Surgery or Waiting to see Your GP!",
+    "description": "If you've got lower back pain, stiffness, or an ache — it's very tempting to think it's nothing and that it will go away on its own. Or, you pass it off as having just \"slept awkwardly\" or that it's just a \"spasm\" or a bit of stiffness that \"everyone\" your age suffers from...\n\nThere's no obvious reason why it happened — but it doesn't seem to be shifting!\n\nIf that's happening to you, you're certainly not alone — and we hear this all the time. In fact, **Lower Back Pain and Sciatica** is THE most common problem seen in our [Nose Creek Physiotherapy Calgary NE clinic](https://www.nosecreekphysiotherapy.com/).\n\nWhen it comes to living with back pain, everyone wants to know *\"Why is this happening to me?\"* and *\"Why has this not improved after 6 or more months of pain?\"*\n\n### Most People Believe Back Pain Will Disappear On Its Own\nYou expect to wake up one morning and like \"magic\", it'll be as if back pain never happened. But 6 months later you're still living with back pain — often even worse than it was in the beginning.\n\n### Sound Familiar?\nAnother scenario we see all the time in our Nose Creek Physiotherapy is when people go to the Doctors, and the Doctor tells them to rest, \"take these painkillers\", and \"see how it goes\".\n\nThis is rarely the best advice and often 6 weeks later, they go back because their condition hasn't improved. A second doctor appointment often results in yet another prescription for stronger medication and MORE rest. This madness explains why so many people aged 40+ are suffering with chronic lower back pain.\n\n### Why Does Back Pain Last Longer Than It Should?\nWhy does [back pain](https://www.nosecreekphysiotherapy.com/common-back-pain-as-a-result-of-si-joint-dysfunction/) last longer than it should? Well, it's easy to get confused with so much conflicting information out there. There is certainly lots of information but the problem is not all of it is credible. Maybe you think your back pain was caused by doing something — like lifting or sleeping awkwardly — but really it was probably caused by years and years of poor posture that caused the muscles in your lower back to become weak, and the lifting or awkward sleeping position was just the EFFECT of that.\n\nIf you don't know what you're doing — back pain can be very confusing. Because of this, many people just end up accepting it as \"part of life\" — as if it's normal, and \"just the way it is\".",
+    "heroImage": "/images/clinic/reception-three.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Ease the pain and rigidity — typically within a couple of sessions.",
+      "Get to the true root cause of your back pain once and for all — often within 20 minutes.",
+      "Pain zaps your energy and disrupts sleep — we help you get a deep night's sleep leaving you energized.",
+      "Make certain that your trouble is 'fixed' and healed correctly with targeted rehabilitation exercises.",
+      "Help you put an end to taking all of those pain medications that are no good for your long-term wellness.",
+      "Avoid risky, invasive surgical treatments and uncomfortable spinal injections.",
+      "Sit or walk for longer periods without the dreadful feeling that your back is going to 'give way' on you.",
+      "Return to living life free from the curse of chronic back pain and enjoy quality time with family."
+    ],
+    "symptoms": [
+      "Persistent lower back stiffness, especially when getting out of bed in the morning",
+      "Sharp pinching or dull ache in the lumbar spine when standing up from a chair or couch",
+      "Shooting pain, tingling, or numbness radiating into the buttock or down the leg (Sciatica)",
+      "Sudden, debilitating muscle spasms when bending over to tie shoes or pick up objects",
+      "Inability to sit, drive, or stand for longer than 20 minutes without needing to shift positions"
+    ],
+    "treatmentApproach": [
+      "Step 1: In-Depth Clinical Evaluation — Pinpointing pelvic rotation, disc compression, or facet joint restriction within 20 minutes.",
+      "Step 2: Hands-On Joint & Spinal Mobilization — Relieving acute joint locking, decompressing spinal nerves, and calming muscle spasms.",
+      "Step 3: Core Stabilizer & Movement Retraining — Restoring deep transverse abdominis and multifidus activation to protect your spine.",
+      "Step 4: Long-Term Postural & Functional Resilience — Personalized home mobility protocol and ergonomic guidance to prevent recurrence."
+    ],
+    "customSections": [
+      {
+        "id": "back-pain-warnings",
+        "eyebrow": "7 Warning Signs",
+        "title": "If You're Coping With Back Pain, Here's 7 Warnings It's Lasting Longer Than It Needs To:",
+        "subtitle": "Don't let acute back discomfort turn into permanent chronic disability.",
+        "background": "light",
+        "align": "left",
+        "content": "If you can relate to these warnings — we would love to assist you by inviting you to book an appointment to chat with one of our physiotherapists at Nose Creek Physiotherapy to figure out what can be done to help you. \n\nThe fact that you've tried most types of treatment is in fact an **ADVANTAGE**! As soon as you understand what doesn't work — you are much closer to finding out the thing that does!",
+        "bullets": [
+          "You believed it would certainly go away by itself — but months later it hasn't shifted.",
+          "After visiting the physician you were told to rest and take painkillers — but pills did not fix the underlying mechanical problem.",
+          "A family member or friend told you that everyone gets back pain as they age, so you simply accepted it.",
+          "You visited other healthcare professionals or a physio in the past, however nothing they did appeared to help long-term.",
+          "Trying YouTube exercises either did not do a thing, or made your back pain ten times worse.",
+          "You believed it would be an amazing idea to rest, yet all that did was make your back feel much more stiff and tight.",
+          "You got a few relaxation massages, but while they felt nice in the moment, they did nothing to fix the structural issue."
+        ],
+        "ctaText": "Speak to a Physio on the Phone »",
+        "ctaHref": "/contact"
+      },
+      {
+        "id": "back-pain-action-steps",
+        "eyebrow": "Proven Action Plan",
+        "title": "What Can I Do To Get Rid Of MY Back Pain Quickly?",
+        "subtitle": "Here are 4 practical things you can do right now to begin recovery:",
+        "background": "white",
+        "align": "left",
+        "content": "1. **Most importantly, decide to get help:** Many patients procrastinate for long, thinking that their back pain will 'simply disappear with time'. But 6 months down the line they're still struggling to see improvement, and nothing's changed... Or it gets worse.\n\n2. **Do the RIGHT workouts:** One of the best tricks that can work wonders for you is to do the right series of progressive exercises — the right exercises given to you by a Physiotherapist will ease your back pain, allow you to move freely within no time, and ensure problems do not return.\n\n3. **Avoid resting in a still position for long periods:** Ever tried standing up from a sofa after resting for a while, only to struggle because your back feels sore and tight? Resting and sitting for extended periods starves joints of lubricating fluid. Movement, hands-on treatment, and strengthening exercises get you moving comfortably.\n\n4. **Get real, 'hands-on' Physio:** Scientific data suggests physiotherapy works best for people with low-back pain. At Nose Creek Physiotherapy, it is the most common injury we treat. If back pain is affecting your work, independence, or family time, physiotherapy can help you get back to living the life you deserve.",
+        "ctaText": "Apply for a Free Discovery Session »",
+        "ctaHref": "/free-discovery-session"
+      },
+      {
+        "id": "back-pain-free-guide",
+        "eyebrow": "Complimentary Download",
+        "title": "Get Your Free Back Pain Guide",
+        "subtitle": "How to Put an End to Back Pain and Stiffness Without Painkillers or Surgery",
+        "background": "teal",
+        "align": "center",
+        "content": "Download our practical guide written by Calgary orthopedic physiotherapists, explaining easy daily habits and stretches to relieve lower back stiffness immediately.",
+        "ctaText": "Download Your Free Guide Now »",
+        "ctaHref": "/contact"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Will my back pain go away on its own if I just rest?",
+        "answer": "In the vast majority of cases, prolonged rest weakens the deep spinal stabilizers and causes joint capsules to stiffen, making back pain worse. Active, targeted physical therapy restores natural blood flow and joint mobility significantly faster."
+      },
+      {
+        "question": "How quickly can I expect relief from chronic lower back pain?",
+        "answer": "Most patients experience significant relief and reduction in rigidity within 1 to 3 sessions. During your first 20 minutes, our clinicians pinpoint the exact mechanical root cause to design an immediate relief protocol."
+      },
+      {
+        "question": "Do I need a doctor's referral to see a physiotherapist for back pain?",
+        "answer": "No. In Alberta, physiotherapy is direct access. You can book an appointment directly with our licensed physiotherapists without requiring a physician's referral or prescription."
+      },
+      {
+        "question": "Can physiotherapy help if I have shooting pain down my leg (Sciatica)?",
+        "answer": "Yes, absolutely. Sciatica is caused by compression or irritation of the sciatic nerve roots in the lumbar spine or pelvis. Our specialized nerve glides, spinal decompression mobilizations, and core stabilizing exercises relieve nerve pressure safely."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "chiropractic-care",
+      "acupuncture",
+      "shockwave-therapy"
+    ],
+    "sort_order": 1,
+    "is_published": true,
+    "seo": {
+      "title": "Back Pain & Sciatica Relief Calgary NE & NW | Nose Creek Physiotherapy",
+      "description": "Put an end to lower back pain, sciatica, and morning stiffness naturally. Hands-on physiotherapy, dry needling, and spinal rehabilitation in Calgary.",
+      "ogTitle": "End Lower Back Pain & Sciatica in Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Discover proven, drug-free relief for chronic lower back pain and stiffness. Book a comprehensive 1-on-1 assessment in Beddington, Calgary."
+    }
+  },
+  {
+    "id": "neck-shoulder-pain",
+    "slug": "neck-shoulder-pain",
+    "name": "Neck & Shoulder Pain",
+    "category": "Spine & Neck",
+    "shortDescription": "How to Ease Daily Annoying, Irritating Neck and Shoulder Pain Naturally without painkillers or surgery.",
+    "description": "When it comes to living with Neck or Shoulder Pain, everyone we encounter has the same question:\n*\"Why is this happening to me?\"* ... *\"How come I'm still in discomfort in my neck and shoulders after six months or more?\"*\n\nYou might think that this shoulder and neck pain will subside on its own. It's like you will wake up one fine morning and boom!, the pain has gone away. However, that's not the case sadly. Six months down the line, this annoying pain shows no remarkable improvement and has gotten worse than before.\n\n### Can You Relate To This?\nEvery week, we see patients at our [physiotherapy center in Calgary North](https://www.nosecreekphysiotherapy.com/) who have seen their doctor only to be prescribed pain medication and asked to relax. Then, they come back for more pills six weeks later because the problem hasn't gone away. Even if medication masks the symptoms, it will not solve the problem.\n\n### Does That Ever Happen to You?\nThe reason you're confused is that different people have told you different things. For example, you may believe you have a neck problem, but in fact, it's your shoulder aggravating the pain. Because shoulder and neck pain are challenging to diagnose, many people just conclude that they have to accept the pain as a part of life, as if \"it has\" to be that way.\n\nIf you're having trouble with your shoulders or neck — **We Can help you STOP the pain.** [Schedule an appointment](https://www.nosecreekphysiotherapy.com/contact/) with one of our [Physiotherapists](https://www.nosecreekphysiotherapy.com/physiotherapy/) to discuss the best solutions to your pain. You have likely tried many solutions that haven't worked — so let's find out what does.",
+    "heroImage": "/images/blog/neck-upper-back-posture-jaw-function-tmj-discomfort.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Ease the pain and rigidity — typically within a couple of sessions.",
+      "Learn what's happening in your body, and get to the root cause of your neck and shoulder pain once and for all — often within 20 minutes.",
+      "Pain can 'zap' your energy and affect your sleep cycle — we help you get a good night's sleep leaving you energized.",
+      "Make certain that your trouble is 'fixed' and healed correctly with the ideal collection of progressive exercises.",
+      "Put an end to taking all of those pain medicines that are no good for your long-term wellness.",
+      "Avoid risky, invasive surgical treatments and uncomfortable cortisone injections.",
+      "Help you stay out of the Doctor's office and keep you from taking those pills!",
+      "Enjoy quality time with friends and family once again free from neck tension and headaches."
+    ],
+    "symptoms": [
+      "Persistent dull ache or burning tightness across the top of the shoulders and base of the neck",
+      "Sharp pain or restriction when turning your head to check blind spots while driving",
+      "Tension headaches starting at the base of the skull and radiating behind the eyes",
+      "Tingling, numbness, or weakness travelling down the arm into the hands and fingers",
+      "Inability to sleep comfortably on your side without waking up with a stiff, locked neck"
+    ],
+    "treatmentApproach": [
+      "Step 1: Cervical & Shoulder Biomechanical Assessment — Differentiating cervical facet joint locks from rotator cuff and scapular dyskinesis.",
+      "Step 2: Gentle Cervicothoracic Mobilizations — Freeing restricted neck and upper back vertebrae to restore effortless rotation.",
+      "Step 3: Deep Neck Flexor & Scapular Stabilizer Retraining — Strengthening postural muscles to reverse 'tech-neck' and rounded shoulders.",
+      "Step 4: Ergonomic Calibration & Headache Prevention — Tailoring workstation setup, sleeping posture, and daily mobility exercises."
+    ],
+    "customSections": [
+      {
+        "id": "neck-shoulder-warnings",
+        "eyebrow": "4 Core Reasons",
+        "title": "If You Suffer From Neck and Shoulder Pain, Here Are 4 Reasons It's Lingering Longer Than It Should:",
+        "subtitle": "Why resting and waiting rarely fixes cervical spine and shoulder mechanics.",
+        "background": "light",
+        "align": "left",
+        "content": "If you're having trouble with your shoulders or neck — we can help you stop the pain. Schedule an appointment with one of our physiotherapists to discuss the best solutions. You have likely tried many solutions that haven't worked — so let's find out what does!",
+        "bullets": [
+          "You were hoping that it would simply subside on its own — but weeks turned into months.",
+          "The prescription provided to you by the doctor only masked the symptoms without solving the mechanical root cause.",
+          "You assumed that chronic neck stiffness and shoulder tension was just a normal part of ageing.",
+          "Previous help from healthcare professionals failed because they treated only the neck or only the shoulder, rather than treating them as an interconnected unit."
+        ],
+        "ctaText": "Talk to a Physio on the Phone »",
+        "ctaHref": "/contact"
+      },
+      {
+        "id": "neck-shoulder-action",
+        "eyebrow": "Recovery Steps",
+        "title": "What Are the Things That Can Help Resolve Shoulder and Neck Pain?",
+        "subtitle": "4 steps to regain comfortable motion and peaceful sleep:",
+        "background": "white",
+        "align": "left",
+        "content": "1. **First, make sure you want to get help:** It will not go away on its own. The longer cervical stiffness persists, the more your body compensates with protective spasms.\n\n2. **Next, do the RIGHT workouts:** When you have neck and shoulder pain, the best thing you can do is a series of progressive, gentle exercises designed specifically for your cervical spine. The correct exercises reduce pain and allow you to move freely again quickly.\n\n3. **Avoid sitting and doing activities in awkward positions:** The single worst thing that can aggravate neck and shoulder pain is being static all day. Avoid prolonged sitting with slouched shoulders and awkward sleeping positions. Appropriate strengthening coupled with hands-on treatment restores vitality rapidly.\n\n4. **Get real, 'hands-on' Physio:** Physiotherapy is proven to be highly effective for neck and shoulder pain. At Nose Creek Physiotherapy, it is one of the most frequent issues we see. We give you back the comfortable life you deserve.",
+        "ctaText": "Apply for a Free Discovery Session »",
+        "ctaHref": "/free-discovery-session"
+      },
+      {
+        "id": "neck-shoulder-guide",
+        "eyebrow": "Free Guide",
+        "title": "Get Your Free Neck & Shoulder Pain Guide",
+        "subtitle": "Natural strategies to ease annoying, irritating neck and shoulder tension at home.",
+        "background": "teal",
+        "align": "center",
+        "content": "Discover evidence-based stretches, ergonomic desk adjustments, and natural relief methods written by Calgary physiotherapists.",
+        "ctaText": "Download Free Guide »",
+        "ctaHref": "/contact"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Can neck problems cause shoulder pain and headaches?",
+        "answer": "Yes. The nerves that exit the cervical spine travel directly across the shoulder girdle and down the arm. Irritation in the upper cervical joints frequently radiates tension into the trapezius and triggers cervicogenic headaches."
+      },
+      {
+        "question": "How do I know if my pain is originating in the neck or the shoulder?",
+        "answer": "Our clinicians perform specific orthopedic tests. Pain provoked by turning your head or looking up usually indicates a neck issue, while pain provoked by reaching overhead or behind your back points toward the shoulder joint or rotator cuff."
+      },
+      {
+        "question": "How can I position my pillow at night to avoid waking up with a stiff neck?",
+        "answer": "Your pillow should keep your neck in a neutral horizontal alignment with your spine. Sleeping with pillows that are too high bends your neck awkwardly and strains muscles. During your session, we review customized sleeping positions."
+      },
+      {
+        "question": "Is dry needling or acupuncture helpful for neck and shoulder pain?",
+        "answer": "Yes, dry needling and acupuncture are exceptionally effective for releasing deep, chronic trigger points in the trapezius, levator scapulae, and suboccipital muscles that cannot be reached by massage alone."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture",
+      "chiropractic-care",
+      "shockwave-therapy"
+    ],
+    "sort_order": 2,
+    "is_published": true,
+    "seo": {
+      "title": "Neck & Shoulder Pain Treatment Calgary NW & NE | Nose Creek Physiotherapy",
+      "description": "Relieve chronic neck stiffness, radiating shoulder pain, and tension headaches naturally. Expert physiotherapy and hands-on care in Calgary.",
+      "ogTitle": "Neck & Shoulder Pain Relief in Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Stop coping with daily neck tension and shoulder aches. Book your comprehensive assessment with Nose Creek Physiotherapy in Calgary."
+    }
+  },
+  {
+    "id": "knee-pain",
+    "slug": "knee-pain",
+    "name": "Knee Pain",
+    "category": "Lower Extremity",
+    "shortDescription": "How to Stop Chronic Knee Pain WITHOUT Injections, Painkillers or Having to Wear a Brace.",
+    "description": "What is the root cause of my knee pain? Why am I experiencing swelling and stiffness, redness and warmth to the touch, weakness or instability, popping or crunching noises, or the inability to fully straighten my knee?\n\nIf you're experiencing any of the above, it's all too simple to ignore it as \"simply something that comes with age,\" \"wear and tear,\" or \"nothing\" that will go away on its own. You're not sure what's causing the discomfort in your knees, but it doesn't seem to be getting any better!\n\nYou're not alone if you're dealing with this; we hear it all the time. Knee Pain is one of THE most common concerns we see at our [Nose Creek Physiotherapy clinic near Calgary North](https://www.nosecreekphysiotherapy.com/).\n\n### Anyone Living With Knee Pain Wants to Know:\n*\"Why is this happening to me?\"* ... *\"What can be the cause behind this?\"*\n\nThe majority think that their knee discomfort will go away on its own. They'll wake up one morning and it'll be gone, as if by \"magic.\" However, as six months pass with no progress and the pain worsens rather than improves, they realize they need to take action.\n\n### Can You Relate to This?\nEvery week, we see patients at our physiotherapy clinic who have seen their doctor only to be prescribed pain medicine and instructed to relax. They're back for more pills and perhaps a knee brace after six weeks because the problem hasn't gone away. Medication and a knee brace will just cover the symptoms, not solve the problem.\n\nPerhaps you believe you have to rest because you've been told that walking aggravates knee pain or that you should do \"this exercise\" and \"that exercise\". It's challenging to know what to do, and that's only to prevent aggravating your knee discomfort! As a result, many people accept their agony as \"part of life\" — it becomes their \"normal,\" as if it \"has\" to be that way.",
+    "heroImage": "/images/clinic/reception-four.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Ease the pain and rigidity — typically within a couple of sessions.",
+      "Get to the root cause of your knee pain once and for all — often within 20 minutes.",
+      "Pain can 'zap' your energy and affect sleep — we help you regain peaceful, deep rest.",
+      "Make certain that your trouble is 'fixed' and healed correctly with targeted strengthening exercises.",
+      "Help you put an end to taking all of those medicines that have harmful side effects.",
+      "Avoid risky, invasive knee surgeries and uncomfortable joint injections.",
+      "Help you stay out of the Doctor's office and keep you from taking those pills!",
+      "Enjoy walking, stairs, and quality time with friends and family without knee pain holding you back."
+    ],
+    "symptoms": [
+      "Swelling, stiffness, or warmth around the knee joint after walking or standing",
+      "Sharp pain when descending stairs, squatting, or rising from a low chair",
+      "Audible popping, clicking, or grinding noises (crepitus) during knee movement",
+      "Feeling of weakness or instability, as though the knee might buckle or give out",
+      "Inability to fully straighten or bend the knee without stiffness or sharp discomfort"
+    ],
+    "treatmentApproach": [
+      "Step 1: Patellofemoral & Tibiofemoral Biomechanical Evaluation — Assessing joint tracking, meniscus loading, and hip-foot alignment.",
+      "Step 2: Hands-On Joint Mobilization & Swelling Reduction — Calming inflamed synovial fluid and relieving pressure on the knee cap.",
+      "Step 3: Quadriceps, Hamstring & Gluteal Strengthening — Building muscular shock absorbers to offload cartilage and ligaments.",
+      "Step 4: Functional Gait & Agility Training — Restoring confidence in walking, climbing stairs, and returning to sports without braces."
+    ],
+    "customSections": [
+      {
+        "id": "knee-pain-warnings",
+        "eyebrow": "5 Common Pitfalls",
+        "title": "If You're Living With Knee Pain, Here's Five Reasons Why It Could Be Lasting Longer Than It Should:",
+        "subtitle": "Why rest and knee braces fail to solve chronic joint discomfort.",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "You were hoping that it would simply go away on its own — but it worsened over time.",
+          "The doctor's prescription for rest and pain medication didn't do the trick; pills only masked the joint wear.",
+          "You assumed that chronic knee stiffness was just a normal consequence of getting older.",
+          "Previous help from healthcare professionals failed to address your hip and ankle mechanics, which directly impact the knee.",
+          "You tried generic YouTube exercises — but they felt painful when you did them, and did nothing to ease the discomfort."
+        ],
+        "ctaText": "Talk to a Physio on the Phone »",
+        "ctaHref": "/contact"
+      },
+      {
+        "id": "knee-pain-action",
+        "eyebrow": "Actionable Guidance",
+        "title": "Some Things That Can Help Resolve Knee Pain...",
+        "subtitle": "4 essential steps to restore pain-free knee mobility:",
+        "background": "white",
+        "align": "left",
+        "content": "1. **First, make sure you need to get help:** It will not go away on its own. Ignoring knee pain accelerates joint wear and tear.\n\n2. **Next, do the RIGHT workouts:** One of the simplest ways to relieve knee pain is to complete the correct set of progressive exercises. The right exercises offered by a Physiotherapist reduce discomfort, allow you to move freely again quickly, and ensure problems do not return.\n\n3. **Avoid sitting in awkward positions:** We weren't built to sit still. When you sit and bend your knees for extended periods, you place high pressure on the patellofemoral joint. Giving you suitable strengthening exercises for better posture and hands-on treatment gets you active and healthy early.\n\n4. **Get real, 'hands-on' Physio:** Physiotherapy has been shown to aid those struggling from knee discomfort. At Nose Creek Physiotherapy, it is one of the most common issues we treat in people over 40.",
+        "ctaText": "Apply for a Free Discovery Session »",
+        "ctaHref": "/free-discovery-session"
+      },
+      {
+        "id": "knee-pain-guide",
+        "eyebrow": "Free Resource",
+        "title": "Get Your Free Knee Pain Guide",
+        "subtitle": "How to Stop Chronic Knee Pain WITHOUT Injections, Painkillers or Wearing a Brace",
+        "background": "teal",
+        "align": "center",
+        "content": "Learn practical home exercises and knee joint protection strategies written by our clinical specialists in Calgary.",
+        "ctaText": "Download Free Guide »",
+        "ctaHref": "/contact"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Is it safe to exercise my knee if I feel a grinding or crunching sensation?",
+        "answer": "Yes, provided the exercises are low-impact and properly aligned. Grinding (crepitus) often indicates patellar tracking friction or cartilage thinning. Targeted glute and quad strengthening helps align the knee cap smoothly."
+      },
+      {
+        "question": "Can physiotherapy help me avoid knee replacement surgery?",
+        "answer": "In many cases, yes. Strengthening the muscles surrounding the knee joint creates natural shock absorption, reducing bone-on-bone friction and significantly delaying or eliminating the need for surgical replacement."
+      },
+      {
+        "question": "Should I wear a knee brace all day?",
+        "answer": "Braces can provide temporary support during acute flare-ups, but wearing them constantly causes surrounding muscles to weaken and rely on external support. We focus on rebuilding your own muscular stability."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "chiropractic-care",
+      "massage-therapy",
+      "shockwave-therapy",
+      "acupuncture"
+    ],
+    "sort_order": 3,
+    "is_published": true,
+    "seo": {
+      "title": "Knee Pain Relief Calgary NW & NE | Nose Creek Physiotherapy",
+      "description": "Stop chronic knee pain, meniscus irritation, and stiffness without surgery or braces. Expert knee rehabilitation and physical therapy in Calgary.",
+      "ogTitle": "Knee Pain Treatment Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Rebuild knee joint strength and climb stairs pain-free. Book your 1-on-1 assessment at Nose Creek Physiotherapy in Calgary."
+    }
+  },
+  {
+    "id": "foot-pain",
+    "slug": "foot-pain",
+    "name": "Foot Pain",
+    "category": "Lower Extremity",
+    "shortDescription": "Want to Ease This Annoying, Irritating Foot Pain Naturally? Overcome morning heel pain and walk comfortably.",
+    "description": "What is the source of my foot pain? Why does walking on my feet hurt so much? My feet have started to hurt, and I can't walk barefoot for at least the first 20 minutes when I get up. I'm in terrible shooting and scorching pain. I can no longer walk for long periods without experiencing pain. What could be the source of this, and what can I do to get relief?\n\nWhen it comes to living with Foot Pain, everybody we see wants to know:\n*\"Why Is This Happening To Me?\"* ... *\"What Is Causing This?\"*\n\nMost people believe that foot and lower leg pain will go away on its own. They'll wake up one morning and it'll be gone, as if by \"magic.\" However, six months later, not only has the nagging discomfort not improved, but it has gotten worse.\n\n### Does That Sound Like You?\nEvery week, we see people in our [Calgary North Physiotherapy Clinic](https://www.nosecreekphysiotherapy.com/) that have gone to their doctor only to be given pain medication and told to rest. Six weeks later they are back for more pills as the problem remains. Medication will mask the symptoms but will not fix the problem.\n\nMaybe you are confused because you've been told different things by different people. For example, perhaps you think you have a foot problem — but it's your lower leg causing the problem. It's a very confusing part of the body to diagnose and this makes it challenging to figure out what to do. Because of this, many people just end up accepting their pain as a \"part of life\" — it becomes their routine, as if it \"has\" to be that way.",
+    "heroImage": "/images/workshops/orthotics-webinar.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Ease the pain and rigidity — typically within a couple of sessions.",
+      "Get to the root cause of your foot and lower leg pain once and for all — often within 20 minutes.",
+      "Walk barefoot in the morning without dreading those first painful 20 minutes.",
+      "Make certain that your trouble is properly healed with the ideal collection of foot exercises.",
+      "Help you put an end to taking pain medications that are no good for your wellness.",
+      "Avoid risky, invasive surgical treatments and uncomfortable cortisone injections.",
+      "Help you stay out of the Doctor's office and keep you from taking those pills!",
+      "Enjoy walking, standing at work, and running without sharp arch or heel pain."
+    ],
+    "symptoms": [
+      "Sharp, stabbing heel pain during the first steps out of bed in the morning (Plantar Fasciitis)",
+      "Burning or aching along the bottom arch of the foot after standing or walking for short periods",
+      "Stiffness and tight pulling in the Achilles tendon and calf muscles upon waking",
+      "Tender, bruised sensation on the ball of the foot (Metatarsalgia or Morton's Neuroma)",
+      "Inability to walk barefoot on hardwood or tile floors without discomfort"
+    ],
+    "treatmentApproach": [
+      "Step 1: Foot & Ankle Biomechanical Assessment — Analyzing foot arch height, gait strike patterns, and calf tendon flexibility.",
+      "Step 2: Hands-On Plantar Fascia & Joint Mobilization — Releasing tight plantar tissue and restoring ankle mortise gliding.",
+      "Step 3: Intrinsic Foot Strengthening & Custom Orthotic Evaluation — Building arch resilience and advising on proper footwear.",
+      "Step 4: Functional Loading & Shockwave Therapy — Stimulating deep collagen healing for chronic heel spurs and Achilles tendinopathy."
+    ],
+    "customSections": [
+      {
+        "id": "foot-pain-warnings",
+        "eyebrow": "4 Common Reasons",
+        "title": "If You're Living With Foot Or Lower Leg Pain, Here's Four Reasons It's Lasting Longer Than It Should:",
+        "subtitle": "Why waiting for plantar fasciitis to resolve on its own leads to chronic disability.",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "You were hoping that it would simply go away on its own — but each morning started with the same stabbing pain.",
+          "The doctor's prescription for rest and anti-inflammatories didn't fix the biomechanical strain on your plantar fascia.",
+          "You assumed that foot aching was just an inevitable consequence of getting older or being on your feet.",
+          "Previous treatments failed because they ignored tightness in your calf muscles and restriction in the subtalar joint."
+        ],
+        "ctaText": "Talk to a Physio on the Phone »",
+        "ctaHref": "/contact"
+      },
+      {
+        "id": "foot-pain-action",
+        "eyebrow": "Practical Solutions",
+        "title": "Some Things That Can Help Resolve Foot and Lower Leg Pain...",
+        "subtitle": "4 proven strategies to step out of bed pain-free:",
+        "background": "white",
+        "align": "left",
+        "content": "1. **First, decide to get help:** It will not go away on its own. Continued walking on an inflamed plantar fascia leads to micro-tears and bone spurs.\n\n2. **Do the RIGHT exercises:** One of the simplest ways to relieve feet and lower leg pain is to complete the correct set of progressive stretches and arch strengthening exercises.\n\n3. **Avoid being in awkward positions:** Prolonged static standing on hard floors is one of the worst things for foot and lower leg discomfort. Proper footwear combined with hands-on treatment helps you go back to being active quickly.\n\n4. **Get real, 'hands-on' Physio:** Physiotherapy has been shown to aid those struggling from foot and lower leg pain. We identify whether your issue stems from plantar fasciitis, tendonitis, or referred nerve irritation.",
+        "ctaText": "Apply for a Free Discovery Session »",
+        "ctaHref": "/free-discovery-session"
+      },
+      {
+        "id": "foot-pain-guide",
+        "eyebrow": "Free Guide",
+        "title": "Get Your Free Foot Pain Guide",
+        "subtitle": "Want to Ease This Annoying, Irritating Foot Pain Naturally?",
+        "background": "teal",
+        "align": "center",
+        "content": "Discover how to relieve morning heel pain, stretch tight calves, and choose the right footwear with our free clinical report.",
+        "ctaText": "Download Free Guide »",
+        "ctaHref": "/contact"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Why does my heel hurt so severely on the first step out of bed?",
+        "answer": "While sleeping, the plantar fascia shortens and tightens in a resting position. When you take your first morning step, your full body weight suddenly stretches this contracted, inflamed tissue, causing sharp micro-tearing pain."
+      },
+      {
+        "question": "Do I need custom orthotics for foot pain?",
+        "answer": "Not necessarily. Many patients resolve foot pain completely with manual therapy, calf stretching, and intrinsic foot muscle strengthening. If structural arch collapse is present, we evaluate you for custom orthotics."
+      },
+      {
+        "question": "How effective is Shockwave Therapy for chronic plantar fasciitis?",
+        "answer": "Shockwave therapy is exceptionally effective for chronic plantar fasciitis and Achilles tendinopathy, delivering high-energy acoustic pulses that stimulate blood circulation, break down scar tissue, and trigger rapid cellular repair."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "shockwave-therapy",
+      "massage-therapy",
+      "chiropractic-care"
+    ],
+    "sort_order": 4,
+    "is_published": true,
+    "seo": {
+      "title": "Foot Pain & Plantar Fasciitis Relief Calgary | Nose Creek Physiotherapy",
+      "description": "Overcome stabbing heel pain, plantar fasciitis, and arch soreness naturally. Hands-on physiotherapy and shockwave therapy in Calgary.",
+      "ogTitle": "Foot Pain & Plantar Fasciitis Treatment Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Walk barefoot and stand comfortably again. Book your comprehensive foot and ankle assessment at Nose Creek Physiotherapy."
+    }
+  },
+  {
+    "id": "sports-injury",
+    "slug": "sports-injury",
+    "name": "Sports Injury",
+    "category": "Athletic Rehab",
+    "shortDescription": "7 Secret Recovery 'Strategies' Used By PRO Athletes to heal quickly and get back in the game safely.",
+    "description": "What Do Injured Elite Athletes And Weekend Warriors Have In Common, Regardless Of Their Sport?\nWhen injured they all have to figure out how to heal, get fit, and stay healthy so they can keep **Enjoying Their Sport** and being active.\n\nIt might be pretty easy to ignore a sports injury as \"nothing serious\" and simply \"put up with it\" and carry on as best you can whether you've recently developed one or have been suffering from one for some time. It's easy to become upset and feel \"stuck,\" wondering if you'll ever be able to return to playing your sport or staying active as you once did...\n\nIf this is happening to you, know that you are not alone; we see it all the time. We treat clients in our Beddington clinic Calgary NE all year who have had an injury due to sports or activity.\n\n### The Secret Difference: Timing\nI worked in amateur sports for over 25 years, so I've seen a wide range of sports injuries and know how to assist individuals recover. I asked you what elite athletes and weekend warriors had in common. Now, what makes them unique? Why do top athletes return to their sport more quickly? **The answer has to do with timing.** When elite athletes are injured, treatment begins the **SAME DAY** or the **NEXT DAY**.\n\nThat is not how most people react to a sports injury, which is why so many people are asking:\n*“It’s Been Months Now — Why am I still suffering with an injury that’s preventing me from being active?”*\n\nMost people believe they will return to their activity after a few days off, only to discover that they are still restricted when they do. Complete rest is rarely the best prescription for sports injuries such as hamstrings, ankle sprains, runner's knee, and so on. For an injury to heal, **blood flow is needed**, which complete rest limits!",
+    "heroImage": "/images/credentials/sport-physiotherapy-canada.png",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Get rid of pain and stiffness rapidly — usually in a couple of sessions.",
+      "Get to the bottom of your injury once and for all — usually in less than 30 minutes.",
+      "Assist you in getting back to doing what you love safely without risk of re-injury.",
+      "Make sure your problem is appropriately 'fixed' and 'healed' with the right set of sports-specific exercises.",
+      "Work with you to eliminate the need for painkillers, which are harmful for long-term health.",
+      "Identify the true root cause, whether it's hip tightness causing knee pain or ankle stiffness causing calf pulls.",
+      "Return to living your best life, pain-free, active, and performing at your peak."
+    ],
+    "symptoms": [
+      "Sudden sharp pain or pulling sensation during sprinting, jumping, or rapid cutting",
+      "Lingering swelling, joint stiffness, and localized bruising after a direct athletic collision",
+      "Persistent ache in the shoulder or elbow after throwing, swimming, or serving in tennis",
+      "Recurring muscle pulls (hamstring, groin, calf) that flare up as soon as you increase intensity",
+      "Apprehension or loss of confidence in your joint's stability during sports movements"
+    ],
+    "treatmentApproach": [
+      "Step 1: Athletic Injury Triage & Movement Analysis — Assessing joint mechanics, muscle firing order, and movement symmetry.",
+      "Step 2: Rapid Swelling Reduction & Soft Tissue Therapy — Restoring vascular flow and relieving protective muscle guarding.",
+      "Step 3: Progressive Eccentric Loading & Sport Drills — Rebuilding tendon tensile strength and ligament stability under controlled load.",
+      "Step 4: Return-To-Sport Testing & Re-Injury Prevention — Objective strength and agility benchmarks to ensure safe return to play."
+    ],
+    "customSections": [
+      {
+        "id": "sports-injury-warnings",
+        "eyebrow": "7 Warning Signs",
+        "title": "If You Are Frustrated Living With A Sport Injury, Here’s 7 More Reasons It Could Be Lasting Longer:",
+        "subtitle": "Why waiting and resting slows down athletic tissue regeneration.",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "You assumed it would disappear on its own after a few days off, but the pain returned as soon as you resumed activity.",
+          "You went to the doctor, who advised rest, a brace, and painkillers — but the pills didn't heal the ligament or tendon.",
+          "You accepted it because a friend reminded you that everyone becomes more injury-prone as they get older.",
+          "You've already tried other providers with little success because they only treated the symptoms, not your kinetic chain.",
+          "You tried heat pads, ice, and sports supports, but they didn't restore your athletic performance level.",
+          "You took pain medication, yet your athletic performance and confidence remained compromised.",
+          "You attempted 'sports massages' in pursuit of relief, but they only provided short-term relaxation without repairing the injury."
+        ],
+        "ctaText": "Talk to a Physio on the Phone »",
+        "ctaHref": "/contact"
+      },
+      {
+        "id": "sports-injury-action",
+        "eyebrow": "Action Steps",
+        "title": "What Can I Do To Get Help With My Sports Injury?",
+        "subtitle": "Four vital things you can do right now:",
+        "background": "white",
+        "align": "left",
+        "content": "1. **First, decide to get help:** Procrastination is the culprit. Discomfort will not go away on its own. If anything, lack of appropriate treatment adds compensatory problems to adjacent joints.\n\n2. **Next, do the RIGHT exercises:** One of the best ways to help your body recover quickly and safely is to do progressive exercises. The right exercises given by a Physiotherapist reduce pain and allow you to return to your sport.\n\n3. **Avoid 'too much rest':** While rest is a vital aspect of early recovery, too much of it slows down healing. Tissues need controlled mechanical load and blood circulation to repair strong collagen fibers.\n\n4. **Get real, 'hands-on' Physio:** Physiotherapy is proven to help patients recover from sports injuries. Our team works with athletes of all ages year-round to get you back to enjoying the life you deserve.",
+        "ctaText": "Apply for a Free Discovery Session »",
+        "ctaHref": "/free-discovery-session"
+      },
+      {
+        "id": "sports-injury-guide",
+        "eyebrow": "PRO Athlete Strategies",
+        "title": "Get Your Free Sports Injury Report",
+        "subtitle": "7 Secret Recovery 'Strategies' Used By PRO Athletes",
+        "background": "teal",
+        "align": "center",
+        "content": "Discover how elite athletes recover in half the time using progressive active rehabilitation and targeted physio protocols.",
+        "ctaText": "Download Free Report »",
+        "ctaHref": "/contact"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "How soon after a sports injury should I see a physiotherapist?",
+        "answer": "As quickly as possible! Elite athletes begin care within 24 to 48 hours. Early assessment controls excessive swelling, prevents joint adhesions, and promotes optimal collagen alignment during healing."
+      },
+      {
+        "question": "Why does my sports injury flare up every time I return to playing?",
+        "answer": "Pain often subsides before muscle strength, tendon elasticity, and neuromuscular coordination are fully restored. If you return to sports before passing functional criteria, the unconditioned tissue is re-injured under high load."
+      },
+      {
+        "question": "Can physiotherapy help with chronic tendinitis (tennis elbow, runner's knee)?",
+        "answer": "Yes. Chronic tendinitis involves degenerative collagen changes. We utilize progressive eccentric loading, manual therapy, and shockwave therapy to restart the body's natural tendon healing cycle."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "shockwave-therapy",
+      "chiropractic-care",
+      "acupuncture"
+    ],
+    "sort_order": 5,
+    "is_published": true,
+    "seo": {
+      "title": "Sports Injury Physiotherapy Calgary NE & NW | Nose Creek Physiotherapy",
+      "description": "Recover rapidly from sports injuries, sprains, and tendon tears. Evidence-based athletic rehabilitation and physiotherapy in Calgary.",
+      "ogTitle": "Sports Injury Rehabilitation Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Heal like a pro athlete and return to your favorite sport safely. Book your sports injury evaluation at Nose Creek Physiotherapy."
+    }
+  },
+  {
+    "id": "balance-falls",
+    "slug": "balance-falls",
+    "name": "Balance and Falls",
+    "category": "Balance & Mobility",
+    "shortDescription": "Are You Living With, OR Worried About Someone Suffering from a Loss of Balance? Conquer your fear of falling.",
+    "description": "If You or a Loved One Suffers from Poor Balance Then Reading This Page is a MUST.\n\n* In the last three months, you have fallen or nearly fallen.\n* You've lost out on something you wanted to do because you couldn't stand still.\n* You've wondered if you could improve your balance.\n* **You are not alone.**\n\n### The Reality of Falls Among Canadian Seniors\n* Every year, **one out of every four adults over the age of 65 falls**.\n* Every year, **one in every two adults over the age of 80 falls**.\n* If you fall once, the odds of falling again doubles.\n* A sideways fall is responsible for **95% of hip fractures**.\n* One in every five people who suffer a hip fracture due to a fall does not survive the first year after the injury.\n* One out of every four patients who have a hip fracture do not return to live in their own home.\n\nFalls are the main cause of injury among seniors in Canada. Many falls result in significant damage such as broken bones (wrist, hip, arm, ankle) or a concussion. An average person's quality of life can be drastically altered by a fall.\n\n### Conquering the \"Fear of Falling\"\nWhen someone falls, they often develop an intense fear of falling again, which paradoxically increases their chance of falling. You become anxious, move slower, lose muscle endurance, and adopt uncertain motions that set you up for another fall.\n\nAt [Nose Creek Physiotherapy Calgary North](https://www.nosecreekphysiotherapy.com/), we help you conquer your \"Fear of Falling\" with a well-designed balancing program suited to your specific needs.",
+    "heroImage": "/images/clinic/clinic-mobile.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Pinpoint the root causes of balance difficulties and unsteadiness — often within 20 minutes.",
+      "Rebuild lower body muscle strength (quadriceps, glutes, ankles) for dependable stability.",
+      "Conquer your fear of falling and regain independence at home and in the community.",
+      "Retrain inner ear (vestibular), visual, and sensory reflexes to catch yourself if you stumble.",
+      "Learn simple, effective changes to make in your home environment to eliminate fall hazards.",
+      "Walk with confidence on sidewalks, grocery stores, and winter surfaces without hesitation.",
+      "Avoid hospitalizations, hip fractures, and loss of your independent living lifestyle."
+    ],
+    "symptoms": [
+      "Feeling unsteady or swaying when standing still or walking through crowded rooms",
+      "Stumbling, close calls, or needing to hold onto walls, furniture, or a companion's arm",
+      "Difficulty rising from a chair without pushing off forcefully with both hands",
+      "Dizziness or lightheadedness when turning your head rapidly or getting up quickly (Vertigo)",
+      "Fear of walking outdoors, navigating curbs, or handling stairs without handrails"
+    ],
+    "treatmentApproach": [
+      "Step 1: Balance & Falls Risk Screening — Evaluating vestibular function, sensory neuropathy, visual tracking, and leg strength.",
+      "Step 2: Lower Extremity Stability & Strength Building — Targeted strengthening for hips, knees, and ankles to support upright posture.",
+      "Step 3: Reactive Stepping & Vestibular Retraining — Drills on varied surfaces to sharpen rapid balance reflexes and catch mechanisms.",
+      "Step 4: Home Hazard Checklist & Assistive Device Optimization — Eliminating tripping hazards and ensuring proper cane/walker fitting."
+    ],
+    "customSections": [
+      {
+        "id": "balance-risk-factors",
+        "eyebrow": "Internal & External Factors",
+        "title": "How Do You Solve Balance Problems? Internal vs. External Risk Factors:",
+        "subtitle": "Why balance issues require a multi-system physiotherapy assessment:",
+        "background": "light",
+        "align": "left",
+        "content": "We must first learn about your medical history before performing a physiotherapy assessment to determine which modifiable risk factors you require assistance with.\n\nIn our **FREE REPORT**, we split risks into internal factors (your body) and external factors (your environment):\n\n* **Internally:** Flexibility, lower body strength, medication reactions, and visual/vestibular processing.\n* **Externally:** Bathroom grab bars, non-slip flooring, adequate stair lighting, and eliminating throw rugs.\n\nBecause balance has multiple origins (including inner ear Vertigo and foot neuropathy), taking advantage of your **FREE Discovery Session** is the best place to start!",
+        "bullets": [
+          "Internal Factor 1: Leg and core muscle weakness causing slow reaction times.",
+          "Internal Factor 2: Vestibular (inner ear) disturbances creating dizziness and disequilibrium.",
+          "Internal Factor 3: Stiff ankle and hip joints preventing natural micro-adjustments.",
+          "External Factor: Inadequate lighting, loose rugs, and lack of bathroom support bars.",
+          "Medication interactions that create sudden blood pressure drops or drowsiness."
+        ],
+        "ctaText": "Arrange Your FREE Discovery Session »",
+        "ctaHref": "/free-discovery-session"
+      },
+      {
+        "id": "balance-discovery-call",
+        "eyebrow": "30-Minute Free Session",
+        "title": "What Happens During Your Free 'Balance & Falls Risk Discovery Session'?",
+        "subtitle": "We’ll Help You Understand 2 Vital Things:",
+        "background": "white",
+        "align": "left",
+        "content": "1. **The Root Cause for your balance difficulties:** Whether it's vestibular, muscular, joint stiffness, or sensory changes.\n2. **What you can do to improve your balance immediately:** Simple daily habits and safe exercises you can begin at home right away.\n\nNow is the moment to regain your balance and resume the active lifestyle you deserve. We'll identify your modifiable risk factors and work with you to change them.\n\n**Call our clinic today at (587) 355-2738 or 587 205-5235** to schedule your complimentary session!",
+        "ctaText": "Call Us: (587) 355-2738",
+        "ctaHref": "tel:5873552738"
+      },
+      {
+        "id": "balance-free-guide",
+        "eyebrow": "Free 21-Page Report",
+        "title": "Get Your Free Balance & Fall Prevention Guide",
+        "subtitle": "8 Proven Techniques for Lowering Your Risk of Falling at Home",
+        "background": "teal",
+        "align": "center",
+        "content": "If you have a loved one who does not have access to a computer, simply call the clinic at (587) 355-2738 and we will mail a copy of the FREE report directly to them.",
+        "ctaText": "Request Your Free Guide »",
+        "ctaHref": "/contact"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Can balance really be restored or improved in older adults?",
+        "answer": "Yes! Balance is a motor skill that responds remarkably well to physical training at any age. Strengthening stabilizing muscles and challenging balance reflexes stimulates neuroplasticity, drastically lowering your fall risk."
+      },
+      {
+        "question": "What is Vertigo and how does physiotherapy treat it?",
+        "answer": "Vertigo (often BPPV) occurs when tiny calcium carbonate crystals in the inner ear become dislodged. Our certified physiotherapists perform gentle canalith repositioning maneuvers (such as the Epley maneuver) to resolve dizziness within 1 to 2 sessions."
+      },
+      {
+        "question": "Is there any financial cost or obligation for the Balance Discovery Session?",
+        "answer": "None whatsoever. Our Free Discovery Session is completely complimentary and risk-free. It gives you a chance to speak with a clinician, assess your stability, and learn your options without any pressure."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "chiropractic-care",
+      "massage-therapy",
+      "acupuncture"
+    ],
+    "sort_order": 6,
+    "is_published": true,
+    "seo": {
+      "title": "Balance & Fall Prevention Physiotherapy Calgary | Nose Creek Physiotherapy",
+      "description": "Overcome fear of falling, dizziness, and unsteadiness. Expert geriatric physiotherapy, vestibular rehabilitation, and balance training in Calgary.",
+      "ogTitle": "Balance Training & Fall Prevention Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Stay independent and safe on your feet. Book your free Balance & Falls Risk Discovery Session at Nose Creek Physiotherapy in Calgary."
+    }
+  },
+  {
+    "id": "shoulder-osteoarthritis",
+    "slug": "shoulder-osteoarthritis",
+    "name": "Shoulder Osteoarthritis Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Shoulder Osteoarthritis Treatment Calgary NW: Alleviate Joint Pain and Maintain Mobility with targeted physiotherapy.",
+    "description": "Shoulder osteoarthritis is a degenerative joint condition characterized by the gradual breakdown of the protective cartilage that caps the surfaces of the ball-and-socket mechanism. This issue can result in a deep, persistent ache, significant morning stiffness, and an unsettling grinding sensation during normal arm movements. At Nose Creek Physiotherapy in Calgary NW, we provide therapeutic protocols aimed at managing joint inflammation, preserving your range of motion, and helping you maintain an active lifestyle comfortably.\n\n### Understanding Shoulder Osteoarthritis\nThe glenohumeral joint is lined with a smooth layer of hyaline cartilage designed to absorb shock and allow the bones to glide effortlessly over one another. Shoulder osteoarthritis occurs when this protective cartilage thins and wears away over time, exposing the raw bone underneath to friction and mechanical stress. As the body attempts to protect the area, it develops hard bone spurs around the edges of the joint, which further restricts your range of motion and creates chronic inflammation within the joint fluid.\n\nThis condition is closely tied to the biomechanics of aging and structural loading. Unlike weight-bearing joints like the knee, shoulder arthritis is frequently driven by past joint trauma, chronic rotator cuff tears, or decades of repetitive heavy use. As the cartilage wears away, the joint space collapses, forcing the surrounding muscles to become tight and tensed in an effort to protect the arm. Effective clinical treatment focuses on maximizing joint lubrication through gentle movement and building up the surrounding musculature to offload the bone-on-bone surfaces.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Gentle passive joint mobilizations to stimulate lubricating synovial fluid",
+      "Targeted rotator cuff and periscapular strengthening to act as natural shock absorbers",
+      "Preserve functional independence and maintain comfortable overhead range of motion",
+      "Soft tissue massage and dry needling to ease protective muscle guarding in the neck and upper back",
+      "Evidence-based lifestyle modifications and ergonomics to minimize joint stress"
+    ],
+    "symptoms": [
+      "A deep, dull ache localized within the back of the shoulder joint that worsens after physical activity",
+      "Pronounced stiffness in the morning or after periods of rest that gradually loosens with light movement",
+      "An audible and palpable grinding or crunching sensation, known as crepitus, when rotating the arm",
+      "A gradual, progressive loss of range of motion, making it difficult to reach behind your back or lift overhead",
+      "Persistent joint pain during cold weather changes or following heavy carrying tasks"
+    ],
+    "treatmentApproach": [
+      "Step 1: Multi-Planar Orthopedic Assessment — Measuring joint space restriction, bone spur limitations, and rotator cuff integrity.",
+      "Step 2: Gentle Joint Distraction & Mobilization — Expanding joint space, promoting synovial fluid circulation, and easing stiffness.",
+      "Step 3: Rotator Cuff & Scapular Offloading Drills — Conditioning surrounding muscles to absorb kinetic forces instead of worn cartilage.",
+      "Step 4: Joint Pacing & Long-Term Preservation — Educating on ergonomic carrying techniques and sustainable home mobility routines."
+    ],
+    "customSections": [
+      {
+        "id": "shoulder-osteo-causes",
+        "eyebrow": "Structural Causes",
+        "title": "Causes of Shoulder Osteoarthritis",
+        "subtitle": "Why does shoulder cartilage wear down over time?",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Post-Traumatic Arthritis: Degeneration of joint cartilage following a previous fracture, dislocation, or severe sprain.",
+          "Rotator Cuff Tear Arthropathy: Long-standing unmanaged rotator cuff tears that alter joint mechanics and cause bone rubbing.",
+          "Repetitive Heavy Loading: Decades of physical occupations or heavy lifting sports placing high mechanical stress on joint surfaces.",
+          "Advanced Age Demographics: Natural reduction in cartilage hydration and elasticity that occurs in individuals over fifty.",
+          "Genetic Predisposition: Inherited biological factors that affect cartilage thickness and natural bone metabolism."
+        ]
+      },
+      {
+        "id": "shoulder-osteo-approach",
+        "eyebrow": "Clinical Care",
+        "title": "Our Approach to Treating Shoulder Osteoarthritis in Calgary NW",
+        "subtitle": "Preserving your mobility and reducing joint discomfort without surgery.",
+        "background": "white",
+        "align": "left",
+        "content": "At Nose Creek Physiotherapy, our main priority when managing osteoarthritis is to help you preserve your functional independence and keep your joints as comfortable as possible. \n\nOur clinical focus centers on an extensive structural evaluation to determine which specific movements are most limited by bone spurs or muscle tension. By implementing an assessment-based treatment pathway, we utilize gentle manual techniques to improve joint spacing and guide you through an offloading exercise routine in Calgary NW.",
+        "ctaText": "Book Your Assessment Online »",
+        "ctaHref": "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Can Physiotherapy Help If My X-Rays Already Show Bone-On-Bone Arthritis?",
+        "answer": "Yes, absolutely! While physiotherapy cannot regrow lost cartilage, it strengthens the dynamic rotator cuff and scapular muscles, which act as shock absorbers to dramatically reduce bone-on-bone friction and pain."
+      },
+      {
+        "question": "Is It Safe To Exercise My Shoulder If I Feel A Grinding Sensation?",
+        "answer": "Gentle, non-compressive movements are safe and essential for joint lubrication. We guide you through specific offloading angles that avoid painful bone spur impingement."
+      },
+      {
+        "question": "How Helpful Is Chiropractic Care For Overcoming Shoulder Stiffness?",
+        "answer": "Chiropractic adjustments to the cervical and upper thoracic spine restore thoracic extension and rib mobility, allowing the shoulder blade to glide freely and reducing compensatory shoulder strain."
+      },
+      {
+        "question": "What Is The Best Home Management Strategy For Morning Joint Stiffness?",
+        "answer": "Gentle pendulum exercises and warm showers in the morning stimulate lubricating synovial fluid circulation, loosening up joint stiffness before daily tasks."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture",
+      "chiropractic-care",
+      "shockwave-therapy"
+    ],
+    "sort_order": 10,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Shoulder Osteoarthritis Treatment Calgary NW | Nose Creek Physiotherapy",
+      "description": "Relieve shoulder joint pain, morning stiffness, and bone-on-bone grinding. Evidence-based arthritis physiotherapy in Beddington, Calgary NW.",
+      "ogTitle": "Shoulder Arthritis Relief Calgary NW | Nose Creek Physiotherapy",
+      "ogDescription": "Maintain mobility and avoid surgery with targeted joint preservation physical therapy at Nose Creek Physiotherapy in Calgary."
+    }
+  },
+  {
+    "id": "scapular-dyskinesis",
+    "slug": "scapular-dyskinesis",
+    "name": "Scapular Dyskinesis Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Scapular Dyskinesis Treatment Calgary NW: Correct Shoulder Blade Alignment and Movement.",
+    "description": "Scapular dyskinesis is a mechanical condition characterized by abnormal positioning or uncoordinated movement of the shoulder blade during arm usage. This issue often results in a dull ache around the upper back, localized shoulder clicking, and an increased risk of developing rotator cuff injuries or impingement. At Nose Creek Physiotherapy in Calgary NW, we offer movement retraining and strengthening programs aimed at restoring your natural shoulder rhythm and protecting your joints from chronic mechanical wear.\n\n### Understanding Scapular Dyskinesis\nThe scapula, commonly known as the shoulder blade, serves as the structural foundation for your entire arm, hosting the socket part of the ball-and-socket joint. Scapular dyskinesis is frequently misunderstood as a simple postural issue, but it is actually a functional breakdown where the shoulder blade fails to track smoothly along the rib cage during movement. When the muscles that stabilize the scapula become weak or uncoordinated, the bone may tilt forward or wing outward, throwing the entire upper body out of alignment.\n\nThis condition severely disrupts the biomechanics of the shoulder complex. For every two degrees your arm lifts, your shoulder blade must rotate upward by one degree; this is known as the **scapulohumeral rhythm**. If this timing is disrupted, the upper arm bone will compress the subacromial tissues, leading to chronic inflammation and secondary injuries. Effective clinical resolution requires retraining the serratus anterior and lower trapezius muscles to lift and stabilize the bone efficiently.",
+    "heroImage": "/images/blog/neck-upper-back-posture-jaw-function-tmj-discomfort.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Restore the natural 2:1 scapulohumeral rhythm during arm elevation",
+      "Rebuild power in the serratus anterior and lower trapezius muscles",
+      "Eliminate nagging dull aching between the shoulder blades and at the base of the neck",
+      "Prevent secondary rotator cuff tears, impingement, and labral damage",
+      "Neuromuscular biofeedback training for automatic postural control"
+    ],
+    "symptoms": [
+      "Visible winging or protrusion of the inner border of the shoulder blade away from the rib cage",
+      "Persistent dull ache between the shoulder blades or at the base of the neck after desk work",
+      "Localized snapping, popping, or crunching sounds around the shoulder blade during arm circles",
+      "A premature drop or uncoordinated 'jump' of the shoulder blade when lowering the arm",
+      "Noticeable loss of overhead lifting power and premature muscle fatigue during activity"
+    ],
+    "treatmentApproach": [
+      "Step 1: Multi-Planar Dynamic Scapular Analysis — Evaluating upward rotation, posterior tilt, and muscle activation timing.",
+      "Step 2: Targeted Manual Release of Anterior Guarding — Lengthening tight pectoralis minor and upper trapezius restrictions.",
+      "Step 3: Serratus Anterior & Lower Trapezius Re-Education — High-yield isolation drills to re-establish upward scapular rotation.",
+      "Step 4: Functional Kinetic Chain Integration — Linking scapular stability with overhead athletic and occupational duties."
+    ],
+    "customSections": [
+      {
+        "id": "scapular-causes",
+        "eyebrow": "Biomechanical Triggers",
+        "title": "Causes of Scapular Dyskinesis",
+        "subtitle": "Why the shoulder blade loses its tracking rhythm:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Muscular Imbalances: Weakness in the lower trapezius and serratus anterior combined with tightness in the pec minor.",
+          "Chronic Desk Posture: Prolonged slouched sitting that adapts the shoulder blade into a forward-tilted position.",
+          "Nerve Irritation: Irritation or compression of the long thoracic nerve controlling the primary stabilizer muscles.",
+          "Underlying Shoulder Injuries: Conditions like labral tears or tendinitis that cause compensatory movement changes.",
+          "Thoracic Spine Stiffness: Rigidity in the upper back bones that physically prevents smooth rib cage gliding."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "What Exactly Is 'Winged Shoulder' and Is It Reversible?",
+        "answer": "Winging occurs when stabilizing muscles fail to hold the shoulder blade flat against the rib cage. In the majority of cases, it is fully reversible with targeted strengthening of the serratus anterior and lower trapezius."
+      },
+      {
+        "question": "Why Does My Shoulder Blade Make A Crunching Sound When I Move It?",
+        "answer": "This is known as scapulothoracic crepitus, caused by altered bone alignment or inflamed bursa gliding abnormally over the ribs. Restoring muscle balance eliminates the friction."
+      },
+      {
+        "question": "Can Scapular Dyskinesis Cause My Chronic Neck Pain?",
+        "answer": "Yes. When the shoulder blade does not rotate properly, the upper trapezius and levator scapulae muscles overwork to compensate, causing chronic neck spasms and tension headaches."
+      },
+      {
+        "question": "How Long Does It Take To Train A Shoulder Blade To Move Correctly?",
+        "answer": "Most patients experience significant improvements in tracking and symptom reduction within 4 to 8 weeks of consistent neuromuscular retraining and exercise."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "chiropractic-care",
+      "acupuncture"
+    ],
+    "sort_order": 11,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Scapular Dyskinesis & Winging Treatment Calgary NW | Nose Creek",
+      "description": "Correct shoulder blade winging, restore scapulohumeral rhythm, and eliminate upper back pain with physiotherapy in Calgary NW.",
+      "ogTitle": "Scapular Dyskinesis Correction Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Fix uncoordinated shoulder blade movement and prevent rotator cuff injuries. Book your assessment at Nose Creek Physiotherapy."
+    }
+  },
+  {
+    "id": "shoulder-labrum-tear",
+    "slug": "shoulder-labrum-tear",
+    "name": "Shoulder Labrum Tear Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Shoulder Labrum Tear Treatment Calgary NW: Resolve Deep Joint Pain and Restore Function without surgery.",
+    "description": "A shoulder labrum tear is a structural injury affecting the ring of fibrous cartilage that lines the edge of the shoulder socket. This condition can lead to sharp joint pain, an unsettling clicking sensation, and a significant loss of stability during throwing, lifting, or overhead activities. At Nose Creek Physiotherapy in Calgary NW, we offer comprehensive rehabilitation programs aimed at controlling deep joint pain, rebuilding muscular support, and helping you return to your active life safely without surgical intervention.\n\n### Understanding Shoulder Labrum Tears\nThe labrum is a specialized ring of dense cartilage that serves to deepen the flat shoulder socket, acting like a flexible rubber gasket to keep the upper arm bone centered securely. A labrum tear occurs when this cartilage is frayed or torn away from the bone due to high-force trauma or repetitive traction forces. When the labrum is damaged, the joint loses a portion of its suction seal, causing the ball to slide around abnormally and create deep mechanical pain and clicking.\n\nThis condition deeply impacts the internal stability of the shoulder complex. Labral tears can occur along the top of the socket, commonly known as a **SLAP tear**, or along the lower rim following a dislocation (Bankart tear). Because the long tendon of the biceps muscle attaches directly to the top of the labrum, movements that strain the biceps can pull on the tear and worsen your symptoms. Effective physiotherapy focuses on building a muscular support system to center the joint bone mechanically, bypassing the damaged cartilage.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Targeted rotator cuff dynamic stabilization to mechanically bypass cartilage tears",
+      "Biceps tendon offloading exercises to eliminate painful traction forces on the labrum",
+      "Proprioceptive reactive training on unstable surfaces to rebuild brain-muscle reflexes",
+      "Eliminate deep, agonizing joint catching, clicking, and 'dead arm' sensations",
+      "Avoid surgical repair and prolonged sling immobilization with conservative rehabilitation"
+    ],
+    "symptoms": [
+      "A deep, localized ache within the shoulder joint that is difficult to pinpoint from the outside",
+      "Audible catching, popping, or clicking sounds during specific movements, often accompanied by sharp pain",
+      "A clear loss of strength and overhead throwing power, often referred to as a 'dead arm' sensation",
+      "A feeling of instability or an unsettling sensation that the shoulder might slide out of its socket",
+      "Increased pain during activities that involve heavy pulling or holding objects with an outstretched arm"
+    ],
+    "treatmentApproach": [
+      "Step 1: Orthopedic Provocation Testing — Performing O'Brien's, Speed's, and Crank tests to isolate SLAP vs Bankart tears.",
+      "Step 2: Rotator Cuff Dynamic Centering — Strengthening infraspinatus and subscapularis to maintain humeral head position.",
+      "Step 3: Biceps Anchor Decompression & Scapular Tracking — Offloading traction stress while restoring upward socket rotation.",
+      "Step 4: High-Velocity Perturbation Drills — Rebuilding athletic throwing power and reactive joint stability."
+    ],
+    "customSections": [
+      {
+        "id": "labrum-causes",
+        "eyebrow": "Injury Mechanisms",
+        "title": "Causes of Shoulder Labrum Tears",
+        "subtitle": "How cartilage rings tear under trauma and repetitive stress:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Fall or Direct Impact: Landing heavily on an outstretched arm or sustaining a blow that jams joint surfaces.",
+          "Repetitive Overhead Throwing: High-velocity baseball, tennis, or javelin throws placing extreme traction on the labrum.",
+          "Heavy Pulling or Lifting: A sudden high-force pull on the arm, such as starting a lawnmower or lifting heavy weights improperly.",
+          "Recurrent Shoulder Dislocations: Instability episodes that shear the labrum cartilage off the lower rim of the socket.",
+          "Natural Degenerative Attrition: Gradual fraying of cartilage tissue over decades of cumulative physical work."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Can A Torn Shoulder Labrum Heal On Its Own Without Surgery?",
+        "answer": "Cartilage has limited blood supply, so structural tears may not fully knit back to bone. However, conservative physiotherapy strengthens surrounding muscles to fully compensate, allowing most patients to become completely pain-free and fully functional without surgery."
+      },
+      {
+        "question": "Is Every Shoulder Click A Definitive Sign Of A Labrum Tear?",
+        "answer": "No. Clicking can also be caused by tendon snapping, harmless gas bubbles, or minor bursal friction. We perform specific clinical tests to differentiate benign clicking from true labral pathology."
+      },
+      {
+        "question": "What Activities Should I Avoid If I Have A Confirmed SLAP Tear?",
+        "answer": "Avoid heavy overhead throwing, wide-grip behind-the-neck presses, and sudden heavy pulling until rotator cuff stability is rebuilt to protect the biceps anchor."
+      },
+      {
+        "question": "Can Chiropractic Care Help With My Labrum Tear Recovery?",
+        "answer": "Yes, gentle chiropractic adjustments to the thoracic spine and ribs improve overall upper body mechanics, reducing rotational stress on the shoulder joint."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture",
+      "chiropractic-care",
+      "shockwave-therapy"
+    ],
+    "sort_order": 12,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Shoulder Labrum & SLAP Tear Treatment Calgary NW | Nose Creek",
+      "description": "Resolve deep shoulder pain, catching, and instability without surgery. Expert labral tear rehabilitation at Nose Creek Physiotherapy.",
+      "ogTitle": "Shoulder Labrum Tear Rehabilitation Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Eliminate shoulder clicking and restore throwing power. Schedule your assessment at Nose Creek Physiotherapy in Calgary NW."
+    }
+  },
+  {
+    "id": "shoulder-dislocation-subluxation",
+    "slug": "shoulder-dislocation-subluxation",
+    "name": "Shoulder Dislocation & Subluxation Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Shoulder Dislocation/Subluxation Treatment Calgary NW: Rebuild Joint Stability and Confidence.",
+    "description": "A shoulder dislocation or subluxation is a significant traumatic or micro-traumatic event where the arm bone is forced out of its socket, stretching or tearing vital stabilizing ligaments. This injury leaves the shoulder joint feeling highly unstable, weak, and vulnerable to re-injury during basic physical tasks or sports. At Nose Creek Physiotherapy in Calgary NW, we provide neurological and physical rehabilitation plans designed to restore joint position, strengthen dynamic stabilizers, and help you regain full confidence in your arm's strength.\n\n### Understanding Shoulder Dislocations and Subluxations\nThe shoulder joint is often compared to a **golf ball sitting on a small tee**, offering incredible mobility but relying heavily on soft tissues for stability. A dislocation occurs when the upper arm bone is completely displaced from the socket, whereas a subluxation is a partial separation where the bone slips out briefly before returning. Both events cause instant stretching or tearing of the joint capsule and surrounding labrum, leaving the shoulder highly susceptible to future instability episodes.\n\nThis condition severely disrupts the neuromuscular control of the upper body. When these ligaments are stretched, the brain loses its ability to accurately sense joint position, resulting in delayed muscle reactions and a persistent fear of movement. Effective clinical rehabilitation focuses on training the surrounding muscle groups, such as the rotator cuff and periscapular muscles, to act as an **active muscular brace**. By improving muscle reaction times and power, we compensate for ligament laxity and stabilize the ball securely in the socket.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Subscapularis and deep rotator cuff strengthening to create an active dynamic joint brace",
+      "Proprioceptive and rhythmic stabilization drills to sharpen joint position awareness",
+      "Scapular positioning retraining to ensure the socket dynamically tracks the arm bone",
+      "Eliminate apprehension, anxiety, and fear of re-injury during athletic or overhead movements",
+      "Safely progress from protected early loading to sport-specific reactive training"
+    ],
+    "symptoms": [
+      "Intense, sharp pain at the moment of displacement, followed by a persistent deep ache",
+      "A clear feeling that the joint is slipping, shifting, or catching during rapid arm movements",
+      "Profound weakness in the arm, making it difficult to lift objects or push against resistance",
+      "Numbness, tingling, or weakness radiating down the arm if local nerves are stretched",
+      "A strong psychological fear or anxiety when moving the arm into an overhead or throwing position"
+    ],
+    "treatmentApproach": [
+      "Step 1: Multi-Directional Laxity & Neurological Testing — Measuring anterior, posterior, and inferior capsule integrity.",
+      "Step 2: Protected Subscapularis & Dynamic Brace Conditioning — Activating anterior muscular stabilizers in safe planes.",
+      "Step 3: Closed-Kinetic Chain & Perturbation Drills — Stimulating joint mechanoreceptors for rapid reflex stabilization.",
+      "Step 4: High-Level Athletic Retraining — Restoring full confidence in contact sports, skiing, or lifting."
+    ],
+    "customSections": [
+      {
+        "id": "dislocation-causes",
+        "eyebrow": "Mechanism of Injury",
+        "title": "Causes of Shoulder Dislocations and Subluxations",
+        "subtitle": "Why shoulder ligaments tear or stretch loose:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Acute Athletic Impact: Direct collisions or heavy falls in hockey, football, or rugby forcing the arm backward.",
+          "Forced Overhead Twisting: A sudden high-force lever action on an abducted arm, common in skiing or wrestling.",
+          "Repetitive Throwing Strain: Cumulative micro-stretching of anterior ligaments from years of high-volume serving or pitching.",
+          "Generalized Ligament Laxity: Congenital loose-jointedness where connective tissues are naturally hyper-mobile.",
+          "Inadequate Past Rehabilitation: Failing to rebuild deep muscular stability after a first dislocation, causing chronic recurrence."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "How Long Does It Take To Fully Recover From A Shoulder Dislocation?",
+        "answer": "A first-time dislocation typically requires 8 to 12 weeks of structured rehabilitation to rebuild dynamic muscular support and restore confidence in overhead movements."
+      },
+      {
+        "question": "Why Am I At A Higher Risk For Another Dislocation After A First Injury?",
+        "answer": "When a joint dislocates, the static ligaments and labrum are stretched. Without targeted physical therapy to train surrounding muscles to act as a replacement brace, the risk of recurrence remains high."
+      },
+      {
+        "question": "What Is The Main Difference Between A Dislocation And A Subluxation?",
+        "answer": "A dislocation is a complete separation where the ball comes completely out of the socket and usually requires reduction. A subluxation is a partial slip where the bone slides out momentarily and pops back in."
+      },
+      {
+        "question": "Can Chiropractic Care Help With My Post-Dislocation Stiffness?",
+        "answer": "Yes, gentle chiropractic mobilizations to the thoracic spine and rib cage relieve compensatory stiffness without stressing the healing shoulder ligaments."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture",
+      "chiropractic-care",
+      "shockwave-therapy"
+    ],
+    "sort_order": 13,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Shoulder Dislocation & Subluxation Rehab Calgary NW | Nose Creek",
+      "description": "Rebuild joint stability, eliminate slipping sensations, and prevent recurrent dislocations. Expert physical therapy in Calgary NW.",
+      "ogTitle": "Shoulder Dislocation Recovery Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Regain full confidence in your arm's strength and stability. Book your evaluation at Nose Creek Physiotherapy in Calgary."
+    }
+  },
+  {
+    "id": "shoulder-bursitis",
+    "slug": "shoulder-bursitis",
+    "name": "Shoulder Bursitis Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Shoulder Bursitis Treatment Calgary NW: Relieve Inflammation and Protect Your Joint.",
+    "description": "Shoulder bursitis is a painful inflammatory condition affecting the fluid-filled sacs that act as protective cushions within the shoulder complex. This issue can make holding your arm out, sleeping on your side, or lifting objects feel incredibly uncomfortable due to localized swelling and constant aching. At Nose Creek Physiotherapy in Calgary NW, we offer targeted clinical interventions designed to calm tissue inflammation, restore proper joint alignment, and ensure your shoulder can handle movement smoothly without pain.\n\n### Understanding Shoulder Bursitis\nA bursa is a small, slippery sac filled with synovial fluid that sits between bones and tendons, serving to eliminate friction during movement. Shoulder bursitis occurs when the **subacromial bursa** becomes highly irritated, thickens, and produces excessive fluid due to mechanical compression or repetitive friction. When this sac expands, it takes up vital room within the joint corridor, creating a vicious cycle where normal movements compress the swollen bursa even further, resulting in severe pain.\n\nThis condition is closely tied to the biomechanics of the shoulder. Bursitis rarely occurs in isolation; it is frequently paired with rotator cuff tendinitis or shoulder impingement. When stabilizing muscles are uncoordinated or weak, the arm bone migrates upward inappropriately, directly squeezing the bursa against the hard acromion bone roof above it. Effective treatment requires an immediate focus on down-regulating local inflammation, followed by targeted exercises to keep the arm bone properly centered within the socket.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Calm acute subacromial bursa swelling and nighttime throbbing pain",
+      "Targeted rotator cuff depressor strengthening to pull the arm bone downward away from the bursa",
+      "Scapular upward rotation exercises to permanently clear the joint corridor",
+      "Manual therapy and dry needling to ease chronic muscle spasms in the chest and neck",
+      "Practical sleeping posture and ergonomic advice to prevent nightly compression"
+    ],
+    "symptoms": [
+      "A localized, throbbing ache on the tip or outside of the shoulder that is present even when resting",
+      "Intense tenderness when pressing directly on the bony bump at the top of your shoulder",
+      "Severe pain when attempting to sleep on the affected side, frequently waking you throughout the night",
+      "A painful arc of movement when lifting the arm out to the side, typically between 60 and 120 degrees",
+      "Mild localized warmth or visible fullness around the shoulder joint during an acute flare-up"
+    ],
+    "treatmentApproach": [
+      "Step 1: Orthopedic Palpation & Space Analysis — Differentiating pure bursitis from rotator cuff tendon tears.",
+      "Step 2: Anti-Inflammatory Manual Decompression — Gentle distraction mobilizations to open the subacromial space.",
+      "Step 3: Humeral Head Depressor Strengthening — Activating the deep infraspinatus and subscapularis to prevent upward bone pinching.",
+      "Step 4: Long-Term Ergonomic & Overhead Calibration — Ensuring sustainable arm mechanics for work, painting, or sports."
+    ],
+    "customSections": [
+      {
+        "id": "bursitis-causes",
+        "eyebrow": "Inflammatory Triggers",
+        "title": "Causes of Shoulder Bursitis",
+        "subtitle": "Why the subacromial bursa swells and thickens:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Repetitive Friction: Continuous overhead motions in swimming, tennis, painting, or construction trades.",
+          "Acute Direct Trauma: A fall directly onto the tip of the shoulder or a hard blow bruising the bursa sac.",
+          "Altered Joint Mechanics: Deep rotator cuff weakness allowing the arm bone to ride upward and pinch the sac.",
+          "Crystal Deposition: Systemic inflammatory conditions causing microscopic crystals to accumulate in synovial fluid.",
+          "Age-Related Narrowing: Natural narrowing of the subacromial corridor that occurs over time."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "How Long Does It Take For Shoulder Bursitis To Heal Completely?",
+        "answer": "With targeted physical therapy and early mechanical correction, most cases of acute bursitis resolve significantly within 3 to 6 weeks."
+      },
+      {
+        "question": "How Can I Position My Arm At Night To Avoid Irritating My Bursitis?",
+        "answer": "Avoid sleeping directly on the affected shoulder. Sleep on your back or on the opposite side with a pillow tucked under the affected arm to prevent the arm from falling forward and pinching the bursa."
+      },
+      {
+        "question": "Can Massage Therapy Help With Shoulder Bursitis?",
+        "answer": "Yes, massage therapy releases guarding tension in the pectoralis minor, deltoid, and upper trapezius, which helps the shoulder blade settle into a more open, decompressed posture."
+      },
+      {
+        "question": "When Should I Consider A Cortisone Injection For My Bursitis?",
+        "answer": "Cortisone can provide rapid temporary relief for severe inflammation, but it does not fix the muscle weakness or bone pinching that caused the bursitis. Physical therapy is always recommended first to correct the mechanical cause."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "acupuncture",
+      "chiropractic-care",
+      "shockwave-therapy"
+    ],
+    "sort_order": 14,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Shoulder Bursitis Treatment Calgary NW | Nose Creek Physiotherapy",
+      "description": "Relieve subacromial bursitis, eliminate nighttime shoulder throbbing, and open joint space. Compassionate physiotherapy in Calgary NW.",
+      "ogTitle": "Shoulder Bursitis Relief Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Calm inflamed joint fluid and sleep through the night again. Book your shoulder bursitis assessment at Nose Creek Physiotherapy."
+    }
+  },
+  {
+    "id": "shoulder-impingement",
+    "slug": "shoulder-impingement",
+    "name": "Shoulder Impingement Syndrome Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Shoulder Impingement Syndrome Treatment Calgary NW: Eliminate Pinching and Move Freely.",
+    "description": "Shoulder impingement syndrome is a common mechanical condition that occurs when the structural tendons or bursa of the shoulder become compressed or pinched during arm elevation. This issue makes actions like lifting weights, swimming, reaching into a back pocket, or typing for extended periods highly painful. At Nose Creek Physiotherapy in Calgary NW, we deliver evidence-based clinical programs aimed at restoring proper joint spacing, correcting movement patterns, and providing lasting relief from subacromial discomfort.\n\n### Understanding Shoulder Impingement Syndrome\nThe subacromial space is a narrow anatomical corridor located directly beneath the bony roof of the shoulder blade, housing vital rotator cuff tendons and a protective bursa. Shoulder impingement syndrome is often misunderstood as a structural disease, but it is primarily a movement problem where this corridor narrows dynamically during arm usage. When the upper arm bone slides upward improperly instead of rolling downward, it squeezes these delicate soft tissues against the bone, causing localized swelling, micro-tearing, and sharp mechanical pain.\n\nThis condition is closely tied to the biomechanics of the upper body kinetic chain. Impingement can occur due to structural bone variations, but it is far more commonly driven by altered scapular stability and muscular imbalances. If the muscles that lift the shoulder blade fail to clear the bone out of the way during arm movement, repetitive pinching is inevitable. Effective clinical care requires expanding this subacromial space by strengthening the deep rotator cuff depressors and retraining the shoulder blade to glide efficiently.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Strengthen deep rotator cuff depressors (infraspinatus, subscapularis) to keep the humeral head centered",
+      "Retrain scapular upward rotation to clear the bony acromion arch during arm elevation",
+      "Eliminate sharp pinching when reaching overhead or reaching behind your back",
+      "Manual therapy and posterior capsule stretching to eliminate forward bone migration",
+      "Prevent minor impingement from progressing into full-thickness rotator cuff tears"
+    ],
+    "symptoms": [
+      "A sharp, sudden pinch on the top or outside of the shoulder when lifting the arm overhead",
+      "Persistent discomfort when lowering the arm from an elevated position, often accompanied by a catching sensation",
+      "Dull aching that radiates into the deltoid muscle region, especially after periods of physical activity",
+      "Inability to reach comfortably across your body or behind your back without triggering localized pain",
+      "Immediate pain when trying to lift a heavy object with an outstretched arm or sleeping on that side"
+    ],
+    "treatmentApproach": [
+      "Step 1: Mechanical Provocation Testing — Neer's and Hawkins-Kennedy tests to isolate impingement zones.",
+      "Step 2: Subacromial Space Decompression — Manual therapy and posterior capsule stretching to allow smooth bone rolling.",
+      "Step 3: Rotator Cuff Depressor Strengthening — Conditioning the deep muscles to actively pull the humeral head downward.",
+      "Step 4: Scapular Rhythm & Postural Retraining — Teaching the shoulder blade to elevate seamlessly without pinching."
+    ],
+    "customSections": [
+      {
+        "id": "impingement-causes",
+        "eyebrow": "Mechanical Causes",
+        "title": "Causes of Shoulder Impingement Syndrome",
+        "subtitle": "Why the subacromial corridor narrows during arm movement:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Rotator Cuff Weakness: Inability of deep stabilizers to hold the arm bone down, allowing it to migrate upward.",
+          "Scapular Dyskinesis: Altered movement of the shoulder blade failing to clear the bony arch during elevation.",
+          "Postural Slouching: Prolonged slouched sitting that tilts the shoulder blade forward and narrows joint clearance.",
+          "Repetitive Overhead Strain: Athletic or occupational tasks like swimming, tennis, carpentry, or stocking shelves.",
+          "Structural Bone Variations: Naturally occurring bone spurs or a hooked acromion bone reducing available space."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Can Shoulder Impingement Lead To A Rotator Cuff Tear?",
+        "answer": "Yes. If left untreated, chronic mechanical friction against the acromion bone causes gradual fraying and micro-tears in the supraspinatus tendon. Early physical therapy stops this progression."
+      },
+      {
+        "question": "Should I Avoid Reaching Overhead Entirely If My Shoulder Pinches?",
+        "answer": "During acute flare-ups, modifying overhead tasks is helpful. However, complete avoidance weakens muscles. We teach you modified movement angles (in the scapular plane) that keep the joint corridor open."
+      },
+      {
+        "question": "How Helpful Is Chiropractic Care For Shoulder Impingement?",
+        "answer": "Very helpful. Adjusting the upper thoracic spine and ribs restores extension, which is required for the shoulder blade to rotate upward properly during arm elevation."
+      },
+      {
+        "question": "Why Does Sitting At My Computer Desk Make My Impingement Worse?",
+        "answer": "Slouching forward causes the scapula to tip downward and anteriorly, immediately narrowing the subacromial space and pre-loading tendons into a pinched state."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "chiropractic-care",
+      "acupuncture",
+      "shockwave-therapy"
+    ],
+    "sort_order": 15,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Shoulder Impingement Treatment Calgary NW | Nose Creek Physiotherapy",
+      "description": "Eliminate shoulder pinching when reaching overhead. Restore joint space and rotator cuff mechanics at Nose Creek Physiotherapy in Calgary NW.",
+      "ogTitle": "Shoulder Impingement Syndrome Relief Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Move your arm freely without sharp subacromial pinching. Book your assessment at Nose Creek Physiotherapy in Calgary NW."
+    }
+  },
+  {
+    "id": "adhesive-capsulitis",
+    "slug": "adhesive-capsulitis",
+    "name": "Adhesive Capsulitis (Frozen Shoulder) Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Adhesive Capsulitis Treatment Calgary NW: Overcome Frozen Shoulder and Stiff Joints safely.",
+    "description": "Adhesive capsulitis, commonly referred to as frozen shoulder, is a painful and highly restrictive condition characterized by progressive stiffness and a severe loss of motion in the shoulder joint. This injury turns everyday movements, such as reaching for a seatbelt, washing your back, or sleeping comfortably, into incredibly difficult tasks. At Nose Creek Physiotherapy in Calgary NW, we provide vestibular and orthopedic rehabilitation plans designed to manage pain, preserve joint function, and systematically restore your arm mobility.\n\n### Understanding Frozen Shoulder\nAdhesive capsulitis involves the chronic inflammation and progressive thickening of the joint capsule, the dense band of connective tissue that surrounds the ball-and-socket mechanism of the shoulder. Frozen shoulder is often misunderstood as simple muscle tightness, but it actually involves the development of thick scar tissue and adhesions within the capsule lining, which physically glues the joint surfaces together. This process results in a dramatic reduction in the joint space and limits the capsule’s ability to stretch during normal arm movements.\n\nThe condition typically progresses through three distinct clinical phases:\n1. **The Freezing Phase:** Marked by intense pain, night aching, and initial loss of range.\n2. **The Frozen Phase:** Pain begins to plateau or stabilize, but stiffness peaks and the joint feels completely locked.\n3. **The Thawing Phase:** Scar tissue gradually remodels and mobility begins to return.\n\nThis condition severely disrupts upper body biomechanics, forcing the shoulder blade to overwork to compensate for the locked glenohumeral joint. Effective physiotherapy requires careful clinical tracking to ensure treatment intensities match your current phase, safely expanding range without aggravating the capsule.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Carefully calibrated phase-matched therapy that expands range without aggravating inflammation",
+      "Gentle joint mobilizations within comfortable limits to maintain synovial circulation",
+      "Targeted low-load prolonged stretching designed to safely elongate contracted capsule tissue",
+      "Soft tissue release to relax guarding muscles in the neck, chest, and upper back",
+      "Dramatically shorten the duration of the 'Frozen' phase and accelerate the 'Thawing' recovery"
+    ],
+    "symptoms": [
+      "Severe, deep shoulder pain that is present even at rest and intensifies drastically with sudden movements",
+      "A profound, global reduction in shoulder motion, particularly when rotating the arm outward (external rotation)",
+      "Inability to sleep on the affected side due to a constant, throbbing ache within the joint capsule",
+      "A distinct mechanical block where the arm cannot be moved further, even with external assistance",
+      "Widespread muscle aching across the neck and upper back from continuous mechanical compensation"
+    ],
+    "treatmentApproach": [
+      "Step 1: Clinical Stage Identification — Determining whether you are in the Freezing, Frozen, or Thawing phase.",
+      "Step 2: Low-Intensity Pain Modulation — Utilizing gentle oscillatory mobilizations, heat, and acupuncture to calm capsule reactivity.",
+      "Step 3: End-Range Capsular Stretching & Myofascial Release — Applying low-load prolonged elongation as the thawing phase begins.",
+      "Step 4: Scapular Retraining & Strength Restoration — Rebuilding arm strength and reversing compensatory neck movement habits."
+    ],
+    "customSections": [
+      {
+        "id": "frozen-shoulder-causes",
+        "eyebrow": "Clinical Triggers",
+        "title": "Causes of Adhesive Capsulitis (Frozen Shoulder)",
+        "subtitle": "Why the shoulder capsule thickens and contracts:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Prolonged Immobilization: Keeping the arm still inside a sling or splint following a fracture, surgery, or sprain.",
+          "Systemic Health Conditions: Individuals with diabetes or thyroid disorders have a significantly higher risk of capsular contracture.",
+          "Minor Shoulder Trauma: A localized fall or sprain setting off an exaggerated, long-term inflammatory cascade.",
+          "Age and Gender Demographics: Most frequently seen in individuals between forty and sixty years old, particularly women.",
+          "Cardiovascular Events: Periods of reduced physical mobility following conditions like stroke or heart surgery."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Can A Frozen Shoulder Resolve On Its Own Without Treatment?",
+        "answer": "While some cases eventually thaw after 2 to 3 years, untreated frozen shoulder often leaves permanent range-of-motion deficits. Physiotherapy significantly shortens the recovery timeline and prevents long-term joint contractures."
+      },
+      {
+        "question": "Is It Normal For The Stretching Exercises To Feel Uncomfortable?",
+        "answer": "A mild stretching sensation is normal during the frozen and thawing phases. However, aggressive stretching during the acute freezing phase can worsen inflammation. Our clinicians prescribe the exact safe intensity."
+      },
+      {
+        "question": "How Often Do I Need to Perform My Home Exercises for Best Results?",
+        "answer": "Short, frequent sessions (3 to 5 minutes, 3 to 4 times daily) are far more effective for collagen remodeling than one long, aggressive session."
+      },
+      {
+        "question": "Does Acupuncture Help With The Pain Of A Frozen Shoulder?",
+        "answer": "Yes, medical acupuncture and dry needling provide outstanding analgesic relief and reduce protective muscular guarding around the locked joint."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "acupuncture",
+      "massage-therapy",
+      "chiropractic-care",
+      "shockwave-therapy"
+    ],
+    "sort_order": 16,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Frozen Shoulder (Adhesive Capsulitis) Treatment Calgary NW",
+      "description": "Overcome frozen shoulder stiffness and throbbing night pain. Stage-matched physiotherapy and gentle mobilization in Calgary NW.",
+      "ogTitle": "Frozen Shoulder Relief in Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Restore shoulder range of motion safely. Book your comprehensive assessment at Nose Creek Physiotherapy in Calgary NW."
+    }
+  },
+  {
+    "id": "shoulder-pain",
+    "slug": "shoulder-pain",
+    "name": "Shoulder Pain Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Shoulder Pain Treatment Calgary NW: Restore Upper Limb Function and Mobility.",
+    "description": "Shoulder pain is a highly disruptive condition that can significantly limit your ability to perform daily tasks, from reaching overhead to sleeping comfortably. Given the extensive range of motion of the shoulder joint, any underlying mechanical dysfunction or structural injury can quickly lead to persistent aching, sharp pains, or weakness. At Nose Creek Physiotherapy in Calgary NW, our experienced team provides comprehensive orthopedic assessments and evidence-based rehabilitation plans to target the source of your discomfort. We are committed to helping you find lasting relief, rebuilding joint stability, and returning to the activities you enjoy without physical limitations.\n\n### Understanding Shoulder Pain\nThe shoulder is a complex ball-and-socket joint that prioritizes exceptional mobility over inherent structural stability, making it highly dependent on a delicate balance of muscles, ligaments, and tendons. Shoulder pain is frequently misunderstood as a simple muscle pull that will resolve on its own, but it often stems from deep-seated issues within the rotator cuff or the joint capsule itself. When the structural integrity of these tissues is compromised, the body naturally adopts compensatory movement patterns that can place excessive mechanical stress on the neck and upper back.\n\nThis condition involves the intricate coordination of the nervous and musculoskeletal systems, specifically the interaction between the upper arm bone, the shoulder blade, and the collarbone. Because the shoulder blade must glide seamlessly along the rib cage to allow for smooth arm elevation, any disruption in this scapular rhythm can cause pinching, localized friction, and tissue degradation. Effective clinical treatment requires a thorough understanding of these biomechanical relationships, focusing on decompressing the joint space and restoring the natural harmony of the upper limb kinetic chain.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Comprehensive multi-system orthopedic evaluation pinpointing tendon, joint, or nerve sources",
+      "Gentle joint mobilizations to restore capsule sliding properties and ease acute pain",
+      "Neuromuscular retraining restoring the coordinated rhythm between arm bone and shoulder blade",
+      "Soft tissue therapy and dry needling to release chronic compensatory spasms in neck and upper back",
+      "Long-term preventative strategies to eliminate recurrent shoulder flare-ups"
+    ],
+    "symptoms": [
+      "Sharp, catching pain when reaching behind your back, putting on a jacket, or lifting objects overhead",
+      "A deep, persistent ache that intensifies at night, often making it difficult to sleep on the affected side",
+      "Noticeable muscular weakness when trying to lift the arm out to the side or push objects away",
+      "Restricted range of motion and progressive joint stiffness that limit basic functional movements",
+      "Audible popping, clicking, or grinding sensations within the joint during circular arm rotations"
+    ],
+    "treatmentApproach": [
+      "Step 1: Thorough Differential Diagnosis — Distinguishing rotator cuff strain, bursitis, labral tear, and cervical radiculopathy.",
+      "Step 2: Hands-On Decompression & Joint Mobilization — Relieving subacromial pressure and capsular stiffness.",
+      "Step 3: Rotator Cuff & Scapular Stabilizer Conditioning — Rebuilding foundational muscular strength and balance.",
+      "Step 4: Functional Return-to-Activity Training — Optimizing workstation ergonomics, sports mechanics, and lifting form."
+    ],
+    "customSections": [
+      {
+        "id": "shoulder-pain-causes",
+        "eyebrow": "Common Origins",
+        "title": "Causes of Shoulder Pain",
+        "subtitle": "Why the shoulder is uniquely susceptible to injury:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Rotator Cuff Tears: Overuse or acute injury to the stabilizing tendons of the shoulder, leading to localized weakness.",
+          "Subacromial Impingement: Structural narrowing of the joint corridor that pinches tendons and bursa beneath the acromion.",
+          "Adhesive Capsulitis (Frozen Shoulder): Progressive thickening, tightening, and inflammation of the joint capsule.",
+          "Shoulder Bursitis: Irritation and swelling of the protective fluid-filled sacs cushioning the joint bones.",
+          "Postural Imbalances: Chronic forward-head and rounded-shoulder postures compressing anterior joint structures."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "Why Does My Shoulder Pain Get Significantly Worse At Night?",
+        "answer": "When lying down, the gravitational pull that normally helps decompress the shoulder joint is absent. Sleeping on the affected side compresses inflamed tendons and reduces blood supply, triggering throbbing night pain."
+      },
+      {
+        "question": "How Do I Know If My Pain Is A Simple Strain Or A Rotator Cuff Tear?",
+        "answer": "A simple strain causes mild aching but preserves arm power. A rotator cuff tear often presents with noticeable weakness (e.g. unable to hold the arm elevated) and pain that doesn't improve with rest. Our clinicians perform specific muscle strength tests to confirm."
+      },
+      {
+        "question": "Can Problems In My Neck Actually Cause Pain In My Shoulder?",
+        "answer": "Yes, cervical spine disc herniations or arthritis frequently refer radiating pain into the shoulder and upper arm. We test both the neck and shoulder to ensure the root cause is treated."
+      },
+      {
+        "question": "Is It Better to Use Heat Or Ice For My Aggravated Shoulder?",
+        "answer": "Use ice for acute, sudden flare-ups to reduce swelling. Use moist heat for chronic stiffness and tight neck/shoulder muscles before gentle stretching."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "massage-therapy",
+      "chiropractic-care",
+      "acupuncture",
+      "shockwave-therapy"
+    ],
+    "sort_order": 17,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Shoulder Pain Treatment Calgary NW & NE | Nose Creek Physiotherapy",
+      "description": "Targeted shoulder rehabilitation, rotator cuff therapy, and pain relief. Evidence-based physiotherapy in Beddington, Calgary NW.",
+      "ogTitle": "Shoulder Pain Relief Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Overcome shoulder stiffness, weakness, and night pain. Book your assessment at Nose Creek Physiotherapy in Calgary."
+    }
+  },
+  {
+    "id": "rotator-cuff-tendinitis",
+    "slug": "rotator-cuff-tendinitis",
+    "name": "Rotator Cuff Tendinitis Treatment",
+    "parentSlug": "neck-shoulder-pain",
+    "category": "Upper Extremity",
+    "shortDescription": "Rotator Cuff Tendinitis Treatment Calgary NW: Rebuild Tendon Strength and Function safely.",
+    "description": "Rotator cuff tendinitis is a highly common overuse injury that causes significant irritation, inflammation, and pain in the tendons that stabilize the shoulder joint. This condition frequently turns straightforward physical movements, such as reaching into a cupboard, driving, or washing your hair, into painful obstacles. At Nose Creek Physiotherapy in Calgary NW, we deliver targeted clinical interventions designed to minimize tendon irritation, stimulate tissue healing, and safely restore the dynamic strength of your upper limb.\n\n### Understanding Rotator Cuff Tendinitis\nThe rotator cuff consists of four key muscles whose tendons fuse to form a protective sleeve over the head of the upper arm bone, providing essential stability during movement. Rotator cuff tendinitis is frequently misunderstood as a sudden, one-time injury, but it is more accurately described as a gradual stress condition where the rate of repetitive tendon loading outpaces the body's natural capacity to repair the tissue. When these tendons are chronically overloaded, the structural collagen fibers begin to fray, resulting in localized inflammation and a noticeable decline in physical performance.\n\nThis condition deeply impacts the biomechanics of the upper extremity, altering how the arm moves relative to the shoulder socket. When the rotator cuff tendons are inflamed, they often fail to keep the arm bone properly centered during movement, leading to secondary friction against adjacent bones. Effective clinical resolution requires a methodical approach that improves the local vascular supply to the tendon, addresses shoulder blade tracking issues, and ensures the arm can handle mechanical loads smoothly.",
+    "heroImage": "/images/blog/navigating-shoulder-muscle-strain-recovery.jpg",
+    "sideImage": "/images/clinic/reception-desktop.jpg",
+    "ctaText": "Book Assessment Online",
+    "ctaMuted": false,
+    "benefits": [
+      "Progressive eccentric loading exercises specifically chosen to repair and strengthen tendon architecture",
+      "Manual therapy and soft tissue mobilization to manage muscular tension and improve joint mobility",
+      "Scapular stabilization training ensuring a firm, supportive base for overhead movement",
+      "Targeted postural retraining and ergonomic adjustments to eliminate internal friction",
+      "Activity pacing guidance to keep you physically active while staying within the tendon's safe capacity"
+    ],
+    "symptoms": [
+      "Pain felt predominantly on the front and outside of the shoulder, which can radiate slightly down the arm",
+      "Increased discomfort when lifting the arm between waist and shoulder height (painful arc)",
+      "Immediate localized tenderness when pressing on the top or front of the shoulder joint bones",
+      "A gradual loss of grip strength and arm power when performing pushing or pulling tasks",
+      "Persistent aching that lingers for hours after engaging in repetitive overhead or throwing activities"
+    ],
+    "treatmentApproach": [
+      "Step 1: Tendon Capacity & Integrity Assessment — Isolating supraspinatus, infraspinatus, and subscapularis tendon thresholds.",
+      "Step 2: Vascular Stimulation & Soft Tissue Release — Reducing hypertonicity in surrounding deltoid and pec muscles.",
+      "Step 3: Progressive Heavy-Slow Resistance (HSR) Loading — Stimulating collagen remodeling and tendon stiffness.",
+      "Step 4: Dynamic Scapular Coordination & Sport/Work Drills — Safely re-introducing overhead reaches, lifting, and athletic throwing."
+    ],
+    "customSections": [
+      {
+        "id": "tendinitis-causes",
+        "eyebrow": "Tendon Stressors",
+        "title": "Causes of Rotator Cuff Tendinitis",
+        "subtitle": "Why shoulder tendons become chronically inflamed:",
+        "background": "light",
+        "align": "left",
+        "bullets": [
+          "Repetitive Overhead Activity: Tasks involving frequent throwing, painting, swimming, or overhead lifting.",
+          "Poor Scapular Mechanics: Weakness in muscles controlling the shoulder blade, forcing the rotator cuff to take excessive load.",
+          "Age-Related Tissue Alterations: Natural reduction in tendon elasticity and blood flow occurring in individuals over thirty.",
+          "Sudden Load Increases: Rapidly escalating the intensity, weight, or duration of a workout before the tendon adapts.",
+          "Postural Deconditioning: Slouched sitting narrowing the subacromial space, directly increasing mechanical friction."
+        ]
+      }
+    ],
+    "sectionsData": {},
+    "faqs": [
+      {
+        "question": "How Long Does It Take For Tendinitis Pain To Improve?",
+        "answer": "With targeted eccentric strengthening and activity pacing, tendon remodeling typically shows noticeable pain reduction within 4 to 6 weeks, with full strength restored by 12 weeks."
+      },
+      {
+        "question": "Can I Continue Weightlifting If I Have Rotator Cuff Tendinitis?",
+        "answer": "Yes, but with modified exercises. We help you adjust grip widths, elbow angles, and bench press depths to keep the tendon working safely without causing impingement."
+      },
+      {
+        "question": "Is Shockwave Therapy Effective For Chronic Rotator Cuff Tendinitis?",
+        "answer": "Yes, shockwave therapy is proven to stimulate angiogenesis (new blood vessel formation) and break up calcific deposits in chronic, stubborn tendinopathy."
+      },
+      {
+        "question": "What Will Happen If I Leave My Tendinitis Untreated?",
+        "answer": "Chronic untreated tendinitis leads to progressive collagen degeneration (tendinosis) and increases the risk of a sudden full-thickness rotator cuff tear under load."
+      }
+    ],
+    "relatedServices": [
+      "physiotherapy",
+      "shockwave-therapy",
+      "massage-therapy",
+      "chiropractic-care",
+      "acupuncture"
+    ],
+    "sort_order": 18,
+    "is_published": true,
+    "seo": {
+      "parentSlug": "neck-shoulder-pain",
+      "title": "Rotator Cuff Tendinitis Treatment Calgary NW | Nose Creek Physiotherapy",
+      "description": "Rebuild tendon strength, eliminate painful arc, and restore overhead arm power. Expert rotator cuff physical therapy in Calgary NW.",
+      "ogTitle": "Rotator Cuff Tendinitis Relief Calgary | Nose Creek Physiotherapy",
+      "ogDescription": "Stimulate tendon healing and lift your arm pain-free. Book your assessment at Nose Creek Physiotherapy in Calgary NW."
     }
   }
 ]

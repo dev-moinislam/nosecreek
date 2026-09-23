@@ -25,6 +25,7 @@ const defaultConditionSectionOrder = [
   "at_a_glance",
   "clinical_overview",
   "custom_sections",
+  "sub_conditions",
   "benefits",
   "symptoms",
   "treatment_approach",
@@ -33,15 +34,23 @@ const defaultConditionSectionOrder = [
   "faqs",
   "location_map",
   "decision_ctas",
+  "sibling_conditions",
   "other_links",
   "bottom_cta"
 ];
 
 const getDefaultConditionOrder = (c: Condition): string[] => {
   const list: string[] = ["hero"];
+  if (c.sectionsData?.at_a_glance) {
+    list.push("at_a_glance");
+  }
+  if (c.description || c.sectionsData?.clinical_overview?.content) {
+    list.push("clinical_overview");
+  }
   if (c.customSections && c.customSections.length > 0) {
     c.customSections.forEach((_, i) => list.push(`custom-${i}`));
   }
+  list.push("sub_conditions");
   if ((c.benefits && c.benefits.length > 0) || (c.sectionsData?.benefits?.bullets && c.sectionsData.benefits.bullets.length > 0)) {
     list.push("benefits");
   }
@@ -51,9 +60,17 @@ const getDefaultConditionOrder = (c: Condition): string[] => {
   if ((c.treatmentApproach && c.treatmentApproach.length > 0) || (c.sectionsData?.treatment_approach?.bullets && c.sectionsData.treatment_approach.bullets.length > 0)) {
     list.push("treatment_approach");
   }
+  list.push("related_therapies");
+  list.push("team_carousel");
   if (c.faqs && c.faqs.length > 0) {
     list.push("faqs");
   }
+  list.push("location_map");
+  list.push("decision_ctas");
+  list.push("sibling_conditions");
+  list.push("other_links");
+  list.push("bottom_cta");
+
   if (c.sectionsData) {
     Object.keys(c.sectionsData).forEach((k) => {
       if (!list.includes(k) && k !== "hero" && !k.startsWith("custom-")) {
@@ -160,13 +177,14 @@ export default function ConditionLiveView({
       return Boolean(condition.customSections && condition.customSections[idx]);
     }
     if (key === "custom_sections") return Boolean(condition.customSections && condition.customSections.length > 0);
+    if (key === "at_a_glance") return Boolean(condition.sectionsData?.at_a_glance);
+    if (key === "clinical_overview") return Boolean(condition.description || condition.sectionsData?.clinical_overview?.content);
+    if (key === "sub_conditions") return Boolean(subConditions && subConditions.length > 0);
+    if (key === "sibling_conditions") return Boolean(condition.parentSlug);
     if (key === "benefits") return Boolean((condition.sectionsData?.benefits?.bullets?.length) || (condition.benefits?.length));
     if (key === "symptoms") return Boolean((condition.sectionsData?.symptoms?.bullets?.length) || (condition.symptoms?.length));
     if (key === "treatment_approach") return Boolean((condition.sectionsData?.treatment_approach?.bullets?.length) || (condition.treatmentApproach?.length));
     if (key === "faqs") return Boolean(condition.faqs?.length);
-    if (rawOrder.includes("at_a_glance") && (!condition.sectionsData || !condition.sectionsData.at_a_glance)) {
-      return Boolean(condition.sectionsData?.[key]);
-    }
     return true;
   });
 
@@ -802,7 +820,135 @@ export default function ConditionLiveView({
           </section>
         );
 
-      case "other_links":
+      case "sub_conditions": {
+        if (!subConditions || subConditions.length === 0) return null;
+        return (
+          <section key="sub_conditions" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#ffffff", borderTop: "1px solid #e7edf1", borderBottom: "1px solid #e7edf1" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+              <div style={{ textAlign: "center", maxWidth: 820, margin: "0 auto 48px" }}>
+                {eyebrowEl("Targeted Shoulder & Cervical Care", "var(--primary, #1c9fd8)")}
+                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
+                  Specific Shoulder Conditions We Treat in Calgary NW
+                </h2>
+                <p style={{ marginTop: 14, fontSize: 16.5, color: "#5a6570", lineHeight: 1.65 }}>
+                  Because shoulder and neck biomechanics are intricately connected, our clinic provides specialized care pathways for 9 distinct shoulder injuries. Select any condition below for targeted clinical guidance:
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 24 }}>
+                {subConditions.map((sub) => {
+                  const nestedUrl = `/conditions/${condition.slug}/${sub.slug}`;
+                  return (
+                    <Link
+                      key={sub.slug}
+                      href={nestedUrl}
+                      style={{
+                        textDecoration: "none",
+                        display: "flex",
+                        flexDirection: "column",
+                        background: "#f8fafc",
+                        border: "1.5px solid #e2ebf0",
+                        borderRadius: 16,
+                        padding: "28px 26px",
+                        transition: "all 0.2s ease",
+                        boxShadow: "0 4px 14px rgba(18,60,80,0.04)"
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--primary, #0e78a8)", background: "#e0f2fe", padding: "4px 10px", borderRadius: 999 }}>
+                          Shoulder Program
+                        </span>
+                        <span style={{ color: "var(--primary, #0e78a8)", fontWeight: 700, fontSize: 18 }}>&rarr;</span>
+                      </div>
+
+                      <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 20, fontWeight: 700, color: "#1d2b34", marginBottom: 10 }}>
+                        {sub.name}
+                      </h3>
+
+                      <p style={{ fontSize: 14.5, lineHeight: 1.65, color: "#5a6570", flexGrow: 1, margin: 0 }}>
+                        {sub.shortDescription || (sub.description ? sub.description.slice(0, 140) + "..." : "Targeted physical therapy assessment, pain reduction, and active recovery.")}
+                      </p>
+
+                      <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid #e2ebf0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--secondary, #6faf1c)" }}>
+                          View Treatment Program &rarr;
+                        </span>
+                        <span style={{ fontSize: 12.5, color: "#94a3b8", fontWeight: 600 }}>
+                          Calgary NW Clinic
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      case "sibling_conditions": {
+        if (!condition.parentSlug) return null;
+        const siblings = allConditions.filter(
+          (c) => c.parentSlug === condition.parentSlug && c.slug !== condition.slug
+        );
+        if (siblings.length === 0) return null;
+
+        return (
+          <section key="sibling_conditions" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#f8fafc", borderTop: "1px solid #e7edf1" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+              <div style={{ textAlign: "center", maxWidth: 780, margin: "0 auto 40px" }}>
+                {eyebrowEl("Other Shoulder Conditions We Treat", "var(--primary, #1c9fd8)")}
+                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.6vw, 40px)", fontWeight: 800, color: "#1d2b34", letterSpacing: "-0.5px" }}>
+                  Find Treatment for Related Shoulder Conditions
+                </h2>
+                <p style={{ marginTop: 12, fontSize: 16, color: "#5a6570", lineHeight: 1.6 }}>
+                  Our Calgary NW physiotherapy team treats a full spectrum of shoulder and cervical dysfunctions. Explore targeted guidance for other conditions:
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18 }}>
+                {siblings.map((sib) => (
+                  <Link
+                    key={sib.slug}
+                    href={`/conditions/${sib.parentSlug}/${sib.slug}`}
+                    style={{
+                      textDecoration: "none",
+                      background: "#fff",
+                      border: "1px solid #d7e6ef",
+                      borderRadius: 14,
+                      padding: "20px 22px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      boxShadow: "0 2px 8px rgba(18,60,80,0.04)",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease"
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--secondary-hover, #5c9515)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 8 }}>
+                        Targeted Therapy
+                      </div>
+                      <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 17, fontWeight: 700, color: "#1d2b34", lineHeight: 1.35, marginBottom: 8 }}>
+                        {sib.name}
+                      </h3>
+                      <p style={{ fontSize: 13.5, color: "#5a6570", lineHeight: 1.55, margin: 0 }}>
+                        {sib.shortDescription || (sib.description ? sib.description.slice(0, 100) + "..." : "")}
+                      </p>
+                    </div>
+                    <div style={{ marginTop: 14, display: "flex", alignItems: "center", gap: 6, fontSize: 13.5, fontWeight: 700, color: "var(--primary, #0e78a8)" }}>
+                      <span>Learn More</span>
+                      <span>&rarr;</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      case "other_links": {
+        const rootOtherConditions = otherConditions.filter((c) => !c.parentSlug);
         return (
           <section key="other_links" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: "#f2f8fb", borderTop: "1px solid #e7edf1" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
@@ -813,7 +959,7 @@ export default function ConditionLiveView({
                 </h2>
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
-                {otherConditions.map((c) => (
+                {rootOtherConditions.map((c) => (
                   <Link
                     key={c.slug}
                     href={`/conditions/${c.slug}`}
@@ -839,6 +985,7 @@ export default function ConditionLiveView({
             </div>
           </section>
         );
+      }
 
       case "bottom_cta":
         return (
