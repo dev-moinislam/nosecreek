@@ -4,21 +4,63 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
-import { CustomPage, FAQItem, PageMetaItem } from "@/types/content";
-import { getCustomPages } from "@/lib/api";
+import { CustomPage, FAQItem, SectionBlockConfig, ServiceCustomSection } from "@/types/content";
+import { getCustomPages, getTeamMembers } from "@/lib/api";
 import RichTextEditor from "@/components/admin/RichTextEditor";
-import { GlobeIcon, SearchIcon, PlusIcon } from "@/components/admin/AdminIcons";
+import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomizerModal";
+import AdminToast from "@/components/admin/AdminToast";
+import ConfirmDeleteModal from "@/components/admin/ConfirmDeleteModal";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
+import CustomPageLiveView, { defaultCustomPageSectionOrder, getDefaultCustomPageOrder } from "@/components/content/CustomPageLiveView";
+import {
+  GlobeIcon,
+  SearchIcon,
+  PlusIcon,
+  TrashIcon,
+  EditIcon,
+  EyeIcon,
+  EyeOffIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  SparklesIcon,
+  SlidersIcon,
+  CheckIcon,
+  XIcon,
+  ExternalLinkIcon
+} from "@/components/admin/AdminIcons";
 
 // Pre-defined Calgary neighborhood presets for quick 1-click creation
 const NEIGHBORHOOD_PRESETS = [
   {
     name: "Thorncliffe",
-    slug: "thorncliffe",
+    slug: "thorncliffe-physiotherapy",
     title: "Physiotherapy in Thorncliffe Calgary | Nose Creek Physiotherapy",
     subtitle: "Personalized, Compassionate Physical Rehabilitation Just Minutes From Thorncliffe",
-    proximity: "just 4 minutes south of Beddington Towne Centre via Centre Street N",
+    badge: "Thorncliffe & North Calgary Physiotherapy",
     description: "<p>If you live or work in <strong>Thorncliffe, Calgary</strong> and are suffering from back pain, neck stiffness, sports injuries, or joint discomfort, <strong>Nose Creek Physiotherapy</strong> is your trusted neighborhood rehabilitation clinic.</p><p>Located just moments away at Beddington Towne Centre, our team of licensed physical therapists, chiropractors, and massage therapists provide one-on-one, hands-on treatment designed to resolve the root cause of your pain—not just mask the symptoms.</p>",
     descriptionCol2: "<h3>Why Thorncliffe Residents Choose Nose Creek Physio</h3><ul><li><strong>Fast, Convenient Access:</strong> Only a 4-minute drive from Thorncliffe with abundant free plaza parking.</li><li><strong>Direct Insurance Billing:</strong> We bill directly to over 25 major health insurance providers (Blue Cross, Sun Life, Manulife, Canada Life, and more).</li><li><strong>Experienced Clinicians:</strong> Over 23 years of clinical excellence with FCAMPT advanced manual therapy credentials.</li><li><strong>Evening & Saturday Appointments:</strong> Flexible scheduling before or after your workday.</li></ul>",
+    benefits: [
+      "Direct Billing to 25+ Major Insurers",
+      "Only 4 Minutes North via Centre Street",
+      "Free Dedicated Plaza Parking Outside Doors",
+      "FCAMPT Certified Manual Therapists",
+      "Extended Early Morning & Evening Hours",
+      "No Doctor Referral Required for Care"
+    ],
+    symptoms: [
+      "Lower Back Pain & Sciatica",
+      "Neck Stiffness & Whiplash Recovery",
+      "Shoulder Impingement & Rotator Cuff",
+      "Knee Pain & Runner's Knee",
+      "Sports Injuries & Ankle Sprains",
+      "Post-Surgical Joint Rehabilitation"
+    ],
+    treatmentApproach: [
+      "Comprehensive 60-Minute Assessment to uncover mechanical root causes",
+      "Hands-On Manual Therapy & Joint Mobilization for rapid relief",
+      "Individualized Active Rehabilitation & Strengthening Roadmap",
+      "Self-Management Strategies & Posture Retraining for long-term health"
+    ],
     faqs: [
       {
         question: "How far is Nose Creek Physiotherapy from Thorncliffe?",
@@ -36,12 +78,34 @@ const NEIGHBORHOOD_PRESETS = [
   },
   {
     name: "Huntington Hills",
-    slug: "huntington-hills",
+    slug: "huntington-hills-physiotherapy",
     title: "Physiotherapy in Huntington Hills Calgary | Nose Creek Physiotherapy",
     subtitle: "Evidence-Based Physiotherapy & Chiropractic Care Serving Huntington Hills Residents",
-    proximity: "directly adjacent to Huntington Hills along Beddington Blvd & 4th Street NW",
+    badge: "Huntington Hills & North Calgary Care",
     description: "<p>Residents of <strong>Huntington Hills</strong> seeking top-tier physiotherapy, sports injury rehabilitation, or chronic pain relief have relied on <strong>Nose Creek Physiotherapy</strong> since 2001.</p><p>Whether you're recovering from a workplace injury, preparing for surgery, dealing with sciatica, or looking to regain your mobility, our multidisciplinary team provides personalized care tailored to your unique goals.</p>",
     descriptionCol2: "<h3>Comprehensive Care for Huntington Hills Patients</h3><ul><li><strong>Spinal & Joint Care:</strong> Targeted relief for lower back pain, sciatica, neck stiffness, and whiplash.</li><li><strong>Sports Rehabilitation:</strong> Evidence-informed therapy for runners, hockey players, soccer athletes, and weekend warriors.</li><li><strong>No Waitlists:</strong> Same-week and next-day appointment availability so you can start recovering immediately.</li><li><strong>Direct Billing:</strong> Instant claims processing for minimal out-of-pocket hassle.</li></ul>",
+    benefits: [
+      "Direct Billing for Huntington Hills Families",
+      "Steps Away via 4th St NW or Beddington Blvd",
+      "Multidisciplinary Team of PTs, DCs & RMTs",
+      "Modern Modalities: Shockwave & IMS Dry Needling",
+      "Open Early Mornings & Saturdays",
+      "One-on-One Personalized Attention"
+    ],
+    symptoms: [
+      "Spinal Disc Herniations & Sciatica",
+      "Neck & Upper Back Postural Strain",
+      "Tennis & Golfer's Elbow",
+      "Hip Impingement & Knee Osteoarthritis",
+      "Workplace WCB & Motor Vehicle Injuries",
+      "Foot Pain & Plantar Fasciitis"
+    ],
+    treatmentApproach: [
+      "In-Depth Biomechanical & Spinal Assessment",
+      "Targeted Soft Tissue Release & Joint Therapy",
+      "Neuromuscular Re-education & Active Exercises",
+      "Ergonomic & Lifestyle Guidance for Sustained Wellness"
+    ],
     faqs: [
       {
         question: "How close is your clinic to Huntington Hills?",
@@ -55,12 +119,34 @@ const NEIGHBORHOOD_PRESETS = [
   },
   {
     name: "MacEwan",
-    slug: "macewan",
+    slug: "macewan-physiotherapy",
     title: "Physiotherapy in MacEwan Calgary | Nose Creek Physiotherapy",
     subtitle: "Restore Mobility, Relieve Pain & Move Naturally Near MacEwan Glen",
-    proximity: "just 5 minutes east from MacEwan via Berkshire Blvd & Beddington Trail",
+    badge: "MacEwan & Calgary NW Community Care",
     description: "<p>Looking for a caring, results-driven physiotherapy clinic near <strong>MacEwan, Calgary</strong>? At <strong>Nose Creek Physiotherapy</strong>, our mission is to help you overcome acute injuries and chronic limitations so you can get back to doing what you love.</p><p>We take the time to listen, perform thorough biomechanical assessments, and create custom treatment roadmaps that empower lasting wellness.</p>",
     descriptionCol2: "<h3>Clinic Advantages for MacEwan Families</h3><ul><li><strong>5 Minutes Away:</strong> Quick commute via Berkshire Blvd with stress-free free parking outside our clinic doors.</li><li><strong>Multidisciplinary Team:</strong> Access physiotherapists, massage therapists, and chiropractors under one supportive roof.</li><li><strong>Advanced Modalities:</strong> Equipped with Shockwave therapy, IMS dry needling, and gait analysis for custom orthotics.</li></ul>",
+    benefits: [
+      "Only 5 Minutes East via Berkshire Blvd",
+      "Direct Extended Health Billing Available",
+      "Over 23 Years of Trusted North Calgary Care",
+      "Custom Orthotics & Biomechanical Gait Analysis",
+      "Personalized Rehab Without Cookie-Cutter Routines",
+      "Free Parking Right Outside the Clinic"
+    ],
+    symptoms: [
+      "Acute & Chronic Lower Back Pain",
+      "Rotator Cuff Tears & Frozen Shoulder",
+      "Patellofemoral Knee Pain Syndrome",
+      "Achilles Tendonitis & Heel Spurs",
+      "Headaches & Cervicogenic Tension",
+      "Repetitive Strain & Carpal Tunnel"
+    ],
+    treatmentApproach: [
+      "Comprehensive Biomechanical Assessment",
+      "Targeted Pain Modulation & Advanced Modalities",
+      "Progressive Functional Strength Training",
+      "Empowering Education for Lifetime Prevention"
+    ],
     faqs: [
       {
         question: "Where is the clinic located relative to MacEwan?",
@@ -74,12 +160,34 @@ const NEIGHBORHOOD_PRESETS = [
   },
   {
     name: "Beddington",
-    slug: "beddington",
+    slug: "beddington-physiotherapy",
     title: "Physiotherapy in Beddington Calgary NW | Nose Creek Physiotherapy",
     subtitle: "Your Premier Local Physiotherapy Clinic in the Heart of Beddington Towne Centre",
-    proximity: "located directly inside Beddington Towne Centre with free plaza parking",
+    badge: "Beddington Towne Centre Clinic",
     description: "<p>Conveniently situated right in <strong>Beddington Towne Centre</strong>, <strong>Nose Creek Physiotherapy</strong> has been the benchmark for clinical excellence in Calgary North for more than two decades.</p><p>From motor vehicle accident recovery to complex spinal rehabilitation, our practitioners combine proven manual techniques with modern therapeutic exercises to restore active living.</p>",
     descriptionCol2: "<h3>Why Beddington Chooses Nose Creek Physio</h3><ul><li><strong>Directly In Your Community:</strong> Located steps from local shopping with plenty of free parking.</li><li><strong>Direct Billing:</strong> Instant electronic billing for most private insurance carriers, WCB, and auto insurers.</li><li><strong>Dedicated One-on-One Sessions:</strong> No rushed assembly-line care; your recovery is our singular priority.</li></ul>",
+    benefits: [
+      "Located In The Centre of Beddington",
+      "Direct Billing to 25+ Health Insurers",
+      "Open Early at 6:45 AM & Open Saturdays",
+      "540+ Five-Star Patient Reviews",
+      "Full Gym & Private Treatment Rooms",
+      "Free Plaza Parking Outside"
+    ],
+    symptoms: [
+      "Motor Vehicle Whiplash & Spine Trauma",
+      "Degenerative Disc Disease & Spinal Stenosis",
+      "Chronic Sciatica & Pinched Nerves",
+      "Rotator Cuff & Shoulder Bursitis",
+      "Hip, Knee & Ankle Sprains",
+      "Workplace Ergonomic & Overuse Injuries"
+    ],
+    treatmentApproach: [
+      "In-Depth Clinical Assessment by FCAMPT Clinicians",
+      "Integrated Manual Therapy & Joint Decompression",
+      "Custom Active Rehabilitation Exercises",
+      "Ergonomic Advice & Ongoing Performance Support"
+    ],
     faqs: [
       {
         question: "Where exactly in Beddington are you located?",
@@ -93,155 +201,419 @@ const NEIGHBORHOOD_PRESETS = [
   }
 ];
 
+const SECTION_DEFINITIONS: Record<string, { label: string; icon: string; defaultTitle: string; description: string }> = {
+  hero: {
+    label: "Hero Header & CTAs",
+    icon: "🌟",
+    defaultTitle: "Hero Banner & CTAs",
+    description: "Top introductory banner with badge, H1, CTAs, trust badges, and hero image."
+  },
+  at_a_glance: {
+    label: "At A Glance Highlights",
+    icon: "⚡",
+    defaultTitle: "Clinic Highlights & Quick Facts",
+    description: "4-card quick highlights (Assessment, Direct Billing, No Referral, Free Parking)."
+  },
+  clinical_overview: {
+    label: "Main Narrative & Care Overview",
+    icon: "📝",
+    defaultTitle: "Understanding Care & Treatment",
+    description: "Detailed rich text overview with 1-column or 2-column layout, images, and bullets."
+  },
+  benefits: {
+    label: "Proven Clinical Benefits",
+    icon: "✅",
+    defaultTitle: "Key Benefits of Physiotherapy Care",
+    description: "Checkmarked benefits grid highlighting patient outcomes."
+  },
+  symptoms: {
+    label: "Conditions & Complaints Treated",
+    icon: "🩺",
+    defaultTitle: "Common Conditions & Complaints We Treat",
+    description: "Grid of targeted symptoms and injury complaints."
+  },
+  treatment_approach: {
+    label: "Patient Care Journey / Steps",
+    icon: "🔢",
+    defaultTitle: "Our Step-by-Step Care Journey",
+    description: "Numbered chronological recovery roadmap (Step 1, Step 2, Step 3...)."
+  },
+  reviews_carousel: {
+    label: "Google Reviews Carousel",
+    icon: "⭐",
+    defaultTitle: "Real 5-Star Reviews From Our Calgary Patients",
+    description: "Live interactive review carousel backed by 545+ Google reviews."
+  },
+  team_carousel: {
+    label: "Practitioners & Team Carousel",
+    icon: "👥",
+    defaultTitle: "Meet Your Dedicated Clinical Team",
+    description: "Scrollable team showcase displaying licensed physiotherapists and chiropractors."
+  },
+  faqs: {
+    label: "Frequently Asked Questions",
+    icon: "❓",
+    defaultTitle: "Frequently Asked Questions",
+    description: "Interactive FAQ accordion with automatic Google FAQPage JSON-LD schema."
+  },
+  location_map: {
+    label: "Clinic Locations & Map",
+    icon: "📍",
+    defaultTitle: "Convenient Clinic Locations with Free Parking",
+    description: "Beddington and Thorncliffe clinic details, hours, and direction links."
+  },
+  bottom_cta: {
+    label: "Decision CTA Banner",
+    icon: "🚀",
+    defaultTitle: "Ready to Get Back to Doing What You Love?",
+    description: "High-converting closing banner with Cost & Availability and Free Discovery buttons."
+  }
+};
+
 export default function AdminPagesManager() {
   const { isAdmin } = useRole();
   const [pages, setPages] = useState<CustomPage[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("All");
-  const [editingPage, setEditingPage] = useState<CustomPage | null>(null);
-  const [isNew, setIsNew] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<string | null>(null);
-  const [showPresetPicker, setShowPresetPicker] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "neighborhood" | "custom">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
 
-  // Load pages from Supabase
-  const loadPages = async () => {
-    setLoading(true);
-    try {
-      const data = await getCustomPages();
-      setPages(data);
-    } catch (err) {
-      console.error("Error loading custom pages:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Active Editing Page State
+  const [activePage, setActivePage] = useState<CustomPage | null>(null);
+  const [activeTab, setActiveTab] = useState<"sections" | "narrative" | "faqs" | "seo">("sections");
+  const [showLivePreview, setShowLivePreview] = useState(false);
+
+  // Section Customizer Modal State
+  const [customizingSection, setCustomizingSection] = useState<{
+    key: string;
+    defaultTitle: string;
+    config?: SectionBlockConfig;
+  } | null>(null);
+
+  // Delete Modal State
+  const [deleteTarget, setDeleteTarget] = useState<CustomPage | null>(null);
+
+  // Toast State
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    loadPages();
+    async function loadData() {
+      setLoading(true);
+      try {
+        const [pagesData, teamData] = await Promise.all([
+          getCustomPages(),
+          getTeamMembers().catch(() => [])
+        ]);
+        setPages(pagesData);
+        setTeamMembers(teamData);
+      } catch (err) {
+        console.error("Failed to load custom pages:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
   }, []);
 
-  // Filter pages by category and search
-  const filteredPages = pages.filter((p) => {
-    const matchesCat = categoryFilter === "All" || p.category === categoryFilter;
-    const q = searchQuery.toLowerCase().trim();
-    const matchesQuery =
-      !q ||
-      p.title.toLowerCase().includes(q) ||
-      p.slug.toLowerCase().includes(q) ||
-      (p.subtitle && p.subtitle.toLowerCase().includes(q));
-    return matchesCat && matchesQuery;
-  });
-
-  // Slug generator helper
-  const slugify = (text: string) => {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-  };
-
-  // Open New Blank Page Modal
-  const handleCreateNew = () => {
-    setIsNew(true);
-    setEditingPage({
-      id: `page-${Date.now()}`,
-      slug: "",
-      title: "",
-      subtitle: "",
-      category: "Neighborhood",
-      hero_image: "/images/clinic/clinic-mobile.jpg",
-      content: "<p>Write your landing page introduction and narrative here...</p>",
-      content_col2: "",
-      content_layout: "1-column",
-      cta_text: "Book Online",
-      cta_url: "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
-      secondary_cta_text: "Free Phone Consultation",
-      secondary_cta_url: "/telephone-consultation",
-      faqs: [],
-      seo: {
-        title: "",
-        description: "",
-        noIndex: false,
-        noFollow: false
-      },
-      is_published: true
-    });
-  };
-
-  // Apply Neighborhood Preset
   const handleApplyPreset = (preset: typeof NEIGHBORHOOD_PRESETS[0]) => {
-    setIsNew(true);
-    setShowPresetPicker(false);
-    setEditingPage({
+    const newPage: CustomPage = {
       id: `page-${preset.slug}`,
       slug: preset.slug,
       title: preset.title,
       subtitle: preset.subtitle,
+      pageType: "neighborhood",
       category: "Neighborhood",
-      hero_image: "/images/clinic/reception-three.jpg",
+      neighborhoodName: preset.name,
+      heroBadge: preset.badge,
+      heroTitle: preset.title.split("|")[0].trim(),
+      heroSubtitle: preset.subtitle,
+      primaryCtaText: "Book Your Appointment Online",
+      primaryCtaUrl: "/inquire",
+      secondaryCtaText: "Call (403) 295-8590",
+      secondaryCtaUrl: "tel:4032958590",
       content: preset.description,
-      content_col2: preset.descriptionCol2,
+      columnTwoContent: preset.descriptionCol2,
       content_layout: "2-column",
-      cta_text: "Book Online",
-      cta_url: "https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington",
-      secondary_cta_text: "Inquire About Cost & Availability",
-      secondary_cta_url: "/inquire",
+      layout: "two-column",
+      benefits: preset.benefits,
+      symptoms: preset.symptoms,
+      treatmentApproach: preset.treatmentApproach,
+      customSections: [],
+      sectionsData: {},
+      sectionOrder: [...defaultCustomPageSectionOrder],
+      hiddenSections: [],
       faqs: preset.faqs,
-      seo: {
-        title: preset.title,
-        description: preset.subtitle,
-        noIndex: false,
-        noFollow: false
-      },
-      is_published: true
+      isPublished: true,
+      is_published: true,
+      seoTitle: preset.title,
+      seoDescription: preset.subtitle,
+      noIndex: false,
+      noFollow: false
+    };
+
+    setActivePage(newPage);
+    setActiveTab("sections");
+    setToast({ message: `Loaded ${preset.name} community preset! Customise your sections and save.`, type: "success" });
+  };
+
+  const handleCreateNewBlank = () => {
+    const blank: CustomPage = {
+      id: `page-new-${Date.now()}`,
+      slug: "",
+      title: "",
+      subtitle: "",
+      pageType: "custom",
+      category: "Landing Page",
+      neighborhoodName: "",
+      heroBadge: "Specialized Clinical Program",
+      heroTitle: "",
+      heroSubtitle: "",
+      primaryCtaText: "Book an Appointment",
+      primaryCtaUrl: "/inquire",
+      secondaryCtaText: "Call (403) 295-8590",
+      secondaryCtaUrl: "tel:4032958590",
+      content: "<h2>Personalized Care in Calgary North</h2><p>Describe your clinical program, therapy approach, or promotional offer here.</p>",
+      columnTwoContent: "",
+      content_layout: "1-column",
+      layout: "one-column",
+      benefits: [
+        "Direct Insurance Billing to Major Providers",
+        "Registered Multidisciplinary Practitioners",
+        "Open Evenings and Saturdays",
+        "Free Dedicated Parking Outside"
+      ],
+      symptoms: [
+        "Neck & Back Pain",
+        "Sports Injuries",
+        "Post-Surgical Recovery",
+        "Joint & Muscle Stiffness"
+      ],
+      treatmentApproach: [
+        "Detailed One-on-One Assessment",
+        "Targeted Manual Therapy",
+        "Personalized Rehabilitation Exercise Plan",
+        "Long-Term Prevention Strategy"
+      ],
+      customSections: [],
+      sectionsData: {},
+      sectionOrder: [...defaultCustomPageSectionOrder],
+      hiddenSections: [],
+      faqs: [],
+      isPublished: true,
+      is_published: true,
+      noIndex: false,
+      noFollow: false
+    };
+
+    setActivePage(blank);
+    setActiveTab("sections");
+  };
+
+  // Section Ordering & Visibility Controls
+  const getActiveOrder = (page: CustomPage): string[] => {
+    if (page.sectionOrder && page.sectionOrder.length > 0) return page.sectionOrder;
+    if (page.section_order && page.section_order.length > 0) return page.section_order;
+    return getDefaultCustomPageOrder(page);
+  };
+
+  const handleMoveSection = (index: number, direction: "up" | "down") => {
+    if (!activePage) return;
+    const currentOrder = [...getActiveOrder(activePage)];
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= currentOrder.length) return;
+
+    const temp = currentOrder[index];
+    currentOrder[index] = currentOrder[targetIndex];
+    currentOrder[targetIndex] = temp;
+
+    setActivePage({
+      ...activePage,
+      sectionOrder: currentOrder,
+      section_order: currentOrder
     });
   };
 
-  // Save Page Handler
-  const handleSavePage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingPage) return;
+  const handleToggleHideSection = (key: string) => {
+    if (!activePage) return;
+    const currentHidden = new Set(activePage.hiddenSections || activePage.hidden_sections || []);
+    if (currentHidden.has(key)) {
+      currentHidden.delete(key);
+    } else {
+      currentHidden.add(key);
+    }
+    const newHidden = Array.from(currentHidden);
+    setActivePage({
+      ...activePage,
+      hiddenSections: newHidden,
+      hidden_sections: newHidden
+    });
+  };
 
-    const cleanSlug = slugify(editingPage.slug);
-    if (!cleanSlug) {
-      alert("Please provide a valid URL slug (e.g. thorncliffe, huntington-hills).");
+  const handleAddCustomSection = () => {
+    if (!activePage) return;
+    const customList = [...(activePage.customSections || activePage.custom_sections || [])];
+    const newIdx = customList.length;
+    const newSec: ServiceCustomSection = {
+      id: `custom-sec-${Date.now()}`,
+      title: `Custom Section ${newIdx + 1}`,
+      eyebrow: "Spotlight Feature",
+      eyebrowColor: "#1c9fd8",
+      subtitle: "Highlighting our specialized approach or neighborhood story",
+      content: "<p>Write your detailed narrative here with rich formatting, lists, or links.</p>",
+      contentLayout: "1-column",
+      background: "white",
+      imagePosition: "right"
+    };
+
+    customList.push(newSec);
+    const order = [...getActiveOrder(activePage)];
+    const customKey = `custom-${newIdx}`;
+    if (!order.includes(customKey)) {
+      // Insert after clinical_overview or hero
+      const insertAt = order.indexOf("clinical_overview") !== -1 ? order.indexOf("clinical_overview") + 1 : 2;
+      order.splice(insertAt, 0, customKey);
+    }
+
+    setActivePage({
+      ...activePage,
+      customSections: customList,
+      custom_sections: customList,
+      sectionOrder: order,
+      section_order: order
+    });
+
+    setToast({ message: "Added custom story section! Click 'Customize' to edit it.", type: "success" });
+  };
+
+  const handleDeleteCustomSection = (idx: number) => {
+    if (!activePage) return;
+    const customList = [...(activePage.customSections || activePage.custom_sections || [])];
+    customList.splice(idx, 1);
+    const customKey = `custom-${idx}`;
+    const order = getActiveOrder(activePage).filter((k) => k !== customKey);
+
+    setActivePage({
+      ...activePage,
+      customSections: customList,
+      custom_sections: customList,
+      sectionOrder: order,
+      section_order: order
+    });
+  };
+
+  // Section Customizer Save Handler
+  const handleSaveSectionConfig = (key: string, updatedConfig: SectionBlockConfig) => {
+    if (!activePage) return;
+    const currentSectionsData = { ...(activePage.sectionsData || activePage.sections_data || {}) };
+    currentSectionsData[key] = updatedConfig;
+
+    let updatedCustomSections = activePage.customSections || activePage.custom_sections || [];
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      const customList = [...updatedCustomSections];
+      if (customList[idx]) {
+        customList[idx] = {
+          ...customList[idx],
+          ...updatedConfig,
+          title: updatedConfig.title || customList[idx].title
+        };
+        updatedCustomSections = customList;
+      }
+    }
+
+    // If clinical_overview was edited, sync content & contentCol2
+    let updatedContent = activePage.content;
+    let updatedCol2 = activePage.columnTwoContent;
+    let updatedLayout = activePage.layout;
+    if (key === "clinical_overview") {
+      if (updatedConfig.content !== undefined) updatedContent = updatedConfig.content;
+      if (updatedConfig.contentCol2 !== undefined) updatedCol2 = updatedConfig.contentCol2;
+      if (updatedConfig.contentLayout) {
+        updatedLayout = updatedConfig.contentLayout === "2-column" ? "two-column" : "one-column";
+      }
+    }
+
+    setActivePage({
+      ...activePage,
+      content: updatedContent,
+      columnTwoContent: updatedCol2,
+      content_col2: updatedCol2,
+      layout: updatedLayout,
+      content_layout: updatedLayout === "two-column" ? "2-column" : "1-column",
+      sectionsData: currentSectionsData,
+      sections_data: currentSectionsData,
+      customSections: updatedCustomSections,
+      custom_sections: updatedCustomSections
+    });
+
+    setCustomizingSection(null);
+    setToast({ message: "Section customization updated!", type: "success" });
+  };
+
+  // Save Page to Database & Local
+  const handleSavePage = async () => {
+    if (!activePage) return;
+
+    const slugClean = activePage.slug.trim().toLowerCase().replace(/^\/+/, "").replace(/[^a-z0-9-]/g, "-");
+    if (!slugClean) {
+      setToast({ message: "Please provide a valid URL slug (e.g. thorncliffe-physiotherapy)", type: "error" });
       return;
     }
 
-    // Check for duplicate slug among other pages
-    const isDuplicate = pages.some((p) => p.slug === cleanSlug && p.id !== editingPage.id);
-    if (isDuplicate) {
-      alert(`The URL slug "${cleanSlug}" is already in use by another page. Please choose a unique slug.`);
+    if (!activePage.title.trim()) {
+      setToast({ message: "Please enter a page title.", type: "error" });
       return;
     }
 
     setSaving(true);
-    setSaveStatus("Saving page...");
 
-    const finalPage: CustomPage = {
-      ...editingPage,
-      slug: cleanSlug,
-      title: editingPage.title.trim(),
-      subtitle: editingPage.subtitle?.trim() || undefined,
-      content_layout: editingPage.content_layout || "1-column",
+    const pageToSave: CustomPage = {
+      ...activePage,
+      id: activePage.id || `page-${slugClean}`,
+      slug: slugClean,
+      title: activePage.title.trim(),
+      heroTitle: activePage.heroTitle?.trim() || activePage.title.trim(),
+      heroSubtitle: activePage.heroSubtitle?.trim() || activePage.subtitle?.trim() || "",
+      subtitle: activePage.subtitle?.trim() || activePage.heroSubtitle?.trim() || "",
+      content: activePage.content || "",
+      columnTwoContent: activePage.columnTwoContent || "",
+      content_col2: activePage.columnTwoContent || "",
+      layout: activePage.layout || "one-column",
+      content_layout: activePage.layout === "two-column" ? "2-column" : "1-column",
+      sectionOrder: getActiveOrder(activePage),
+      section_order: getActiveOrder(activePage),
+      hiddenSections: activePage.hiddenSections || [],
+      hidden_sections: activePage.hiddenSections || [],
+      benefits: activePage.benefits || [],
+      symptoms: activePage.symptoms || [],
+      treatmentApproach: activePage.treatmentApproach || [],
+      customSections: activePage.customSections || [],
+      custom_sections: activePage.customSections || [],
+      sectionsData: activePage.sectionsData || {},
+      sections_data: activePage.sectionsData || {},
+      seo: {
+        title: activePage.seoTitle || activePage.title,
+        description: activePage.seoDescription || activePage.heroSubtitle || activePage.subtitle || "",
+        noIndex: activePage.noIndex,
+        noFollow: activePage.noFollow
+      },
+      updatedAt: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
-    const updatedPages = isNew
-      ? [finalPage, ...pages]
-      : pages.map((p) => (p.id === finalPage.id ? finalPage : p));
+    // Update state pages list
+    const updatedPages = [...pages.filter((p) => p.slug !== activePage.slug && p.id !== activePage.id), pageToSave];
 
+    // 1. Save locally for instant reaction
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adm_custom_pages", JSON.stringify(updatedPages));
+      window.dispatchEvent(new Event("customPagesUpdated"));
+    }
+
+    // 2. Persist to API route
     try {
-      // 1. Local / optimistic update
-      setPages(updatedPages);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("adm_custom_pages", JSON.stringify(updatedPages));
-      }
-
-      // 2. Persist via backend API
       const res = await fetch("/api/admin/save-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -252,34 +624,28 @@ export default function AdminPagesManager() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to save to server");
+        throw new Error("Failed to save to backend API");
       }
 
-      setSaveStatus("✓ Page saved successfully!");
-      setTimeout(() => {
-        setSaveStatus(null);
-        setEditingPage(null);
-        setIsNew(false);
-      }, 700);
+      setPages(updatedPages);
+      setActivePage(pageToSave);
+      setToast({ message: `Page /${slugClean} saved successfully!`, type: "success" });
     } catch (err: any) {
-      console.error("Save page error:", err);
-      alert("Error saving page: " + (err.message || "Unknown error"));
-      setSaveStatus(null);
+      console.warn("API save error:", err);
+      setToast({ message: "Saved locally, but server update had a warning.", type: "error" });
     } finally {
       setSaving(false);
     }
   };
 
-  // Delete Page Handler
-  const handleDeletePage = async (page: CustomPage) => {
-    if (!confirm(`Are you sure you want to delete "${page.title}" (/${page.slug})?`)) {
-      return;
-    }
+  const handleDeletePage = async () => {
+    if (!deleteTarget) return;
+    const targetSlug = deleteTarget.slug;
+    const updated = pages.filter((p) => p.slug !== targetSlug && p.id !== deleteTarget.id);
 
-    const updatedPages = pages.filter((p) => p.id !== page.id);
-    setPages(updatedPages);
     if (typeof window !== "undefined") {
-      localStorage.setItem("adm_custom_pages", JSON.stringify(updatedPages));
+      localStorage.setItem("adm_custom_pages", JSON.stringify(updated));
+      window.dispatchEvent(new Event("customPagesUpdated"));
     }
 
     try {
@@ -288,849 +654,1011 @@ export default function AdminPagesManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "custom_pages",
-          data: updatedPages,
-          deletedSlug: page.slug
+          data: updated,
+          deletedSlug: targetSlug
         })
       });
-    } catch (err) {
-      console.error("Error deleting page:", err);
+    } catch (e) {
+      console.warn("Delete sync warning:", e);
     }
+
+    setPages(updated);
+    if (activePage?.slug === targetSlug) {
+      setActivePage(null);
+    }
+    setDeleteTarget(null);
+    setToast({ message: `Page /${targetSlug} removed.`, type: "success" });
   };
 
-  // FAQ management inside modal
-  const handleAddFaq = () => {
-    if (!editingPage) return;
-    const curFaqs = editingPage.faqs || [];
-    setEditingPage({
-      ...editingPage,
-      faqs: [...curFaqs, { question: "", answer: "" }]
-    });
-  };
+  const filteredPages = pages.filter((p) => {
+    const matchesSearch =
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      p.slug.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.neighborhoodName && p.neighborhoodName.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const handleUpdateFaq = (index: number, field: "question" | "answer", val: string) => {
-    if (!editingPage) return;
-    const curFaqs = [...(editingPage.faqs || [])];
-    curFaqs[index] = { ...curFaqs[index], [field]: val };
-    setEditingPage({ ...editingPage, faqs: curFaqs });
-  };
+    const matchesCat =
+      categoryFilter === "all"
+        ? true
+        : categoryFilter === "neighborhood"
+        ? p.pageType === "neighborhood" || p.category === "Neighborhood"
+        : p.pageType !== "neighborhood" && p.category !== "Neighborhood";
 
-  const handleRemoveFaq = (index: number) => {
-    if (!editingPage) return;
-    const curFaqs = (editingPage.faqs || []).filter((_, i) => i !== index);
-    setEditingPage({ ...editingPage, faqs: curFaqs });
-  };
+    const matchesStatus =
+      statusFilter === "all"
+        ? true
+        : statusFilter === "published"
+        ? p.isPublished !== false && p.is_published !== false
+        : p.isPublished === false || p.is_published === false;
+
+    return matchesSearch && matchesCat && matchesStatus;
+  });
 
   return (
-    <div style={{ padding: "24px 32px", maxWidth: 1400, margin: "0 auto", fontFamily: "'Inter', sans-serif" }}>
-      {/* Page Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
+    <div style={{ maxWidth: 1400, margin: "0 auto", paddingBottom: 80 }}>
+      {toast && (
+        <AdminToast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Top Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexWrap: "wrap", gap: 16 }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 24 }}>📍</span>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#0f172a" }}>
+            <span style={{ fontSize: 24 }}>🗺️</span>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#1e293b", fontFamily: "var(--adm-font-display)" }}>
               Pages &amp; Neighborhood Landing Pages
             </h1>
           </div>
-          <p style={{ margin: "6px 0 0 0", color: "#64748b", fontSize: 14 }}>
-            Build, publish, and customize dedicated high-converting landing pages for Calgary communities (Thorncliffe, Huntington Hills, MacEwan, etc.) with 1-col / 2-col rich text, local FAQs, and robots directives.
+          <p style={{ margin: "4px 0 0 0", fontSize: 13.5, color: "#64748b" }}>
+            Create dynamic, multi-section landing pages (Beddington, Thorncliffe, promotional campaigns) with full rich text, carousels, and SEO controls.
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {/* Quick Preset Generator */}
-          <div style={{ position: "relative" }}>
-            <button
-              type="button"
-              onClick={() => setShowPresetPicker(!showPresetPicker)}
-              style={{
-                padding: "10px 16px",
-                borderRadius: 8,
-                border: "1px solid #bae6fd",
-                background: "#f0f9ff",
-                color: "#0369a1",
-                fontWeight: 700,
-                fontSize: 13.5,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 6
-              }}
-            >
-              <span>⚡ Neighborhood Presets</span>
-              <span>▾</span>
-            </button>
-
-            {showPresetPicker && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "100%",
-                  right: 0,
-                  marginTop: 6,
-                  width: 320,
-                  background: "#ffffff",
-                  borderRadius: 12,
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-                  border: "1px solid #e2e8f0",
-                  padding: "8px 0",
-                  zIndex: 100
-                }}
-              >
-                <div style={{ padding: "8px 14px 6px", fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>
-                  Select Calgary Community:
-                </div>
-                {NEIGHBORHOOD_PRESETS.map((p) => {
-                  const alreadyExists = pages.some((page) => page.slug === p.slug);
-                  return (
-                    <button
-                      key={p.slug}
-                      type="button"
-                      onClick={() => handleApplyPreset(p)}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        textAlign: "left",
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        fontSize: 13,
-                        color: "#1e293b",
-                        transition: "background 0.1s ease"
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f5f9")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
-                    >
-                      <div>
-                        <strong>{p.name}</strong>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>/{p.slug}</div>
-                      </div>
-                      {alreadyExists ? (
-                        <span style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, background: "#dcfce7", color: "#166534", fontWeight: 700 }}>
-                          Created
-                        </span>
-                      ) : (
-                        <span style={{ fontSize: 11, color: "#0284c7", fontWeight: 700 }}>+ Use</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Create Blank Page Button */}
+        <div style={{ display: "flex", gap: 12 }}>
           <button
             type="button"
-            onClick={handleCreateNew}
-            style={{
-              padding: "10px 20px",
-              borderRadius: 8,
-              border: "none",
-              background: "linear-gradient(135deg, #0e78a8 0%, #0369a1 100%)",
-              color: "#ffffff",
-              fontWeight: 700,
-              fontSize: 13.5,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              boxShadow: "0 2px 6px rgba(14,120,168,0.25)"
-            }}
+            onClick={handleCreateNewBlank}
+            className="adm-btn adm-btn-primary"
+            style={{ display: "flex", alignItems: "center", gap: 8 }}
           >
-            <span>+ Create New Page</span>
+            <PlusIcon size={16} />
+            <span>Create Custom Page</span>
           </button>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 12, padding: "14px 18px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14 }}>
-        <div style={{ display: "flex", gap: 8 }}>
-          {["All", "Neighborhood", "Landing Page", "General"].map((cat) => (
+      {/* 1-Click Calgary Community Presets Banner */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #0a2540 0%, #1e3a8a 100%)",
+          color: "#ffffff",
+          borderRadius: 16,
+          padding: "20px 24px",
+          marginBottom: 30,
+          boxShadow: "0 10px 25px -5px rgba(10, 37, 64, 0.25)"
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(56, 189, 248, 0.2)", color: "#38bdf8", padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+              ⚡ 1-Click Fast Starters
+            </div>
+            <h3 style={{ margin: "6px 0 0 0", fontSize: 17, fontWeight: 700, color: "#ffffff" }}>
+              Pre-built Calgary Neighborhood Landing Pages
+            </h3>
+          </div>
+          <span style={{ fontSize: 13, color: "#93c5fd" }}>
+            Click any community to instantly generate a complete, ready-to-publish local page:
+          </span>
+        </div>
+
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+          {NEIGHBORHOOD_PRESETS.map((preset) => (
             <button
-              key={cat}
+              key={preset.name}
               type="button"
-              onClick={() => setCategoryFilter(cat)}
+              onClick={() => handleApplyPreset(preset)}
               style={{
-                padding: "6px 14px",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "9px 16px",
+                background: "rgba(255, 255, 255, 0.12)",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
                 borderRadius: 8,
-                border: "none",
-                background: categoryFilter === cat ? "#0e78a8" : "#f1f5f9",
-                color: categoryFilter === cat ? "#ffffff" : "#475569",
-                fontWeight: 700,
-                fontSize: 12.5,
-                cursor: "pointer"
+                color: "#ffffff",
+                fontSize: 13.5,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.15s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.25)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.12)";
               }}
             >
-              {cat}
+              <span>📍 {preset.name}</span>
+              <span style={{ fontSize: 11.5, color: "#93c5fd" }}>({preset.name} Community)</span>
             </button>
           ))}
         </div>
-
-        <div style={{ minWidth: 260, position: "relative" }}>
-          <input
-            type="text"
-            placeholder="Search pages by title or slug..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "8px 12px 8px 34px",
-              borderRadius: 8,
-              border: "1px solid #cbd5e1",
-              fontSize: 13,
-              outline: "none"
-            }}
-          />
-          <span style={{ position: "absolute", left: 10, top: 9, color: "#94a3b8", pointerEvents: "none" }}>
-            🔍
-          </span>
-        </div>
       </div>
 
-      {/* Pages Table */}
-      <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: 14, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
-        {loading ? (
-          <div style={{ padding: 48, textAlign: "center", color: "#64748b" }}>
-            <div style={{ display: "inline-block", width: 24, height: 24, border: "3px solid #0e78a8", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: 12 }} />
-            <div>Loading pages...</div>
+      {/* Main Split Layout: Left List / Right Active Editor */}
+      <div style={{ display: "grid", gridTemplateColumns: activePage ? "340px 1fr" : "1fr", gap: 24, alignItems: "start" }}>
+        
+        {/* Pages Directory List */}
+        <div className="adm-card" style={{ padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+              All Pages ({filteredPages.length})
+            </h3>
+            {activePage && (
+              <button
+                type="button"
+                onClick={() => setActivePage(null)}
+                style={{ fontSize: 12.5, color: "#64748b", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+              >
+                Close Editor
+              </button>
+            )}
           </div>
-        ) : filteredPages.length === 0 ? (
-          <div style={{ padding: 48, textAlign: "center", color: "#64748b" }}>
-            <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>No landing pages found</p>
-            <p style={{ margin: "6px 0 16px 0", fontSize: 13 }}>Get started quickly by using a pre-filled Calgary neighborhood preset or create a custom page from scratch.</p>
+
+          {/* Search & Filter */}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ position: "relative" }}>
+              <input
+                type="text"
+                placeholder="Search pages by title or slug..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "9px 12px 9px 34px",
+                  borderRadius: 8,
+                  border: "1px solid #cbd5e1",
+                  fontSize: 13,
+                  outline: "none"
+                }}
+              />
+              <span style={{ position: "absolute", left: 10, top: 9, color: "#94a3b8" }}>
+                <SearchIcon size={15} />
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
             <button
               type="button"
-              onClick={() => handleApplyPreset(NEIGHBORHOOD_PRESETS[0])}
+              onClick={() => setCategoryFilter("all")}
               style={{
-                padding: "8px 18px",
-                borderRadius: 8,
+                flex: 1,
+                padding: "6px 8px",
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 6,
                 border: "none",
-                background: "#0e78a8",
-                color: "#fff",
-                fontWeight: 700,
-                fontSize: 13,
+                background: categoryFilter === "all" ? "#0284c7" : "#f1f5f9",
+                color: categoryFilter === "all" ? "#fff" : "#475569",
                 cursor: "pointer"
               }}
             >
-              + Create Thorncliffe Page
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setCategoryFilter("neighborhood")}
+              style={{
+                flex: 1,
+                padding: "6px 8px",
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 6,
+                border: "none",
+                background: categoryFilter === "neighborhood" ? "#0284c7" : "#f1f5f9",
+                color: categoryFilter === "neighborhood" ? "#fff" : "#475569",
+                cursor: "pointer"
+              }}
+            >
+              Neighborhoods
+            </button>
+            <button
+              type="button"
+              onClick={() => setCategoryFilter("custom")}
+              style={{
+                flex: 1,
+                padding: "6px 8px",
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 6,
+                border: "none",
+                background: categoryFilter === "custom" ? "#0284c7" : "#f1f5f9",
+                color: categoryFilter === "custom" ? "#fff" : "#475569",
+                cursor: "pointer"
+              }}
+            >
+              Custom
             </button>
           </div>
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
-                  <th style={{ padding: "12px 18px", width: "30%" }}>Page &amp; Live Route</th>
-                  <th style={{ padding: "12px 18px", width: "15%" }}>Category</th>
-                  <th style={{ padding: "12px 18px", width: "12%" }}>Layout</th>
-                  <th style={{ padding: "12px 18px", width: "15%" }}>Robots Status</th>
-                  <th style={{ padding: "12px 18px", width: "12%" }}>Status</th>
-                  <th style={{ padding: "12px 18px", width: "16%", textAlign: "right" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPages.map((page, idx) => {
-                  const isNoIndex = Boolean(page.seo?.noIndex);
-                  const isNoFollow = Boolean(page.seo?.noFollow);
 
-                  return (
-                    <tr
-                      key={page.id}
-                      style={{
-                        borderBottom: idx < filteredPages.length - 1 ? "1px solid #f1f5f9" : "none",
-                        transition: "background 0.15s ease"
-                      }}
-                    >
-                      {/* Title & Slug */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
-                        <div style={{ fontWeight: 700, color: "#0f172a", fontSize: 14 }}>
-                          {page.title}
-                        </div>
-                        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-                          <code style={{ fontSize: 12, background: "#f1f5f9", padding: "2px 8px", borderRadius: 4, color: "#0369a1", fontWeight: 700 }}>
-                            /{page.slug}
-                          </code>
-                          <a
-                            href={`/${page.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ color: "#64748b", textDecoration: "none", fontSize: 12, fontWeight: 700 }}
-                            title="Open live page in new tab"
-                          >
-                            ↗ Live
-                          </a>
-                        </div>
-                      </td>
+          {/* List items */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "calc(100vh - 280px)", overflowY: "auto" }}>
+            {filteredPages.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "30px 10px", color: "#94a3b8", fontSize: 13 }}>
+                No pages match your filter.
+              </div>
+            ) : (
+              filteredPages.map((p) => {
+                const isSelected = activePage?.slug === p.slug;
+                const isNoIndex = Boolean(p.noIndex || p.seo?.noIndex);
 
-                      {/* Category */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
-                        <span style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          padding: "3px 8px",
-                          borderRadius: 999,
-                          background: page.category === "Neighborhood" ? "#e0f2fe" : "#f1f5f9",
-                          color: page.category === "Neighborhood" ? "#0369a1" : "#475569"
-                        }}>
-                          {page.category || "Neighborhood"}
+                return (
+                  <div
+                    key={p.slug || p.id}
+                    onClick={() => {
+                      setActivePage(p);
+                      setActiveTab("sections");
+                    }}
+                    style={{
+                      padding: "12px 14px",
+                      borderRadius: 10,
+                      border: isSelected ? "2px solid #0284c7" : "1px solid #e2e8f0",
+                      background: isSelected ? "#f0f9ff" : "#ffffff",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                      position: "relative"
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: 13.5, color: "#1e293b", lineHeight: 1.3 }}>
+                        {p.title}
+                      </span>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#0284c7", marginBottom: 6 }}>
+                      <span>/{p.slug}</span>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: p.pageType === "neighborhood" ? "#dcfce7" : "#e0f2fe", color: p.pageType === "neighborhood" ? "#15803d" : "#0369a1" }}>
+                        {p.pageType === "neighborhood" ? "Neighborhood" : "Custom Page"}
+                      </span>
+
+                      {isNoIndex && (
+                        <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#fef3c7", color: "#b45309" }}>
+                          NO-INDEX
                         </span>
-                      </td>
+                      )}
 
-                      {/* Layout */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "middle", color: "#475569", fontWeight: 600 }}>
-                        {page.content_layout === "2-column" ? "2-Column Story" : "1-Column Standard"}
-                      </td>
+                      <span style={{ fontSize: 11, color: "#94a3b8", marginLeft: "auto" }}>
+                        {(p.sectionOrder?.length || 10)} sections
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
 
-                      {/* Robots */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
-                        {isNoIndex ? (
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "#fee2e2", color: "#b91c1c" }}>
-                            ⛔ noindex
-                          </span>
-                        ) : (
-                          <span style={{ fontSize: 11, fontWeight: 700, padding: "3px 8px", borderRadius: 6, background: "#f0fdf4", color: "#166534" }}>
-                            🟢 index{isNoFollow ? ", nofollow" : ", follow"}
-                          </span>
-                        )}
-                      </td>
+        {/* Right Area: Active Editor / Builder */}
+        {activePage && (
+          <div className="adm-card" style={{ padding: 26 }}>
+            {/* Header with Title and Actions */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 14, paddingBottom: 18, borderBottom: "1px solid #e2e8f0", marginBottom: 20 }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "#0284c7", background: "#e0f2fe", padding: "3px 8px", borderRadius: 4, textTransform: "uppercase" }}>
+                    {activePage.pageType === "neighborhood" ? "Neighborhood Page" : "Landing Page"}
+                  </span>
+                  <a
+                    href={`/${activePage.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: 12.5, color: "#64748b", display: "inline-flex", alignItems: "center", gap: 4, textDecoration: "none" }}
+                  >
+                    <span>/{activePage.slug}</span>
+                    <ExternalLinkIcon size={13} />
+                  </a>
+                </div>
+                <h2 style={{ fontSize: 20, fontWeight: 800, margin: 0, color: "#1e293b" }}>
+                  {activePage.title || "Untitled Page"}
+                </h2>
+              </div>
 
-                      {/* Status */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "middle" }}>
-                        <span style={{
-                          fontSize: 11.5,
-                          fontWeight: 700,
-                          padding: "3px 8px",
-                          borderRadius: 6,
-                          background: page.is_published ? "#dcfce7" : "#fef3c7",
-                          color: page.is_published ? "#15803d" : "#92400e"
-                        }}>
-                          {page.is_published ? "Published" : "Draft"}
-                        </span>
-                      </td>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowLivePreview(!showLivePreview)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 14px",
+                    borderRadius: 8,
+                    border: "1px solid #cbd5e1",
+                    background: showLivePreview ? "#0f172a" : "#ffffff",
+                    color: showLivePreview ? "#ffffff" : "#334155",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: "pointer"
+                  }}
+                >
+                  <EyeIcon size={15} />
+                  <span>{showLivePreview ? "Hide Preview" : "Live Preview"}</span>
+                </button>
 
-                      {/* Actions */}
-                      <td style={{ padding: "14px 18px", verticalAlign: "middle", textAlign: "right" }}>
-                        <div style={{ display: "inline-flex", gap: 6 }}>
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(activePage)}
+                  className="adm-btn adm-btn-danger"
+                  style={{ padding: "8px 12px" }}
+                  title="Delete page"
+                >
+                  <TrashIcon size={15} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSavePage}
+                  disabled={saving}
+                  className="adm-btn adm-btn-primary"
+                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 20px" }}
+                >
+                  <CheckIcon size={16} />
+                  <span>{saving ? "Saving..." : "Save & Publish"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Live Preview Toggle Window */}
+            {showLivePreview && (
+              <div style={{ marginBottom: 28, border: "2px solid #0284c7", borderRadius: 14, overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
+                <div style={{ background: "#0f172a", color: "#fff", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13 }}>
+                  <span>👁️ Real-Time Component Live Preview</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowLivePreview(false)}
+                    style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16 }}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div style={{ maxHeight: 600, overflowY: "auto", background: "#ffffff" }}>
+                  <CustomPageLiveView initialPage={activePage} allTeam={teamMembers} />
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Tabs */}
+            <div style={{ display: "flex", gap: 10, borderBottom: "1px solid #e2e8f0", marginBottom: 22 }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab("sections")}
+                style={{
+                  padding: "10px 18px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  border: "none",
+                  borderBottom: activeTab === "sections" ? "3px solid #0284c7" : "3px solid transparent",
+                  background: "none",
+                  color: activeTab === "sections" ? "#0284c7" : "#64748b",
+                  cursor: "pointer"
+                }}
+              >
+                🧩 Modular Sections ({getActiveOrder(activePage).length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("narrative")}
+                style={{
+                  padding: "10px 18px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  border: "none",
+                  borderBottom: activeTab === "narrative" ? "3px solid #0284c7" : "3px solid transparent",
+                  background: "none",
+                  color: activeTab === "narrative" ? "#0284c7" : "#64748b",
+                  cursor: "pointer"
+                }}
+              >
+                📝 Narrative &amp; 2-Column Content
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("faqs")}
+                style={{
+                  padding: "10px 18px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  border: "none",
+                  borderBottom: activeTab === "faqs" ? "3px solid #0284c7" : "3px solid transparent",
+                  background: "none",
+                  color: activeTab === "faqs" ? "#0284c7" : "#64748b",
+                  cursor: "pointer"
+                }}
+              >
+                ❓ FAQs ({activePage.faqs?.length || 0})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("seo")}
+                style={{
+                  padding: "10px 18px",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  border: "none",
+                  borderBottom: activeTab === "seo" ? "3px solid #0284c7" : "3px solid transparent",
+                  background: "none",
+                  color: activeTab === "seo" ? "#0284c7" : "#64748b",
+                  cursor: "pointer"
+                }}
+              >
+                🌐 SEO &amp; Robots Directives
+              </button>
+            </div>
+
+            {/* TAB 1: MODULAR SECTIONS BUILDER */}
+            {activeTab === "sections" && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+                      Page Section Blocks
+                    </h3>
+                    <p style={{ margin: "2px 0 0 0", fontSize: 13, color: "#64748b" }}>
+                      Reorder sections, toggle visibility, and click Customize to alter styling, text, images, or backgrounds.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddCustomSection}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "8px 14px",
+                      background: "#f0fdf4",
+                      color: "#16a34a",
+                      border: "1px solid #bbf7d0",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    <PlusIcon size={14} />
+                    <span>+ Add Custom Story Section</span>
+                  </button>
+                </div>
+
+                {/* Section List */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {getActiveOrder(activePage).map((key, index) => {
+                    const isHidden = (activePage.hiddenSections || activePage.hidden_sections || []).includes(key);
+                    const isCustom = key.startsWith("custom-");
+                    const customIdx = isCustom ? parseInt(key.replace("custom-", ""), 10) : -1;
+                    const customList = activePage.customSections || activePage.custom_sections || [];
+                    const customSec = isCustom ? customList[customIdx] : null;
+
+                    const def = isCustom
+                      ? {
+                          label: customSec?.title || `Custom Story Section ${customIdx + 1}`,
+                          icon: "📖",
+                          defaultTitle: customSec?.title || "Custom Story Section",
+                          description: "Custom storytelling section with 1-col/2-col narrative, image position & background."
+                        }
+                      : SECTION_DEFINITIONS[key] || {
+                          label: key,
+                          icon: "📌",
+                          defaultTitle: key,
+                          description: "Modular content block."
+                        };
+
+                    return (
+                      <div
+                        key={key}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "14px 18px",
+                          borderRadius: 12,
+                          border: isHidden ? "1px dashed #cbd5e1" : "1px solid #e2e8f0",
+                          background: isHidden ? "#f8fafc" : "#ffffff",
+                          opacity: isHidden ? 0.65 : 1,
+                          transition: "all 0.15s ease"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                          <span style={{ fontSize: 22 }}>{def.icon}</span>
+                          <div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{ fontWeight: 700, fontSize: 14.5, color: isHidden ? "#64748b" : "#1e293b" }}>
+                                {def.label}
+                              </span>
+                              {isHidden && (
+                                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#e2e8f0", color: "#64748b" }}>
+                                  HIDDEN
+                                </span>
+                              )}
+                              {isCustom && (
+                                <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#dbeafe", color: "#1d4ed8" }}>
+                                  CUSTOM STORY
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ fontSize: 12.5, color: "#64748b", marginTop: 2 }}>
+                              {def.description}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          {/* Move Up */}
                           <button
                             type="button"
-                            onClick={() => {
-                              setIsNew(false);
-                              setEditingPage({ ...page });
-                            }}
+                            onClick={() => handleMoveSection(index, "up")}
+                            disabled={index === 0}
                             style={{
-                              padding: "6px 12px",
+                              padding: "6px 8px",
                               borderRadius: 6,
                               border: "1px solid #cbd5e1",
                               background: "#ffffff",
-                              color: "#0f172a",
-                              fontWeight: 700,
-                              fontSize: 12,
-                              cursor: "pointer"
+                              cursor: index === 0 ? "not-allowed" : "pointer",
+                              opacity: index === 0 ? 0.4 : 1
                             }}
+                            title="Move section up"
                           >
-                            ✏️ Edit
+                            <ArrowUpIcon size={14} />
                           </button>
+
+                          {/* Move Down */}
                           <button
                             type="button"
-                            onClick={() => handleDeletePage(page)}
+                            onClick={() => handleMoveSection(index, "down")}
+                            disabled={index === getActiveOrder(activePage).length - 1}
+                            style={{
+                              padding: "6px 8px",
+                              borderRadius: 6,
+                              border: "1px solid #cbd5e1",
+                              background: "#ffffff",
+                              cursor: index === getActiveOrder(activePage).length - 1 ? "not-allowed" : "pointer",
+                              opacity: index === getActiveOrder(activePage).length - 1 ? 0.4 : 1
+                            }}
+                            title="Move section down"
+                          >
+                            <ArrowDownIcon size={14} />
+                          </button>
+
+                          {/* Hide / Show */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleHideSection(key)}
                             style={{
                               padding: "6px 10px",
                               borderRadius: 6,
-                              border: "1px solid #fecaca",
-                              background: "#ffffff",
-                              color: "#dc2626",
-                              fontWeight: 700,
-                              fontSize: 12,
+                              border: "1px solid #cbd5e1",
+                              background: isHidden ? "#f1f5f9" : "#ffffff",
+                              color: isHidden ? "#64748b" : "#0284c7",
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4,
+                              fontSize: 12.5,
+                              fontWeight: 600
+                            }}
+                            title={isHidden ? "Show section on site" : "Hide section on site"}
+                          >
+                            {isHidden ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
+                            <span>{isHidden ? "Hidden" : "Visible"}</span>
+                          </button>
+
+                          {/* Customize Section */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const sData = activePage.sectionsData || activePage.sections_data || {};
+                              setCustomizingSection({
+                                key,
+                                defaultTitle: def.defaultTitle,
+                                config: sData[key] || (isCustom ? customSec || undefined : undefined)
+                              });
+                            }}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 6,
+                              padding: "6px 12px",
+                              borderRadius: 6,
+                              background: "#0284c7",
+                              color: "#ffffff",
+                              border: "none",
+                              fontSize: 12.5,
+                              fontWeight: 600,
                               cursor: "pointer"
                             }}
                           >
-                            🗑️
+                            <SlidersIcon size={14} />
+                            <span>Customize</span>
+                          </button>
+
+                          {/* Delete if custom story */}
+                          {isCustom && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCustomSection(customIdx)}
+                              style={{
+                                padding: "6px 8px",
+                                borderRadius: 6,
+                                border: "1px solid #fecaca",
+                                background: "#fef2f2",
+                                color: "#dc2626",
+                                cursor: "pointer"
+                              }}
+                              title="Delete custom section"
+                            >
+                              <TrashIcon size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: NARRATIVE & 2-COLUMN CONTENT */}
+            {activeTab === "narrative" && (
+              <div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 18 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                      Page Title
+                    </label>
+                    <input
+                      type="text"
+                      value={activePage.title}
+                      onChange={(e) => setActivePage({ ...activePage, title: e.target.value })}
+                      placeholder="e.g. Physiotherapy in Thorncliffe Calgary"
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 14 }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                      URL Slug
+                    </label>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <span style={{ padding: "10px 12px", background: "#f1f5f9", border: "1px solid #cbd5e1", borderRight: "none", borderRadius: "8px 0 0 8px", fontSize: 13.5, color: "#64748b" }}>
+                        /
+                      </span>
+                      <input
+                        type="text"
+                        value={activePage.slug}
+                        onChange={(e) => setActivePage({ ...activePage, slug: e.target.value })}
+                        placeholder="thorncliffe-physiotherapy"
+                        style={{ width: "100%", padding: "10px 14px", borderRadius: "0 8px 8px 0", border: "1px solid #cbd5e1", fontSize: 14 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 18 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                      Page Category
+                    </label>
+                    <select
+                      value={activePage.pageType || "neighborhood"}
+                      onChange={(e) => setActivePage({ ...activePage, pageType: e.target.value as any, category: e.target.value === "neighborhood" ? "Neighborhood" : "Landing Page" })}
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 14, background: "#fff" }}
+                    >
+                      <option value="neighborhood">Neighborhood Landing Page</option>
+                      <option value="custom">General Custom Page / Promotion</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                      Neighborhood Name (if applicable)
+                    </label>
+                    <input
+                      type="text"
+                      value={activePage.neighborhoodName || ""}
+                      onChange={(e) => setActivePage({ ...activePage, neighborhoodName: e.target.value })}
+                      placeholder="e.g. Thorncliffe, Huntington Hills"
+                      style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 14 }}
+                    />
+                  </div>
+                </div>
+
+                {/* Layout Mode Switcher */}
+                <div style={{ marginBottom: 20 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 8 }}>
+                    Narrative Layout Mode
+                  </label>
+                  <div style={{ display: "flex", gap: 12 }}>
+                    <button
+                      type="button"
+                      onClick={() => setActivePage({ ...activePage, layout: "one-column", content_layout: "1-column" })}
+                      style={{
+                        padding: "10px 16px",
+                        borderRadius: 8,
+                        border: activePage.layout !== "two-column" ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                        background: activePage.layout !== "two-column" ? "#f0f9ff" : "#ffffff",
+                        color: activePage.layout !== "two-column" ? "#0284c7" : "#475569",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Single Column (Standard Centered)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActivePage({ ...activePage, layout: "two-column", content_layout: "2-column" })}
+                      style={{
+                        padding: "10px 16px",
+                        borderRadius: 8,
+                        border: activePage.layout === "two-column" ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                        background: activePage.layout === "two-column" ? "#f0f9ff" : "#ffffff",
+                        color: activePage.layout === "two-column" ? "#0284c7" : "#475569",
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: "pointer"
+                      }}
+                    >
+                      Dual Column (Side by Side)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Column 1 Editor */}
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                    {activePage.layout === "two-column" ? "Column 1 Narrative" : "Main Narrative Content"}
+                  </label>
+                  <RichTextEditor
+                    value={activePage.content || ""}
+                    onChange={(html) => setActivePage({ ...activePage, content: html })}
+                    placeholder="Write detailed clinical overview, headings, lists, or links..."
+                  />
+                </div>
+
+                {/* Column 2 Editor if two-column */}
+                {activePage.layout === "two-column" && (
+                  <div style={{ marginBottom: 24 }}>
+                    <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                      Column 2 Narrative (Why Choose Us, Highlights, Fast Access)
+                    </label>
+                    <RichTextEditor
+                      value={activePage.columnTwoContent || activePage.content_col2 || ""}
+                      onChange={(html) => setActivePage({ ...activePage, columnTwoContent: html, content_col2: html })}
+                      placeholder="Write secondary column highlights, bullet points, or clinic awards..."
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 3: FAQS MANAGER */}
+            {activeTab === "faqs" && (
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+                      Frequently Asked Questions
+                    </h3>
+                    <p style={{ margin: "2px 0 0 0", fontSize: 13, color: "#64748b" }}>
+                      Add neighborhood-specific FAQs. Automatically generates Google FAQPage JSON-LD schema!
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const list = [...(activePage.faqs || [])];
+                      list.push({ question: "", answer: "" });
+                      setActivePage({ ...activePage, faqs: list });
+                    }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "8px 14px",
+                      background: "#f0fdf4",
+                      color: "#16a34a",
+                      border: "1px solid #bbf7d0",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer"
+                    }}
+                  >
+                    <PlusIcon size={14} />
+                    <span>+ Add FAQ Item</span>
+                  </button>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {(!activePage.faqs || activePage.faqs.length === 0) ? (
+                    <div style={{ padding: 24, textAlign: "center", background: "#f8fafc", borderRadius: 10, color: "#64748b", fontSize: 13 }}>
+                      No FAQs added yet. Click "+ Add FAQ Item" to add questions.
+                    </div>
+                  ) : (
+                    activePage.faqs.map((faq, index) => (
+                      <div key={index} style={{ padding: 18, background: "#f8fafc", borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "#0284c7" }}>
+                            Question #{index + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const list = [...(activePage.faqs || [])];
+                              list.splice(index, 1);
+                              setActivePage({ ...activePage, faqs: list });
+                            }}
+                            style={{ background: "none", border: "none", color: "#dc2626", cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+                          >
+                            Remove
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+
+                        <input
+                          type="text"
+                          placeholder="e.g. Do I need a doctor's referral for physiotherapy?"
+                          value={faq.question}
+                          onChange={(e) => {
+                            const list = [...(activePage.faqs || [])];
+                            list[index].question = e.target.value;
+                            setActivePage({ ...activePage, faqs: list });
+                          }}
+                          style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5, marginBottom: 10 }}
+                        />
+
+                        <textarea
+                          placeholder="Write the clear, helpful clinical answer here..."
+                          rows={3}
+                          value={faq.answer}
+                          onChange={(e) => {
+                            const list = [...(activePage.faqs || [])];
+                            list[index].answer = e.target.value;
+                            setActivePage({ ...activePage, faqs: list });
+                          }}
+                          style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5, resize: "vertical" }}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: SEO & ROBOTS DIRECTIVES */}
+            {activeTab === "seo" && (
+              <div>
+                <h3 style={{ margin: "0 0 16px 0", fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+                  Search Engine Optimization &amp; Robots Directives
+                </h3>
+
+                <div style={{ marginBottom: 18 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                    Custom SEO Title Tag
+                  </label>
+                  <input
+                    type="text"
+                    value={activePage.seoTitle || ""}
+                    onChange={(e) => setActivePage({ ...activePage, seoTitle: e.target.value })}
+                    placeholder={activePage.title || "Physiotherapy in Calgary North | Nose Creek Physiotherapy"}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5 }}
+                  />
+                  <span style={{ fontSize: 12, color: "#64748b" }}>
+                    Recommended 50–60 characters. Leave blank to default to page title.
+                  </span>
+                </div>
+
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#475569", marginBottom: 6 }}>
+                    Custom Meta Description
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={activePage.seoDescription || ""}
+                    onChange={(e) => setActivePage({ ...activePage, seoDescription: e.target.value })}
+                    placeholder="Enter an enticing 140–160 character description summarizing this page for Google search results..."
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5, resize: "vertical" }}
+                  />
+                </div>
+
+                {/* Robots Directives Card */}
+                <div style={{ padding: 20, background: "#f8fafc", borderRadius: 12, border: "1px solid #e2e8f0", marginBottom: 20 }}>
+                  <h4 style={{ margin: "0 0 8px 0", fontSize: 14.5, fontWeight: 700, color: "#1e293b" }}>
+                    Robots Indexing Directives
+                  </h4>
+                  <p style={{ margin: "0 0 16px 0", fontSize: 13, color: "#64748b" }}>
+                    Control how search engine crawlers index this page and whether it appears in the XML sitemaps.
+                  </p>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(activePage.noIndex)}
+                        onChange={(e) => setActivePage({ ...activePage, noIndex: e.target.checked })}
+                        style={{ marginTop: 3, width: 16, height: 16 }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 13.5, color: "#1e293b" }}>
+                          Exclude from Search Engines (noindex)
+                        </div>
+                        <div style={{ fontSize: 12.5, color: "#64748b" }}>
+                          Adds <code>&lt;meta name="robots" content="noindex"&gt;</code> and automatically removes this page from <code>/sitemap.xml</code>.
+                        </div>
+                      </div>
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(activePage.noFollow)}
+                        onChange={(e) => setActivePage({ ...activePage, noFollow: e.target.checked })}
+                        style={{ marginTop: 3, width: 16, height: 16 }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 13.5, color: "#1e293b" }}>
+                          Don&apos;t Follow Links on This Page (nofollow)
+                        </div>
+                        <div style={{ fontSize: 12.5, color: "#64748b" }}>
+                          Tells search engines not to crawl or endorse links on this page.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div style={{ padding: 18, background: "#f1f5f9", borderRadius: 10, fontSize: 13, color: "#475569" }}>
+                  💡 <strong>Tip:</strong> Any page saved here automatically appears in <strong>SEO &amp; Meta Info</strong> tab for advanced override if desired.
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* Page Edit Drawer Modal */}
-      {editingPage && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(15, 23, 42, 0.6)",
-            backdropFilter: "blur(4px)",
-            zIndex: 99999,
-            display: "flex",
-            justifyContent: "flex-end"
-          }}
-          onClick={() => setEditingPage(null)}
-        >
-          <div
-            style={{
-              width: "min(880px, 95vw)",
-              height: "100%",
-              background: "#ffffff",
-              boxShadow: "-10px 0 30px rgba(0,0,0,0.2)",
-              display: "flex",
-              flexDirection: "column",
-              overflowY: "auto",
-              padding: "28px 32px"
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", paddingBottom: 16, borderBottom: "1px solid #e2e8f0", marginBottom: 20 }}>
-              <div>
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: "#0369a1", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  {isNew ? "Creating New Landing Page" : "Editing Landing Page"}
-                </span>
-                <h2 style={{ margin: "2px 0 0 0", fontSize: 20, fontWeight: 800, color: "#0f172a" }}>
-                  {editingPage.title || "Untitled Page"}
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEditingPage(null)}
-                style={{
-                  border: "none",
-                  background: "#f1f5f9",
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  fontWeight: 700,
-                  fontSize: 16,
-                  color: "#64748b"
-                }}
-              >
-                ✕
-              </button>
-            </div>
+      {/* Section Block Customizer Modal */}
+      {customizingSection && (
+        <SectionBlockCustomizerModal
+          isOpen={Boolean(customizingSection)}
+          onClose={() => setCustomizingSection(null)}
+          sectionKey={customizingSection.key}
+          sectionDefaultTitle={customizingSection.defaultTitle}
+          config={customizingSection.config}
+          onSave={(updatedConfig) => handleSaveSectionConfig(customizingSection.key, updatedConfig)}
+        />
+      )}
 
-            <form onSubmit={handleSavePage} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              {/* Basic Meta Fields */}
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 14 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>
-                    Page Title <span style={{ color: "#ef4444" }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={editingPage.title}
-                    onChange={(e) => {
-                      const t = e.target.value;
-                      setEditingPage({
-                        ...editingPage,
-                        title: t,
-                        slug: isNew && !editingPage.slug ? slugify(t) : editingPage.slug
-                      });
-                    }}
-                    placeholder="e.g. Physiotherapy in Thorncliffe Calgary | Nose Creek"
-                    style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5 }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>
-                    URL Slug <span style={{ color: "#ef4444" }}>*</span>
-                  </label>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ padding: "9px 10px", background: "#f1f5f9", border: "1px solid #cbd5e1", borderRight: "none", borderTopLeftRadius: 8, borderBottomLeftRadius: 8, fontSize: 13, color: "#64748b", fontWeight: 700 }}>
-                      /
-                    </span>
-                    <input
-                      type="text"
-                      required
-                      value={editingPage.slug}
-                      onChange={(e) => setEditingPage({ ...editingPage, slug: slugify(e.target.value) })}
-                      placeholder="thorncliffe"
-                      style={{ width: "100%", padding: "9px 12px", borderTopRightRadius: 8, borderBottomRightRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5 }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Subtitle & Category */}
-              <div style={{ display: "grid", gridTemplateColumns: "3fr 1fr", gap: 14 }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>
-                    Subtitle / Hero Tagline
-                  </label>
-                  <input
-                    type="text"
-                    value={editingPage.subtitle || ""}
-                    onChange={(e) => setEditingPage({ ...editingPage, subtitle: e.target.value })}
-                    placeholder="e.g. Compassionate physical rehabilitation just 4 minutes from Thorncliffe"
-                    style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5 }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>
-                    Category
-                  </label>
-                  <select
-                    value={editingPage.category || "Neighborhood"}
-                    onChange={(e) => setEditingPage({ ...editingPage, category: e.target.value as any })}
-                    style={{ width: "100%", padding: "9px 10px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5, background: "#fff" }}
-                  >
-                    <option value="Neighborhood">Neighborhood</option>
-                    <option value="Landing Page">Landing Page</option>
-                    <option value="General">General</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Layout Switcher (1-Col vs 2-Col) */}
-              <div style={{ background: "#f8fafc", padding: 14, borderRadius: 10, border: "1px solid #e2e8f0" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div>
-                    <strong style={{ fontSize: 13.5, color: "#0f172a" }}>Narrative Content Layout</strong>
-                    <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#64748b" }}>
-                      Choose whether this landing page features a single full-width column or a side-by-side 2-column story format.
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button
-                      type="button"
-                      onClick={() => setEditingPage({ ...editingPage, content_layout: "1-column" })}
-                      style={{
-                        padding: "6px 14px",
-                        borderRadius: 6,
-                        border: "1px solid",
-                        borderColor: editingPage.content_layout !== "2-column" ? "#0284c7" : "#cbd5e1",
-                        background: editingPage.content_layout !== "2-column" ? "#e0f2fe" : "#ffffff",
-                        color: editingPage.content_layout !== "2-column" ? "#0369a1" : "#475569",
-                        fontWeight: 700,
-                        fontSize: 12.5,
-                        cursor: "pointer"
-                      }}
-                    >
-                      1-Column
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditingPage({ ...editingPage, content_layout: "2-column" })}
-                      style={{
-                        padding: "6px 14px",
-                        borderRadius: 6,
-                        border: "1px solid",
-                        borderColor: editingPage.content_layout === "2-column" ? "#0284c7" : "#cbd5e1",
-                        background: editingPage.content_layout === "2-column" ? "#e0f2fe" : "#ffffff",
-                        color: editingPage.content_layout === "2-column" ? "#0369a1" : "#475569",
-                        fontWeight: 700,
-                        fontSize: 12.5,
-                        cursor: "pointer"
-                      }}
-                    >
-                      2-Column Story
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Column 1 Narrative RichTextEditor */}
-              <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 6 }}>
-                  {editingPage.content_layout === "2-column" ? "Column 1: Main Story & Overview" : "Page Narrative Content"}
-                </label>
-                <RichTextEditor
-                  value={editingPage.content || ""}
-                  onChange={(val) => setEditingPage({ ...editingPage, content: val })}
-                  placeholder="Describe your clinic services, rehabilitation approach, and benefits for this community..."
-                  minHeight={180}
-                />
-              </div>
-
-              {/* Column 2 Narrative RichTextEditor (if 2-column) */}
-              {editingPage.content_layout === "2-column" && (
-                <div>
-                  <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#1e293b", marginBottom: 6 }}>
-                    Column 2: Community Highlights &amp; Clinic Advantages
-                  </label>
-                  <RichTextEditor
-                    value={editingPage.content_col2 || ""}
-                    onChange={(val) => setEditingPage({ ...editingPage, content_col2: val })}
-                    placeholder="List bullets, parking details, direct billing carriers, and practitioner qualifications..."
-                    minHeight={180}
-                  />
-                </div>
-              )}
-
-              {/* Call to Action Buttons */}
-              <div style={{ background: "#f8fafc", padding: 16, borderRadius: 10, border: "1px solid #e2e8f0" }}>
-                <strong style={{ fontSize: 13.5, color: "#0f172a", display: "block", marginBottom: 12 }}>
-                  🎯 Call-To-Action (CTA) Conversion Buttons
-                </strong>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 4 }}>
-                      Primary Button Text
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPage.cta_text || ""}
-                      onChange={(e) => setEditingPage({ ...editingPage, cta_text: e.target.value })}
-                      placeholder="Book Online"
-                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                    />
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#475569", marginTop: 8, marginBottom: 4 }}>
-                      Primary Button URL
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPage.cta_url || ""}
-                      onChange={(e) => setEditingPage({ ...editingPage, cta_url: e.target.value })}
-                      placeholder="https://app.practiceperfectemr.com/onlinebooking/657/#/landing/nosecreekbeddington"
-                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 4 }}>
-                      Secondary Button Text
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPage.secondary_cta_text || ""}
-                      onChange={(e) => setEditingPage({ ...editingPage, secondary_cta_text: e.target.value })}
-                      placeholder="Free Phone Consultation"
-                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                    />
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#475569", marginTop: 8, marginBottom: 4 }}>
-                      Secondary Button URL
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPage.secondary_cta_url || ""}
-                      onChange={(e) => setEditingPage({ ...editingPage, secondary_cta_url: e.target.value })}
-                      placeholder="/telephone-consultation"
-                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Local FAQs Section */}
-              <div style={{ background: "#ffffff", padding: 16, borderRadius: 10, border: "1px solid #e2e8f0" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                  <div>
-                    <strong style={{ fontSize: 13.5, color: "#0f172a" }}>Frequently Asked Questions (FAQs)</strong>
-                    <p style={{ margin: "2px 0 0 0", fontSize: 12, color: "#64748b" }}>
-                      Local questions inject rich FAQPage schema for higher Google click-through rates.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddFaq}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 6,
-                      border: "1px solid #cbd5e1",
-                      background: "#f1f5f9",
-                      fontWeight: 700,
-                      fontSize: 12,
-                      cursor: "pointer"
-                    }}
-                  >
-                    + Add Question
-                  </button>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {(editingPage.faqs || []).map((faq, i) => (
-                    <div key={i} style={{ background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#0369a1" }}>Question #{i + 1}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveFaq(i)}
-                          style={{ border: "none", background: "none", color: "#dc2626", cursor: "pointer", fontSize: 12, fontWeight: 700 }}
-                        >
-                          ✕ Remove
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        value={faq.question}
-                        onChange={(e) => handleUpdateFaq(i, "question", e.target.value)}
-                        placeholder="e.g. How far is your clinic from Thorncliffe?"
-                        style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13, marginBottom: 8 }}
-                      />
-                      <textarea
-                        rows={2}
-                        value={faq.answer}
-                        onChange={(e) => handleUpdateFaq(i, "answer", e.target.value)}
-                        placeholder="Answer describing proximity, directions, or booking..."
-                        style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* SEO & Robots Directives */}
-              <div style={{ background: "#f8fafc", padding: 16, borderRadius: 10, border: "1px solid #e2e8f0" }}>
-                <strong style={{ fontSize: 13.5, color: "#0f172a", display: "block", marginBottom: 12 }}>
-                  🔍 Search Engine Optimization (SEO) &amp; Robots Directives
-                </strong>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 4 }}>
-                      Meta Title (Google Result Headline)
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPage.seo?.title || ""}
-                      onChange={(e) => setEditingPage({
-                        ...editingPage,
-                        seo: { ...(editingPage.seo || {}), title: e.target.value }
-                      })}
-                      placeholder="Defaults to Page Title..."
-                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#475569", marginBottom: 4 }}>
-                      Meta Description (Google Snippet)
-                    </label>
-                    <textarea
-                      rows={2}
-                      value={editingPage.seo?.description || ""}
-                      onChange={(e) => setEditingPage({
-                        ...editingPage,
-                        seo: { ...(editingPage.seo || {}), description: e.target.value }
-                      })}
-                      placeholder="Defaults to Subtitle..."
-                      style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 13 }}
-                    />
-                  </div>
-
-                  {/* Robots Checkboxes */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 4 }}>
-                    <label style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 8,
-                      cursor: "pointer",
-                      background: editingPage.seo?.noIndex ? "#fee2e2" : "#ffffff",
-                      padding: "8px 12px",
-                      borderRadius: 8,
-                      border: editingPage.seo?.noIndex ? "1px solid #fecaca" : "1px solid #cbd5e1"
-                    }}>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(editingPage.seo?.noIndex)}
-                        onChange={(e) => setEditingPage({
-                          ...editingPage,
-                          seo: { ...(editingPage.seo || {}), noIndex: e.target.checked }
-                        })}
-                        style={{ marginTop: 2, accentColor: "#dc2626" }}
-                      />
-                      <div>
-                        <strong style={{ fontSize: 12.5, color: editingPage.seo?.noIndex ? "#b91c1c" : "#1e293b" }}>
-                          Disallow Indexing (`noindex`)
-                        </strong>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>
-                          Removes page from Google &amp; XML Sitemaps.
-                        </div>
-                      </div>
-                    </label>
-
-                    <label style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 8,
-                      cursor: "pointer",
-                      background: editingPage.seo?.noFollow ? "#fef3c7" : "#ffffff",
-                      padding: "8px 12px",
-                      borderRadius: 8,
-                      border: editingPage.seo?.noFollow ? "1px solid #fef3c7" : "1px solid #cbd5e1"
-                    }}>
-                      <input
-                        type="checkbox"
-                        checked={Boolean(editingPage.seo?.noFollow)}
-                        onChange={(e) => setEditingPage({
-                          ...editingPage,
-                          seo: { ...(editingPage.seo || {}), noFollow: e.target.checked }
-                        })}
-                        style={{ marginTop: 2, accentColor: "#d97706" }}
-                      />
-                      <div>
-                        <strong style={{ fontSize: 12.5, color: editingPage.seo?.noFollow ? "#92400e" : "#1e293b" }}>
-                          Disallow Following (`nofollow`)
-                        </strong>
-                        <div style={{ fontSize: 11, color: "#64748b" }}>
-                          Tells crawlers not to endorse links on this page.
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Publication Status & Action Buttons */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 16, borderTop: "1px solid #e2e8f0" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#1e293b" }}>
-                  <input
-                    type="checkbox"
-                    checked={editingPage.is_published}
-                    onChange={(e) => setEditingPage({ ...editingPage, is_published: e.target.checked })}
-                    style={{ width: 18, height: 18, accentColor: "#15803d" }}
-                  />
-                  <span>Publish this page immediately</span>
-                </label>
-
-                <div style={{ display: "flex", gap: 10 }}>
-                  <button
-                    type="button"
-                    onClick={() => setEditingPage(null)}
-                    style={{
-                      padding: "10px 18px",
-                      borderRadius: 8,
-                      border: "1px solid #cbd5e1",
-                      background: "#ffffff",
-                      color: "#475569",
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    style={{
-                      padding: "10px 24px",
-                      borderRadius: 8,
-                      border: "none",
-                      background: "linear-gradient(135deg, #0e78a8 0%, #0369a1 100%)",
-                      color: "#ffffff",
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    {saving ? "Saving Page..." : "💾 Save Page"}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* Confirm Delete Modal */}
+      {deleteTarget && (
+        <ConfirmDeleteModal
+          isOpen={Boolean(deleteTarget)}
+          title={`Delete /${deleteTarget.slug}?`}
+          itemName={`/${deleteTarget.slug} (${deleteTarget.title})`}
+          itemType="Custom Page"
+          onConfirm={handleDeletePage}
+          onClose={() => setDeleteTarget(null)}
+        />
       )}
     </div>
   );
