@@ -122,7 +122,7 @@ export default function ClientLoginPage() {
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. nosecreek or client@nosecreek.com"
+              placeholder="Enter your username or email"
               style={{
                 width: "100%",
                 padding: "11px 14px",

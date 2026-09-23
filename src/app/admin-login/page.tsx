@@ -122,7 +122,7 @@ export default function AdminLoginPage() {
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. nosecreek-admin or admin@nosecreek.com"
+              placeholder="Enter your administrator username or email"
               style={{
                 width: "100%",
                 padding: "11px 14px",
