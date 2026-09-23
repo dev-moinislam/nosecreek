@@ -58,8 +58,8 @@
       ]
     },
     "googleAnalytics": {
-      "enabled": true,
-      "trackingId": "UA-121730452-1"
+      "enabled": false,
+      "trackingId": ""
     },
     "facebookPixel": {
       "enabled": true,

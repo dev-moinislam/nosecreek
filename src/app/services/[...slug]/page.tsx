@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps) {
     openGraph: {
       title: service.seo?.ogTitle || `${service.title} | Nose Creek Physiotherapy Calgary`,
       description: service.seo?.ogDescription || service.shortDescription || undefined,
-      images: (service.cardImage || service.heroImage) ? [{ url: String(service.cardImage || service.heroImage) }] : undefined
+      images: (service.seo?.ogImage || service.heroImage || service.cardImage) ? [{ url: String(service.seo?.ogImage || service.heroImage || service.cardImage) }] : undefined
     }
   });
 }

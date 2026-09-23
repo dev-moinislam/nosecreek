@@ -12,8 +12,8 @@ const DEFAULT_MARKETING = {
     containerIds: ["GTM-M3WLKSQ", "GTM-PJ447MK"]
   },
   googleAnalytics: {
-    enabled: true,
-    trackingId: "UA-121730452-1"
+    enabled: false,
+    trackingId: ""
   },
   facebookPixel: {
     enabled: true,
@@ -68,9 +68,10 @@ export default function MarketingScripts() {
     (marketing.gtm?.containerId ? [marketing.gtm.containerId] : ["GTM-M3WLKSQ", "GTM-PJ447MK"]);
   const gtmEnabled = marketing.gtm?.enabled ?? true;
 
-  // Google Analytics (UA-121730452-1)
-  const gaId = marketing.googleAnalytics?.trackingId || "UA-121730452-1";
-  const gaEnabled = marketing.googleAnalytics?.enabled ?? true;
+  // Google Analytics 4 (GA4) - ignores deprecated Universal Analytics (UA-)
+  const rawGaId = marketing.googleAnalytics?.trackingId || "";
+  const gaId = rawGaId.toUpperCase().startsWith("UA-") ? "" : rawGaId;
+  const gaEnabled = Boolean(marketing.googleAnalytics?.enabled && gaId);
 
   // Facebook Pixel (275772356383035)
   const fbPixelId = marketing.facebookPixel?.pixelId || "275772356383035";

@@ -5,15 +5,18 @@ interface GoogleAnalyticsProps {
 }
 
 export default function GoogleAnalytics({
-  trackingId = "UA-121730452-1"
+  trackingId
 }: GoogleAnalyticsProps) {
-  const ids = (
+  const rawIds = (
     Array.isArray(trackingId)
       ? trackingId
       : (trackingId ? trackingId.split(",") : [])
   )
     .map((s) => s.trim())
     .filter(Boolean);
+
+  // Filter out any obsolete Universal Analytics (UA-) IDs
+  const ids = rawIds.filter((id) => !id.toUpperCase().startsWith("UA-"));
 
   if (ids.length === 0) return null;
   const primaryId = ids[0];

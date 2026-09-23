@@ -37,6 +37,15 @@ export async function generateMetadata({ params }: PageProps) {
   const defaultTitle = page.seoTitle || `${page.title} | Nose Creek Physiotherapy Calgary`;
   const defaultDesc = page.seoDescription || page.heroSubtitle || page.subtitle || undefined;
 
+  const heroImg = page.heroImage || 
+    page.hero_image || 
+    page.sectionsData?.hero?.image ||
+    page.sections_data?.hero?.image ||
+    (page as any).cardImage ||
+    undefined;
+
+  const targetOgImage = page.ogImage || page.seoOgImage || page.seo?.ogImage || heroImg;
+
   return resolvePageMetadata(pathUrl, {
     title: defaultTitle,
     description: defaultDesc,
@@ -45,7 +54,8 @@ export async function generateMetadata({ params }: PageProps) {
       description: defaultDesc,
       url: `https://www.nosecreekphysiotherapy.com/${slug}`,
       siteName: "Nose Creek Physiotherapy",
-      type: "website"
+      type: "website",
+      images: targetOgImage ? [{ url: targetOgImage }] : undefined
     }
   });
 }

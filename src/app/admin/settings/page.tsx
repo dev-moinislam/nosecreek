@@ -51,7 +51,7 @@ export default function AdminSettingsPage() {
   }>({
     callTracking: { enabled: false, scriptUrl: "" },
     gtm: { enabled: true, containerId: "GTM-M3WLKSQ, GTM-PJ447MK" },
-    googleAnalytics: { enabled: true, trackingId: "UA-121730452-1" },
+    googleAnalytics: { enabled: false, trackingId: "" },
     facebookPixel: { enabled: true, pixelId: "275772356383035" }
   });
   const [loading, setLoading] = useState(true);
@@ -612,11 +612,13 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="adm-form-group" style={{ margin: 0 }}>
-              <label className="adm-form-label">Tracking ID (e.g. UA-121730452-1 or G-XXXXXXXXXX)</label>
+              <label className="adm-form-label">
+                Google Analytics 4 (GA4) Measurement ID (e.g. G-XXXXXXXXXX)
+              </label>
               <input
                 type="text"
                 className="adm-input"
-                placeholder="UA-121730452-1"
+                placeholder="G-XXXXXXXXXX"
                 value={marketing.googleAnalytics.trackingId ?? ""}
                 disabled={!canEditMarketingScripts}
                 onChange={(e) => setMarketing({
@@ -624,6 +626,23 @@ export default function AdminSettingsPage() {
                   googleAnalytics: { ...marketing.googleAnalytics, trackingId: e.target.value }
                 })}
               />
+              {marketing.googleAnalytics.trackingId?.toUpperCase().startsWith("UA-") && (
+                <div style={{ marginTop: 8, padding: "8px 12px", background: "#fef3c7", border: "1px solid #fde68a", borderRadius: 6, fontSize: 12, color: "#92400e", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>
+                    ⚠️ <strong>Universal Analytics (UA-) is retired:</strong> Google sunset UA in July 2023. Please enter your modern GA4 Measurement ID starting with <strong>G-</strong>.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setMarketing({
+                      ...marketing,
+                      googleAnalytics: { ...marketing.googleAnalytics, trackingId: "", enabled: false }
+                    })}
+                    style={{ background: "#d97706", color: "#fff", border: "none", borderRadius: 4, padding: "3px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", marginLeft: 8 }}
+                  >
+                    Clear Deprecated UA
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

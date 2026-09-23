@@ -476,6 +476,9 @@ export interface CustomPage {
   seo?: PageMetaItem;
   seoTitle?: string;
   seoDescription?: string;
+  ogImage?: string;
+  seoOgImage?: string;
+  seo_og_image?: string;
   noIndex?: boolean;
   noFollow?: boolean;
   is_published?: boolean;

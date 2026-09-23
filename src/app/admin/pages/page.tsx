@@ -1054,8 +1054,11 @@ export default function AdminPagesManager() {
         title: activePage.seoTitle || activePage.title,
         description: activePage.seoDescription || activePage.heroSubtitle || activePage.subtitle || "",
         noIndex: activePage.noIndex,
-        noFollow: activePage.noFollow
+        noFollow: activePage.noFollow,
+        ogImage: activePage.ogImage || activePage.seoOgImage || undefined
       },
+      ogImage: activePage.ogImage || activePage.seoOgImage || undefined,
+      seoOgImage: activePage.ogImage || activePage.seoOgImage || undefined,
       updatedAt: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -2099,6 +2102,40 @@ export default function AdminPagesManager() {
                     placeholder="Enter an enticing 140–160 character description summarizing this page for Google search results..."
                     style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: "1px solid #cbd5e1", fontSize: 13.5, resize: "vertical" }}
                   />
+                </div>
+
+                {/* Social OpenGraph (OG) Image */}
+                <div style={{ marginBottom: 24, padding: 18, background: "#f8fafc", borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                    <label style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 6 }}>
+                      <span>📱</span> Social Media Open Graph (OG) Image
+                    </label>
+                    {activePage.ogImage ? (
+                      <span style={{ fontSize: 11, background: "#dbeafe", color: "#1d4ed8", padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                        ★ Custom OG Image
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 11, background: "#dcfce7", color: "#15803d", padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                        ✓ Using Page Hero Image Fallback
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ margin: "0 0 12px 0", fontSize: 12.5, color: "#64748b" }}>
+                    Shown when this page link is shared on Facebook, LinkedIn, X, WhatsApp, or messaging apps.
+                  </p>
+                  <AdminImageUploader
+                    value={activePage.ogImage || activePage.seoOgImage || ""}
+                    onChange={(url) => setActivePage({ ...activePage, ogImage: url, seoOgImage: url })}
+                    label="Custom Social Share Image"
+                    placeholder="Upload 1200x630 image or paste URL..."
+                    aspectRatioNote="Recommended: 1200 × 630 px (~1.91:1 ratio). Leave empty to automatically use this page's Hero Image."
+                    folder="seo"
+                  />
+                  {!activePage.ogImage && !activePage.seoOgImage && (
+                    <div style={{ marginTop: 10, padding: "8px 12px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, fontSize: 12, color: "#166534" }}>
+                      <strong>Hero Fallback Active:</strong> When shared, this page will automatically display its hero image.
+                    </div>
+                  )}
                 </div>
 
                 {/* Robots Directives Card */}

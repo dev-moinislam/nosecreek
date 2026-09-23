@@ -43,8 +43,7 @@ Nose Creek Physiotherapy ওয়েবসাইটের পুরো কোড�
 | | Local Geo Keywords | ✅ আছে | Calgary, Beddington, NW & NE কি-ওয়ার্ড টাইটেল ও হেডিংয়ে ন্যাচারালভাবে যুক্ত। |
 | | Neighborhood Landing Pages | ❌ নেই | Thorncliffe, Huntington Hills, MacEwan ইত্যাদি এলাকার আলাদা পেজ নেই। |
 | **Analytics & Tracking** | Google Tag Manager (GTM) | ✅ আছে | মাল্টি-কন্টেইনার সাপোর্ট সহ ইন্টিগ্রেটেড। |
-| | CallRail Call Tracking | ✅ আছে | ডায়নামিক ফোন নম্বর ট্র্যাকিং স্ক্রিপ্ট যুক্ত। |
-| | Google Analytics 4 (GA4) | ⚠️ ওল্ড ভার্সন | কোডে এখনও পুরনো Universal Analytics (`UA-121730452-1`) রেফারেন্স আছে। |
+| | Google Analytics 4 (GA4) | ✅ আধুনিকায়িত (GA4 Ready) | পুরনো Universal Analytics (`UA-`) সরানো হয়েছে; আধুনিক GA4 (`G-XXXXXXXXXX`) এবং GTM কনফিগার করা। |
 
 ---
 
@@ -102,9 +101,8 @@ Nose Creek Physiotherapy ওয়েবসাইটের পুরো কোড�
 - **সমস্যা:** কন্ডিশন পেজে `MedicalCondition` এবং সার্ভিস পেজে `MedicalProcedure` বা `MedicalTherapy` স্কিমা ব্যবহৃত হয়নি।
 - **প্রভাব:** হেলথকেয়ার ও ফিজিওথেরাপি রিলেটেড রিচ স্নিপেট থেকে সাইটটি বঞ্চিত হচ্ছে।
 
-#### ৫. Universal Analytics (UA) কোড আপডেট দরকার
-- **সমস্যা:** `MarketingScripts.tsx`-এ এখনও ওল্ড `UA-121730452-1` সেট করা আছে। গুগল ২০২৩ সালের জুলাই মাসে ইউনিভার্সাল অ্যানালিটিক্স বন্ধ করে দিয়েছে।
-- **প্রভাব:** গুগলে ডাটা ট্র্যাক হওয়ার জন্য আধুনিক **GA4 Measurement ID** (`G-XXXXXXXXXX`) প্রয়োজন।
+#### ৫. Google Analytics 4 (GA4) আধুনিকায়ন (সমাধানকৃত ✅)
+- **সমাধান:** কোড থেকে সব পুরনো `UA-121730452-1` সরিয়ে নেওয়া হয়েছে। সিস্টেম এখন সম্পূর্ণ আধুনিক **GA4 Measurement ID** (`G-XXXXXXXXXX`) এবং গুগল ট্যাগ ম্যানেজার (GTM) সাপোর্ট করে। অ্যাডমিনে পুরনো UA ইনপুট ঠেকাতে অ্যালার্ট দেওয়া হয়েছে।
 
 ---
 

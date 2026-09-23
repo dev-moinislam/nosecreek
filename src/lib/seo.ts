@@ -192,13 +192,20 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
     customPages.forEach((cp) => {
       const pagePath = `/${cp.slug}`;
       if (!routes.some((r) => r.path === pagePath)) {
+        const cpHeroImg = cp.heroImage ||
+          cp.hero_image ||
+          cp.sectionsData?.hero?.image ||
+          cp.sections_data?.hero?.image ||
+          (cp as any).cardImage ||
+          undefined;
+
         routes.push({
           path: pagePath,
           name: `${cp.title} (${cp.pageType === "neighborhood" ? "Neighborhood Page" : "Custom Landing Page"})`,
           category: "Neighborhood & Custom Pages",
           defaultTitle: cp.seoTitle || `${cp.title} | Nose Creek Physiotherapy`,
           defaultDescription: cp.seoDescription || cp.heroSubtitle || "Expert personalized physiotherapy in Calgary.",
-          defaultOgImage: undefined
+          defaultOgImage: cpHeroImg
         });
       }
     });
@@ -305,11 +312,19 @@ export async function resolvePageMetadata(
           const { getCustomPageBySlug } = await import("@/lib/api");
           const cp = await getCustomPageBySlug(slug);
           if (cp) {
+            const cpHeroImg = cp.heroImage ||
+              cp.hero_image ||
+              cp.sectionsData?.hero?.image ||
+              cp.sections_data?.hero?.image ||
+              (cp as any).cardImage ||
+              undefined;
+
             custom = {
               title: cp.seoTitle || cp.seo?.title,
               description: cp.seoDescription || cp.seo?.description || cp.subtitle,
               noIndex: cp.noIndex ?? cp.seo?.noIndex,
-              noFollow: cp.noFollow ?? cp.seo?.noFollow
+              noFollow: cp.noFollow ?? cp.seo?.noFollow,
+              ogImage: cp.ogImage || cp.seoOgImage || cp.seo_og_image || cp.seo?.ogImage || cpHeroImg
             };
           }
         } catch {}
@@ -336,9 +351,57 @@ export async function resolvePageMetadata(
       ? custom.ogDescription.trim()
       : (fallback.openGraph?.description || description);
 
-    const ogImage = custom?.ogImage && custom.ogImage.trim() !== ""
+    // 1. Custom OG image explicitly set in Admin SEO
+    let ogImage: string | undefined = custom?.ogImage && custom.ogImage.trim() !== ""
       ? custom.ogImage.trim()
-      : (fallback.openGraph?.images as any)?.[0]?.url || settings.seo?.ogImage || "/images/og-home.jpg";
+      : undefined;
+
+    // 2. Fallback to page Hero Image provided via fallback.openGraph.images
+    if (!ogImage) {
+      const fallbackImg = (fallback.openGraph?.images as any)?.[0]?.url;
+      if (fallbackImg && typeof fallbackImg === "string" && fallbackImg.trim() !== "") {
+        ogImage = fallbackImg.trim();
+      }
+    }
+
+    // 3. Fallback: Dynamically resolve hero image based on route path
+    if (!ogImage && !pathname.includes("/admin") && !pathname.includes("/api")) {
+      try {
+        if (pathname.startsWith("/services/")) {
+          const serviceSlug = pathname.replace("/services/", "").split("/").pop();
+          if (serviceSlug) {
+            const { getServices } = await import("@/lib/api");
+            const svcs = await getServices();
+            const s = svcs.find((item) => item.slug === serviceSlug);
+            if (s) ogImage = s.heroImage || s.cardImage || undefined;
+          }
+        } else if (pathname.startsWith("/conditions/")) {
+          const conditionSlug = pathname.replace("/conditions/", "").split("/").pop();
+          if (conditionSlug) {
+            const { getConditions } = await import("@/lib/api");
+            const conds = await getConditions();
+            const c = conds.find((item) => item.slug === conditionSlug);
+            if (c) ogImage = c.heroImage || c.cardImage || undefined;
+          }
+        } else if (pathname.startsWith("/blog/")) {
+          const postSlug = pathname.replace("/blog/", "").split("/").pop();
+          if (postSlug) {
+            const { getBlogPostBySlug } = await import("@/lib/api");
+            const post = await getBlogPostBySlug(postSlug);
+            if (post) ogImage = post.featuredImage || undefined;
+          }
+        }
+      } catch {}
+    }
+
+    // 4. Final fallback to site default OG image
+    if (!ogImage || ogImage.trim() === "") {
+      ogImage = settings.seo?.ogImage || "/images/og-home.jpg";
+    }
+
+    const resolvedOgImageUrl = ogImage.startsWith("http://") || ogImage.startsWith("https://")
+      ? ogImage
+      : (ogImage.startsWith("/") ? `${baseUrl}${ogImage}` : `${baseUrl}/${ogImage}`);
 
     // Dynamic Self-Canonical or Custom Target Resolution
     let canonicalUrl: string;
@@ -369,7 +432,7 @@ export async function resolvePageMetadata(
         ...(fallback.openGraph || {}),
         title: ogTitle,
         description: ogDescription,
-        images: [{ url: ogImage }],
+        images: [{ url: resolvedOgImageUrl, width: 1200, height: 630, alt: ogTitle }],
         siteName: settings.clinicName,
         url: canonicalUrl,
       },
@@ -378,7 +441,7 @@ export async function resolvePageMetadata(
         card: "summary_large_image",
         title: ogTitle,
         description: ogDescription,
-        images: [ogImage],
+        images: [resolvedOgImageUrl],
       },
       ...(custom?.keywords ? { keywords: custom.keywords } : {}),
       robots: {

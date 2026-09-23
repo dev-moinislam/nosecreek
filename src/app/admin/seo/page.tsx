@@ -7,6 +7,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { SiteSettings, PageMetaItem } from "@/types/content";
 import { getAllSiteRoutes, SiteRouteInfo } from "@/lib/seo";
 import { GlobeIcon, SearchIcon } from "@/components/admin/AdminIcons";
+import AdminImageUploader from "@/components/admin/AdminImageUploader";
 
 const DEFAULT_SEO_SETTINGS: SiteSettings = {
   clinicName: "Nose Creek Physiotherapy",
@@ -160,7 +161,7 @@ export default function AdminSeoManagerPage() {
       canonicalUrl: existing.canonicalUrl || "",
       ogTitle: existing.ogTitle || existing.title || route.defaultTitle,
       ogDescription: existing.ogDescription || existing.description || route.defaultDescription,
-      ogImage: existing.ogImage || route.defaultOgImage || settings.seo?.ogImage || "/images/og-home.jpg",
+      ogImage: existing.ogImage || "",
       keywords: existing.keywords || "",
       noIndex: Boolean(existing.noIndex),
       noFollow: Boolean(existing.noFollow)
@@ -273,6 +274,10 @@ export default function AdminSeoManagerPage() {
       </div>
     );
   }
+
+  const currentEditingRoute = editingPath ? routes.find((r) => r.path === editingPath) : undefined;
+  const heroFallbackImage = currentEditingRoute?.defaultOgImage || "";
+  const effectiveOgImage = editForm.ogImage || heroFallbackImage || settings.seo?.ogImage || "/images/og-home.jpg";
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -419,12 +424,13 @@ export default function AdminSeoManagerPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
-                  <th style={{ padding: "12px 18px", width: "20%" }}>Page &amp; Route</th>
-                  <th style={{ padding: "12px 18px", width: "13%" }}>Robots Status</th>
-                  <th style={{ padding: "12px 18px", width: "25%" }}>Meta Title (Google Tab)</th>
-                  <th style={{ padding: "12px 18px", width: "20%" }}>Meta Description</th>
-                  <th style={{ padding: "12px 18px", width: "14%" }}>Canonical URL</th>
-                  <th style={{ padding: "12px 18px", width: "8%", textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
+                  <th style={{ padding: "12px 18px", width: "18%" }}>Page &amp; Route</th>
+                  <th style={{ padding: "12px 18px", width: "15%" }}>Social / OG Image</th>
+                  <th style={{ padding: "12px 18px", width: "11%" }}>Robots Status</th>
+                  <th style={{ padding: "12px 18px", width: "23%" }}>Meta Title (Google Tab)</th>
+                  <th style={{ padding: "12px 18px", width: "17%" }}>Meta Description</th>
+                  <th style={{ padding: "12px 18px", width: "10%" }}>Canonical URL</th>
+                  <th style={{ padding: "12px 18px", width: "6%", textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -436,6 +442,10 @@ export default function AdminSeoManagerPage() {
                   const hasCustomCanonical = Boolean(custom?.canonicalUrl);
                   const isNoIndex = Boolean(custom?.noIndex);
                   const isNoFollow = Boolean(custom?.noFollow);
+
+                  const hasCustomOg = Boolean(custom?.ogImage && custom.ogImage.trim() !== "");
+                  const rowEffectiveOg = custom?.ogImage || route.defaultOgImage || settings.seo?.ogImage || "/images/og-home.jpg";
+                  const isHeroFallback = !hasCustomOg && Boolean(route.defaultOgImage);
 
                   return (
                     <tr
@@ -480,15 +490,81 @@ export default function AdminSeoManagerPage() {
                             </span>
                           )}
                           <span style={{
-                            fontSize: 10.5,
-                            fontWeight: 700,
-                            padding: "2px 7px",
-                            borderRadius: 999,
-                            background: hasCustom ? "#dcfce7" : "#e2e8f0",
-                            color: hasCustom ? "#15803d" : "#475569"
-                          }}>
-                            {hasCustom ? "✓ Custom Meta Set" : "Default"}
+                              fontSize: 10.5,
+                              fontWeight: 700,
+                              padding: "2px 7px",
+                              borderRadius: 999,
+                              background: hasCustom ? "#dcfce7" : "#e2e8f0",
+                              color: hasCustom ? "#15803d" : "#475569"
+                            }}>
+                              {hasCustom ? "✓ Custom Meta Set" : "Default"}
                           </span>
+                        </div>
+                      </td>
+
+                      {/* Social / OG Share Image Preview */}
+                      <td style={{ padding: "14px 18px", verticalAlign: "top" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <div style={{
+                            width: 52,
+                            height: 32,
+                            borderRadius: 6,
+                            overflow: "hidden",
+                            border: "1px solid #cbd5e1",
+                            background: "#f1f5f9",
+                            flexShrink: 0
+                          }}>
+                            <img
+                              src={rowEffectiveOg}
+                              alt="Social preview"
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          </div>
+                          <div>
+                            {hasCustomOg ? (
+                              <span style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 999,
+                                background: "#dbeafe",
+                                color: "#1d4ed8",
+                                border: "1px solid #bfdbfe",
+                                display: "inline-block",
+                                whiteSpace: "nowrap"
+                              }}>
+                                ★ Custom OG
+                              </span>
+                            ) : isHeroFallback ? (
+                              <span style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 999,
+                                background: "#dcfce7",
+                                color: "#15803d",
+                                border: "1px solid #bbf7d0",
+                                display: "inline-block",
+                                whiteSpace: "nowrap"
+                              }} title="Automatically inherits the page's hero image">
+                                ✓ Hero Fallback
+                              </span>
+                            ) : (
+                              <span style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                padding: "2px 7px",
+                                borderRadius: 999,
+                                background: "#f1f5f9",
+                                color: "#64748b",
+                                border: "1px solid #e2e8f0",
+                                display: "inline-block",
+                                whiteSpace: "nowrap"
+                              }}>
+                                Site Default
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
 
@@ -895,21 +971,155 @@ export default function AdminSeoManagerPage() {
                 />
               </div>
 
-              {/* Social / OpenGraph Title & Image */}
-              <div style={{ background: "#f8fafc", padding: 14, borderRadius: 10, border: "1px solid #e2e8f0" }}>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: "#334155", marginBottom: 10 }}>
-                  📱 Social Media Sharing Preview (Facebook / LinkedIn / X)
+              {/* Social Media Sharing & OG Image Upload */}
+              <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>📱</span> Social Media Open Graph (OG) Image
+                  </div>
+                  {editForm.ogImage ? (
+                    <span style={{ fontSize: 11, background: "#dbeafe", color: "#1d4ed8", padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                      ★ Custom OG Image Uploaded
+                    </span>
+                  ) : heroFallbackImage ? (
+                    <span style={{ fontSize: 11, background: "#dcfce7", color: "#15803d", padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                      ✓ Auto Using Page Hero Image
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 11, background: "#f1f5f9", color: "#64748b", padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                      Site Default Fallback
+                    </span>
+                  )}
                 </div>
-                <div className="adm-form-group" style={{ margin: "0 0 10px 0" }}>
-                  <label className="adm-form-label" style={{ fontSize: 11.5 }}>OG Share Image URL</label>
-                  <input
-                    type="text"
-                    className="adm-input"
-                    value={editForm.ogImage || ""}
-                    onChange={(e) => setEditForm({ ...editForm, ogImage: e.target.value })}
-                    placeholder="/images/og-home.jpg"
-                    style={{ fontSize: 12 }}
-                  />
+
+                <p style={{ margin: "0 0 14px 0", fontSize: 12.5, color: "#64748b", lineHeight: 1.5 }}>
+                  This image is automatically displayed when this page link is shared on Facebook, LinkedIn, Twitter/X, WhatsApp, and messaging apps.
+                </p>
+
+                {/* AdminImageUploader Component */}
+                <AdminImageUploader
+                  value={editForm.ogImage || ""}
+                  onChange={(url) => setEditForm({ ...editForm, ogImage: url })}
+                  label="Upload Custom OpenGraph Image"
+                  placeholder="Upload 1200x630 image or paste URL..."
+                  aspectRatioNote="Recommended resolution: 1200 × 630 px (1.91:1 ratio). Formats: PNG, JPG, WebP."
+                  folder="seo"
+                />
+
+                {/* Hero Image Fallback Banner / Actions */}
+                {!editForm.ogImage ? (
+                  <div style={{
+                    marginTop: 12,
+                    padding: "12px 14px",
+                    background: "#f0fdf4",
+                    border: "1px solid #bbf7d0",
+                    borderRadius: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    flexWrap: "wrap"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      {heroFallbackImage ? (
+                        <img
+                          src={heroFallbackImage}
+                          alt="Hero fallback preview"
+                          style={{ width: 64, height: 38, objectFit: "cover", borderRadius: 6, border: "1px solid #86efac", background: "#f8fafc" }}
+                        />
+                      ) : (
+                        <div style={{ width: 40, height: 40, borderRadius: 6, background: "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
+                          🖼️
+                        </div>
+                      )}
+                      <div>
+                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "#166534" }}>
+                          ✓ Page Hero Image Fallback Active
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "#15803d", marginTop: 2 }}>
+                          {heroFallbackImage
+                            ? `No custom OG image uploaded; automatically using this page's Hero Image: ${heroFallbackImage.split("/").pop()}`
+                            : "No hero image found for this route; using website default (/images/og-home.jpg)."}
+                        </div>
+                      </div>
+                    </div>
+                    {heroFallbackImage && (
+                      <button
+                        type="button"
+                        onClick={() => setEditForm({ ...editForm, ogImage: heroFallbackImage })}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: 6,
+                          border: "1px solid #16a34a",
+                          background: "#16a34a",
+                          color: "#ffffff",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap"
+                        }}
+                      >
+                        Pin Hero Image as Custom OG
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ marginTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 12, color: "#0369a1", fontWeight: 600 }}>
+                      ✓ Custom OG image is active for this page.
+                    </span>
+                    {heroFallbackImage && (
+                      <button
+                        type="button"
+                        onClick={() => setEditForm({ ...editForm, ogImage: "" })}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "#dc2626",
+                          fontSize: 12,
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          textDecoration: "underline"
+                        }}
+                      >
+                        Reset to Page Hero Image Fallback
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Social Card Snippet Mockup (Facebook / LinkedIn style) */}
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ fontSize: 11.5, fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 6 }}>
+                    Live Social Share Card Preview
+                  </div>
+                  <div style={{
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    background: "#ffffff",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                    maxWidth: 500
+                  }}>
+                    <div style={{ width: "100%", height: 180, background: "#f1f5f9", position: "relative", overflow: "hidden" }}>
+                      <img
+                        src={effectiveOgImage}
+                        alt="Social preview"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    </div>
+                    <div style={{ padding: "10px 14px", background: "#f8fafc", borderTop: "1px solid #e2e8f0" }}>
+                      <div style={{ fontSize: 11, color: "#64748b", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.4px" }}>
+                        NOSECREEKPHYSIOTHERAPY.COM
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {editForm.ogTitle || editForm.title || "Page Title — Nose Creek Physiotherapy"}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#64748b", marginTop: 2, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.4 }}>
+                        {editForm.ogDescription || editForm.description || "Page summary preview will appear here..."}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
