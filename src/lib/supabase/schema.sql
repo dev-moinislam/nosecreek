@@ -415,4 +415,40 @@ CREATE POLICY "Allow server read client_users" ON client_users FOR SELECT USING 
 DROP POLICY IF EXISTS "Allow server update client_users" ON client_users;
 CREATE POLICY "Allow server update client_users" ON client_users FOR UPDATE USING (true);
 
+-- ==============================================================================
+-- 14. CUSTOM & NEIGHBORHOOD LANDING PAGES TABLE
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS custom_pages (
+  id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  title TEXT NOT NULL,
+  subtitle TEXT,
+  category TEXT DEFAULT 'Neighborhood',
+  hero_image TEXT,
+  content TEXT DEFAULT '',
+  content_col2 TEXT,
+  content_layout TEXT DEFAULT '1-column',
+  cta_text TEXT,
+  cta_url TEXT,
+  secondary_cta_text TEXT,
+  secondary_cta_url TEXT,
+  faqs JSONB DEFAULT '[]'::jsonb,
+  custom_sections JSONB DEFAULT '[]'::jsonb,
+  seo JSONB DEFAULT '{}'::jsonb,
+  is_published BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS update_custom_pages_modtime ON custom_pages;
+CREATE TRIGGER update_custom_pages_modtime
+BEFORE UPDATE ON custom_pages
+FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+ALTER TABLE custom_pages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read custom_pages" ON custom_pages;
+CREATE POLICY "Public read custom_pages" ON custom_pages FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role write custom_pages" ON custom_pages;
+CREATE POLICY "Service role write custom_pages" ON custom_pages FOR ALL USING (true);
+
 

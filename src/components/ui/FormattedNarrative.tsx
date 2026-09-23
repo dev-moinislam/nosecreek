@@ -168,19 +168,22 @@ export default function FormattedNarrative({
       }
 
       const linkText = match[1];
-      const linkHref = match[2].trim();
+      const rawHref = match[2].trim();
+      const isNofollowInMarkdown = rawHref.toLowerCase().includes("nofollow");
+      const cleanLinkHref = rawHref.replace(/["'].*["']/, "").trim();
       const isInternal =
-        linkHref.startsWith("/") ||
-        linkHref.startsWith("#") ||
-        linkHref.includes("nosecreekphysiotherapy.com");
+        cleanLinkHref.startsWith("/") ||
+        cleanLinkHref.startsWith("#") ||
+        cleanLinkHref.includes("nosecreekphysiotherapy.com");
 
       if (isInternal) {
-        const cleanHref = linkHref.replace(/^https?:\/\/(www\.)?nosecreekphysiotherapy\.com/, "");
+        const cleanHref = cleanLinkHref.replace(/^https?:\/\/(www\.)?nosecreekphysiotherapy\.com/, "");
         elements.push(
           <Link
             key={`link-${matchStart}`}
             href={cleanHref || "/"}
             title={linkText}
+            rel={isNofollowInMarkdown ? "nofollow" : undefined}
             style={{
               color: linkColor,
               textDecoration: "underline",
@@ -193,12 +196,13 @@ export default function FormattedNarrative({
           </Link>
         );
       } else {
+        const relVal = isNofollowInMarkdown ? "noopener noreferrer nofollow" : "noopener noreferrer";
         elements.push(
           <a
             key={`link-${matchStart}`}
-            href={linkHref}
+            href={cleanLinkHref}
             target="_blank"
-            rel="noopener noreferrer"
+            rel={relVal}
             title={linkText}
             style={{
               color: linkColor,

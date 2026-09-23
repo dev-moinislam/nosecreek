@@ -95,16 +95,24 @@ export default function RichTextEditor({
     url: string,
     title: string,
     _item?: any,
-    options?: { isExternal?: boolean; openInNewTab?: boolean }
+    options?: { isExternal?: boolean; openInNewTab?: boolean; isNoFollow?: boolean }
   ) => {
     restoreSelection();
     const sel = window.getSelection();
     const selectedText = sel ? sel.toString().trim() : "";
     const linkText = selectedText || title;
     const isExternal = options?.isExternal ?? (url.startsWith("http://") || url.startsWith("https://"));
-    const targetAttr = isExternal || options?.openInNewTab ? ' target="_blank" rel="noopener noreferrer"' : "";
+    const openInNewTab = Boolean(options?.openInNewTab || isExternal);
+    const isNoFollow = Boolean(options?.isNoFollow);
 
-    const linkHtml = `<a href="${url}" title="${title}"${targetAttr} style="color: #0284c7; text-decoration: underline; font-weight: 600;">${linkText}</a>&nbsp;`;
+    const relParts: string[] = [];
+    if (openInNewTab) relParts.push("noopener", "noreferrer");
+    if (isNoFollow) relParts.push("nofollow");
+
+    const targetAttr = openInNewTab ? ' target="_blank"' : "";
+    const relAttr = relParts.length > 0 ? ` rel="${relParts.join(" ")}"` : "";
+
+    const linkHtml = `<a href="${url}" title="${title}"${targetAttr}${relAttr} style="color: #0284c7; text-decoration: underline; font-weight: 600;">${linkText}</a>&nbsp;`;
     const success = document.execCommand("insertHTML", false, linkHtml);
     if (!success && editorRef.current) {
       editorRef.current.innerHTML += linkHtml;

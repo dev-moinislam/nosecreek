@@ -50,7 +50,16 @@ export default function AdminOverviewPage() {
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <Link href="/admin/pages" className="adm-btn adm-btn-secondary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            <span>Landing Pages</span>
+          </Link>
           <Link href="/admin/settings" className="adm-btn adm-btn-primary" style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <SettingsIcon size={16} />
             <span>Clinic Settings & Schemas</span>
@@ -127,6 +136,39 @@ export default function AdminOverviewPage() {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+          <Link
+            href="/admin/pages"
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 14,
+              padding: 18,
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: 12,
+              textDecoration: "none",
+              color: "inherit",
+              transition: "all 0.2s ease"
+            }}
+          >
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(14, 165, 233, 0.12)", color: "#0284c7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 14, color: "#1e293b", marginBottom: 4 }}>
+                Pages &amp; Neighborhoods
+              </div>
+              <div style={{ fontSize: 12.5, color: "#64748b", lineHeight: 1.4 }}>
+                Create local landing pages (Beddington, Thorncliffe, etc.), rich text narratives, and custom routes.
+              </div>
+            </div>
+          </Link>
+
           <Link
             href="/admin/settings"
             style={{

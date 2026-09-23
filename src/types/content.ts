@@ -7,6 +7,7 @@ export interface PageMetaItem {
   ogImage?: string;
   keywords?: string;
   noIndex?: boolean;
+  noFollow?: boolean;
 }
 
 export interface SEOData {
@@ -271,6 +272,7 @@ export interface BlogPost {
   readingTime?: string;
   relatedPosts?: string[]; // slugs
   href?: string;
+  is_published?: boolean;
   seo?: SEOData;
 }
 
@@ -426,3 +428,42 @@ export interface HomePageData {
   sectionsData?: Record<string, SectionBlockConfig>;
 }
 
+export interface CustomPage {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle?: string;
+  category?: "Neighborhood" | "Landing Page" | "General";
+  pageType?: "neighborhood" | "custom";
+  neighborhoodName?: string;
+  hero_image?: string;
+  heroBadge?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  content?: string;
+  content_col2?: string;
+  columnTwoContent?: string;
+  content_layout?: "1-column" | "2-column";
+  layout?: "one-column" | "two-column";
+  cta_text?: string;
+  cta_url?: string;
+  primaryCtaText?: string;
+  primaryCtaUrl?: string;
+  secondary_cta_text?: string;
+  secondary_cta_url?: string;
+  secondaryCtaText?: string;
+  secondaryCtaUrl?: string;
+  faqs?: FAQItem[];
+  custom_sections?: SectionBlockConfig[];
+  seo?: PageMetaItem;
+  seoTitle?: string;
+  seoDescription?: string;
+  noIndex?: boolean;
+  noFollow?: boolean;
+  is_published?: boolean;
+  isPublished?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

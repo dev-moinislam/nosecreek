@@ -453,6 +453,61 @@ export async function POST(req: Request) {
       }
     }
 
+    // Backend Supabase sync for custom_pages & neighborhood landing pages
+    if (type === "custom_pages" && Array.isArray(data)) {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          if (deletedSlug) {
+            try {
+              await supabase.from("custom_pages").delete().eq("slug", deletedSlug);
+              await supabase.from("custom_pages").delete().eq("id", deletedSlug);
+            } catch {}
+          }
+
+          // 1. Mirror into site_settings.marketing.custom_pages for high resilience
+          const { data: stRow } = await supabase.from("site_settings").select("marketing").eq("id", "main").maybeSingle();
+          const curMarketing = stRow?.marketing || {};
+          await supabase.from("site_settings").update({
+            marketing: {
+              ...curMarketing,
+              custom_pages: data
+            },
+            updated_at: new Date().toISOString()
+          }).eq("id", "main");
+
+          // 2. Upsert into dedicated custom_pages table if table exists
+          const rows = data.map((p: any) => ({
+            id: p.id || `page-${p.slug}`,
+            slug: p.slug,
+            title: p.title,
+            subtitle: p.subtitle || null,
+            category: p.category || "Neighborhood",
+            hero_image: p.hero_image || p.heroImage || null,
+            content: p.content || "",
+            content_col2: p.content_col2 || p.contentCol2 || null,
+            content_layout: p.content_layout || p.contentLayout || "1-column",
+            cta_text: p.cta_text || p.ctaText || null,
+            cta_url: p.cta_url || p.ctaUrl || null,
+            secondary_cta_text: p.secondary_cta_text || p.secondaryCtaText || null,
+            secondary_cta_url: p.secondary_cta_url || p.secondaryCtaUrl || null,
+            faqs: Array.isArray(p.faqs) ? p.faqs : [],
+            custom_sections: Array.isArray(p.custom_sections) ? p.custom_sections : (Array.isArray(p.customSections) ? p.customSections : []),
+            seo: p.seo || {},
+            is_published: p.is_published !== false,
+            updated_at: new Date().toISOString()
+          }));
+
+          try {
+            await supabase.from("custom_pages").upsert(rows, { onConflict: "slug" });
+          } catch (tErr) {
+            console.warn("custom_pages table upsert skipped (table might not exist yet):", tErr);
+          }
+        } catch (supaErr) {
+          console.warn("custom_pages sync error:", supaErr);
+        }
+      }
+    }
+
     // Instant cache purge across all affected routes
     try {
       if (type === "team") {
@@ -481,6 +536,16 @@ export async function POST(req: Request) {
         revalidatePath("/locations");
         revalidatePath("/locations/[slug]", "page");
         revalidatePath("/", "layout");
+      } else if (type === "custom_pages") {
+        revalidatePath("/", "layout");
+        if (deletedSlug) {
+          revalidatePath(`/${deletedSlug}`);
+        }
+        if (Array.isArray(data)) {
+          data.forEach((p: any) => {
+            if (p.slug) revalidatePath(`/${p.slug}`);
+          });
+        }
       } else if (type === "settings") {
         revalidatePath("/", "layout");
         revalidatePath("/");

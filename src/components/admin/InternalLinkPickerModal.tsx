@@ -7,6 +7,7 @@ import { SearchIcon, XIcon, CheckIcon, LinkIcon } from "./AdminIcons";
 export interface LinkSelectOptions {
   isExternal?: boolean;
   openInNewTab?: boolean;
+  isNoFollow?: boolean;
 }
 
 interface InternalLinkPickerModalProps {
@@ -99,6 +100,10 @@ export default function InternalLinkPickerModal({
   const [customText, setCustomText] = useState("");
   const [selectedRoute, setSelectedRoute] = useState<InternalRouteItem | null>(null);
 
+  // Link options states
+  const [isNoFollow, setIsNoFollow] = useState(false);
+  const [internalOpenInNewTab, setInternalOpenInNewTab] = useState(false);
+
   // External Link states
   const [externalUrl, setExternalUrl] = useState(isInitiallyExternal ? initialUrl : "");
   const [externalTitle, setExternalTitle] = useState("");
@@ -136,7 +141,11 @@ export default function InternalLinkPickerModal({
   // Handle selecting an internal route
   const handleSelectInternal = (route: InternalRouteItem) => {
     const finalTitle = customText.trim() || route.title;
-    onSelect(route.url, finalTitle, route, { isExternal: false, openInNewTab: false });
+    onSelect(route.url, finalTitle, route, {
+      isExternal: false,
+      openInNewTab: internalOpenInNewTab,
+      isNoFollow
+    });
     onClose();
   };
 
@@ -166,7 +175,11 @@ export default function InternalLinkPickerModal({
       }
     }
 
-    onSelect(cleanUrl, finalTitle, undefined, { isExternal: true, openInNewTab });
+    onSelect(cleanUrl, finalTitle, undefined, {
+      isExternal: true,
+      openInNewTab,
+      isNoFollow
+    });
     onClose();
   };
 
@@ -637,7 +650,7 @@ export default function InternalLinkPickerModal({
                     onChange={(e) => setCustomText(e.target.value)}
                     style={{
                       width: "100%",
-                      maxWidth: 280,
+                      maxWidth: 240,
                       padding: "6px 10px",
                       borderRadius: 6,
                       border: "1px solid #cbd5e1",
@@ -647,6 +660,28 @@ export default function InternalLinkPickerModal({
                   />
                 </div>
               )}
+
+              {/* Internal Link Directives */}
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 600, color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={internalOpenInNewTab}
+                    onChange={(e) => setInternalOpenInNewTab(e.target.checked)}
+                    style={{ accentColor: "#0284c7" }}
+                  />
+                  <span>New Tab</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700, color: isNoFollow ? "#b91c1c" : "#334155", cursor: "pointer" }} title="Tell search engines not to follow or pass PageRank authority through this link">
+                  <input
+                    type="checkbox"
+                    checked={isNoFollow}
+                    onChange={(e) => setIsNoFollow(e.target.checked)}
+                    style={{ accentColor: "#dc2626" }}
+                  />
+                  <span>rel="nofollow"</span>
+                </label>
+              </div>
 
               <div style={{ display: "flex", gap: 10, marginLeft: "auto" }}>
                 <button
@@ -762,14 +797,17 @@ export default function InternalLinkPickerModal({
                 </p>
               </div>
 
-              {/* Open in New Tab Toggle */}
+              {/* Link Directives: Open in New Tab & NoFollow */}
               <div
                 style={{
                   background: "#f8fafc",
                   border: "1px solid #e2e8f0",
                   borderRadius: 10,
                   padding: "12px 16px",
-                  marginBottom: 20
+                  marginBottom: 20,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12
                 }}
               >
                 <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
@@ -785,6 +823,25 @@ export default function InternalLinkPickerModal({
                     </strong>
                     <p style={{ margin: 0, fontSize: 11.5, color: "#64748b" }}>
                       Recommended for external sites so patients do not leave your clinic website.
+                    </p>
+                  </div>
+                </label>
+
+                <div style={{ height: 1, background: "#e2e8f0" }} />
+
+                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={isNoFollow}
+                    onChange={(e) => setIsNoFollow(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: "#dc2626" }}
+                  />
+                  <div>
+                    <strong style={{ fontSize: 13, color: isNoFollow ? "#b91c1c" : "#0f172a" }}>
+                      Mark as nofollow (rel="nofollow")
+                    </strong>
+                    <p style={{ margin: 0, fontSize: 11.5, color: "#64748b" }}>
+                      Instructs search engines not to crawl or transfer SEO PageRank authority to this external destination.
                     </p>
                   </div>
                 </label>

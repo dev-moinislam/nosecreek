@@ -24,6 +24,7 @@ export default function AdminSeoManagerPage() {
   const [customPages, setCustomPages] = useState<Record<string, PageMetaItem>>({});
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [robotsFilter, setRobotsFilter] = useState<"all" | "indexable" | "noindex">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [editingPath, setEditingPath] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<PageMetaItem>({});
@@ -112,15 +113,29 @@ export default function AdminSeoManagerPage() {
     };
   }, []);
 
-  const categories = ["All", "Core Pages", "Clinical Services", "Conditions We Treat", "Sub-Pages", "Blog Posts", "Team & Locations"];
+  const categories = [
+    "All",
+    "Core Pages",
+    "Neighborhood & Custom Pages",
+    "Clinical Services",
+    "Conditions We Treat",
+    "Sub-Pages",
+    "Blog Posts",
+    "Team & Locations"
+  ];
 
   const filteredRoutes = routes.filter((r) => {
     const matchesCategory =
       activeCategory === "All" ||
       (activeCategory === "Team & Locations" ? r.category === "Team Members" || r.category === "Clinic Locations" : r.category === activeCategory);
 
-    const q = searchQuery.toLowerCase().trim();
     const custom = customPages[r.path];
+    const isNoIndex = Boolean(custom?.noIndex);
+    const matchesRobots =
+      robotsFilter === "all" ||
+      (robotsFilter === "noindex" ? isNoIndex : !isNoIndex);
+
+    const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
       !q ||
       r.name.toLowerCase().includes(q) ||
@@ -133,7 +148,7 @@ export default function AdminSeoManagerPage() {
       (custom?.title && custom.title.toLowerCase().includes(q)) ||
       (custom?.description && custom.description.toLowerCase().includes(q));
 
-    return matchesCategory && matchesSearch;
+    return matchesCategory && matchesRobots && matchesSearch;
   });
 
   const handleOpenEdit = (route: SiteRouteInfo) => {
@@ -147,7 +162,8 @@ export default function AdminSeoManagerPage() {
       ogDescription: existing.ogDescription || existing.description || route.defaultDescription,
       ogImage: existing.ogImage || route.defaultOgImage || settings.seo?.ogImage || "/images/og-home.jpg",
       keywords: existing.keywords || "",
-      noIndex: existing.noIndex || false
+      noIndex: Boolean(existing.noIndex),
+      noFollow: Boolean(existing.noFollow)
     });
   };
 
@@ -168,7 +184,9 @@ export default function AdminSeoManagerPage() {
         ogTitle: editForm.ogTitle?.trim() || undefined,
         ogDescription: editForm.ogDescription?.trim() || undefined,
         ogImage: editForm.ogImage?.trim() || undefined,
-        keywords: editForm.keywords?.trim() || undefined
+        keywords: editForm.keywords?.trim() || undefined,
+        noIndex: Boolean(editForm.noIndex),
+        noFollow: Boolean(editForm.noFollow)
       }
     };
 
@@ -336,26 +354,50 @@ export default function AdminSeoManagerPage() {
             })}
           </div>
 
-          {/* Search Box */}
-          <div style={{ minWidth: 260, position: "relative" }}>
-            <input
-              type="text"
-              placeholder="Search by page name, URL slug..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "8px 12px 8px 34px",
-                borderRadius: 8,
-                border: "1px solid #cbd5e1",
-                fontSize: 13,
-                outline: "none",
-                background: "#f8fafc"
-              }}
-            />
-            <span style={{ position: "absolute", left: 10, top: 9, color: "#94a3b8", pointerEvents: "none" }}>
-              🔍
-            </span>
+          {/* Search & Robots Filters */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: "#475569" }}>Robots:</span>
+              <select
+                value={robotsFilter}
+                onChange={(e) => setRobotsFilter(e.target.value as any)}
+                style={{
+                  padding: "7px 10px",
+                  borderRadius: 8,
+                  border: "1px solid #cbd5e1",
+                  fontSize: 12.5,
+                  background: "#ffffff",
+                  fontWeight: 600,
+                  color: "#1e293b",
+                  outline: "none"
+                }}
+              >
+                <option value="all">All Statuses</option>
+                <option value="indexable">🟢 Indexable Only</option>
+                <option value="noindex">⛔ No-Index Only</option>
+              </select>
+            </div>
+
+            <div style={{ minWidth: 240, position: "relative" }}>
+              <input
+                type="text"
+                placeholder="Search by page name, URL slug..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "8px 12px 8px 34px",
+                  borderRadius: 8,
+                  border: "1px solid #cbd5e1",
+                  fontSize: 13,
+                  outline: "none",
+                  background: "#f8fafc"
+                }}
+              />
+              <span style={{ position: "absolute", left: 10, top: 9, color: "#94a3b8", pointerEvents: "none" }}>
+                🔍
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -377,27 +419,30 @@ export default function AdminSeoManagerPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569", fontWeight: 700 }}>
-                  <th style={{ padding: "12px 18px", width: "22%" }}>Page &amp; Route</th>
-                  <th style={{ padding: "12px 18px", width: "28%" }}>Meta Title (Google Tab)</th>
-                  <th style={{ padding: "12px 18px", width: "22%" }}>Meta Description</th>
-                  <th style={{ padding: "12px 18px", width: "18%" }}>Canonical URL</th>
+                  <th style={{ padding: "12px 18px", width: "20%" }}>Page &amp; Route</th>
+                  <th style={{ padding: "12px 18px", width: "13%" }}>Robots Status</th>
+                  <th style={{ padding: "12px 18px", width: "25%" }}>Meta Title (Google Tab)</th>
+                  <th style={{ padding: "12px 18px", width: "20%" }}>Meta Description</th>
+                  <th style={{ padding: "12px 18px", width: "14%" }}>Canonical URL</th>
                   <th style={{ padding: "12px 18px", width: "8%", textAlign: "right", whiteSpace: "nowrap" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRoutes.map((route, idx) => {
                   const custom = customPages[route.path];
-                  const hasCustom = Boolean(custom?.title || custom?.description || custom?.canonicalUrl);
+                  const hasCustom = Boolean(custom?.title || custom?.description || custom?.canonicalUrl || custom?.noIndex !== undefined);
                   const activeTitle = custom?.title || route.defaultTitle;
                   const activeDesc = custom?.description || route.defaultDescription;
                   const hasCustomCanonical = Boolean(custom?.canonicalUrl);
+                  const isNoIndex = Boolean(custom?.noIndex);
+                  const isNoFollow = Boolean(custom?.noFollow);
 
                   return (
                     <tr
                       key={route.path}
                       style={{
                         borderBottom: idx < filteredRoutes.length - 1 ? "1px solid #f1f5f9" : "none",
-                        background: hasCustom ? "#f0fdf4" : "transparent",
+                        background: isNoIndex ? "#fff5f5" : (hasCustom ? "#f0fdf4" : "transparent"),
                         transition: "background 0.15s ease"
                       }}
                     >
@@ -445,6 +490,55 @@ export default function AdminSeoManagerPage() {
                             {hasCustom ? "✓ Custom Meta Set" : "Default"}
                           </span>
                         </div>
+                      </td>
+
+                      {/* Robots Directive Status */}
+                      <td style={{ padding: "14px 18px", verticalAlign: "top" }}>
+                        {isNoIndex ? (
+                          <div style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}>
+                            <span style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              padding: "3px 8px",
+                              borderRadius: 6,
+                              background: "#fee2e2",
+                              color: "#b91c1c",
+                              border: "1px solid #fecaca",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 4
+                            }}>
+                              <span>⛔</span> noindex
+                            </span>
+                            {isNoFollow && (
+                              <span style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                padding: "2px 6px",
+                                borderRadius: 4,
+                                background: "#fef3c7",
+                                color: "#92400e"
+                              }}>
+                                🛑 nofollow
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: "3px 8px",
+                            borderRadius: 6,
+                            background: "#f0fdf4",
+                            color: "#166534",
+                            border: "1px solid #bbf7d0",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4
+                          }}>
+                            <span>🟢</span> index{isNoFollow ? ", nofollow" : ", follow"}
+                          </span>
+                        )}
                       </td>
 
                       {/* Meta Title */}
@@ -711,6 +805,80 @@ export default function AdminSeoManagerPage() {
                     </span>
                   )}
                 </span>
+              </div>
+
+              {/* Robots & Indexing Directives */}
+              <div style={{ background: "#f8fafc", padding: 16, borderRadius: 12, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <label className="adm-form-label" style={{ margin: 0, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>🤖</span> Search Engine Indexing &amp; Robots Directives
+                  </label>
+                  {editForm.noIndex ? (
+                    <span style={{ fontSize: 11, background: "#fee2e2", color: "#b91c1c", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      ⛔ Disallowed (noindex)
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 11, background: "#f0fdf4", color: "#166534", padding: "2px 8px", borderRadius: 4, fontWeight: 700 }}>
+                      🟢 Indexable (index)
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 10 }}>
+                  {/* NoIndex Checkbox */}
+                  <label style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 10,
+                    cursor: "pointer",
+                    background: editForm.noIndex ? "#fef2f2" : "#ffffff",
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    border: editForm.noIndex ? "1px solid #fecaca" : "1px solid #cbd5e1"
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(editForm.noIndex)}
+                      onChange={(e) => setEditForm({ ...editForm, noIndex: e.target.checked })}
+                      style={{ marginTop: 2, width: 16, height: 16, cursor: "pointer" }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: editForm.noIndex ? "#dc2626" : "#0f172a" }}>
+                        Exclude this page from Search Engines (`noindex`)
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 2, lineHeight: 1.4 }}>
+                        Tells Google, Bing, and web crawlers <strong>NOT to index</strong> this page in search results. This page will also automatically be excluded from all XML Sitemaps.
+                      </div>
+                    </div>
+                  </label>
+
+                  {/* NoFollow Checkbox */}
+                  <label style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 10,
+                    cursor: "pointer",
+                    background: editForm.noFollow ? "#fffbeb" : "#ffffff",
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    border: editForm.noFollow ? "1px solid #fef3c7" : "1px solid #cbd5e1"
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(editForm.noFollow)}
+                      onChange={(e) => setEditForm({ ...editForm, noFollow: e.target.checked })}
+                      style={{ marginTop: 2, width: 16, height: 16, cursor: "pointer" }}
+                    />
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: editForm.noFollow ? "#d97706" : "#0f172a" }}>
+                        Instruct crawlers not to follow links (`nofollow`)
+                      </div>
+                      <div style={{ fontSize: 11.5, color: "#64748b", marginTop: 2, lineHeight: 1.4 }}>
+                        Tells search engines not to crawl or transfer PageRank authority to links contained on this page.
+                      </div>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               {/* Keywords */}

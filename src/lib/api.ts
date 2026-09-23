@@ -6,7 +6,8 @@ import {
   Location,
   Condition,
   Testimonial,
-  HomePageData
+  HomePageData,
+  CustomPage
 } from "@/types/content";
 import { supabase, isSupabaseConfigured } from "./supabase/client";
 
@@ -565,4 +566,91 @@ export async function getHomeContent(): Promise<HomePageData> {
   }
 
   return {} as HomePageData;
+}
+
+/**
+ * Custom & Neighborhood Landing Pages — Loaded authoritatively from Supabase
+ */
+export async function getCustomPages(): Promise<CustomPage[]> {
+  const deletedSlugs = await getDeletedSlugsSet();
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      // 1. Try querying the dedicated custom_pages table
+      const { data, error } = await supabase
+        .from("custom_pages")
+        .select("*")
+        .eq("is_published", true)
+        .order("created_at", { ascending: false });
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        return data
+          .filter((p: any) => !deletedSlugs.has(p.slug))
+          .map((p: any) => ({
+            id: p.id,
+            slug: p.slug,
+            title: p.title,
+            subtitle: p.subtitle || undefined,
+            category: p.category || "Neighborhood",
+            hero_image: p.hero_image || undefined,
+            content: p.content || "",
+            content_col2: p.content_col2 || undefined,
+            content_layout: p.content_layout || "1-column",
+            cta_text: p.cta_text || undefined,
+            cta_url: p.cta_url || undefined,
+            secondary_cta_text: p.secondary_cta_text || undefined,
+            secondary_cta_url: p.secondary_cta_url || undefined,
+            faqs: Array.isArray(p.faqs) ? p.faqs : [],
+            custom_sections: Array.isArray(p.custom_sections) ? p.custom_sections : [],
+            seo: p.seo || {},
+            is_published: p.is_published !== false,
+            created_at: p.created_at,
+            updated_at: p.updated_at
+          }));
+      }
+
+      // 2. Fallback: check site_settings.marketing.custom_pages
+      const { data: stData } = await supabase
+        .from("site_settings")
+        .select("marketing")
+        .eq("id", "main")
+        .maybeSingle();
+
+      const pages = stData?.marketing?.custom_pages;
+      if (Array.isArray(pages) && pages.length > 0) {
+        return pages
+          .filter((p: any) => p.is_published !== false && !deletedSlugs.has(p.slug))
+          .map((p: any) => ({
+            ...p,
+            content_layout: p.content_layout || "1-column",
+            faqs: Array.isArray(p.faqs) ? p.faqs : [],
+            custom_sections: Array.isArray(p.custom_sections) ? p.custom_sections : [],
+            seo: p.seo || {}
+          }));
+      }
+    } catch (e) {
+      console.warn("Supabase fetch failed for custom_pages", e);
+    }
+  }
+
+  // Client-side local override in dev / fallback
+  if (typeof window !== "undefined") {
+    try {
+      const local = localStorage.getItem("adm_custom_pages");
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((p: any) => p.is_published !== false && !deletedSlugs.has(p.slug));
+        }
+      }
+    } catch {}
+  }
+
+  return [];
+}
+
+export async function getCustomPageBySlug(slug: string): Promise<CustomPage | null> {
+  const cleanSlug = slug.toLowerCase().trim();
+  const all = await getCustomPages();
+  return all.find((p) => p.slug.toLowerCase() === cleanSlug) || null;
 }

@@ -1,11 +1,11 @@
 import { Metadata } from "next";
-import { getSiteSettings, getServices, getConditions, getBlogPosts, getTeamMembers, getLocations } from "@/lib/api";
+import { getSiteSettings, getServices, getConditions, getBlogPosts, getTeamMembers, getLocations, getCustomPages } from "@/lib/api";
 import { PageMetaItem } from "@/types/content";
 
 export interface SiteRouteInfo {
   path: string;
   name: string;
-  category: "Core Pages" | "Clinical Services" | "Conditions We Treat" | "Sub-Pages" | "Blog Posts" | "Team Members" | "Clinic Locations";
+  category: "Core Pages" | "Clinical Services" | "Conditions We Treat" | "Sub-Pages" | "Blog Posts" | "Team Members" | "Clinic Locations" | "Neighborhood & Custom Pages";
   parentName?: string;
   parentSlug?: string;
   isSubPage?: boolean;
@@ -107,12 +107,13 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
   const routes: SiteRouteInfo[] = [...CORE_PAGES];
 
   try {
-    const [services, conditions, posts, team, locations] = await Promise.all([
+    const [services, conditions, posts, team, locations, customPages] = await Promise.all([
       getServices().catch(() => []),
       getConditions().catch(() => []),
       getBlogPosts().catch(() => []),
       getTeamMembers().catch(() => []),
-      getLocations().catch(() => [])
+      getLocations().catch(() => []),
+      getCustomPages().catch(() => [])
     ]);
 
     // 1. Services
@@ -185,6 +186,21 @@ export async function getAllSiteRoutes(): Promise<SiteRouteInfo[]> {
         defaultDescription: l.address ? `Find our clinic at ${l.address}. Direct insurance billing and free parking.` : "Clinic location details.",
         defaultOgImage: l.images && l.images.length > 0 ? l.images[0] : undefined
       });
+    });
+
+    // 6. Custom & Neighborhood Landing Pages
+    customPages.forEach((cp) => {
+      const pagePath = `/${cp.slug}`;
+      if (!routes.some((r) => r.path === pagePath)) {
+        routes.push({
+          path: pagePath,
+          name: `${cp.title} (${cp.pageType === "neighborhood" ? "Neighborhood Page" : "Custom Landing Page"})`,
+          category: "Neighborhood & Custom Pages",
+          defaultTitle: cp.seoTitle || `${cp.title} | Nose Creek Physiotherapy`,
+          defaultDescription: cp.seoDescription || cp.heroSubtitle || "Expert personalized physiotherapy in Calgary.",
+          defaultOgImage: undefined
+        });
+      }
     });
 
     // 6. Navigation Custom Pages Discovery
@@ -281,7 +297,24 @@ export async function resolvePageMetadata(
       getSiteBaseUrl()
     ]);
     const customPages = settings.seo?.pages || {};
-    const custom = customPages[pathname];
+    let custom = customPages[pathname];
+    if (!custom && !pathname.includes("/admin") && !pathname.includes("/api")) {
+      const slug = pathname.replace(/^\//, "").trim();
+      if (slug && !slug.includes("/")) {
+        try {
+          const { getCustomPageBySlug } = await import("@/lib/api");
+          const cp = await getCustomPageBySlug(slug);
+          if (cp) {
+            custom = {
+              title: cp.seoTitle || cp.seo?.title,
+              description: cp.seoDescription || cp.seo?.description || cp.subtitle,
+              noIndex: cp.noIndex ?? cp.seo?.noIndex,
+              noFollow: cp.noFollow ?? cp.seo?.noFollow
+            };
+          }
+        } catch {}
+      }
+    }
 
     const fallbackTitleStr = typeof fallback.title === "string" 
       ? fallback.title 
@@ -348,7 +381,17 @@ export async function resolvePageMetadata(
         images: [ogImage],
       },
       ...(custom?.keywords ? { keywords: custom.keywords } : {}),
-      ...(custom?.noIndex ? { robots: { index: false, follow: false } } : {})
+      robots: {
+        index: !custom?.noIndex,
+        follow: !custom?.noFollow,
+        googleBot: {
+          index: !custom?.noIndex,
+          follow: !custom?.noFollow,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1
+        }
+      }
     };
   } catch (err) {
     console.warn(`Error resolving metadata for ${pathname}:`, err);
