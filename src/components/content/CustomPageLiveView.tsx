@@ -708,8 +708,47 @@ export default function CustomPageLiveView({
         );
       }
 
-      case "bottom_cta":
       case "decision_ctas": {
+        const title = cfg?.title || "Want help deciding if physio is right for you?";
+        const subtitle = cfg?.subtitle || cfg?.content || "Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first.";
+        return (
+          <section key="decision_ctas" style={{ padding: "clamp(56px, 7vw, 96px) 0", background: cfg?.background === "teal" ? "#12303d" : cfg?.background === "light" ? "#f8fafc" : "#ffffff" }}>
+            <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
+              <div style={{ textAlign: "center", maxWidth: 680, margin: "0 auto 40px" }}>
+                {cfg?.eyebrow && eyebrowEl(cfg.eyebrow, cfg.eyebrowColor || "#1c9fd8")}
+                <h2 style={{ fontFamily: "'Poppins',sans-serif", fontSize: "clamp(26px, 3.8vw, 42px)", fontWeight: 800, letterSpacing: "-0.5px", color: cfg?.background === "teal" ? "#fff" : "#1d2b34" }}>
+                  {title}
+                </h2>
+                <p style={{ marginTop: 14, fontSize: 16, color: cfg?.background === "teal" ? "#cbdbe4" : "#5a6570", lineHeight: 1.6 }}>
+                  {subtitle}
+                </p>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+                <div style={{ background: "linear-gradient(160deg, var(--secondary, #6faf1c), var(--secondary-hover, #5c9515))", color: "#fff", borderRadius: 20, padding: 34 }}>
+                  <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>Free Discovery Session</h3>
+                  <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#eaf6da" }}>
+                    Unsure if physiotherapy will work for your condition, or had a bad experience elsewhere? Come in, tour our clinic and talk to a physiotherapist — no treatment, no pressure.
+                  </p>
+                  <Link href="/free-discovery-session" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--secondary-hover, #5c9515)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                    Apply for a Free Discovery Session &rarr;
+                  </Link>
+                </div>
+                <div style={{ background: "linear-gradient(160deg, var(--primary, #1c9fd8), var(--primary-hover, #1179ab))", color: "#fff", borderRadius: 20, padding: 34 }}>
+                  <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>Talk to a Physio First</h3>
+                  <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.65, color: "#e2f2fa" }}>
+                    Have questions about symptoms, recovery timelines, or insurance coverage? Schedule a free phone consultation with our Calgary clinical team.
+                  </p>
+                  <a href="tel:4032958590" style={{ display: "inline-block", marginTop: 20, background: "#fff", color: "var(--primary-hover, #1179ab)", fontFamily: "'Poppins',sans-serif", fontWeight: 700, padding: "13px 24px", borderRadius: 9, textDecoration: "none" }}>
+                    Arrange a Free Phone Consult &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      case "bottom_cta": {
         const ctaTitle = cfg?.title || "Ready to Get Back to Doing What You Love?";
         const ctaSubtitle = cfg?.subtitle || "Our experienced Calgary physiotherapists are ready to help you recover faster with personalized, one-on-one care. No doctor referral required.";
         const primaryText = cfg?.ctaText || page.primaryCtaText || page.cta_text || "Inquire About Cost & Availability";
@@ -717,7 +756,7 @@ export default function CustomPageLiveView({
 
         return (
           <section
-            key={key}
+            key="bottom_cta"
             style={{
               background: "linear-gradient(135deg, #0a2540 0%, #162e4a 100%)",
               color: "#ffffff",

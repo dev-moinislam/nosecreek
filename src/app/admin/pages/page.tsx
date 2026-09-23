@@ -26,7 +26,21 @@ import {
   SlidersIcon,
   CheckIcon,
   XIcon,
-  ExternalLinkIcon
+  ExternalLinkIcon,
+  StethoscopeIcon,
+  ActivityIcon,
+  CheckCircleIcon,
+  FileTextIcon,
+  CompassIcon,
+  StarIcon,
+  UsersIcon,
+  MapPinIcon,
+  HelpCircleIcon,
+  TargetIcon,
+  RocketIcon,
+  ColumnsIcon,
+  LayersIcon,
+  ImageIcon
 } from "@/components/admin/AdminIcons";
 
 // Pre-defined Calgary neighborhood presets for quick 1-click creation
@@ -267,8 +281,292 @@ const SECTION_DEFINITIONS: Record<string, { label: string; icon: string; default
     icon: "🚀",
     defaultTitle: "Ready to Get Back to Doing What You Love?",
     description: "High-converting closing banner with Cost & Availability and Free Discovery buttons."
+  },
+  decision_ctas: {
+    label: "Free Discovery & Phone CTAs",
+    icon: "🎯",
+    defaultTitle: "Want help deciding if physio is right for you?",
+    description: "Two low-friction cards for Free Discovery Sessions and Telephone Consultations."
   }
 };
+
+const PAGE_SECTION_TEMPLATES = [
+  // Category 1: Clinical & Community Core
+  {
+    category: "Clinical & Community Core",
+    icon: <StethoscopeIcon size={15} />,
+    color: "#0369a1",
+    items: [
+      {
+        id: "clinical_overview",
+        title: "Clinical Overview & Care Narrative",
+        desc: "Rich narrative overview with 1-col or 2-col layout, clinical methodology & side image.",
+        iconComponent: <StethoscopeIcon size={18} />,
+        iconBg: "#e0f2fe",
+        iconColor: "#0284c7",
+        preset: {
+          eyebrow: "Evidence-Based Clinical Care",
+          title: "Comprehensive Physical Therapy & Rehabilitation",
+          subtitle: "Dedicated one-on-one recovery protocols in Calgary North",
+          content: "<p>At Nose Creek Physiotherapy, our licensed clinicians take the time to evaluate movement mechanics, joint mobility, and neurological function.</p>",
+          imagePosition: "right",
+          background: "white"
+        }
+      },
+      {
+        id: "at_a_glance",
+        title: "At-A-Glance Community Highlights",
+        desc: "4 highlight cards: Duration, direct billing, no-referral, free plaza parking.",
+        iconComponent: <ActivityIcon size={18} />,
+        iconBg: "#fef3c7",
+        iconColor: "#d97706",
+        preset: {
+          title: "Clinic Highlights & Care Features",
+          background: "light"
+        }
+      },
+      {
+        id: "benefits",
+        title: "Key Patient Benefits Grid",
+        desc: "Highlighted checklist of proven clinical outcomes and clinic advantages.",
+        iconComponent: <CheckCircleIcon size={18} />,
+        iconBg: "#dcfce7",
+        iconColor: "#16a34a",
+        preset: {
+          eyebrow: "Proven Clinical Outcomes",
+          title: "Why Calgary Patients Trust Our Rehabilitation Team",
+          background: "light",
+          bullets: [
+            "Over 23 Years of Trusted Calgary Clinical Excellence",
+            "Direct Billing to 25+ Extended Health Insurers",
+            "FCAMPT Certified Manual Therapy Clinicians",
+            "Free Dedicated Parking Directly Outside Clinic Doors",
+            "Early Morning at 6:45 AM & Saturday Appointments",
+            "No Doctor Referral Required to Start Treatment"
+          ]
+        }
+      },
+      {
+        id: "symptoms",
+        title: "Targeted Symptoms & Conditions",
+        desc: "Grid of common symptoms, injuries, and mobility complaints treated.",
+        iconComponent: <FileTextIcon size={18} />,
+        iconBg: "#fee2e2",
+        iconColor: "#dc2626",
+        preset: {
+          eyebrow: "Conditions & Complaints",
+          title: "Common Limitations We Treat",
+          imagePosition: "left",
+          background: "white",
+          bullets: [
+            "Lower Back Pain, Sciatica & Herniated Discs",
+            "Neck Pain, Whiplash & Posture Strain",
+            "Shoulder Impingement & Rotator Cuff Tears",
+            "Knee Pain, Ligament Strains & Runner's Knee",
+            "Sports Injuries, Sprains & Tendonitis",
+            "Workplace (WCB) & Motor Vehicle Accidents (MVA)"
+          ]
+        }
+      },
+      {
+        id: "treatment_approach",
+        title: "4-Step Patient Care Journey",
+        desc: "Step roadmap with custom <h3> titles and descriptive paragraphs.",
+        iconComponent: <CompassIcon size={18} />,
+        iconBg: "#e0e7ff",
+        iconColor: "#4f46e5",
+        preset: {
+          eyebrow: "Care Pathway",
+          title: "Your 4-Step Recovery Journey",
+          background: "teal",
+          bullets: [
+            "Comprehensive 60-Minute Assessment: In-depth biomechanical and mobility evaluation to uncover root causes.",
+            "Targeted Manual Therapy: Hands-on joint mobilization and soft-tissue release for rapid, natural pain relief.",
+            "Individualized Active Rehabilitation: Customized progressive strengthening and stabilization exercises.",
+            "Long-Term Prevention Strategy: Posture retraining, ergonomics, and home maintenance for lasting health."
+          ]
+        }
+      }
+    ]
+  },
+  // Category 2: Custom Storytelling & Visual Media
+  {
+    category: "Custom Storytelling & Visual Media",
+    icon: <ImageIcon size={15} />,
+    color: "#15803d",
+    items: [
+      {
+        isCustom: true,
+        title: "Custom Story (Right Photo)",
+        desc: "Right photo with headline, narrative paragraphs & checkmarks on the left.",
+        iconComponent: <ColumnsIcon size={18} />,
+        iconBg: "#e0f2fe",
+        iconColor: "#0284c7",
+        preset: {
+          eyebrow: "Community-Focused Care",
+          eyebrowColor: "#1c9fd8",
+          title: "State-of-the-Art Rehabilitation in North Calgary",
+          subtitle: "Designed for your comfort, privacy, and active recovery",
+          content: "Our Calgary clinics feature fully equipped private treatment rooms and active exercise gym spaces to provide the highest standard of one-on-one physiotherapy care.",
+          bullets: [
+            "Private consultation and treatment rooms",
+            "Advanced modalities: Shockwave, IMS/Dry Needling & Laser",
+            "Active exercise rehabilitation gym space"
+          ],
+          image: "/images/clinic/reception-one.jpg",
+          imagePosition: "right",
+          background: "white"
+        }
+      },
+      {
+        isCustom: true,
+        title: "Custom Story (Left Photo)",
+        desc: "Left photo with clinical explanation, story, and treatment methodology.",
+        iconComponent: <LayersIcon size={18} />,
+        iconBg: "#dcfce7",
+        iconColor: "#16a34a",
+        preset: {
+          eyebrow: "Tailored Recovery",
+          eyebrowColor: "#10b981",
+          title: "Personalized Protocols Tailored to Your Recovery Milestones",
+          subtitle: "Evidence-based therapy for lasting mobility and athletic return",
+          content: "We create tailored rehabilitation milestones for your daily routine, whether returning to high-performance sports or comfortable everyday living.",
+          bullets: [
+            "Custom milestone tracking and progress measurements",
+            "Direct communication with your family physician if requested",
+            "Ergonomic and workplace postural guidance"
+          ],
+          image: "/images/clinic/reception-two.jpg",
+          imagePosition: "left",
+          background: "light"
+        }
+      },
+      {
+        isCustom: true,
+        title: "Dark Clinic Teal Banner",
+        desc: "High-contrast dark teal banner with bright green bullets & white text.",
+        iconComponent: <SparklesIcon size={18} />,
+        iconBg: "#12303d",
+        iconColor: "#f6c945",
+        preset: {
+          eyebrow: "Why Nose Creek Physiotherapy",
+          eyebrowColor: "#f6c945",
+          title: "Over 20+ Years Serving North & Northwest Calgary",
+          subtitle: "Trusted by thousands of Calgary families, athletes, and doctors",
+          content: "Since 2001, Nose Creek Physiotherapy has helped over 15,000 Calgarians overcome acute injuries and chronic limitations through dedicated care.",
+          bullets: [
+            "545+ Five-Star Google Reviews across Calgary",
+            "Registered Physiotherapists with advanced orthopedic certifications",
+            "Direct insurance billing with zero hassle"
+          ],
+          imagePosition: "none",
+          background: "teal"
+        }
+      },
+      {
+        isCustom: true,
+        title: "Blank Custom Story Section",
+        desc: "Start with clean fields: customize text, image, bullets and theme from scratch.",
+        iconComponent: <PlusIcon size={18} />,
+        iconBg: "#f1f5f9",
+        iconColor: "#475569",
+        preset: {
+          eyebrow: "Specialized Therapy",
+          eyebrowColor: "#1c9fd8",
+          title: "Custom Community Feature",
+          subtitle: "Personalized care protocol",
+          content: "Add your clinical description, neighborhood highlights, or patient story here...",
+          bullets: [
+            "Key highlight bullet 1",
+            "Key highlight bullet 2"
+          ],
+          image: "/images/clinic/reception-three.jpg",
+          imagePosition: "right",
+          background: "white"
+        }
+      }
+    ]
+  },
+  // Category 3: Social Proof & Conversion
+  {
+    category: "Social Proof & Conversion",
+    icon: <StarIcon size={15} />,
+    color: "#7e22ce",
+    items: [
+      {
+        id: "reviews_carousel",
+        title: "Google Reviews Carousel Widget",
+        desc: "Live Google reviews widget and patient 5-star testimonials.",
+        iconComponent: <StarIcon size={18} />,
+        iconBg: "#fef3c7",
+        iconColor: "#d97706",
+        preset: {
+          eyebrow: "Patient Experiences",
+          title: "Real 5-Star Reviews From Our Calgary Patients",
+          subtitle: "See what our patients have to say about their recovery journey at Nose Creek Physiotherapy",
+          background: "light"
+        }
+      },
+      {
+        id: "team_carousel",
+        title: "Meet Our Team Carousel",
+        desc: "Interactive scrolling carousel of registered clinicians.",
+        iconComponent: <UsersIcon size={18} />,
+        iconBg: "#e0e7ff",
+        iconColor: "#4f46e5",
+        noConfig: true
+      },
+      {
+        id: "location_map",
+        title: "Clinic Location & Map",
+        desc: "Beddington location directions, hours & Google map embed.",
+        iconComponent: <MapPinIcon size={18} />,
+        iconBg: "#fee2e2",
+        iconColor: "#dc2626",
+        noConfig: true
+      },
+      {
+        id: "faqs",
+        title: "Interactive FAQ Accordion",
+        desc: "Patient questions, insurance coverage & answers with Google FAQPage schema.",
+        iconComponent: <HelpCircleIcon size={18} />,
+        iconBg: "#e0f2fe",
+        iconColor: "#0284c7",
+        preset: {
+          eyebrow: "Common Questions",
+          title: "Frequently Asked Questions",
+          background: "light"
+        }
+      },
+      {
+        id: "decision_ctas",
+        title: "Free Discovery & Phone CTAs",
+        desc: "Two low-friction cards for Free Discovery Sessions and Phone Consults.",
+        iconComponent: <TargetIcon size={18} />,
+        iconBg: "#dcfce7",
+        iconColor: "#16a34a",
+        preset: {
+          eyebrow: "Risk-Free Consult",
+          title: "Want help deciding if physiotherapy is right for you?",
+          subtitle: "Not quite ready to book? We offer two free, no-pressure ways to get your questions answered first.",
+          background: "light"
+        }
+      },
+      {
+        id: "bottom_cta",
+        title: "Bottom Booking Call-to-Action Banner",
+        desc: "Full-width high-contrast booking banner with direct call & online inquiry buttons.",
+        iconComponent: <RocketIcon size={18} />,
+        iconBg: "#fee2e2",
+        iconColor: "#dc2626",
+        preset: {
+          title: "Ready to Get Back to Doing What You Love?",
+          subtitle: "Our experienced Calgary physiotherapists are ready to help you recover faster with personalized, one-on-one care."
+        }
+      }
+    ]
+  }
+];
 
 export default function AdminPagesManager() {
   const { isAdmin } = useRole();
@@ -283,6 +581,9 @@ export default function AdminPagesManager() {
   const [activePage, setActivePage] = useState<CustomPage | null>(null);
   const [activeTab, setActiveTab] = useState<"sections" | "narrative" | "faqs" | "seo">("sections");
   const [showLivePreview, setShowLivePreview] = useState(false);
+
+  // Section Template Picker Modal State
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
   // Section Customizer Modal State
   const [customizingSection, setCustomizingSection] = useState<{
@@ -358,7 +659,7 @@ export default function AdminPagesManager() {
     setToast({ message: `Loaded ${preset.name} community preset! Customise your sections and save.`, type: "success" });
   };
 
-  const handleCreateNewBlank = () => {
+  const handleCreateNewBlank = (startBlank = false) => {
     const blank: CustomPage = {
       id: `page-new-${Date.now()}`,
       slug: "",
@@ -398,7 +699,7 @@ export default function AdminPagesManager() {
       ],
       customSections: [],
       sectionsData: {},
-      sectionOrder: [...defaultCustomPageSectionOrder],
+      sectionOrder: startBlank ? ["hero"] : [...defaultCustomPageSectionOrder],
       hiddenSections: [],
       faqs: [],
       isPublished: true,
@@ -409,6 +710,10 @@ export default function AdminPagesManager() {
 
     setActivePage(blank);
     setActiveTab("sections");
+    if (startBlank) {
+      setShowAddSectionModal(true);
+      setToast({ message: "Started new blank page! Choose your first section to add.", type: "success" });
+    }
   };
 
   // Section Ordering & Visibility Controls
@@ -452,55 +757,207 @@ export default function AdminPagesManager() {
   };
 
   const handleAddCustomSection = () => {
+    handleAddCustomSectionWithPreset();
+  };
+
+  const handleAddCustomSectionWithPreset = (preset?: Partial<ServiceCustomSection>) => {
     if (!activePage) return;
     const customList = [...(activePage.customSections || activePage.custom_sections || [])];
     const newIdx = customList.length;
+    const newCustomKey = `custom-${newIdx}`;
+
     const newSec: ServiceCustomSection = {
       id: `custom-sec-${Date.now()}`,
-      title: `Custom Section ${newIdx + 1}`,
-      eyebrow: "Spotlight Feature",
-      eyebrowColor: "#1c9fd8",
-      subtitle: "Highlighting our specialized approach or neighborhood story",
-      content: "<p>Write your detailed narrative here with rich formatting, lists, or links.</p>",
-      contentLayout: "1-column",
-      background: "white",
-      imagePosition: "right"
+      title: preset?.title || `Custom Section ${newIdx + 1}`,
+      eyebrow: preset?.eyebrow || "Spotlight Feature",
+      eyebrowColor: preset?.eyebrowColor || "#1c9fd8",
+      subtitle: preset?.subtitle || "Highlighting our specialized approach or community story",
+      content: preset?.content || "<p>Write your detailed narrative here with rich formatting, lists, or links.</p>",
+      contentCol2: preset?.contentCol2 || "",
+      contentLayout: preset?.contentLayout || "1-column",
+      bullets: preset?.bullets ? [...preset.bullets] : ["Personalized 1-on-1 attention", "Direct insurance billing"],
+      image: preset?.image || "/images/clinic/reception-one.jpg",
+      imagePosition: preset?.imagePosition || "right",
+      background: preset?.background || "white",
+      ctaText: preset?.ctaText || "Book an Appointment",
+      ctaHref: preset?.ctaHref || "/inquire"
     };
 
     customList.push(newSec);
-    const order = [...getActiveOrder(activePage)];
-    const customKey = `custom-${newIdx}`;
-    if (!order.includes(customKey)) {
-      // Insert after clinical_overview or hero
-      const insertAt = order.indexOf("clinical_overview") !== -1 ? order.indexOf("clinical_overview") + 1 : 2;
-      order.splice(insertAt, 0, customKey);
-    }
+    const order = [...getActiveOrder(activePage), newCustomKey];
 
-    setActivePage({
+    const updatedPage: CustomPage = {
       ...activePage,
       customSections: customList,
       custom_sections: customList,
       sectionOrder: order,
       section_order: order
-    });
+    };
 
+    setActivePage(updatedPage);
     setToast({ message: "Added custom story section! Click 'Customize' to edit it.", type: "success" });
+
+    // Open customizer immediately
+    setCustomizingSection({
+      key: newCustomKey,
+      defaultTitle: newSec.title,
+      config: newSec
+    });
   };
 
   const handleDeleteCustomSection = (idx: number) => {
     if (!activePage) return;
-    const customList = [...(activePage.customSections || activePage.custom_sections || [])];
-    customList.splice(idx, 1);
-    const customKey = `custom-${idx}`;
-    const order = getActiveOrder(activePage).filter((k) => k !== customKey);
+    const customList = (activePage.customSections || activePage.custom_sections || []).filter((_, i) => i !== idx);
+    const deletedKey = `custom-${idx}`;
+    const curOrder = getActiveOrder(activePage);
+
+    // Shift down remaining custom-N keys if they were greater than idx
+    const newOrder = curOrder
+      .filter((k) => k !== deletedKey)
+      .map((k) => {
+        if (k.startsWith("custom-")) {
+          const num = parseInt(k.replace("custom-", ""), 10);
+          if (num > idx) {
+            return `custom-${num - 1}`;
+          }
+        }
+        return k;
+      });
+
+    const curHidden = activePage.hiddenSections || activePage.hidden_sections || [];
+    const newHidden = curHidden
+      .filter((k) => k !== deletedKey)
+      .map((k) => {
+        if (k.startsWith("custom-")) {
+          const num = parseInt(k.replace("custom-", ""), 10);
+          if (num > idx) {
+            return `custom-${num - 1}`;
+          }
+        }
+        return k;
+      });
 
     setActivePage({
       ...activePage,
       customSections: customList,
       custom_sections: customList,
-      sectionOrder: order,
-      section_order: order
+      sectionOrder: newOrder,
+      section_order: newOrder,
+      hiddenSections: newHidden,
+      hidden_sections: newHidden
     });
+    setToast({ message: "Deleted custom story section.", type: "success" });
+  };
+
+  const deleteSection = (key: string) => {
+    if (!activePage) return;
+    if (key === "hero") {
+      setToast({ message: "The Hero header section cannot be removed.", type: "error" });
+      return;
+    }
+
+    if (key.startsWith("custom-")) {
+      const idx = parseInt(key.replace("custom-", ""), 10);
+      handleDeleteCustomSection(idx);
+      return;
+    }
+
+    const curOrder = getActiveOrder(activePage);
+    const newOrder = curOrder.filter((k) => k !== key);
+    const curHidden = activePage.hiddenSections || activePage.hidden_sections || [];
+
+    setActivePage({
+      ...activePage,
+      sectionOrder: newOrder,
+      section_order: newOrder,
+      hiddenSections: curHidden.filter((k) => k !== key),
+      hidden_sections: curHidden.filter((k) => k !== key)
+    });
+    setToast({ message: `Removed section "${SECTION_DEFINITIONS[key]?.label || key}" from page.`, type: "success" });
+  };
+
+  const applySectionTemplate = (template: any) => {
+    setShowAddSectionModal(false);
+    if (!activePage) return;
+
+    if (template.isCustom) {
+      handleAddCustomSectionWithPreset(template.preset);
+      return;
+    }
+
+    const key = template.id;
+    const curOrder = getActiveOrder(activePage);
+    const curHidden = activePage.hiddenSections || activePage.hidden_sections || [];
+    const cleanOrder = curOrder.filter((k) => k !== key && k !== "hero");
+    const newOrder = ["hero", ...cleanOrder, key];
+    const curSectionsData = activePage.sectionsData || activePage.sections_data || {};
+
+    let updatedFields: Partial<CustomPage> = {};
+    if (key === "benefits" && (!activePage.benefits || activePage.benefits.length === 0)) {
+      updatedFields.benefits = template.preset?.bullets || [
+        "Direct Insurance Billing to 25+ Providers",
+        "Registered Multidisciplinary Physiotherapists",
+        "Open Early Evenings and Saturdays",
+        "Free Dedicated Plaza Parking Outside"
+      ];
+    }
+    if (key === "symptoms" && (!activePage.symptoms || activePage.symptoms.length === 0)) {
+      updatedFields.symptoms = template.preset?.bullets || [
+        "Lower Back Pain, Sciatica & Spinal Stiffness",
+        "Neck Pain, Whiplash & Tension Headaches",
+        "Shoulder Impingement & Rotator Cuff Tears",
+        "Knee & Hip Mobility Restrictions"
+      ];
+    }
+    if (key === "treatment_approach" && (!activePage.treatmentApproach || activePage.treatmentApproach.length === 0)) {
+      updatedFields.treatmentApproach = template.preset?.bullets || [
+        "Comprehensive 60-Minute Assessment: Detailed biomechanical and movement analysis.",
+        "Hands-On Manual Therapy: Joint mobilization and soft-tissue release for rapid relief.",
+        "Individualized Active Rehabilitation: Customized progressive strengthening and stabilization exercises.",
+        "Long-Term Prevention Strategy: Posture retraining, ergonomics, and home maintenance for lasting health."
+      ];
+    }
+    if (key === "faqs" && (!activePage.faqs || activePage.faqs.length === 0)) {
+      updatedFields.faqs = [
+        {
+          question: `Do I need a doctor's referral for care?`,
+          answer: "No. In Alberta, you have direct access to physiotherapy without requiring a physician's referral."
+        },
+        {
+          question: "Do you offer direct billing to insurance?",
+          answer: "Yes, we direct bill to all major extended health insurance providers, as well as Alberta Blue Cross, WCB, and auto insurers."
+        }
+      ];
+    }
+
+    const updatedPage: CustomPage = {
+      ...activePage,
+      ...updatedFields,
+      sectionOrder: newOrder,
+      section_order: newOrder,
+      hiddenSections: curHidden.filter((k) => k !== key),
+      hidden_sections: curHidden.filter((k) => k !== key),
+      sectionsData: {
+        ...curSectionsData,
+        [key]: {
+          ...(curSectionsData[key] || {}),
+          ...(template.preset || {})
+        }
+      }
+    };
+
+    setActivePage(updatedPage);
+    setToast({ message: `Added ${template.title || key} to page!`, type: "success" });
+
+    // If template has editable content, open its customizer immediately!
+    if (!template.noConfig) {
+      const def = SECTION_DEFINITIONS[key] || { defaultTitle: template.title || key };
+      setCustomizingSection({
+        key,
+        defaultTitle: def.defaultTitle,
+        config: updatedPage.sectionsData?.[key]
+      });
+    }
   };
 
   // Section Customizer Save Handler
@@ -717,15 +1174,26 @@ export default function AdminPagesManager() {
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button
             type="button"
-            onClick={handleCreateNewBlank}
+            onClick={() => handleCreateNewBlank(true)}
             className="adm-btn adm-btn-primary"
-            style={{ display: "flex", alignItems: "center", gap: 8 }}
+            style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px" }}
           >
             <PlusIcon size={16} />
-            <span>Create Custom Page</span>
+            <span>+ Create Page (Pick Sections)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleCreateNewBlank(false)}
+            className="adm-btn adm-btn-secondary"
+            style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px" }}
+            title="Create page with full default sections pre-loaded"
+          >
+            <SparklesIcon size={15} />
+            <span>⚡ Full Template Page</span>
           </button>
         </div>
       </div>
@@ -1119,26 +1587,46 @@ export default function AdminPagesManager() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleAddCustomSection}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      padding: "8px 14px",
-                      background: "#f0fdf4",
-                      color: "#16a34a",
-                      border: "1px solid #bbf7d0",
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    <PlusIcon size={14} />
-                    <span>+ Add Custom Story Section</span>
-                  </button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddSectionModal(true)}
+                      className="adm-btn adm-btn-primary"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 14px",
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: "pointer"
+                      }}
+                    >
+                      <PlusIcon size={14} />
+                      <span>+ Add / Insert Section (Templates)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleAddCustomSection}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 14px",
+                        background: "#f0fdf4",
+                        color: "#16a34a",
+                        border: "1px solid #bbf7d0",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: "pointer"
+                      }}
+                    >
+                      <PlusIcon size={14} />
+                      <span>+ Add Custom Story</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Section List */}
@@ -1292,11 +1780,11 @@ export default function AdminPagesManager() {
                             <span>Customize</span>
                           </button>
 
-                          {/* Delete if custom story */}
-                          {isCustom && (
+                          {/* Delete Section button (any non-hero section) */}
+                          {key !== "hero" && (
                             <button
                               type="button"
-                              onClick={() => handleDeleteCustomSection(customIdx)}
+                              onClick={() => deleteSection(key)}
                               style={{
                                 padding: "6px 8px",
                                 borderRadius: 6,
@@ -1305,7 +1793,7 @@ export default function AdminPagesManager() {
                                 color: "#dc2626",
                                 cursor: "pointer"
                               }}
-                              title="Delete custom section"
+                              title={`Remove ${def.label} section`}
                             >
                               <TrashIcon size={14} />
                             </button>
@@ -1315,6 +1803,37 @@ export default function AdminPagesManager() {
                     );
                   })}
                 </div>
+
+                {/* Empty State when only Hero exists */}
+                {getActiveOrder(activePage).length <= 1 && (
+                  <div
+                    style={{
+                      padding: "36px 24px",
+                      textAlign: "center",
+                      background: "#f8fafc",
+                      borderRadius: 14,
+                      border: "2px dashed #cbd5e1",
+                      marginTop: 16
+                    }}
+                  >
+                    <div style={{ fontSize: 32, marginBottom: 8 }}>🧩</div>
+                    <h4 style={{ margin: "0 0 6px 0", fontSize: 16, fontWeight: 700, color: "#1e293b" }}>
+                      No Additional Sections Added Yet
+                    </h4>
+                    <p style={{ margin: "0 0 16px 0", fontSize: 13, color: "#64748b", maxWidth: 440, marginLeft: "auto", marginRight: "auto" }}>
+                      This page currently only has the Hero Banner. Click below to pick and insert any clinical, storytelling, reviews, or FAQ sections you want!
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddSectionModal(true)}
+                      className="adm-btn adm-btn-primary"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 18px" }}
+                    >
+                      <PlusIcon size={16} />
+                      <span>Choose Sections to Add</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1636,6 +2155,134 @@ export default function AdminPagesManager() {
           </div>
         )}
       </div>
+
+      {/* ── MODAL: CHOOSE SECTION TEMPLATE TO ADD ── */}
+      {showAddSectionModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.65)",
+            backdropFilter: "blur(4px)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 16
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowAddSectionModal(false);
+          }}
+        >
+          <div
+            className="adm-modal"
+            style={{ maxWidth: 780, maxHeight: "88vh", display: "flex", flexDirection: "column", overflow: "hidden" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="adm-modal-header">
+              <div>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#0f172a" }}>
+                  Choose Section to Add
+                </h3>
+                <span style={{ fontSize: 12.5, color: "#64748b" }}>
+                  Select any section to add it to this page. Configurable blocks will immediately open an info update box.
+                </span>
+              </div>
+              <button
+                onClick={() => setShowAddSectionModal(false)}
+                style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8", display: "flex", padding: 4 }}
+              >
+                <XIcon size={20} />
+              </button>
+            </div>
+
+            <div className="adm-modal-body" style={{ overflowY: "auto", padding: "18px 24px" }}>
+              {PAGE_SECTION_TEMPLATES.map((cat, catIdx) => (
+                <div key={cat.category} style={{ marginBottom: catIdx === PAGE_SECTION_TEMPLATES.length - 1 ? 0 : 22 }}>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: cat.color,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.5px",
+                      marginBottom: 12,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6
+                    }}
+                  >
+                    {cat.icon}
+                    <span>{cat.category}</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    {cat.items.map((item, i) => (
+                      <div
+                        key={i}
+                        onClick={() => applySectionTemplate(item)}
+                        style={{
+                          background: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: 12,
+                          padding: "14px 16px",
+                          cursor: "pointer",
+                          display: "flex",
+                          gap: 12,
+                          alignItems: "flex-start",
+                          transition: "all 0.15s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = "var(--adm-primary)";
+                          e.currentTarget.style.boxShadow = "0 4px 14px rgba(28,159,216,0.12)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "#e2e8f0";
+                          e.currentTarget.style.boxShadow = "none";
+                          e.currentTarget.style.transform = "none";
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 8,
+                            background: item.iconBg,
+                            color: item.iconColor,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0
+                          }}
+                        >
+                          {item.iconComponent}
+                        </div>
+                        <div>
+                          <strong style={{ fontSize: 13.5, color: "#1e293b", display: "block" }}>{item.title}</strong>
+                          <p style={{ margin: "3px 0 0 0", fontSize: 12, color: "#64748b", lineHeight: 1.4 }}>
+                            {item.desc}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="adm-modal-footer">
+              <button
+                type="button"
+                onClick={() => setShowAddSectionModal(false)}
+                className="adm-btn adm-btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Section Block Customizer Modal */}
       {customizingSection && (
