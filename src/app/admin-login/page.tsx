@@ -83,14 +83,33 @@ export default function AdminLoginPage() {
               background: "#fee2e2",
               color: "#991b1b",
               border: "1px solid #fecaca",
-              padding: "10px 14px",
+              padding: "12px 14px",
               borderRadius: 8,
               fontSize: 13,
               marginBottom: 18,
-              textAlign: "left"
+              textAlign: "left",
+              lineHeight: 1.45
             }}
           >
-            ⚠️ {error}
+            <div style={{ fontWeight: 600, marginBottom: error.includes("client-login") ? 8 : 0 }}>
+              ⚠️ {error}
+            </div>
+            {error.includes("client-login") && (
+              <a
+                href="/client-login"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  color: "#0369a1",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  textDecoration: "underline"
+                }}
+              >
+                Go to Client Content Portal →
+              </a>
+            )}
           </div>
         )}
 

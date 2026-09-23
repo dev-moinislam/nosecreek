@@ -66,7 +66,10 @@ export async function POST(req: NextRequest) {
     const ident = usernameOrEmail.trim().toLowerCase();
     const secret = passwordOrPin.trim();
     const isClientPortal = portal === "client";
-    const tableName = isClientPortal ? "client_users" : "admin_users";
+    const targetRole: "admin" | "client" = isClientPortal ? "client" : "admin";
+    const oppositeRole: "admin" | "client" = isClientPortal ? "admin" : "client";
+    const primaryTable = isClientPortal ? "client_users" : "admin_users";
+    const oppositeTable = isClientPortal ? "admin_users" : "client_users";
 
     let authenticatedUser: {
       username: string;
@@ -79,10 +82,70 @@ export async function POST(req: NextRequest) {
       auth: { persistSession: false }
     });
 
-    // 1a. Query primary table in Supabase (admin_users or client_users)
+    // --------------------------------------------------------------------------
+    // STEP 1: PROACTIVE OPPOSITE-PORTAL DETECTION & REJECTION
+    // Under standard login protocol, credentials for one portal must NEVER be accepted
+    // on the other portal, and cross-portal role escalation is strictly forbidden.
+    // --------------------------------------------------------------------------
+
+    // 1a. Check known authoritative credentials for opposite portal
+    const oppAuthCred = AUTHORITATIVE_CREDENTIALS[oppositeRole];
+    const isOppAuthIdent =
+      ident === oppAuthCred.username.toLowerCase() ||
+      ident === oppAuthCred.email.toLowerCase() ||
+      (oppositeRole === "client" && ident === "nosecreek") ||
+      (oppositeRole === "admin" && ident === "nosecreek-admin");
+
+    if (isOppAuthIdent) {
+      const isOppPassValid = verifySecret(secret, oppAuthCred.password_hash) || secret === oppAuthCred.raw_password;
+      if (isOppPassValid || secret.length > 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: isClientPortal
+              ? "Access Denied: This account is a Master Administrator account. Please use the Master Admin Portal (/admin-login) to sign in."
+              : "Access Denied: This account is a Client account. Please use the Client Content Portal (/client-login) to sign in."
+          },
+          { status: 403 }
+        );
+      }
+    }
+
+    // 1b. Check opposite database table
+    try {
+      const { data: oppUsers } = await supabase
+        .from(oppositeTable)
+        .select("id, username, email, password_hash, pin, role")
+        .or(`username.ilike.${ident},email.ilike.${ident}`)
+        .limit(1);
+
+      if (oppUsers && oppUsers.length > 0) {
+        const oppRow = oppUsers[0];
+        const isOppPass = verifySecret(secret, oppRow.password_hash) || verifySecret(secret, oppRow.pin);
+        if (isOppPass) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: isClientPortal
+                ? "Access Denied: This account is a Master Administrator account. Please use the Master Admin Portal (/admin-login) to sign in."
+                : "Access Denied: This account is a Client account. Please use the Client Content Portal (/client-login) to sign in."
+            },
+            { status: 403 }
+          );
+        }
+      }
+    } catch (oppErr) {
+      console.warn("[Auth] Opposite table check warning:", oppErr);
+    }
+
+    // --------------------------------------------------------------------------
+    // STEP 2: STRICT TARGET PORTAL AUTHENTICATION
+    // --------------------------------------------------------------------------
+
+    // 2a. Query target table in Supabase (admin_users for admin, client_users for client)
     try {
       const { data: users, error: dbError } = await supabase
-        .from(tableName)
+        .from(primaryTable)
         .select("*")
         .or(`username.ilike.${ident},email.ilike.${ident}`)
         .limit(1);
@@ -97,6 +160,20 @@ export async function POST(req: NextRequest) {
           );
         }
 
+        // Strict role validation: Ensure user row's role matches required portal role
+        const rowRole = (userRow.role as "admin" | "client") || targetRole;
+        if (rowRole !== targetRole) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: isClientPortal
+                ? "Access Denied: Administrator accounts cannot sign in through the Client Portal."
+                : "Access Denied: Client accounts cannot sign in through the Master Admin Portal."
+            },
+            { status: 403 }
+          );
+        }
+
         // Verify password or PIN
         const isPasswordValid = verifySecret(secret, userRow.password_hash);
         const isPinValid = verifySecret(secret, userRow.pin);
@@ -106,14 +183,14 @@ export async function POST(req: NextRequest) {
             username: userRow.username,
             email: userRow.email || `${userRow.username}@nosecreek.com`,
             full_name: userRow.full_name || (isClientPortal ? "Clinic Manager" : "Master Administrator"),
-            role: (userRow.role as "admin" | "client") || (isClientPortal ? "client" : "admin")
+            role: targetRole
           };
 
           // Smart Auto-Upgrade: if password was stored in plain text, upgrade to bcrypt
           if (isPasswordValid && !userRow.password_hash.startsWith("$2")) {
             try {
               const upgraded = bcrypt.hashSync(secret, 10);
-              await supabase.from(tableName).update({ password_hash: upgraded }).eq("id", userRow.id);
+              await supabase.from(primaryTable).update({ password_hash: upgraded }).eq("id", userRow.id);
               console.log(`[Auth] Upgraded plaintext password to bcrypt hash for user ${userRow.username}`);
             } catch (upgradeErr) {
               console.warn("[Auth] Failed to auto-upgrade plaintext hash:", upgradeErr);
@@ -125,7 +202,7 @@ export async function POST(req: NextRequest) {
       console.warn("[Auth] Primary table lookup failed, checking site_settings:", tblErr);
     }
 
-    // 1b. If not found in primary table, check auth credentials stored in Supabase site_settings
+    // 2b. If not found in primary table, check target auth credentials in site_settings
     if (!authenticatedUser) {
       try {
         const { data: sData, error: sErr } = await supabase
@@ -136,39 +213,44 @@ export async function POST(req: NextRequest) {
 
         if (!sErr && sData?.marketing?.auth_credentials) {
           const credMap = sData.marketing.auth_credentials;
-          const portalCreds = credMap[isClientPortal ? "client" : "admin"];
-          const fallbackCreds = credMap[isClientPortal ? "admin" : "client"];
+          const oppSiteCred = credMap[oppositeRole];
+          const targetCred = credMap[targetRole];
 
-          let matchedCred = null;
-          if (portalCreds) {
-            const matchesUser =
-              ident === (portalCreds.username || "").toLowerCase() ||
-              ident === (portalCreds.email || "").toLowerCase() ||
-              ident === "nosecreek";
+          // Check if opposite portal credentials were entered into site_settings
+          if (oppSiteCred) {
+            const matchesOpp =
+              ident === (oppSiteCred.username || "").toLowerCase() ||
+              ident === (oppSiteCred.email || "").toLowerCase() ||
+              (oppositeRole === "client" ? ident === "nosecreek" : ident === "nosecreek-admin");
 
-            if (matchesUser && verifySecret(secret, portalCreds.password_hash)) {
-              matchedCred = portalCreds;
+            if (matchesOpp && verifySecret(secret, oppSiteCred.password_hash)) {
+              return NextResponse.json(
+                {
+                  success: false,
+                  error: isClientPortal
+                    ? "Access Denied: This account is a Master Administrator account. Please use the Master Admin Portal (/admin-login) to sign in."
+                    : "Access Denied: This account is a Client account. Please use the Client Content Portal (/client-login) to sign in."
+                },
+                { status: 403 }
+              );
             }
           }
 
-          if (!matchedCred && fallbackCreds) {
-            const matchesFallback =
-              ident === (fallbackCreds.username || "").toLowerCase() ||
-              ident === (fallbackCreds.email || "").toLowerCase() ||
-              ident === "nosecreek";
+          // Match strictly against target portal credentials (NO fallback cross-role matching)
+          if (targetCred) {
+            const matchesTarget =
+              ident === (targetCred.username || "").toLowerCase() ||
+              ident === (targetCred.email || "").toLowerCase() ||
+              (targetRole === "client" ? ident === "nosecreek" : ident === "nosecreek-admin");
 
-            if (matchesFallback && verifySecret(secret, fallbackCreds.password_hash)) {
-              matchedCred = fallbackCreds;
+            if (matchesTarget && verifySecret(secret, targetCred.password_hash)) {
+              authenticatedUser = {
+                username: targetCred.username,
+                email: targetCred.email,
+                full_name: targetCred.full_name || (isClientPortal ? "Clinic Manager" : "Master Administrator"),
+                role: targetRole
+              };
             }
-          }
-
-          if (matchedCred) {
-            authenticatedUser = {
-              username: matchedCred.username,
-              email: matchedCred.email,
-              full_name: matchedCred.full_name || (isClientPortal ? "Clinic Manager" : "Master Administrator"),
-              role: isClientPortal ? "client" : "admin"
-            };
           }
         }
       } catch (settingsErr) {
@@ -176,21 +258,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 1c. Authoritative credentials check with database self-healing
+    // 2c. Authoritative target credentials check with database self-healing
     if (!authenticatedUser) {
-      const targetCred = isClientPortal ? AUTHORITATIVE_CREDENTIALS.client : AUTHORITATIVE_CREDENTIALS.admin;
+      const targetCred = AUTHORITATIVE_CREDENTIALS[targetRole];
       const isIdentMatch =
         ident === targetCred.username.toLowerCase() ||
         ident === targetCred.email.toLowerCase() ||
-        (isClientPortal && ident === "nosecreek") ||
-        (!isClientPortal && ident === "nosecreek-admin");
+        (targetRole === "client" && ident === "nosecreek") ||
+        (targetRole === "admin" && ident === "nosecreek-admin");
 
       if (isIdentMatch && (verifySecret(secret, targetCred.password_hash) || secret === targetCred.raw_password)) {
         authenticatedUser = {
           username: targetCred.username,
           email: targetCred.email,
           full_name: targetCred.full_name,
-          role: targetCred.role
+          role: targetRole
         };
 
         // Self-heal: automatically ensure Supabase site_settings has auth_credentials stored!
@@ -233,12 +315,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Return failure if not matched
+    // Return failure if target credentials do not match
     if (!authenticatedUser) {
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid username/email or password."
+          error: isClientPortal
+            ? "Invalid client username/email or password."
+            : "Invalid administrator username/email or password."
         },
         { status: 401 }
       );
