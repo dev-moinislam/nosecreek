@@ -301,5 +301,28 @@ details[open] .faqPlus{transform:rotate(45deg)}
     height: 0 !important;
     width: 0 !important;
   }
+
+  /* ─── HIDE HERO TOP NAVIGATION (BREADCRUMBS & BACK LINK) ON MOBILE TO SAVE SPACE ─── */
+  .condition-hero-top-nav,
+  .service-hero-top-nav {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .condition-hero-section,
+  .service-hero-section {
+    padding-top: 18px !important;
+    padding-bottom: 28px !important;
+  }
+
+  .condition-hero-main-grid,
+  .service-hero-main-grid {
+    margin-top: 4px !important;
+  }
 }
+
 

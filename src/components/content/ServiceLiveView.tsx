@@ -206,37 +206,39 @@ export default function ServiceLiveView({
     switch (key) {
       case "hero":
         return (
-          <section key="hero" style={{ background: "linear-gradient(180deg, #f2f8fb 0%, #ffffff 100%)", padding: "clamp(36px, 4vw, 56px) 0 44px" }}>
+          <section key="hero" className="service-hero-section" style={{ background: "linear-gradient(180deg, #f2f8fb 0%, #ffffff 100%)", padding: "clamp(24px, 4vw, 56px) 0 44px" }}>
             <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-              <Breadcrumbs
-                items={[
-                  { label: "Home", href: "/" },
-                  { label: "Services", href: "/services" },
-                  ...(parentService ? [{ label: parentService.title, href: `/services/${parentService.slug}` }] : []),
-                  { label: service.title }
-                ]}
-              />
+              <div className="service-hero-top-nav">
+                <Breadcrumbs
+                  items={[
+                    { label: "Home", href: "/" },
+                    { label: "Services", href: "/services" },
+                    ...(parentService ? [{ label: parentService.title, href: `/services/${parentService.slug}` }] : []),
+                    { label: service.title }
+                  ]}
+                />
 
-              {parentService && (
-                <div style={{ marginTop: 14 }}>
-                  <Link
-                    href={`/services/${parentService.slug}`}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      fontSize: 13.5,
-                      fontWeight: 700,
-                      color: "var(--primary, #0e78a8)",
-                      textDecoration: "none"
-                    }}
-                  >
-                    &larr; Back to {parentService.title} Overview
-                  </Link>
-                </div>
-              )}
+                {parentService && (
+                  <div style={{ marginTop: 14 }}>
+                    <Link
+                      href={`/services/${parentService.slug}`}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: "var(--primary, #0e78a8)",
+                        textDecoration: "none"
+                      }}
+                    >
+                      &larr; Back to {parentService.title} Overview
+                    </Link>
+                  </div>
+                )}
+              </div>
 
-              <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(32px, 4vw, 56px)", alignItems: "center" }}>
+              <div className="service-hero-main-grid" style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "clamp(32px, 4vw, 56px)", alignItems: "center" }}>
                 <div>
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--nc-bg-blue, #e6f4ea)", color: "var(--secondary-hover, #5c9515)", fontWeight: 700, fontSize: 13, fontFamily: "'Poppins',sans-serif", padding: "7px 14px", borderRadius: 999, marginBottom: 20 }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--secondary, #6faf1c)", display: "inline-block" }} />
