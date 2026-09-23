@@ -483,3 +483,88 @@ export interface CustomPage {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface StepItem {
+  title: string;
+  description: string;
+}
+
+/**
+ * Parses a step item from various formats (object or string with delimiter)
+ * into a step number, a semantic title (for H3 heading), and body description.
+ */
+export function parseStepItem(raw: any, index: number): { stepNum: number; title: string; description: string } {
+  if (!raw) {
+    return { stepNum: index + 1, title: `Phase ${index + 1}`, description: "" };
+  }
+  if (typeof raw === "object" && raw !== null) {
+    const title = raw.title || raw.heading || raw.label || raw.name || `Phase ${index + 1}`;
+    const description = raw.description || raw.text || raw.content || raw.val || "";
+    return {
+      stepNum: index + 1,
+      title: String(title).trim(),
+      description: String(description).trim()
+    };
+  }
+
+  let str = String(raw).trim();
+  // Strip redundant leading "Step 1: " or "Step 1 - " if present
+  str = str.replace(/^Step\s*\d+[\s:–-]+/i, "").trim();
+
+  // 1. If string contains a colon ":" separator (e.g. "Initial Assessment: A 60-minute one-on-one session...")
+  if (str.includes(":")) {
+    const colonIdx = str.indexOf(":");
+    const title = str.substring(0, colonIdx).trim();
+    const description = str.substring(colonIdx + 1).trim();
+    return {
+      stepNum: index + 1,
+      title: title || `Step ${index + 1}`,
+      description
+    };
+  }
+
+  // 2. If string contains a dash separator " - " or " – "
+  if (str.includes(" – ") || str.includes(" - ")) {
+    const delimiter = str.includes(" – ") ? " – " : " - ";
+    const parts = str.split(delimiter);
+    const title = parts[0].trim();
+    const description = parts.slice(1).join(delimiter).trim();
+    return {
+      stepNum: index + 1,
+      title: title || `Step ${index + 1}`,
+      description
+    };
+  }
+
+  // 3. If string contains a period separator ". " (e.g. "Initial Assessment. A 60-minute one-on-one session...")
+  if (str.includes(". ")) {
+    const dotIdx = str.indexOf(". ");
+    const title = str.substring(0, dotIdx).trim();
+    const description = str.substring(dotIdx + 2).trim();
+    if (title.length > 0 && description.length > 0) {
+      return {
+        stepNum: index + 1,
+        title,
+        description
+      };
+    }
+  }
+
+  // 4. Fallback: If it's a short text (<= 7 words), treat as the title itself
+  const words = str.split(/\s+/);
+  if (words.length <= 7) {
+    return {
+      stepNum: index + 1,
+      title: str,
+      description: ""
+    };
+  }
+
+  // 4. For longer sentences without delimiter, use the sentence as the title
+  return {
+    stepNum: index + 1,
+    title: str,
+    description: ""
+  };
+}
+

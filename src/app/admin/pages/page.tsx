@@ -56,10 +56,10 @@ const NEIGHBORHOOD_PRESETS = [
       "Post-Surgical Joint Rehabilitation"
     ],
     treatmentApproach: [
-      "Comprehensive 60-Minute Assessment to uncover mechanical root causes",
-      "Hands-On Manual Therapy & Joint Mobilization for rapid relief",
-      "Individualized Active Rehabilitation & Strengthening Roadmap",
-      "Self-Management Strategies & Posture Retraining for long-term health"
+      "Comprehensive 60-Minute Assessment: Thorough orthopaedic examination to uncover mechanical root causes.",
+      "Hands-On Manual Therapy: Joint mobilization and soft-tissue release for rapid, natural pain relief.",
+      "Individualized Active Rehabilitation: Customized strengthening and functional movement roadmap.",
+      "Self-Management & Long-Term Prevention: Posture retraining and home exercise guidance for lasting wellness."
     ],
     faqs: [
       {
@@ -101,10 +101,10 @@ const NEIGHBORHOOD_PRESETS = [
       "Foot Pain & Plantar Fasciitis"
     ],
     treatmentApproach: [
-      "In-Depth Biomechanical & Spinal Assessment",
-      "Targeted Soft Tissue Release & Joint Therapy",
-      "Neuromuscular Re-education & Active Exercises",
-      "Ergonomic & Lifestyle Guidance for Sustained Wellness"
+      "In-Depth Biomechanical & Spinal Assessment: Detailed evaluation of spinal posture, nerve health, and joint mobility.",
+      "Targeted Soft Tissue Release & Joint Therapy: Hands-on manual therapy and decompression to relieve localized inflammation.",
+      "Neuromuscular Re-education: Active therapeutic exercises to rebuild stabilizer strength and coordination.",
+      "Ergonomic & Lifestyle Guidance: Practical workstation and posture adjustments for sustained wellness."
     ],
     faqs: [
       {
@@ -142,10 +142,10 @@ const NEIGHBORHOOD_PRESETS = [
       "Repetitive Strain & Carpal Tunnel"
     ],
     treatmentApproach: [
-      "Comprehensive Biomechanical Assessment",
-      "Targeted Pain Modulation & Advanced Modalities",
-      "Progressive Functional Strength Training",
-      "Empowering Education for Lifetime Prevention"
+      "Comprehensive Biomechanical Assessment: 1-on-1 evaluation of movement restrictions, gait, and pain triggers.",
+      "Targeted Pain Modulation: Evidence-based manual therapy and advanced modalities like shockwave or IMS.",
+      "Progressive Functional Strength Training: Step-by-step exercise routines to restore athletic and everyday agility.",
+      "Empowering Lifetime Prevention: Ergonomic education and home maintenance routines to stop recurring flare-ups."
     ],
     faqs: [
       {
@@ -183,10 +183,10 @@ const NEIGHBORHOOD_PRESETS = [
       "Workplace Ergonomic & Overuse Injuries"
     ],
     treatmentApproach: [
-      "In-Depth Clinical Assessment by FCAMPT Clinicians",
-      "Integrated Manual Therapy & Joint Decompression",
-      "Custom Active Rehabilitation Exercises",
-      "Ergonomic Advice & Ongoing Performance Support"
+      "In-Depth Clinical Assessment: Advanced evaluation by credentialed FCAMPT physiotherapists.",
+      "Integrated Manual Therapy: Hands-on spinal decompression, joint mobilization, and myofascial release.",
+      "Custom Active Rehabilitation: One-on-one guided exercises tailored specifically to your sport or lifestyle.",
+      "Ergonomic Advice & Ongoing Performance: Postural correction and long-term joint health maintenance."
     ],
     faqs: [
       {
@@ -391,10 +391,10 @@ export default function AdminPagesManager() {
         "Joint & Muscle Stiffness"
       ],
       treatmentApproach: [
-        "Detailed One-on-One Assessment",
-        "Targeted Manual Therapy",
-        "Personalized Rehabilitation Exercise Plan",
-        "Long-Term Prevention Strategy"
+        "Detailed One-on-One Assessment: Thorough physical evaluation of mobility, strength, and pain mechanics.",
+        "Targeted Manual Therapy: Evidence-based hands-on joint mobilization and soft-tissue release.",
+        "Personalized Rehabilitation Plan: Tailored progressive strengthening and stability exercise routines.",
+        "Long-Term Prevention Strategy: Posture education and home exercise guidance for lasting recovery."
       ],
       customSections: [],
       sectionsData: {},

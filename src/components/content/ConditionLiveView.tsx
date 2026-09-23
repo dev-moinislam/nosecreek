@@ -6,7 +6,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ServiceIcon from "@/components/ui/ServiceIcon";
 import TeamCarousel from "@/components/ui/TeamCarousel";
 import FormattedNarrative from "@/components/ui/FormattedNarrative";
-import { Condition, Service, TeamMember, SectionBlockConfig } from "@/types/content";
+import { Condition, Service, TeamMember, SectionBlockConfig, parseStepItem } from "@/types/content";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import VisitUsSection from "./VisitUsSection";
 import CustomStorySection from "./CustomStorySection";
@@ -560,15 +560,29 @@ export default function ConditionLiveView({
                 {cfg?.subtitle && <p style={{ fontSize: 16, color: isLight ? "#5a6570" : "#cbdbe4", marginTop: 12, lineHeight: 1.6 }}>{cfg.subtitle}</p>}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24 }}>
-                {approachList.map((step, i) => (
-                  <div key={i} style={{ background: isLight ? "#fff" : "rgba(255,255,255,0.06)", border: isLight ? "1px solid #e7edf1" : "1px solid rgba(255,255,255,0.12)", padding: 28, borderRadius: 16, boxShadow: "0 6px 20px rgba(18,60,80,0.05)" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--secondary, #6faf1c)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 17, marginBottom: 18 }}>
-                      {i + 1}
+                {approachList.map((step, i) => {
+                  const parsed = parseStepItem(step, i);
+                  return (
+                    <div key={i} style={{ background: isLight ? "#fff" : "rgba(255,255,255,0.06)", border: isLight ? "1px solid #e7edf1" : "1px solid rgba(255,255,255,0.12)", padding: 28, borderRadius: 16, boxShadow: "0 6px 20px rgba(18,60,80,0.05)" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--secondary, #6faf1c)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 17 }}>
+                          {parsed.stepNum}
+                        </div>
+                        <span style={{ fontSize: 11.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: isLight ? "#0e78a8" : "#93c5fd", background: isLight ? "#e0f2fe" : "rgba(255,255,255,0.1)", padding: "3px 9px", borderRadius: 999 }}>
+                          Step {parsed.stepNum}
+                        </span>
+                      </div>
+                      <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, fontWeight: 700, color: isLight ? "#1d2b34" : "#fff", marginBottom: parsed.description ? 10 : 0, lineHeight: 1.35 }}>
+                        {parsed.title}
+                      </h3>
+                      {parsed.description && (
+                        <p style={{ margin: 0, fontSize: 14.5, color: isLight ? "#48535c" : "#cbdbe4", lineHeight: 1.65 }}>
+                          {parsed.description}
+                        </p>
+                      )}
                     </div>
-                    <h3 style={{ fontFamily: "'Poppins',sans-serif", fontSize: 18, fontWeight: 700, color: isLight ? "#1d2b34" : "#fff", marginBottom: 10 }}>Step {i + 1}</h3>
-                    <p style={{ margin: 0, fontSize: 14.5, color: isLight ? "#48535c" : "#cbdbe4", lineHeight: 1.65 }}>{step}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>

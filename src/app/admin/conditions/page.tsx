@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRole } from "@/components/admin/RoleGuard";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
-import { Condition, ServiceCustomSection, FAQItem, SectionBlockConfig } from "@/types/content";
+import { Condition, ServiceCustomSection, FAQItem, SectionBlockConfig, parseStepItem } from "@/types/content";
 import { getConditions } from "@/lib/api";
 import LivePreviewPane from "@/components/admin/LivePreviewPane";
 import SectionBlockCustomizerModal from "@/components/admin/SectionBlockCustomizerModal";
@@ -1380,12 +1380,24 @@ function ConditionEditorModal({
   };
 
   // Treatment steps helpers
-  const [newStep, setNewStep] = useState("");
-  const addStep = () => {
-    if (!newStep.trim()) return;
-    const item = newStep.trim();
+  const [newStepTitle, setNewStepTitle] = useState("");
+  const [newStepDesc, setNewStepDesc] = useState("");
+  const [editingStepIdx, setEditingStepIdx] = useState<number | null>(null);
+
+  const saveStep = () => {
+    if (!newStepTitle.trim() && !newStepDesc.trim()) return;
+    const formatted = newStepTitle.trim()
+      ? (newStepDesc.trim() ? `${newStepTitle.trim()}: ${newStepDesc.trim()}` : newStepTitle.trim())
+      : newStepDesc.trim();
+
     setCond((prev) => {
-      const updated = [...(prev.treatmentApproach || []), item];
+      let updated: string[];
+      if (editingStepIdx !== null && editingStepIdx >= 0) {
+        updated = [...(prev.treatmentApproach || [])];
+        updated[editingStepIdx] = formatted;
+      } else {
+        updated = [...(prev.treatmentApproach || []), formatted];
+      }
       return {
         ...prev,
         treatmentApproach: updated,
@@ -1398,8 +1410,19 @@ function ConditionEditorModal({
         }
       };
     });
-    setNewStep("");
+    setNewStepTitle("");
+    setNewStepDesc("");
+    setEditingStepIdx(null);
   };
+
+  const startEditStep = (idx: number) => {
+    const raw = (cond.treatmentApproach || [])[idx];
+    const parsed = parseStepItem(raw, idx);
+    setNewStepTitle(parsed.title);
+    setNewStepDesc(parsed.description);
+    setEditingStepIdx(idx);
+  };
+
   const removeStep = (idx: number) => {
     setCond((prev) => {
       const updated = prev.treatmentApproach?.filter((_, i) => i !== idx) || [];
@@ -1415,6 +1438,11 @@ function ConditionEditorModal({
         }
       };
     });
+    if (editingStepIdx === idx) {
+      setEditingStepIdx(null);
+      setNewStepTitle("");
+      setNewStepDesc("");
+    }
   };
 
   // FAQs helpers
@@ -2637,43 +2665,135 @@ function ConditionEditorModal({
           {activeTab === "steps" && (
             <div>
               <div style={{ background: "#f1f5f9", padding: 16, borderRadius: 12, marginBottom: 20 }}>
-                <h4 style={{ margin: "0 0 10px 0", fontSize: 14, fontWeight: 700 }}>Add Recovery Step</h4>
-                <div style={{ display: "flex", gap: 10 }}>
-                  <input
-                    type="text"
-                    placeholder="E.g., Step 1: Comprehensive Orthopedic & Nerve Assessment"
-                    className="adm-input"
-                    value={newStep}
-                    onChange={(e) => setNewStep(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addStep(); } }}
-                  />
-                  <button
-                    type="button"
-                    onClick={addStep}
-                    className="adm-btn adm-btn-primary adm-btn-sm"
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
-                    <PlusIcon size={14} />
-                    <span>Add</span>
-                  </button>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                  <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>
+                    {editingStepIdx !== null ? `Editing Step ${editingStepIdx + 1}` : "Add Recovery Step (Title = <h3> Heading)"}
+                  </h4>
+                  {editingStepIdx !== null && (
+                    <button
+                      type="button"
+                      onClick={() => { setEditingStepIdx(null); setNewStepTitle(""); setNewStepDesc(""); }}
+                      style={{ fontSize: 11.5, color: "#64748b", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "#334155", marginBottom: 4 }}>
+                      Step Title <span style={{ color: "#0284c7", fontWeight: 700 }}>(Renders as &lt;h3&gt; Heading tag)</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="E.g., Comprehensive Orthopedic Assessment"
+                      className="adm-input"
+                      style={{ fontSize: 13.5, fontWeight: 600 }}
+                      value={newStepTitle}
+                      onChange={(e) => setNewStepTitle(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); saveStep(); } }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "#334155", marginBottom: 4 }}>
+                      Step Description <span style={{ color: "#64748b" }}>(Paragraph text below heading)</span>
+                    </label>
+                    <textarea
+                      placeholder="E.g., In-depth physical mobility evaluation, nerve conduction tests, and biomechanical posture analysis..."
+                      className="adm-textarea"
+                      rows={2}
+                      style={{ fontSize: 13, resize: "vertical" }}
+                      value={newStepDesc}
+                      onChange={(e) => setNewStepDesc(e.target.value)}
+                    />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <button
+                      type="button"
+                      onClick={saveStep}
+                      className="adm-btn adm-btn-primary adm-btn-sm"
+                      style={{ display: "flex", alignItems: "center", gap: 6 }}
+                    >
+                      <PlusIcon size={14} />
+                      <span>{editingStepIdx !== null ? "Update Step" : "Add Step to Protocol"}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {cond.treatmentApproach?.map((step, idx) => (
-                  <div key={idx} style={{ background: "#fff", border: "1px solid #e2e8f0", padding: "10px 14px", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: 13.5, color: "#334155" }}>{idx + 1}. {step}</span>
-                    {isAdmin && (
-                      <button
-                        type="button"
-                        onClick={() => removeStep(idx)}
-                        style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", display: "flex", padding: 4 }}
-                      >
-                        <TrashIcon size={14} />
-                      </button>
-                    )}
-                  </div>
-                ))}
+                {cond.treatmentApproach?.map((step, idx) => {
+                  const parsed = parseStepItem(step, idx);
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        background: editingStepIdx === idx ? "#fffbeb" : "#fff",
+                        border: editingStepIdx === idx ? "2px solid #f59e0b" : "1px solid #e2e8f0",
+                        padding: "12px 14px",
+                        borderRadius: 8,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: 12
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: 10, flex: 1 }}>
+                        <span
+                          style={{
+                            background: "var(--secondary, #6faf1c)",
+                            color: "#fff",
+                            fontWeight: 800,
+                            fontSize: 12,
+                            padding: "3px 8px",
+                            borderRadius: 6,
+                            whiteSpace: "nowrap",
+                            marginTop: 2
+                          }}
+                        >
+                          Step {parsed.stepNum}
+                        </span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: "#0369a1", background: "#e0f2fe", padding: "1px 5px", borderRadius: 4 }}>
+                              &lt;h3&gt;
+                            </span>
+                            <strong style={{ fontSize: 14, color: "#1e293b", fontFamily: "'Poppins', sans-serif" }}>
+                              {parsed.title}
+                            </strong>
+                          </div>
+                          {parsed.description && (
+                            <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#475569", lineHeight: 1.5 }}>
+                              {parsed.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {isAdmin && (
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={() => startEditStep(idx)}
+                            className="adm-btn adm-btn-secondary adm-btn-xs"
+                            style={{ padding: "4px 8px", fontSize: 11.5 }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeStep(idx)}
+                            style={{ color: "#dc2626", background: "none", border: "none", cursor: "pointer", display: "flex", padding: 4 }}
+                            title="Delete step"
+                          >
+                            <TrashIcon size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

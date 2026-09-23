@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SectionBlockConfig } from "@/types/content";
+import { SectionBlockConfig, parseStepItem } from "@/types/content";
 import {
   ImageIcon,
   LayoutIcon,
@@ -52,6 +52,9 @@ export default function SectionBlockCustomizerModal({
   });
 
   const [newBullet, setNewBullet] = useState("");
+  const [newStepTitle, setNewStepTitle] = useState("");
+  const [newStepDesc, setNewStepDesc] = useState("");
+  const [editingStepIdx, setEditingStepIdx] = useState<number | null>(null);
   const [pickerMode, setPickerMode] = useState<"cta" | "content" | null>(null);
 
   useEffect(() => {
@@ -143,10 +146,60 @@ export default function SectionBlockCustomizerModal({
   const handleRemoveBullet = (idx: number) => {
     const updated = (formData.bullets || []).filter((_, i) => i !== idx);
     setFormData({ ...formData, bullets: updated });
+    if (editingStepIdx === idx) {
+      setEditingStepIdx(null);
+      setNewStepTitle("");
+      setNewStepDesc("");
+    }
+  };
+
+  const handleSaveStep = () => {
+    if (!newStepTitle.trim() && !newStepDesc.trim()) return;
+    const formatted = newStepTitle.trim()
+      ? (newStepDesc.trim() ? `${newStepTitle.trim()}: ${newStepDesc.trim()}` : newStepTitle.trim())
+      : newStepDesc.trim();
+
+    if (editingStepIdx !== null && editingStepIdx >= 0) {
+      const updated = [...(formData.bullets || [])];
+      updated[editingStepIdx] = formatted;
+      setFormData({ ...formData, bullets: updated });
+      setEditingStepIdx(null);
+    } else {
+      setFormData({
+        ...formData,
+        bullets: [...(formData.bullets || []), formatted]
+      });
+    }
+    setNewStepTitle("");
+    setNewStepDesc("");
+  };
+
+  const handleStartEditStep = (idx: number) => {
+    const raw = (formData.bullets || [])[idx];
+    const parsed = parseStepItem(raw, idx);
+    setNewStepTitle(parsed.title);
+    setNewStepDesc(parsed.description);
+    setEditingStepIdx(idx);
+  };
+
+  const handleCancelEditStep = () => {
+    setNewStepTitle("");
+    setNewStepDesc("");
+    setEditingStepIdx(null);
+  };
+
+  const handleLoadDefaultSteps = () => {
+    const defaultSteps = [
+      "Initial Comprehensive Assessment: A thorough evaluation of your symptoms, posture, joint mechanics, and functional mobility.",
+      "Targeted Pain Relief & Manual Therapy: Hands-on joint mobilization, myofascial release, and modalities to alleviate discomfort quickly.",
+      "Active Rehabilitation & Strengthening: Personalized therapeutic exercises to rebuild core strength, stability, and biomechanical resilience.",
+      "Long-Term Prevention & Performance: Ergonomic guidance, home exercise regimens, and maintenance plans to ensure lasting recovery."
+    ];
+    setFormData({ ...formData, bullets: defaultSteps });
   };
 
   const renderBulletText = (b: string, bIdx: number) => {
-    const prefix = isRoadmap ? `Step ${bIdx + 1}: ` : `✓ `;
+    const prefix = `✓ `;
     const match = b.match(/\[([^\]]+)\]\(([^)]+)\)/);
     if (!match) {
       return (
@@ -517,8 +570,171 @@ export default function SectionBlockCustomizerModal({
             </div>
           )}
 
-          {/* 4. Bullets / List Items (Shown on Benefits, Symptoms, Roadmap, At-A-Glance, Stories) */}
-          {(isListSection || isMediaRichStory) && (
+          {/* 4a. Special Step-by-Step Protocol Editor (When isRoadmap) */}
+          {isRoadmap && (
+            <div style={{ background: "#f8fafc", padding: 18, borderRadius: 12, border: "1px solid #cbd5e1" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                <div>
+                  <label className="adm-form-label" style={{ marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 16 }}>🔢</span>
+                    <span>Patient Care Journey Protocol (Step Title = &lt;h3&gt; Heading)</span>
+                  </label>
+                  <p style={{ margin: 0, fontSize: 12.5, color: "#64748b" }}>
+                    Each recovery step has its own title and description. <strong>The Step Title acts as the semantic &lt;h3&gt; heading</strong> on your live website for optimal SEO and patient readability.
+                  </p>
+                </div>
+                {(!formData.bullets || formData.bullets.length === 0) && (
+                  <button
+                    type="button"
+                    onClick={handleLoadDefaultSteps}
+                    className="adm-btn adm-btn-secondary adm-btn-xs"
+                    style={{ whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 4 }}
+                  >
+                    <SparklesIcon size={13} />
+                    <span>Load 4-Step Template</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Add / Edit Step Inputs */}
+              <div style={{ background: "#ffffff", padding: 14, borderRadius: 10, border: "1px solid #e2e8f0", marginBottom: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: editingStepIdx !== null ? "#d97706" : "#0e78a8", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    {editingStepIdx !== null ? `Editing Step ${editingStepIdx + 1}` : "Add New Recovery Step"}
+                  </span>
+                  {editingStepIdx !== null && (
+                    <button
+                      type="button"
+                      onClick={handleCancelEditStep}
+                      style={{ fontSize: 11.5, color: "#64748b", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+                    >
+                      Cancel Edit
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "#334155", marginBottom: 4 }}>
+                    Step Title <span style={{ color: "#0284c7", fontWeight: 700 }}>(Renders as &lt;h3&gt; Heading tag)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="E.g., Comprehensive Orthopaedic Assessment"
+                    className="adm-input"
+                    style={{ fontSize: 13.5, fontWeight: 600 }}
+                    value={newStepTitle}
+                    onChange={(e) => setNewStepTitle(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSaveStep(); } }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: 11.5, fontWeight: 600, color: "#334155", marginBottom: 4 }}>
+                    Step Description <span style={{ color: "#64748b" }}>(Paragraph text below heading)</span>
+                  </label>
+                  <textarea
+                    placeholder="E.g., Detailed clinical examination of joint mobility, pain triggers, posture, and nerve sensitivity to determine the root cause..."
+                    className="adm-textarea"
+                    rows={2}
+                    style={{ fontSize: 13, resize: "vertical" }}
+                    value={newStepDesc}
+                    onChange={(e) => setNewStepDesc(e.target.value)}
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <button
+                    type="button"
+                    onClick={handleSaveStep}
+                    className="adm-btn adm-btn-primary adm-btn-sm"
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    {editingStepIdx !== null ? <CheckIcon size={14} /> : <PlusIcon size={14} />}
+                    <span>{editingStepIdx !== null ? "Update Step" : "Add Step to Protocol"}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Current Steps List */}
+              {formData.bullets && formData.bullets.length > 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {formData.bullets.map((b, bIdx) => {
+                    const parsed = parseStepItem(b, bIdx);
+                    return (
+                      <div
+                        key={bIdx}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          gap: 12,
+                          padding: "12px 14px",
+                          background: editingStepIdx === bIdx ? "#fffbeb" : "#fff",
+                          borderRadius: 8,
+                          border: editingStepIdx === bIdx ? "2px solid #f59e0b" : "1px solid #e2e8f0",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.04)"
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10, flex: 1 }}>
+                          <span
+                            style={{
+                              background: "#6faf1c",
+                              color: "#fff",
+                              fontWeight: 800,
+                              fontSize: 12,
+                              padding: "3px 8px",
+                              borderRadius: 6,
+                              whiteSpace: "nowrap",
+                              marginTop: 2
+                            }}
+                          >
+                            Step {parsed.stepNum}
+                          </span>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ fontSize: 11, fontWeight: 700, color: "#0369a1", background: "#e0f2fe", padding: "1px 5px", borderRadius: 4 }}>
+                                &lt;h3&gt;
+                              </span>
+                              <strong style={{ fontSize: 14, color: "#1e293b", fontFamily: "'Poppins', sans-serif" }}>
+                                {parsed.title}
+                              </strong>
+                            </div>
+                            {parsed.description && (
+                              <p style={{ margin: "4px 0 0 0", fontSize: 13, color: "#475569", lineHeight: 1.5 }}>
+                                {parsed.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditStep(bIdx)}
+                            className="adm-btn adm-btn-secondary adm-btn-xs"
+                            style={{ padding: "4px 8px", fontSize: 11.5 }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveBullet(bIdx)}
+                            style={{ color: "#ef4444", background: "none", border: "none", cursor: "pointer", display: "flex", padding: 4 }}
+                            title="Delete step"
+                          >
+                            <TrashIcon size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* 4b. Bullets / List Items (Shown on Benefits, Symptoms, At-A-Glance, Stories - when NOT isRoadmap) */}
+          {(isListSection || isMediaRichStory) && !isRoadmap && (
             <div style={{ background: "#f8fafc", padding: 16, borderRadius: 12, border: "1px solid #e2e8f0" }}>
               <label className="adm-form-label" style={{ marginBottom: 8, display: "block" }}>
                 {listLabel}
