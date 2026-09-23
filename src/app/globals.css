@@ -179,12 +179,16 @@ details[open] .faqPlus{transform:rotate(45deg)}
   height: 100%;
 }
 
+.nav-level2-item {
+  position: relative;
+}
+
 .nav-level3-flyout {
   display: none;
   position: absolute;
   top: -4px;
   left: calc(100% + 4px);
-  min-width: 230px;
+  min-width: 250px;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 16px 44px rgba(18, 60, 80, 0.16);

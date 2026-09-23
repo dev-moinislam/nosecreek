@@ -713,6 +713,7 @@ export default function Header({
                             key={sub.id}
                             className="nav-level2-item has-children"
                             style={{
+                              position: "relative",
                               borderRadius: 7,
                               background: subActive ? "rgba(28, 159, 216, 0.12)" : "transparent",
                               borderLeft: subActive ? "3px solid #1c9fd8" : "3px solid transparent",

@@ -88,40 +88,40 @@
             "id": "ft-col-services",
             "links": [
               {
-                "label": "Physiotherapy",
-                "href": "/services/physiotherapy"
+                "href": "/services/physiotherapy",
+                "label": "Physiotherapy"
               },
               {
-                "label": "Massage Therapy",
-                "href": "/services/massage-therapy"
+                "href": "/services/massage-therapy",
+                "label": "Massage Therapy"
               },
               {
-                "label": "Acupuncture & TCM",
-                "href": "/services/acupuncture"
+                "href": "/services/acupuncture",
+                "label": "Acupuncture & TCM"
               },
               {
-                "label": "Chiropractic Care",
-                "href": "/services/chiropractic"
+                "href": "/services/chiropractic",
+                "label": "Chiropractic Care"
               },
               {
-                "label": "Shockwave Therapy",
-                "href": "/services/shockwave-therapy"
+                "href": "/services/shockwave-therapy",
+                "label": "Shockwave Therapy"
               },
               {
-                "label": "Custom Orthotics",
-                "href": "/services/custom-orthotics"
+                "href": "/services/custom-orthotics",
+                "label": "Custom Orthotics"
               },
               {
-                "label": "Concussion Clinic",
-                "href": "/services/concussion-clinic"
+                "href": "/services/concussion-clinic",
+                "label": "Concussion Clinic"
               },
               {
-                "label": "Knee Bracing",
-                "href": "/services/knee-bracing"
+                "href": "/services/knee-bracing",
+                "label": "Knee Bracing"
               },
               {
-                "label": "Pelvic Health",
-                "href": "/services/pelvic-health"
+                "href": "/services/pelvic-health",
+                "label": "Pelvic Health"
               }
             ],
             "title": "Clinical Services"
@@ -134,20 +134,36 @@
                 "href": "/conditions/back-pain"
               },
               {
-                "label": "Leg pain",
-                "href": "/conditions/new-condition"
-              },
-              {
                 "label": "Neck & Shoulder Pain",
                 "href": "/conditions/neck-shoulder-pain"
+              },
+              {
+                "label": "Shoulder Osteoarthritis",
+                "href": "/conditions/neck-shoulder-pain/shoulder-osteoarthritis"
+              },
+              {
+                "label": "Rotator Cuff Tendinitis",
+                "href": "/conditions/neck-shoulder-pain/rotator-cuff-tendinitis"
+              },
+              {
+                "label": "Frozen Shoulder",
+                "href": "/conditions/neck-shoulder-pain/adhesive-capsulitis"
               },
               {
                 "label": "Knee Pain",
                 "href": "/conditions/knee-pain"
               },
               {
+                "label": "Foot Pain",
+                "href": "/conditions/foot-pain"
+              },
+              {
                 "label": "Sports Injury",
                 "href": "/conditions/sports-injury"
+              },
+              {
+                "label": "Balance & Falls",
+                "href": "/conditions/balance-falls"
               },
               {
                 "label": "Motor Vehicle Accidents",
@@ -303,28 +319,6 @@
                 "href": "/conditions/back-pain",
                 "label": "Back Pain",
                 "enabled": true,
-                "children": [
-                  {
-                    "id": "cnd-si-joint-dysfunction",
-                    "href": "/conditions/back-pain/si-joint-dysfunction",
-                    "label": "SI Joint Dysfunction",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
-                    "id": "cnd-sciatica",
-                    "href": "/conditions/back-pain/sciatica",
-                    "label": "Sciatica",
-                    "enabled": true,
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "id": "cnd-new-condition",
-                "href": "/conditions/new-condition",
-                "label": "Leg pain",
-                "enabled": true,
                 "children": []
               },
               {
@@ -334,16 +328,65 @@
                 "enabled": true,
                 "children": [
                   {
-                    "id": "cnd-shoulder-conditions",
-                    "href": "/conditions/neck-shoulder-pain/shoulder-conditions",
-                    "label": "Shoulder Conditions",
+                    "id": "cnd-shoulder-osteoarthritis",
+                    "href": "/conditions/neck-shoulder-pain/shoulder-osteoarthritis",
+                    "label": "Shoulder Osteoarthritis Treatment",
                     "enabled": true,
                     "children": []
                   },
                   {
-                    "id": "cnd-nerve-pain",
-                    "href": "/conditions/neck-shoulder-pain/nerve-pain",
-                    "label": "Nerve Pain",
+                    "id": "cnd-scapular-dyskinesis",
+                    "href": "/conditions/neck-shoulder-pain/scapular-dyskinesis",
+                    "label": "Scapular Dyskinesis Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-shoulder-labrum-tear",
+                    "href": "/conditions/neck-shoulder-pain/shoulder-labrum-tear",
+                    "label": "Shoulder Labrum Tear Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-shoulder-dislocation-subluxation",
+                    "href": "/conditions/neck-shoulder-pain/shoulder-dislocation-subluxation",
+                    "label": "Shoulder Dislocation & Subluxation Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-shoulder-bursitis",
+                    "href": "/conditions/neck-shoulder-pain/shoulder-bursitis",
+                    "label": "Shoulder Bursitis Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-shoulder-impingement",
+                    "href": "/conditions/neck-shoulder-pain/shoulder-impingement",
+                    "label": "Shoulder Impingement Syndrome Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-adhesive-capsulitis",
+                    "href": "/conditions/neck-shoulder-pain/adhesive-capsulitis",
+                    "label": "Adhesive Capsulitis (Frozen Shoulder) Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-shoulder-pain",
+                    "href": "/conditions/neck-shoulder-pain/shoulder-pain",
+                    "label": "Shoulder Pain Treatment",
+                    "enabled": true,
+                    "children": []
+                  },
+                  {
+                    "id": "cnd-rotator-cuff-tendinitis",
+                    "href": "/conditions/neck-shoulder-pain/rotator-cuff-tendinitis",
+                    "label": "Rotator Cuff Tendinitis Treatment",
                     "enabled": true,
                     "children": []
                   }
@@ -354,73 +397,35 @@
                 "href": "/conditions/knee-pain",
                 "label": "Knee Pain",
                 "enabled": true,
-                "children": [
-                  {
-                    "id": "cnd-foot-pain",
-                    "href": "/conditions/knee-pain/foot-pain",
-                    "label": "Foot Pain",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
-                    "id": "cnd-hip-pain",
-                    "href": "/conditions/knee-pain/hip-pain",
-                    "label": "Hip Pain",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
-                    "id": "cnd-joint-pain",
-                    "href": "/conditions/knee-pain/joint-pain",
-                    "label": "Joint Pain",
-                    "enabled": true,
-                    "children": []
-                  }
-                ]
+                "children": []
+              },
+              {
+                "id": "cnd-foot-pain",
+                "href": "/conditions/foot-pain",
+                "label": "Foot Pain",
+                "enabled": true,
+                "children": []
               },
               {
                 "id": "cnd-sports-injury",
                 "href": "/conditions/sports-injury",
                 "label": "Sports Injury",
                 "enabled": true,
-                "children": [
-                  {
-                    "id": "cnd-balance-falls",
-                    "href": "/conditions/sports-injury/balance-falls",
-                    "label": "Balance & Falls",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
-                    "id": "cnd-concussion",
-                    "href": "/conditions/sports-injury/concussion",
-                    "label": "Concussion",
-                    "enabled": true,
-                    "children": []
-                  },
-                  {
-                    "id": "cnd-muscle-pain",
-                    "href": "/conditions/sports-injury/muscle-pain",
-                    "label": "Muscle Pain",
-                    "enabled": true,
-                    "children": []
-                  }
-                ]
+                "children": []
+              },
+              {
+                "id": "cnd-balance-falls",
+                "href": "/conditions/balance-falls",
+                "label": "Balance and Falls",
+                "enabled": true,
+                "children": []
               },
               {
                 "id": "cnd-motor-vehicle-accidents",
                 "href": "/conditions/motor-vehicle-accidents",
                 "label": "Motor Vehicle Accidents",
                 "enabled": true,
-                "children": [
-                  {
-                    "id": "cnd-workplace-injuries",
-                    "href": "/conditions/motor-vehicle-accidents/workplace-injuries",
-                    "label": "Workplace Injuries",
-                    "enabled": true,
-                    "children": []
-                  }
-                ]
+                "children": []
               }
             ]
           },
@@ -470,15 +475,8 @@
           {
             "id": "nav-reviews",
             "href": "/reviews",
-            "badge": "4.9 ★",
-            "label": "Google Reviews",
-            "enabled": true,
-            "children": []
-          },
-          {
-            "id": "nav-team",
-            "href": "/team",
-            "label": "Our Team",
+            "badge": "",
+            "label": "Reviews",
             "enabled": true,
             "children": []
           },
@@ -487,12 +485,7 @@
             "href": "/contact",
             "label": "Contact",
             "enabled": true,
-            "children": [
-              { "id": "cnt-main", "label": "Contact Us", "href": "/contact", "enabled": true },
-              { "id": "cnt-inquire", "label": "Inquire About Cost & Availability", "href": "/inquire", "enabled": true },
-              { "id": "cnt-phone", "label": "Free Telephone Consultation", "href": "/telephone-consultation", "enabled": true },
-              { "id": "cnt-discovery", "label": "Free Discovery Session", "href": "/free-discovery-session", "enabled": true }
-            ]
+            "children": []
           }
         ],
         "phone": "403-295-8590",
@@ -934,10 +927,30 @@
           "label": "Contact",
           "enabled": true,
           "children": [
-            { "id": "cnt-main", "label": "Contact Us", "href": "/contact", "enabled": true },
-            { "id": "cnt-inquire", "label": "Inquire About Cost & Availability", "href": "/inquire", "enabled": true },
-            { "id": "cnt-phone", "label": "Free Telephone Consultation", "href": "/telephone-consultation", "enabled": true },
-            { "id": "cnt-discovery", "label": "Free Discovery Session", "href": "/free-discovery-session", "enabled": true }
+            {
+              "id": "cnt-main",
+              "label": "Contact Us",
+              "href": "/contact",
+              "enabled": true
+            },
+            {
+              "id": "cnt-inquire",
+              "label": "Inquire About Cost & Availability",
+              "href": "/inquire",
+              "enabled": true
+            },
+            {
+              "id": "cnt-phone",
+              "label": "Free Telephone Consultation",
+              "href": "/telephone-consultation",
+              "enabled": true
+            },
+            {
+              "id": "cnt-discovery",
+              "label": "Free Discovery Session",
+              "href": "/free-discovery-session",
+              "enabled": true
+            }
           ]
         }
       ],

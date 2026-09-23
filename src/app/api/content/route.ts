@@ -116,7 +116,7 @@ export async function GET(req: Request) {
               teamMembers: s.team_members || [],
               locations: s.locations || [],
               testimonials: s.testimonials || [],
-              parentSlug: s.parent_slug || undefined,
+              parentSlug: s.parent_slug || s.seo?.parentSlug || undefined,
               seo: s.seo || {}
             }));
           return NextResponse.json(list);
@@ -162,7 +162,7 @@ export async function GET(req: Request) {
               sectionOrder: c.section_order || [],
               relatedServices: c.related_services || [],
               category: c.category || "general",
-              parentSlug: c.parent_slug || undefined,
+              parentSlug: c.parent_slug || c.seo?.parentSlug || undefined,
               seo: c.seo || {}
             }));
           return NextResponse.json(list);
