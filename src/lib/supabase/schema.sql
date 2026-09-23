@@ -304,30 +304,55 @@ ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE form_submissions ENABLE ROW LEVEL SECURITY;
 
--- 11.1 Full Access for Dashboard & Website
+-- 11.1 Hardened RLS: Public Read-Only for Content, Insert-Only for Leads, Service Role for Mutations
 DROP POLICY IF EXISTS "Public can view and update settings" ON site_settings;
-CREATE POLICY "Public can view and update settings" ON site_settings FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view settings" ON site_settings;
+CREATE POLICY "Public can view settings" ON site_settings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage settings" ON site_settings;
+CREATE POLICY "Service role can manage settings" ON site_settings FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public can view and update services" ON services;
-CREATE POLICY "Public can view and update services" ON services FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view services" ON services;
+CREATE POLICY "Public can view services" ON services FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage services" ON services;
+CREATE POLICY "Service role can manage services" ON services FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public can view and update conditions" ON conditions;
-CREATE POLICY "Public can view and update conditions" ON conditions FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view conditions" ON conditions;
+CREATE POLICY "Public can view conditions" ON conditions FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage conditions" ON conditions;
+CREATE POLICY "Service role can manage conditions" ON conditions FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public can view and update team members" ON team_members;
-CREATE POLICY "Public can view and update team members" ON team_members FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view team members" ON team_members;
+CREATE POLICY "Public can view team members" ON team_members FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage team members" ON team_members;
+CREATE POLICY "Service role can manage team members" ON team_members FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public can view and update locations" ON locations;
-CREATE POLICY "Public can view and update locations" ON locations FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view locations" ON locations;
+CREATE POLICY "Public can view locations" ON locations FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage locations" ON locations;
+CREATE POLICY "Service role can manage locations" ON locations FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public can view and update blog posts" ON blog_posts;
-CREATE POLICY "Public can view and update blog posts" ON blog_posts FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view blog posts" ON blog_posts;
+CREATE POLICY "Public can view blog posts" ON blog_posts FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage blog posts" ON blog_posts;
+CREATE POLICY "Service role can manage blog posts" ON blog_posts FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public can view and update testimonials" ON testimonials;
-CREATE POLICY "Public can view and update testimonials" ON testimonials FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can view testimonials" ON testimonials;
+CREATE POLICY "Public can view testimonials" ON testimonials FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Service role can manage testimonials" ON testimonials;
+CREATE POLICY "Service role can manage testimonials" ON testimonials FOR ALL TO service_role USING (true) WITH CHECK (true);
 
+-- Leads: Public can only submit inquiries. Only Service Role can read, update, or delete patient submissions.
 DROP POLICY IF EXISTS "Public can view and manage form submissions" ON form_submissions;
-CREATE POLICY "Public can view and manage form submissions" ON form_submissions FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Public can submit inquiries" ON form_submissions;
+CREATE POLICY "Public can submit inquiries" ON form_submissions FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Service role can manage form submissions" ON form_submissions;
+CREATE POLICY "Service role can manage form submissions" ON form_submissions FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- ==============================================================================
 -- 12. SUPABASE STORAGE BUCKET CONFIGURATION (MEDIA & UPLOADS)
@@ -399,21 +424,19 @@ CREATE TRIGGER update_client_users_modtime
 BEFORE UPDATE ON client_users
 FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
--- 13.3 Row Level Security for User Tables
+-- 13.3 Row Level Security for User Tables (Service Role ONLY - completely block public anon access)
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE client_users ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow server read admin_users" ON admin_users;
-CREATE POLICY "Allow server read admin_users" ON admin_users FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow server update admin_users" ON admin_users;
-CREATE POLICY "Allow server update admin_users" ON admin_users FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Service role can manage admin_users" ON admin_users;
+CREATE POLICY "Service role can manage admin_users" ON admin_users FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Allow server read client_users" ON client_users;
-CREATE POLICY "Allow server read client_users" ON client_users FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow server update client_users" ON client_users;
-CREATE POLICY "Allow server update client_users" ON client_users FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Service role can manage client_users" ON client_users;
+CREATE POLICY "Service role can manage client_users" ON client_users FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- ==============================================================================
 -- 14. CUSTOM & NEIGHBORHOOD LANDING PAGES TABLE

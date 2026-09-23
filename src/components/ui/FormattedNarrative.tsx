@@ -18,6 +18,21 @@ function isHtmlContent(str: string): boolean {
 }
 
 /**
+ * Sanitizes rich HTML content to prevent Cross-Site Scripting (XSS).
+ * Strips script tags, unsafe embedded tags, event handlers (onerror, onload, etc.),
+ * and malicious javascript: pseudo-protocol URIs.
+ */
+function sanitizeHtml(html: string): string {
+  if (!html) return "";
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<\/?(?:iframe|object|embed|applet|form|input|button|meta|link|base)\b[^>]*>/gi, "")
+    .replace(/\s*on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/(href|src)\s*=\s*["']?\s*javascript:[^"'>\s]+/gi, '$1="#"')
+    .replace(/href\s*=\s*["']?\s*data:[^"'>\s]+/gi, 'href="#"');
+}
+
+/**
  * Enhanced FormattedNarrative:
  * Supports rich HTML (Headings H2-H6, Bullet & Numbered lists, Alignments, Bold, Links, Quotes)
  * while preserving 100% backward compatibility for legacy markdown links [text](url) and paragraphs.
@@ -38,12 +53,14 @@ export default function FormattedNarrative({
   // CASE 1: RICH HTML CONTENT
   if (isHtmlContent(content)) {
     // Process markdown links [text](url) that may exist inside HTML
-    const processedHtml = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, href) => {
-      const isInternal = href.startsWith("/") || href.startsWith("#") || href.includes("nosecreekphysiotherapy.com");
-      const cleanHref = href.replace(/^https?:\/\/(www\.)?nosecreekphysiotherapy\.com/, "");
-      const targetAttr = isInternal ? "" : ' target="_blank" rel="noopener noreferrer"';
-      return `<a href="${cleanHref || "/"}"${targetAttr} class="nc-content-link">${text}</a>`;
-    });
+    const processedHtml = sanitizeHtml(
+      content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text, href) => {
+        const isInternal = href.startsWith("/") || href.startsWith("#") || href.includes("nosecreekphysiotherapy.com");
+        const cleanHref = href.replace(/^https?:\/\/(www\.)?nosecreekphysiotherapy\.com/, "");
+        const targetAttr = isInternal ? "" : ' target="_blank" rel="noopener noreferrer"';
+        return `<a href="${cleanHref || "/"}"${targetAttr} class="nc-content-link">${text}</a>`;
+      })
+    );
 
     return (
       <div

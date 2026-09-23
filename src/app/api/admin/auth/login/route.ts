@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createClient } from "@supabase/supabase-js";
+import { createSignedSessionToken } from "@/lib/auth/serverAuth";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -8,20 +9,23 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// Rate limiting: max 5 failed attempts per 15 minutes per IP address
+const failedLoginAttempts = new Map<string, { count: number; resetTime: number }>();
+const MAX_FAILED_ATTEMPTS = 5;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
 const AUTHORITATIVE_CREDENTIALS = {
   admin: {
     username: "nosecreek-admin",
     email: "admin@nosecreek.com",
-    password_hash: "$2b$10$vr4k1Mc7456lnlD.u4HtZOlYx5bnmJe9RmeY4ayk3qIdi7UOItgTa",
-    raw_password: "z$7Ti45KHsqK1VZ)kQ3Q$QKd",
+    password_hash: "$2b$10$GV68E2JqKhqK4zyl27U63uQ726BW4nl0WhIW/c6hgM6/ff5IfWbsG",
     full_name: "Master Administrator",
     role: "admin" as const
   },
   client: {
     username: "nosecreek",
     email: "client@nosecreek.com",
-    password_hash: "$2b$10$TtHT8PBYpqqbA5AkbGosSuN/1Zj0NrWlp1JUCXnh0udmorlVJJB1S",
-    raw_password: "KHszQ$Q5qK1VZ$Kdi47T)kQ3",
+    password_hash: "$2b$10$jNHQnC8IGj1Y4RqUswgN4.31LUloT/su/aJBVFeNgq0IduYgWkw.S",
     full_name: "Clinic Manager",
     role: "client" as const
   }
@@ -43,6 +47,30 @@ function verifySecret(secret: string, storedHashOrPlain: string | null | undefin
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. IP-based Brute-Force Rate Limiter
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    const now = Date.now();
+    const rateRecord = failedLoginAttempts.get(clientIp);
+
+    if (rateRecord && now < rateRecord.resetTime) {
+      if (rateRecord.count >= MAX_FAILED_ATTEMPTS) {
+        const remainingMinutes = Math.ceil((rateRecord.resetTime - now) / 60000);
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Too many failed login attempts. For security, please wait ${remainingMinutes} minute${remainingMinutes > 1 ? "s" : ""} before trying again.`
+          },
+          { status: 429 }
+        );
+      }
+    } else if (rateRecord && now >= rateRecord.resetTime) {
+      failedLoginAttempts.delete(clientIp);
+    }
+
     const body = await req.json();
     const { usernameOrEmail, passwordOrPin, portal = "admin" } = body;
 
@@ -183,7 +211,7 @@ export async function POST(req: NextRequest) {
         (targetRole === "client" && ident === "nosecreek") ||
         (targetRole === "admin" && ident === "nosecreek-admin");
 
-      if (isIdentMatch && (verifySecret(secret, targetCred.password_hash) || secret === targetCred.raw_password)) {
+      if (isIdentMatch && verifySecret(secret, targetCred.password_hash)) {
         authenticatedUser = {
           username: targetCred.username,
           email: targetCred.email,
@@ -233,6 +261,10 @@ export async function POST(req: NextRequest) {
 
     // Return uniform failure if target credentials do not match
     if (!authenticatedUser) {
+      const cur = failedLoginAttempts.get(clientIp) || { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
+      cur.count += 1;
+      failedLoginAttempts.set(clientIp, cur);
+
       return NextResponse.json(
         {
           success: false,
@@ -242,13 +274,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create session payload and set secure cookie
-    const sessionToken = Buffer.from(
-      JSON.stringify({
-        ...authenticatedUser,
-        timestamp: Date.now()
-      })
-    ).toString("base64");
+    // Clear failed attempts on successful authentication
+    failedLoginAttempts.delete(clientIp);
+
+    // Create cryptographically signed HMAC-SHA256 session token
+    const sessionToken = await createSignedSessionToken({
+      username: authenticatedUser.username,
+      email: authenticatedUser.email,
+      full_name: authenticatedUser.full_name,
+      role: authenticatedUser.role
+    });
 
     const response = NextResponse.json({
       success: true,

@@ -35,6 +35,25 @@ export async function GET(req: Request) {
 
         if (!error && supaSettings) {
           const effectiveNav = supaSettings.marketing?.navigation || supaSettings.navigation || {};
+
+          // SECURITY SANITIZATION: Strip private credentials and secrets before returning public settings
+          const safeMarketing = { ...(supaSettings.marketing || {}) };
+          delete safeMarketing.auth_credentials;
+
+          const rawNotifs = supaSettings.marketing?.notifications || supaSettings.notifications || {};
+          const safeNotifications = {
+            enabled: Boolean(rawNotifs.enabled),
+            provider: rawNotifs.provider || "smtp",
+            receiverEmail: rawNotifs.receiverEmail || "info@nosecreekphysiotherapy.com",
+            senderName: rawNotifs.senderName || "Nose Creek Physiotherapy",
+            senderEmail: rawNotifs.senderEmail || "",
+            subjectPrefix: rawNotifs.subjectPrefix || "[New Website Lead]",
+            autoReply: rawNotifs.autoReply || { enabled: false },
+            hasSmtpPass: Boolean(rawNotifs.smtpPass),
+            hasResendApiKey: Boolean(rawNotifs.resendApiKey)
+          };
+          safeMarketing.notifications = safeNotifications;
+
           return NextResponse.json({
             clinicName: supaSettings.clinic_name,
             logoText: supaSettings.logo_text,
@@ -46,9 +65,9 @@ export async function GET(req: Request) {
             footerContent: supaSettings.footer_content,
             seo: supaSettings.seo || {},
             favicon: supaSettings.seo?.favicon || supaSettings.favicon || "/favicon.ico",
-            marketing: supaSettings.marketing || {},
+            marketing: safeMarketing,
             customSchemas: supaSettings.marketing?.customSchemas || supaSettings.customSchemas || [],
-            notifications: supaSettings.marketing?.notifications || supaSettings.notifications || {},
+            notifications: safeNotifications,
             navigation: effectiveNav
           });
         }

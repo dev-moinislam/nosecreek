@@ -3,14 +3,30 @@ import { revalidatePath } from "next/cache";
 import fs from "fs";
 import path from "path";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { requireAuth } from "@/lib/auth/serverAuth";
 
 export async function POST(req: Request) {
   try {
+    // 1. Enforce Server Authentication
+    const { user, errorResponse } = await requireAuth(req);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     const body = await req.json();
     const { type, data, deletedSlug } = body; // type: 'services' | 'conditions' | 'team' | 'locations' | 'settings'
 
     if (!type || !data) {
       return NextResponse.json({ error: "Missing type or data" }, { status: 400 });
+    }
+
+    // 2. Strict Role Authorization: Settings and structural changes require Master Admin
+    const adminOnlyTypes = ["settings", "navigation", "redirects", "email-setup", "schemas", "reviews"];
+    if (adminOnlyTypes.includes(type) && user?.role !== "admin") {
+      return NextResponse.json(
+        { error: "Forbidden: Master Administrator privileges are required to modify settings or structure." },
+        { status: 403 }
+      );
     }
 
     const filePath = path.resolve(process.cwd(), `src/data/${type}.json`);

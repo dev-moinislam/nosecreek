@@ -3,8 +3,14 @@ import fs from "fs";
 import path from "path";
 import nodemailer from "nodemailer";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getServerSession } from "@/lib/auth/serverAuth";
 
 export const runtime = "nodejs";
+
+// IP Rate Limiter for public form submissions (prevents spam and quota exhaustion)
+const formSubmissionIps = new Map<string, { count: number; resetTime: number }>();
+const MAX_FORM_SUBMISSIONS_PER_WINDOW = 10;
+const FORM_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 interface AutoReplySettings {
   enabled: boolean;
@@ -403,8 +409,44 @@ function buildPatientAutoReplyHtml(lead: any, notifSettings: NotificationSetting
 
 export async function POST(req: Request) {
   try {
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
     const payload = await req.json();
     const { isTest, receiverEmailOverride, tempSettings, ...leadData } = payload;
+
+    // 1. Prevent Open-Relay & Abuse: Only authenticated admins can trigger tests or pass custom settings
+    if (isTest || tempSettings || receiverEmailOverride) {
+      const sessionUser = await getServerSession(req);
+      if (!sessionUser || sessionUser.role !== "admin") {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized: Administrator privileges required to test notifications." },
+          { status: 401 }
+        );
+      }
+    } else {
+      // 2. IP Rate Limiting for Public Inquiries
+      const now = Date.now();
+      const ipRecord = formSubmissionIps.get(clientIp);
+      if (ipRecord && now < ipRecord.resetTime) {
+        if (ipRecord.count >= MAX_FORM_SUBMISSIONS_PER_WINDOW) {
+          return NextResponse.json(
+            { success: false, error: "Too many submissions from this connection. Please try again in a few minutes." },
+            { status: 429 }
+          );
+        }
+        ipRecord.count += 1;
+      } else {
+        formSubmissionIps.set(clientIp, { count: 1, resetTime: now + FORM_RATE_LIMIT_WINDOW_MS });
+      }
+
+      // 3. Honeypot Anti-Bot Filter
+      if (leadData.honeypot || leadData.website_hp || leadData.fax_number) {
+        return NextResponse.json({ success: true, message: "Inquiry received." });
+      }
+    }
 
     // Use in-memory tempSettings if provided (e.g. during live test in admin dashboard), or load saved settings
     const notifSettings = tempSettings || (await getNotificationSettings());

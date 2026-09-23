@@ -36,19 +36,20 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
   useEffect(() => {
     async function fetchNewLeadsCount() {
-      if (isSupabaseConfigured && supabase) {
-        try {
-          const { count, error } = await supabase
-            .from("form_submissions")
-            .select("*", { count: "exact", head: true })
-            .eq("status", "new");
-          if (!error && typeof count === "number") {
-            setNewLeadsCount(count);
+      try {
+        const res = await fetch("/api/admin/leads?countOnly=true");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && typeof data.count === "number") {
+            setNewLeadsCount(data.count);
+            return;
           }
-        } catch {
-          // ignore
         }
-      } else if (typeof window !== "undefined") {
+      } catch {
+        // ignore
+      }
+
+      if (typeof window !== "undefined") {
         const local = JSON.parse(localStorage.getItem("demo_leads") || "[]");
         const count = local.filter((l: any) => l.status === "new").length;
         setNewLeadsCount(count);
@@ -56,7 +57,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     }
 
     fetchNewLeadsCount();
-    const interval = setInterval(fetchNewLeadsCount, 15000);
+    const interval = setInterval(fetchNewLeadsCount, 30000);
     return () => clearInterval(interval);
   }, []);
 

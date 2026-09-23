@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { RedirectRule, NotFoundLogItem, RedirectsData } from "@/types/redirects";
+import { requireAuth } from "@/lib/auth/serverAuth";
 
 const dataFilePath = path.join(process.cwd(), "src", "data", "redirects.json");
 
@@ -36,6 +37,12 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    // 1. Enforce Master Admin Authentication
+    const { errorResponse } = await requireAuth(req, "admin");
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     const body = await req.json();
     const { action, rule, rules, notFoundId } = body;
     const data = readRedirectsData();
@@ -108,6 +115,13 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    // Check if internal middleware is updating hit counts
+    const isInternalMiddleware = req.headers.get("x-internal-middleware") === "1";
+    if (!isInternalMiddleware) {
+      const { errorResponse } = await requireAuth(req, "admin");
+      if (errorResponse) return errorResponse;
+    }
+
     const { searchParams } = new URL(req.url);
     const hitId = searchParams.get("hitId");
     if (!hitId) return NextResponse.json({ error: "Missing hitId" }, { status: 400 });
@@ -128,6 +142,10 @@ export async function PATCH(req: Request) {
 
 export async function DELETE(req: Request) {
   try {
+    // Enforce Master Admin Authentication
+    const { errorResponse } = await requireAuth(req, "admin");
+    if (errorResponse) return errorResponse;
+
     const { searchParams } = new URL(req.url);
     const ruleId = searchParams.get("id");
     const notFoundId = searchParams.get("notFoundId");

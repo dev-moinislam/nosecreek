@@ -25,23 +25,26 @@ export default function AdminLeadsPage() {
 
   const fetchLeads = async () => {
     setLoading(true);
-    if (isSupabaseConfigured && supabase) {
-      try {
-        let query = supabase.from("form_submissions").select("*").order("created_at", { ascending: false });
-        if (selectedStatus !== "all") {
-          query = query.eq("status", selectedStatus);
+    try {
+      const params = new URLSearchParams();
+      if (selectedStatus !== "all") params.set("status", selectedStatus);
+      if (selectedFormType !== "all") params.set("form_type", selectedFormType);
+
+      const res = await fetch(`/api/admin/leads?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.leads)) {
+          setLeads(data.leads);
+          setLoading(false);
+          return;
         }
-        if (selectedFormType !== "all") {
-          query = query.eq("form_type", selectedFormType);
-        }
-        const { data, error } = await query;
-        if (!error && data) {
-          setLeads(data);
-        }
-      } catch (err) {
-        console.error("Error fetching leads:", err);
       }
-    } else if (typeof window !== "undefined") {
+    } catch (err) {
+      console.error("Error fetching leads via API:", err);
+    }
+
+    // Fallback to local storage if running in demo mode
+    if (typeof window !== "undefined") {
       let local = JSON.parse(localStorage.getItem("demo_leads") || "[]");
       if (selectedStatus !== "all") {
         local = local.filter((l: any) => l.status === selectedStatus);
@@ -59,12 +62,24 @@ export default function AdminLeadsPage() {
   }, [selectedStatus, selectedFormType]);
 
   const handleStatusChange = async (leadId: string, newStatus: LeadStatus) => {
-    if (isSupabaseConfigured && supabase) {
-      await supabase
-        .from("form_submissions")
-        .update({ status: newStatus })
-        .eq("id", leadId);
-    } else if (typeof window !== "undefined") {
+    try {
+      const res = await fetch("/api/admin/leads", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: leadId, status: newStatus })
+      });
+      if (res.ok) {
+        fetchLeads();
+        if (selectedLead && selectedLead.id === leadId) {
+          setSelectedLead((prev) => (prev ? { ...prev, status: newStatus } : null));
+        }
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to update lead status:", err);
+    }
+
+    if (typeof window !== "undefined") {
       const local = JSON.parse(localStorage.getItem("demo_leads") || "[]");
       const updated = local.map((l: any) =>
         l.id === leadId ? { ...l, status: newStatus } : l
@@ -87,17 +102,23 @@ export default function AdminLeadsPage() {
       channel: "email" as const
     };
 
-    if (isSupabaseConfigured && supabase) {
+    try {
       const lead = leads.find((l) => l.id === leadId);
       const updatedHistory = [...(lead?.reply_history || []), newReply];
-      await supabase
-        .from("form_submissions")
-        .update({
-          status: "replied",
-          reply_history: updatedHistory
-        })
-        .eq("id", leadId);
-    } else if (typeof window !== "undefined") {
+      const res = await fetch("/api/admin/leads", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: leadId, status: "replied", reply_history: updatedHistory })
+      });
+      if (res.ok) {
+        fetchLeads();
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to send reply:", err);
+    }
+
+    if (typeof window !== "undefined") {
       const local = JSON.parse(localStorage.getItem("demo_leads") || "[]");
       const updated = local.map((l: any) => {
         if (l.id === leadId) {

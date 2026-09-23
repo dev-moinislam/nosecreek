@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySignedSessionToken } from "@/lib/auth/serverAuth";
 
 interface CachedRule {
   id: string;
@@ -20,9 +21,41 @@ export async function middleware(request: NextRequest) {
   const lowerPath = pathname.toLowerCase();
   const normalizedPath = lowerPath.endsWith("/") && lowerPath.length > 1 ? lowerPath.slice(0, -1) : lowerPath;
 
-  const now = Date.now();
+  // 1. Server-Side Route Guard for Protected Admin Routes
+  const isAdminRoute = normalizedPath === "/admin" || normalizedPath.startsWith("/admin/");
+  const isLoginPage = normalizedPath === "/admin-login" || normalizedPath === "/client-login";
 
-  // Dynamically refresh rules from API if TTL expired
+  if (isAdminRoute || isLoginPage) {
+    const sessionToken = request.cookies.get("adm_session")?.value;
+    const user = await verifySignedSessionToken(sessionToken);
+
+    if (isAdminRoute) {
+      if (!user) {
+        const loginUrl = new URL("/admin-login", request.url);
+        loginUrl.searchParams.set("redirect", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      // Restrict client-role users from accessing master-admin configuration
+      const masterAdminOnlySubpaths = [
+        "/admin/settings",
+        "/admin/schemas",
+        "/admin/seo",
+        "/admin/navigation",
+        "/admin/email-setup",
+        "/admin/redirects"
+      ];
+      if (user.role === "client" && masterAdminOnlySubpaths.some((p) => normalizedPath.startsWith(p))) {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+    } else if (isLoginPage && user) {
+      // If already authenticated and visiting login page, redirect directly to dashboard
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+  }
+
+  // 2. Dynamic Redirect Rules Engine
+  const now = Date.now();
   if (now - lastFetchTime > CACHE_TTL_MS) {
     try {
       const res = await fetch(`${origin}/api/admin/redirects`, {
@@ -37,7 +70,7 @@ export async function middleware(request: NextRequest) {
         }
       }
     } catch {
-      // Fall back to currently cached rules or static data
+      // Fall back to currently cached rules
     }
   }
 

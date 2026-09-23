@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
+import { requireAuth } from "@/lib/auth/serverAuth";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+
 export async function POST(req: NextRequest) {
   try {
+    // 1. Enforce Server Authentication
+    const { errorResponse } = await requireAuth(req);
+    if (errorResponse) {
+      return errorResponse;
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string) || "general";
@@ -16,13 +25,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate mime type
+    // 2. Validate file size limit
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "File exceeds maximum size limit of 10MB." },
+        { status: 400 }
+      );
+    }
+
+    // 3. Validate mime type and extension
     if (!file.type.startsWith("image/") && !file.name.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
       return NextResponse.json({ error: "Only image files (.png, .jpg, .webp, .svg) are allowed" }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    // 4. SVG XSS Prevention: Disallow embedded scripts and execution handlers in SVG images
+    if (file.name.toLowerCase().endsWith(".svg") || file.type.includes("svg")) {
+      const svgText = buffer.toString("utf-8").toLowerCase();
+      if (
+        svgText.includes("<script") ||
+        svgText.includes("javascript:") ||
+        svgText.includes("onerror=") ||
+        svgText.includes("onload=")
+      ) {
+        return NextResponse.json(
+          { error: "Malicious SVG rejected: Embedded scripts and event handlers are strictly forbidden." },
+          { status: 400 }
+        );
+      }
+    }
 
     // Clean filename
     const ext = file.name.split(".").pop() || "webp";
